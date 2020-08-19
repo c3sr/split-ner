@@ -1,0 +1,68 @@
+\subsection{Problem Description}
+
+Questions:
+\begin{enumerate}
+\item{one model or co-training of multiple models?}
+\item{how to detect the boundary -- (1) sequence learning such as CRF (2) boundary known in advance from rules or NP (3) 2 index vectors as in Deep Learning for RegEx~\footnote{\url{http://dlacombejr.github.io/2016/11/13/deep-learning-for-regex.html}}}
+\item{character vs pattern? (1) character level can learn the value range (2) pattern is better to handle data sparsity}
+\item{how to judge the quality of intermediate classification results during the bootstrapping process? (1) CrossWeigh (cross validation) approach (2) rule-based}
+
+\end{enumerate}
+
+\subsection{Architecture}
+
+
+
+\subsection{Features}
+\textbf{Entity Features:}\\
+We segment positive instances of the entity mentions into tokens based on the word separator and non-letter symbols.
+Then, each instance is converted
+
+\begin{itemize}
+\item{Entity type embedding: the type of the target entity}
+\item{Word embedding: tokens separated by space.  use pretrained word embeddings with updates}
+\item{Subword embedding: tokens separated by character case, punctuation marks in a word}
+\item{Character embedding}
+\item{Pattern embedding: internal lexical and orthographical patterns of entity mentions}
+\end{itemize}
+
+\textbf{Context Features:}\\
+All sentences with the entity type as positive sample.
+Sentence without the entity type as negative sample.
+\begin{itemize}
+\item{Entity Type embedding like word embedding}
+\item{Embedding of the words in the context}
+\item{POS tags of words in the windows}
+\item{embedding of the entity types  appearing in the context}
+\item{The covering entity types}
+\item{sentence embedding: 
+sentence embedding with words (? not sure if this is useful), 
+sentence embedding after replacing mentions with entity type, and 
+sentence embedding after replacing mentions with mention pattern (?)
+}
+\end{itemize}
+
+\if false
+\begin{table*}[ht]
+\centering
+\begin{tabular}{p{0.95\textwidth}}
+\toprule
+\begin{itemize}
+\item \textbf{Inputs:} A number of positive instances or an initial set of patterns (e.g., regex) 
+\item \textbf{Initial Training Data Generation:} 
+ Generate an initial collection of labeled documents, $L$, by matching the input dictionary or patterns in a data collection.
+\item \textbf{Repeat:} 
+\begin{itemize}
+\item Train classifier $C_e$ with the entity pattern features
+\item Train classifier $C_c$ with the context features 
+\item Classify unlabeled instances using $C_e$ and $C_c$ 
+\item Add instances which $C_e$ and $C_c$ classified as positive instances
+\end{itemize}
+\end{itemize} \\
+\bottomrule
+\end{tabular}
+\caption{High level steps of our co-training}
+\label{alg:main}
+\end{table*}
+
+\fi

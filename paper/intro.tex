@@ -1,0 +1,24 @@
+Most state-of-the-art NER models rely on large amounts of labeled data and often not successful for new entities or languages with a small amount of labeled data.
+Lots of existing systems also deal with transfer learning approaches, transferring knowledge from one language to corresponding similar words in a low-resource language. (source to target)
+But low-resource NER task is in general broad, and may not always involve a language-to-language knowledge transfer.
+
+We work on entity extraction for rare entities (unconventional types, very sensitive information, so not available publicly, etc).
+
+Traditional word and character embeddings-based method don't work well due to the data sparsity.
+There can be a vast diversity of samples and very few labeled training samples.
+We aim to experiment and find answers to the following: \\
+1. granularity of basic units: character vs. pattern vs. word \\
+2. LM (embeddings) vs. subword \\
+3. sequence labeling or span classification \\
+4. works on low resources \\
+5. one model vs. co-training? \\
+
+Bootstrapping methods aim to improve the accuracy of supervised learning by utilizing a large amount of unlabeled data when there is only a small amount of labeled data.
+These methods start with a given small set of positive instances, learn the extraction patterns and increase the amount of labeled examples by incorporating unlabeled data.
+
+Co-training extracts two different (independent) views of the data and builds two different classifiers (one for each view) which interact each other in the bootstrapping process.
+
+Co-training has been successfully applied to several different NLP tasks such as syntactic parsing, sentence segmentation, and word sense disambiguation.
+
+We apply co-training to extract entity mentions given a number of seed instances (i.e, entity lexicon).
+Unlike PERSON, ORGANIZATION and LOCATION, many domain-specific entities contain non-typical tokens (such as RNA names in the medical domain, malware names in the cybersecurity domain).

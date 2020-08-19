@@ -1,0 +1,14 @@
+torch
+tensorflow
+tensorflow-hub
+transformers
+spacy
+scispacy
+gensim
+
+numpy
+matplotlib
+scipy
+scikit-learn
+tqdm
+flair

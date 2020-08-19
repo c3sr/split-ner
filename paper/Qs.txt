@@ -1,0 +1,21 @@
+1. granuality of basic units: character vs. pattern vs. word
+2. LM (embeddings) vs. subword
+3. sequence labeling or span classification
+4. Low resources
+
+609-123-3456
+
+ddd-ddd-dddd
+d3-d3-d4
+
+Youngja M. Park
+U1L6 U1. U1L3
+w w
+a7 a4
+
+
+for each word = pattern embedding + pretrained word embedding + <subtype embedding>
+
+email address : company name + person name
+
+

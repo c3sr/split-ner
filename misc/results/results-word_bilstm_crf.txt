@@ -1,0 +1,266 @@
+Loaded checkpoint: ../../checkpoints/bilstm-crf/model-best.pth. Resume training from epoch 13
+Using GPU
+TRAIN: Accuracy: 0.916 | Loss: 190.006
+                                             precision    recall  f1-score   support
+
+                                      <PAD>       1.00      1.00      1.00     17259
+                                          O       0.96      0.97      0.96    148151
+            B-(AND G#cell_type G#cell_type)       0.00      0.00      0.00         1
+B-(AND G#protein_complex G#protein_complex)       0.00      0.00      0.00         0
+                                B-G#DNA_N/A       0.00      0.00      0.00        16
+                   B-G#DNA_domain_or_region       0.68      0.73      0.70      2582
+                    B-G#DNA_family_or_group       0.78      0.49      0.60       562
+                           B-G#DNA_molecule       0.67      0.55      0.60       161
+                       B-G#DNA_substructure       0.00      0.00      0.00        36
+                                B-G#RNA_N/A       1.00      0.11      0.20         9
+                   B-G#RNA_domain_or_region       0.00      0.00      0.00         1
+                    B-G#RNA_family_or_group       0.63      0.66      0.65       109
+                           B-G#RNA_molecule       0.55      0.61      0.58        99
+                       B-G#RNA_substructure       0.00      0.00      0.00         0
+                     B-G#amino_acid_monomer       0.82      0.81      0.82       332
+                                   B-G#atom       0.75      0.40      0.53       129
+                              B-G#body_part       0.89      0.80      0.84       139
+                           B-G#carbohydrate       0.75      0.07      0.13        43
+                         B-G#cell_component       0.80      0.90      0.84       250
+                              B-G#cell_line       0.78      0.71      0.74      1317
+                              B-G#cell_type       0.80      0.74      0.77      2790
+                              B-G#inorganic       0.80      0.69      0.74       109
+                                  B-G#lipid       0.87      0.80      0.84       995
+                              B-G#mono_cell       0.92      0.89      0.91        91
+                             B-G#multi_cell       0.90      0.74      0.81       625
+                             B-G#nucleotide       0.87      0.64      0.74       111
+                B-G#other_artificial_source       0.74      0.56      0.64        66
+                             B-G#other_name       0.81      0.67      0.73      5158
+                 B-G#other_organic_compound       0.87      0.79      0.83      1747
+                                B-G#peptide       0.84      0.57      0.68       203
+                         B-G#polynucleotide       0.80      0.43      0.56        93
+                            B-G#protein_N/A       1.00      0.15      0.26        34
+                        B-G#protein_complex       0.78      0.29      0.42       863
+               B-G#protein_domain_or_region       0.76      0.60      0.67       376
+                B-G#protein_family_or_group       0.74      0.73      0.74      3156
+                       B-G#protein_molecule       0.71      0.88      0.78      8633
+                   B-G#protein_substructure       0.79      0.23      0.36        47
+                        B-G#protein_subunit       0.67      0.43      0.52       323
+                                 B-G#tissue       0.81      0.66      0.73       247
+                                  B-G#virus       0.89      0.82      0.85       910
+            I-(AND G#cell_type G#cell_type)       0.00      0.00      0.00         4
+I-(AND G#protein_complex G#protein_complex)       0.00      0.00      0.00         0
+                                I-G#DNA_N/A       1.00      0.05      0.10        19
+                   I-G#DNA_domain_or_region       0.74      0.84      0.79      2922
+                    I-G#DNA_family_or_group       0.88      0.61      0.72       690
+                           I-G#DNA_molecule       0.67      0.56      0.61       170
+                       I-G#DNA_substructure       1.00      0.11      0.20        44
+                                I-G#RNA_N/A       0.00      0.00      0.00         4
+                   I-G#RNA_domain_or_region       0.00      0.00      0.00         0
+                    I-G#RNA_family_or_group       0.72      0.58      0.64        76
+                           I-G#RNA_molecule       0.64      0.69      0.66       112
+                       I-G#RNA_substructure       0.00      0.00      0.00         0
+                     I-G#amino_acid_monomer       0.83      0.47      0.60        40
+                                   I-G#atom       0.86      0.30      0.44        20
+                              I-G#body_part       0.92      0.81      0.86        90
+                           I-G#carbohydrate       1.00      0.40      0.57        20
+                         I-G#cell_component       0.85      0.86      0.86       177
+                              I-G#cell_line       0.81      0.85      0.83      2044
+                              I-G#cell_type       0.83      0.85      0.84      2890
+                              I-G#inorganic       0.81      0.84      0.83        51
+                                  I-G#lipid       0.79      0.76      0.77       185
+                              I-G#mono_cell       0.93      0.95      0.94        75
+                             I-G#multi_cell       0.91      0.73      0.81       256
+                             I-G#nucleotide       0.85      0.76      0.80        29
+                I-G#other_artificial_source       0.71      0.64      0.67        69
+                             I-G#other_name       0.85      0.75      0.80      5283
+                 I-G#other_organic_compound       0.87      0.85      0.86       727
+                                I-G#peptide       0.82      0.74      0.78       107
+                         I-G#polynucleotide       0.79      0.54      0.64        63
+                            I-G#protein_N/A       0.94      0.38      0.55        39
+                        I-G#protein_complex       0.84      0.54      0.66       664
+               I-G#protein_domain_or_region       0.79      0.75      0.77       506
+                I-G#protein_family_or_group       0.79      0.81      0.80      2897
+                       I-G#protein_molecule       0.71      0.81      0.75      3290
+                   I-G#protein_substructure       0.92      0.22      0.35        50
+                        I-G#protein_subunit       0.65      0.61      0.63       226
+                                 I-G#tissue       0.86      0.81      0.83       238
+                                  I-G#virus       0.91      0.91      0.91       690
+                                    <START>       0.00      0.00      0.00         0
+                                     <STOP>       0.00      0.00      0.00         0
+
+                                  micro avg       0.92      0.92      0.92    222540
+                                  macro avg       0.69      0.53      0.57    222540
+                               weighted avg       0.92      0.92      0.91    222540
+
+VAL: Accuracy: 0.861 | Loss: 188.361
+                                             precision    recall  f1-score   support
+
+                                      <PAD>       1.00      1.00      1.00      5882
+                                          O       0.93      0.94      0.93     49370
+            B-(AND G#cell_type G#cell_type)       0.00      0.00      0.00         0
+B-(AND G#protein_complex G#protein_complex)       0.00      0.00      0.00         0
+                                B-G#DNA_N/A       0.00      0.00      0.00         6
+                   B-G#DNA_domain_or_region       0.51      0.55      0.53       818
+                    B-G#DNA_family_or_group       0.64      0.34      0.44       180
+                           B-G#DNA_molecule       0.52      0.48      0.50        48
+                       B-G#DNA_substructure       0.00      0.00      0.00        11
+                                B-G#RNA_N/A       0.00      0.00      0.00         2
+                   B-G#RNA_domain_or_region       0.00      0.00      0.00         6
+                    B-G#RNA_family_or_group       0.42      0.41      0.41        32
+                           B-G#RNA_molecule       0.49      0.53      0.51        36
+                       B-G#RNA_substructure       0.00      0.00      0.00         0
+                     B-G#amino_acid_monomer       0.75      0.59      0.66       124
+                                   B-G#atom       0.73      0.33      0.45        49
+                              B-G#body_part       0.67      0.51      0.58        51
+                           B-G#carbohydrate       0.00      0.00      0.00        14
+                         B-G#cell_component       0.66      0.69      0.68        77
+                              B-G#cell_line       0.68      0.58      0.63       446
+                              B-G#cell_type       0.69      0.65      0.67       880
+                              B-G#inorganic       0.79      0.61      0.69        36
+                                  B-G#lipid       0.73      0.70      0.72       338
+                              B-G#mono_cell       0.89      0.74      0.81        34
+                             B-G#multi_cell       0.81      0.64      0.72       214
+                             B-G#nucleotide       0.78      0.44      0.56        32
+                B-G#other_artificial_source       0.48      0.41      0.44        32
+                             B-G#other_name       0.62      0.50      0.55      1701
+                 B-G#other_organic_compound       0.72      0.61      0.66       558
+                                B-G#peptide       0.48      0.36      0.41        69
+                         B-G#polynucleotide       0.77      0.23      0.36        43
+                            B-G#protein_N/A       1.00      0.06      0.12        16
+                        B-G#protein_complex       0.53      0.19      0.28       315
+               B-G#protein_domain_or_region       0.63      0.47      0.54       131
+                B-G#protein_family_or_group       0.62      0.61      0.62      1020
+                       B-G#protein_molecule       0.63      0.78      0.70      2999
+                   B-G#protein_substructure       1.00      0.06      0.11        18
+                        B-G#protein_subunit       0.52      0.35      0.42       128
+                                 B-G#tissue       0.47      0.30      0.37        92
+                                  B-G#virus       0.84      0.73      0.78       320
+            I-(AND G#cell_type G#cell_type)       0.00      0.00      0.00         0
+I-(AND G#protein_complex G#protein_complex)       0.00      0.00      0.00         0
+                                I-G#DNA_N/A       0.00      0.00      0.00         3
+                   I-G#DNA_domain_or_region       0.54      0.64      0.59       903
+                    I-G#DNA_family_or_group       0.70      0.36      0.47       242
+                           I-G#DNA_molecule       0.43      0.32      0.36        57
+                       I-G#DNA_substructure       1.00      0.07      0.12        15
+                                I-G#RNA_N/A       0.00      0.00      0.00         0
+                   I-G#RNA_domain_or_region       0.00      0.00      0.00         5
+                    I-G#RNA_family_or_group       0.44      0.44      0.44        16
+                           I-G#RNA_molecule       0.52      0.46      0.49        37
+                       I-G#RNA_substructure       0.00      0.00      0.00         0
+                     I-G#amino_acid_monomer       0.00      0.00      0.00        11
+                                   I-G#atom       0.00      0.00      0.00         2
+                              I-G#body_part       0.58      0.44      0.50        34
+                           I-G#carbohydrate       0.00      0.00      0.00         6
+                         I-G#cell_component       0.58      0.71      0.64        42
+                              I-G#cell_line       0.71      0.68      0.69       681
+                              I-G#cell_type       0.71      0.76      0.73       885
+                              I-G#inorganic       0.62      0.57      0.59        14
+                                  I-G#lipid       0.57      0.49      0.53        63
+                              I-G#mono_cell       0.78      0.89      0.83        28
+                             I-G#multi_cell       0.64      0.61      0.62        69
+                             I-G#nucleotide       0.60      0.60      0.60         5
+                I-G#other_artificial_source       0.56      0.51      0.53        39
+                             I-G#other_name       0.66      0.56      0.61      1727
+                 I-G#other_organic_compound       0.57      0.47      0.52       250
+                                I-G#peptide       0.32      0.41      0.36        29
+                         I-G#polynucleotide       0.89      0.32      0.47        25
+                            I-G#protein_N/A       1.00      0.09      0.17        22
+                        I-G#protein_complex       0.48      0.29      0.36       202
+               I-G#protein_domain_or_region       0.61      0.58      0.59       179
+                I-G#protein_family_or_group       0.62      0.65      0.63       974
+                       I-G#protein_molecule       0.55      0.62      0.59      1077
+                   I-G#protein_substructure       0.00      0.00      0.00        15
+                        I-G#protein_subunit       0.59      0.47      0.53        89
+                                 I-G#tissue       0.56      0.45      0.50        74
+                                  I-G#virus       0.86      0.81      0.84       232
+                                    <START>       0.00      0.00      0.00         0
+                                     <STOP>       0.00      0.00      0.00         0
+
+                                  micro avg       0.86      0.86      0.86     74180
+                                  macro avg       0.50      0.38      0.41     74180
+                               weighted avg       0.86      0.86      0.86     74180
+
+TEST: Accuracy: 0.854 | Loss: 189.164
+                                             precision    recall  f1-score   support
+
+                                      <PAD>       1.00      1.00      1.00      5489
+                                          O       0.92      0.94      0.93     49668
+            B-(AND G#cell_type G#cell_type)       0.00      0.00      0.00         0
+B-(AND G#protein_complex G#protein_complex)       0.00      0.00      0.00         0
+                                B-G#DNA_N/A       0.00      0.00      0.00         5
+                   B-G#DNA_domain_or_region       0.50      0.55      0.53       843
+                    B-G#DNA_family_or_group       0.58      0.32      0.41       203
+                           B-G#DNA_molecule       0.39      0.31      0.34        65
+                       B-G#DNA_substructure       0.00      0.00      0.00        15
+                                B-G#RNA_N/A       0.00      0.00      0.00         0
+                   B-G#RNA_domain_or_region       0.00      0.00      0.00         4
+                    B-G#RNA_family_or_group       0.57      0.53      0.55        32
+                           B-G#RNA_molecule       0.29      0.23      0.26        39
+                       B-G#RNA_substructure       0.00      0.00      0.00         2
+                     B-G#amino_acid_monomer       0.83      0.61      0.71       106
+                                   B-G#atom       0.62      0.35      0.45        43
+                              B-G#body_part       0.79      0.55      0.65        60
+                           B-G#carbohydrate       0.00      0.00      0.00        10
+                         B-G#cell_component       0.54      0.58      0.56        74
+                              B-G#cell_line       0.65      0.59      0.62       448
+                              B-G#cell_type       0.65      0.61      0.63       868
+                              B-G#inorganic       0.58      0.58      0.58        33
+                                  B-G#lipid       0.76      0.76      0.76       355
+                              B-G#mono_cell       0.78      0.61      0.68        41
+                             B-G#multi_cell       0.75      0.58      0.65       203
+                             B-G#nucleotide       0.69      0.49      0.57        37
+                B-G#other_artificial_source       0.55      0.59      0.57        27
+                             B-G#other_name       0.62      0.50      0.55      1665
+                 B-G#other_organic_compound       0.72      0.54      0.62       541
+                                B-G#peptide       0.60      0.46      0.52        61
+                         B-G#polynucleotide       0.38      0.14      0.20        37
+                            B-G#protein_N/A       0.00      0.00      0.00        10
+                        B-G#protein_complex       0.52      0.19      0.28       296
+               B-G#protein_domain_or_region       0.57      0.47      0.51       120
+                B-G#protein_family_or_group       0.60      0.58      0.59      1096
+                       B-G#protein_molecule       0.62      0.77      0.68      2920
+                   B-G#protein_substructure       1.00      0.05      0.09        21
+                        B-G#protein_subunit       0.54      0.38      0.45       103
+                                 B-G#tissue       0.41      0.34      0.37        73
+                                  B-G#virus       0.84      0.72      0.78       314
+            I-(AND G#cell_type G#cell_type)       0.00      0.00      0.00         0
+I-(AND G#protein_complex G#protein_complex)       0.00      0.00      0.00         0
+                                I-G#DNA_N/A       0.00      0.00      0.00         9
+                   I-G#DNA_domain_or_region       0.50      0.62      0.56       895
+                    I-G#DNA_family_or_group       0.66      0.39      0.49       247
+                           I-G#DNA_molecule       0.40      0.32      0.36        75
+                       I-G#DNA_substructure       0.50      0.04      0.08        24
+                                I-G#RNA_N/A       0.00      0.00      0.00         0
+                   I-G#RNA_domain_or_region       0.00      0.00      0.00         2
+                    I-G#RNA_family_or_group       0.38      0.22      0.28        23
+                           I-G#RNA_molecule       0.41      0.33      0.36        46
+                       I-G#RNA_substructure       0.00      0.00      0.00         1
+                     I-G#amino_acid_monomer       0.75      0.21      0.33        14
+                                   I-G#atom       0.00      0.00      0.00         7
+                              I-G#body_part       0.79      0.58      0.67        45
+                           I-G#carbohydrate       0.00      0.00      0.00         3
+                         I-G#cell_component       0.51      0.55      0.53        58
+                              I-G#cell_line       0.65      0.75      0.70       656
+                              I-G#cell_type       0.70      0.72      0.71       936
+                              I-G#inorganic       0.53      0.47      0.50        17
+                                  I-G#lipid       0.50      0.37      0.42        60
+                              I-G#mono_cell       0.79      0.71      0.75        31
+                             I-G#multi_cell       0.69      0.40      0.50        88
+                             I-G#nucleotide       0.75      0.25      0.38        12
+                I-G#other_artificial_source       0.53      0.62      0.57        26
+                             I-G#other_name       0.65      0.53      0.59      1702
+                 I-G#other_organic_compound       0.66      0.52      0.58       236
+                                I-G#peptide       0.46      0.34      0.39        38
+                         I-G#polynucleotide       0.50      0.25      0.33        24
+                            I-G#protein_N/A       0.00      0.00      0.00         6
+                        I-G#protein_complex       0.43      0.28      0.34       223
+               I-G#protein_domain_or_region       0.55      0.56      0.56       139
+                I-G#protein_family_or_group       0.64      0.64      0.64      1074
+                       I-G#protein_molecule       0.54      0.65      0.59      1110
+                   I-G#protein_substructure       0.50      0.05      0.09        20
+                        I-G#protein_subunit       0.45      0.37      0.41       102
+                                 I-G#tissue       0.55      0.54      0.54        67
+                                  I-G#virus       0.83      0.84      0.84       257
+                                    <START>       0.00      0.00      0.00         0
+                                     <STOP>       0.00      0.00      0.00         0
+
+                                  micro avg       0.85      0.85      0.85     74200
+                                  macro avg       0.46      0.36      0.39     74200
+                               weighted avg       0.85      0.85      0.85     74200
+
