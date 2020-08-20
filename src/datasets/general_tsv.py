@@ -12,6 +12,24 @@ def create_mask_file_for_pipeline(mask_file_path):
         f.write("O\n")
 
 
+def create_tag_to_mention_mapping(corpus):
+    tag_mentions = defaultdict()
+    for sentence in corpus:
+        mention = None
+        tag = None
+        for token in sentence:
+            if token.tag.startswith("B-"):
+                mention = token.text
+                tag = token.tag[2:]
+            elif token.tag.startswith("I-"):
+                mention += " " + token.text
+            elif mention and tag:
+                tag_mentions[tag].append(mention)
+                mention = None
+                tag = None
+    return tag_mentions
+
+
 def generate_corpus_files(root_dir, corpus, corpus_train, corpus_dev, corpus_test, tag_to_text_fn):
     write_to_file(corpus, os.path.join(root_dir, "corpus.tsv"))
     write_to_file(corpus_train, os.path.join(root_dir, "train.tsv"))
@@ -65,6 +83,9 @@ def main(args):
     generate_corpus_files(root_dir, corpus, corpus_train, corpus_dev, corpus_test,
                           tag_to_text_fn=lambda tag: " ".join(tag.lower().split("_")))
     create_vocab_from_embeddings(embpath=args.glove_emb_path, vocabpath=os.path.join(root_dir, "glove_vocab.txt"))
+
+    tag_mentions = create_tag_to_mention_mapping(corpus)
+    print(tag_mentions)
 
 
 if __name__ == "__main__":
