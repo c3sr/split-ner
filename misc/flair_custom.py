@@ -169,16 +169,16 @@ if __name__ == "__main__":
     ap.add_argument("--eval", type=str, default="none",
                     help="only evaluate existing checkpoint model (none/best/<checkpoint-id>) (Default: 'none')")
 
-    ap.add_argument("--train_path", type=str, default="../../../GENIA_term_3.02/train.tsv",
-                    help="path to train dataset (Default: '../../../GENIA_term_3.02/train.tsv')")
-    ap.add_argument("--dev_path", type=str, default="../../../GENIA_term_3.02/dev.tsv",
-                    help="path to dev dataset (Default: '../../../GENIA_term_3.02/dev.tsv')")
-    ap.add_argument("--test_path", type=str, default="../../../GENIA_term_3.02/test.tsv",
-                    help="path to test dataset (Default: '../../../GENIA_term_3.02/test.tsv')")
-    ap.add_argument("--word_vocab_path", type=str, default="../../../GENIA_term_3.02/glove_vocab.txt",
-                    help="path to word vocab (Default: '../../../GENIA_term_3.02/glove_vocab.txt')")
-    ap.add_argument("--tags_path", type=str, default="../../../GENIA_term_3.02/tag_vocab.txt",
-                    help="path to output tags vocab (Default: '../../../GENIA_term_3.02/tag_vocab.txt')")
+    ap.add_argument("--train_path", type=str, default="../../data/GENIA_term_3.02/train.tsv",
+                    help="path to train dataset (Default: '../../data/GENIA_term_3.02/train.tsv')")
+    ap.add_argument("--dev_path", type=str, default="../../data/GENIA_term_3.02/dev.tsv",
+                    help="path to dev dataset (Default: '../../data/GENIA_term_3.02/dev.tsv')")
+    ap.add_argument("--test_path", type=str, default="../../data/GENIA_term_3.02/test.tsv",
+                    help="path to test dataset (Default: '../../data/GENIA_term_3.02/test.tsv')")
+    ap.add_argument("--word_vocab_path", type=str, default="../../data/GENIA_term_3.02/glove_vocab.txt",
+                    help="path to word vocab (Default: '../../data/GENIA_term_3.02/glove_vocab.txt')")
+    ap.add_argument("--tags_path", type=str, default="../../data/GENIA_term_3.02/tag_vocab.txt",
+                    help="path to output tags vocab (Default: '../../data/GENIA_term_3.02/tag_vocab.txt')")
 
     ap.add_argument("--num_epochs", type=int, default=10, help="# epochs to train (Default: 10)")
     ap.add_argument("--batch_size", type=int, default=128, help="batch size (Default: 128)")

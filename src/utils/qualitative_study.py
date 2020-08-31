@@ -145,10 +145,10 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Qualitative analysis utils")
     ap.add_argument("--dir", type=str,
-                    default="../../../GENIA_term_3.02/quality/patcnn-word-pat-char",
-                    help="Parent results directory (../../../tmVarCorpus/quality/tmvar-patcnn-word-pat-char"
-                         "|../../../GENIA_term_3.02/quality/patcnn-word-pat-char)"
-                         "(Default: '../../../GENIA_term_3.02/quality/patcnn-word-pat-char')")
+                    default="../../data/GENIA_term_3.02/quality/patcnn-word-pat-char",
+                    help="Parent results directory (../../data/tmVarCorpus/quality/tmvar-patcnn-word-pat-char"
+                         "|../../data/GENIA_term_3.02/quality/patcnn-word-pat-char)"
+                         "(Default: '../../data/GENIA_term_3.02/quality/patcnn-word-pat-char')")
     ap.add_argument("--file", type=str, default="dev.out.tsv",
                     help="Outputs filename relative to directory which needs to be analysed (Default: 'train.out.tsv')")
     ap = ap.parse_args()

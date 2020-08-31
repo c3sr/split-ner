@@ -91,8 +91,8 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Train Word2Vec model")
-    ap.add_argument("--dir", type=str, default="../../../GENIA_term_3.02",
-                    help="root directory (Default: '../../../GENIA_term_3.02')")
+    ap.add_argument("--dir", type=str, default="../../data/GENIA_term_3.02",
+                    help="root directory (Default: '../../data/GENIA_term_3.02')")
     ap.add_argument("--corpus_path", type=str, default="emb_text_corpus.txt",
                     help="corpus text file path, relative to root directory "
                          "(emb_text_corpus.txt|std_emb_text_corpus.txt|jnlpba_emb_text_corpus.txt)"

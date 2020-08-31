@@ -65,8 +65,8 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="CNN-BiLSTM-CRF model for NER with Flair Embeddings")
     ap.add_argument("--name", type=str, default="flair", help="model name (Default: 'flair')")
-    ap.add_argument("--datapath", type=str, default="../../../GENIA_term_3.02",
-                    help="corpus directory (Default: '../../../GENIA_term_3.02')")
+    ap.add_argument("--datapath", type=str, default="../../data/GENIA_term_3.02",
+                    help="corpus directory (Default: '../../data/GENIA_term_3.02')")
     ap.add_argument("--checkpoint_dir", type=str, default="../../checkpoints",
                     help="checkpoint directory (Default: '../../checkpoints')")
     ap.add_argument("--trainfile", type=str, default="train.tsv",

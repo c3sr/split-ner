@@ -601,10 +601,10 @@ if __name__ == "__main__":
     ap.add_argument("--query", action="store_true",
                     help="query mode, can be used with eval to work with best model (Default: False)")
 
-    ap.add_argument("--data_dir", type=str, default="../../../GENIA_term_3.02",
-                    help="path to input dataset directory (Default: '../../../GENIA_term_3.02')")
-    ap.add_argument("--out_dir", type=str, default="../../../GENIA_term_3.02/out",
-                    help="path to output directory (Default: '../../../GENIA_term_3.02/out')")
+    ap.add_argument("--data_dir", type=str, default="../../data/GENIA_term_3.02",
+                    help="path to input dataset directory (Default: '../../data/GENIA_term_3.02')")
+    ap.add_argument("--out_dir", type=str, default="../../data/GENIA_term_3.02/out",
+                    help="path to output directory (Default: '../../data/GENIA_term_3.02/out')")
     ap.add_argument("--train_path", type=str, default="train.tsv",
                     help="path to train dataset (Default: 'train.tsv')")
     ap.add_argument("--dev_path", type=str, default="dev.tsv",

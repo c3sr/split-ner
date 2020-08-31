@@ -11,7 +11,8 @@ class CNN_LSTM_Base(nn.Module):
                  pos_tag_vocab_size=None, dep_tag_vocab_size=None, word_emb_dim=None, pos_tag_emb_dim=None,
                  dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word="glove", use_pos_tag=False,
                  use_dep_tag=False, use_char=True, use_maxpool=False, use_lstm=True, use_tag_info="self",
-                 use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none", tag_emb=None):
+                 use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none", tag_emb=None,
+                 word_emb_model_from_tf=False):
         super(CNN_LSTM_Base, self).__init__()
 
         self.use_maxpool = use_maxpool
@@ -60,7 +61,7 @@ class CNN_LSTM_Base(nn.Module):
             elif "bert" in self.use_word:
                 # possible values include: "bert-base-uncased", "allenai/scibert_scivocab_uncased"
                 self.bert_tokenizer = BertTokenizer.from_pretrained(self.use_word)
-                self.bert_model = BertModel.from_pretrained(self.use_word)
+                self.bert_model = BertModel.from_pretrained(self.use_word, from_tf=word_emb_model_from_tf)
                 word_emb_dim = self.bert_model.config.hidden_size
                 if self.use_tfo == "xl":
                     self.tfo_model = TransfoXLModel(TransfoXLConfig(n_layer=1, d_model=word_emb_dim, d_inner=256))
@@ -216,14 +217,14 @@ class CNN_LSTM(nn.Module):
                  dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word="glove", use_pos_tag=False,
                  use_dep_tag=False, use_char=True, use_maxpool=False, use_lstm=True, use_tag_info="self",
                  use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none",
-                 use_class_guidance=False, tag_emb=None):
+                 use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False):
         super(CNN_LSTM, self).__init__()
 
         self.base = CNN_LSTM_Base(inp_dim, conv1_dim, hidden_dim, kernel_size, word_len, device,
                                   word_vocab_size, pos_tag_vocab_size, dep_tag_vocab_size, word_emb_dim,
                                   pos_tag_emb_dim, dep_tag_emb_dim, tag_emb_dim, pre_trained_emb, use_word, use_pos_tag,
                                   use_dep_tag, use_char, use_maxpool, use_lstm, use_tag_info, use_tag_cosine_sim,
-                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb)
+                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb, word_emb_model_from_tf)
         self.use_class_guidance = use_class_guidance
         if self.use_class_guidance:
             assert isinstance(tag_emb, torch.Tensor), "tag embeddings tensor is needed for class guidance calculations"
@@ -248,14 +249,14 @@ class CNN_LSTM_Span(nn.Module):
                  dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word="glove", use_pos_tag=False,
                  use_dep_tag=False, use_char=True, use_maxpool=False, use_lstm=True, use_tag_info="self",
                  use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none",
-                 use_class_guidance=False, tag_emb=None, span_pooling="boundary"):
+                 use_class_guidance=False, tag_emb=None, span_pooling="boundary", word_emb_model_from_tf=False):
         super(CNN_LSTM_Span, self).__init__()
 
         self.base = CNN_LSTM_Base(inp_dim, conv1_dim, hidden_dim, kernel_size, word_len, device,
                                   word_vocab_size, pos_tag_vocab_size, dep_tag_vocab_size, word_emb_dim,
                                   pos_tag_emb_dim, dep_tag_emb_dim, tag_emb_dim, pre_trained_emb, use_word, use_pos_tag,
                                   use_dep_tag, use_char, use_maxpool, use_lstm, use_tag_info, use_tag_cosine_sim,
-                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb)
+                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb, word_emb_model_from_tf)
 
         self.use_class_guidance = use_class_guidance
         self.begin_outputs = nn.Linear(self.base.next_inp_dim, 2)

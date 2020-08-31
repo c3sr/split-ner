@@ -127,8 +127,8 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Univ. Sentence Encoder (USE) embeddings for tags")
 
-    ap.add_argument("--root_dir", type=str, default="../../../GENIA_term_3.02",
-                    help="tags vocab file (Default: '../../../GENIA_term_3.02')")
+    ap.add_argument("--root_dir", type=str, default="../../data/GENIA_term_3.02",
+                    help="tags vocab file (Default: '../../data/GENIA_term_3.02')")
     ap.add_argument("--tag_vocab_file", type=str, default="all_tag_vocab.txt",
                     help="tags vocab file, relative to root dir "
                          "(all_tag_vocab.txt|std_all_tag_vocab.txt|jnlpba_all_tag_vocab.txt) "

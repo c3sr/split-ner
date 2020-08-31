@@ -241,7 +241,7 @@ class WordDataset(Dataset):
 
 
 if __name__ == "__main__":
-    dataset = WordDataset("../../../GENIA_term_3.02/processed.tsv", "../../../GENIA_term_3.02/glove_vocab.txt",
+    dataset = WordDataset("../../data/GENIA_term_3.02/processed.tsv", "../../data/GENIA_term_3.02/glove_vocab.txt",
                           "../../../../Embeddings/glove.6B.50d.txt")
     data_loader = DataLoader(dataset=dataset, batch_size=100, shuffle=False)
     dataset.out_tags.append(START_TAG)

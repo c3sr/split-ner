@@ -149,8 +149,8 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="TMVar corpus parser (convert to TSV)")
-    ap.add_argument("--dir", type=str, default="../../../tmVarCorpus",
-                    help="corpus dir (Default: '../../../tmVarCorpus')")
+    ap.add_argument("--dir", type=str, default="../../data/tmVarCorpus",
+                    help="corpus dir (Default: '../../data/tmVarCorpus')")
     ap.add_argument("--inp_train", type=str, default="train.PubTator.txt",
                     help="path to input train file (.txt), relative to corpus dir (Default: 'train.PubTator.txt')")
     ap.add_argument("--inp_test", type=str, default="test.PubTator.txt",

@@ -90,8 +90,8 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="General TSV input corpus converted into model format.")
-    ap.add_argument("--parent_dir", default="../../../", type=str,
-                    help="parent location of corpus dir (Default: '../../../')")
+    ap.add_argument("--parent_dir", default="../../data/", type=str,
+                    help="parent location of corpus dir (Default: '../../data/')")
     ap.add_argument("--corpus_name", default="BioNLP13CG-IOB", type=str,
                     help="name of corpus directory, relative to parent location (Default: 'BioNLP13CG-IOB')")
     ap.add_argument("--train_path", default="orig_train.tsv", type=str,

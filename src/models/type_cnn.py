@@ -54,7 +54,8 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
                               use_tag_info=self.args.use_tag_info, device=self.device,
                               use_tag_cosine_sim=self.args.use_tag_cosine_sim,
                               fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
-                              use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb)
+                              use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
+                              word_emb_model_from_tf=self.args.word_emb_model_from_tf)
 
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -245,10 +246,10 @@ if __name__ == "__main__":
     ap.add_argument("--query", action="store_true",
                     help="query mode, can be used with eval to work with best model (Default: False)")
 
-    ap.add_argument("--data_dir", type=str, default="../../../GENIA_term_3.02",
-                    help="path to input dataset directory (Default: '../../../GENIA_term_3.02')")
-    ap.add_argument("--out_dir", type=str, default="../../../GENIA_term_3.02/out",
-                    help="path to output directory (Default: '../../../GENIA_term_3.02/out')")
+    ap.add_argument("--data_dir", type=str, default="../../data/GENIA_term_3.02",
+                    help="path to input dataset directory (Default: '../../data/GENIA_term_3.02')")
+    ap.add_argument("--out_dir", type=str, default="../../data/GENIA_term_3.02/out",
+                    help="path to output directory (Default: '../../data/GENIA_term_3.02/out')")
     ap.add_argument("--train_path", type=str, default="train.tsv",
                     help="path to train dataset (train.tsv|std_train.tsv|jnlpba_train.tsv) (Default: 'train.tsv')")
     ap.add_argument("--dev_path", type=str, default="dev.tsv",
@@ -318,9 +319,13 @@ if __name__ == "__main__":
                     help="size of context window for type info on either side of current token (Default: 5)")
     ap.add_argument("--use_word", type=str, default="allenai/scibert_scivocab_uncased",
                     help="use word(token) embeddings "
-                         "(none|rand|glove|allenai/scibert_scivocab_uncased|bert-base-uncased) "
+                         "(none|rand|glove|allenai/scibert_scivocab_uncased|bert-base-uncased"
+                         "|../../../resources/biobert_v1.1_pubmed) "
                          "(Default: allenai/scibert_scivocab_uncased)")
     ap.add_argument("--use_pre_padding", action="store_true", help="pre-padding for char/word (Default: False)")
+    ap.add_argument("--word_emb_model_from_tf", action="store_true",
+                    help="word embedding generator model is a pretrained tensorflow model. Use 'True' for models like, "
+                         "'../../../resources/biobert_v1.1_pubmed' (Default: False)")
     ap.add_argument("--use_class_guidance", action="store_true",
                     help="take guidance through pre-trained class embeddings (Default: False)")
     ap.add_argument("--fine_tune_bert", action="store_true", help="fine-tune bert embeddings (Default: False)")

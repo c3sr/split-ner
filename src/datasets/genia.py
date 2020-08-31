@@ -440,14 +440,14 @@ def main(args):
 if __name__ == "__main__":
     # corpus link: http://www.geniaproject.org/genia-corpus/term-corpus
     ap = argparse.ArgumentParser(description="GENIA term(entity) corpus parser. Converts to tsv form.")
-    ap.add_argument("-it", "--inp_term", default="../../../GENIA_term_3.02/GENIAcorpus3.02.xml", type=str,
-                    help="raw xml ner term corpus location (Default: '../../../GENIA_term_3.02/GENIAcorpus3.02.xml')")
-    ap.add_argument("-ip", "--inp_pos", default="../../../GENIA_term_3.02/GENIAcorpus3.02.pos.xml", type=str,
-                    help="raw xml pos, token corpus location (Default: '../../../GENIA_term_3.02/GENIAcorpus3.02.xml')")
-    ap.add_argument("-o", "--out", default="../../../GENIA_term_3.02/", type=str,
-                    help="processed corpus output location (Default: '../../../GENIA_term_3.02/')")
+    ap.add_argument("-it", "--inp_term", default="../../data/GENIA_term_3.02/GENIAcorpus3.02.xml", type=str,
+                    help="raw xml ner term corpus location (Default: '../../data/GENIA_term_3.02/GENIAcorpus3.02.xml')")
+    ap.add_argument("-ip", "--inp_pos", default="../../data/GENIA_term_3.02/GENIAcorpus3.02.pos.xml", type=str,
+                    help="raw xml pos, token corpus location (Default: '../../data/GENIA_term_3.02/GENIAcorpus3.02.xml')")
+    ap.add_argument("-o", "--out", default="../../data/GENIA_term_3.02/", type=str,
+                    help="processed corpus output location (Default: '../../data/GENIA_term_3.02/')")
     ap.add_argument("--jnlpba_root", default="../../../MTL-Bioinformatics-2016/data/JNLPBA", type=str,
-                    help="input corpus root (Default: '../../../MTL-Bioinformatics-2016/data/JNLPBA')")
+                    help="input corpus root (Default: '../../data/MTL-Bioinformatics-2016/data/JNLPBA')")
     ap.add_argument("--jnlpba_train_path", default="train.tsv", type=str,
                     help="train corpus input location, relative to corpus root (Default: 'train.tsv')")
     ap.add_argument("--jnlpba_dev_path", default="devel.tsv", type=str,

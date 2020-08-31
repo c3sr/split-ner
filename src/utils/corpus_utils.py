@@ -189,10 +189,10 @@ if __name__ == "__main__":
              "3: filter tag embeddings input file to retain only words in supplied tags vocab file"]
     ap = argparse.ArgumentParser(description="Corpus processing utils. Tasks supported:" + "\n".join(tasks))
     ap.add_argument("-t", "--task", type=int, default=1, help="Task ID (Default: 1)")
-    ap.add_argument("--genia_path", type=str, default="../../../GENIA_term_3.02",
-                    help="path to GENIA corpus dir (Default: '../../../GENIA_term_3.02')")
-    ap.add_argument("--tmvar_path", type=str, default="../../../tmVarCorpus",
-                    help="path to TmVar corpus dir (Default: '../../../tmVarCorpus')")
+    ap.add_argument("--genia_path", type=str, default="../../data/GENIA_term_3.02",
+                    help="path to GENIA corpus dir (Default: '../../data/GENIA_term_3.02')")
+    ap.add_argument("--tmvar_path", type=str, default="../../data/tmVarCorpus",
+                    help="path to TmVar corpus dir (Default: '../../data/tmVarCorpus')")
     ap.add_argument("--corpusfile", type=str, default="corpus.tsv",
                     help="relative path to corpus file (corpus.tsv|std_corpus.tsv|jnlpba_corpus.tsv) "
                          "(Default: 'corpus.tsv')")
@@ -206,14 +206,14 @@ if __name__ == "__main__":
     ap.add_argument("--tagsfile", type=str, default="tag_vocab.txt",
                     help="relative path to tags vocab file (tag_vocab.txt|std_tag_vocab.txt|jnlpba_tag_vocab.txt) "
                          "(Default: 'tag_vocab.txt')")
-    ap.add_argument("--vocabfile", type=str, default="../../../GENIA_term_3.02/glove_vocab.txt",
-                    help="output token vocab file path (Default: '../../../GENIA_term_3.02/glove_vocab.txt')")
+    ap.add_argument("--vocabfile", type=str, default="../../data/GENIA_term_3.02/glove_vocab.txt",
+                    help="output token vocab file path (Default: '../../data/GENIA_term_3.02/glove_vocab.txt')")
     ap.add_argument("--emb_inpfile", type=str, default="../../../../Embeddings/glove.6B.50d.txt",
                     help="embeddings input file path "
-                         "('../../../GENIA_term_3.02/emb_out.txt'|'../../../../Embeddings/glove.6B.50d.txt') "
+                         "('../../data/GENIA_term_3.02/emb_out.txt'|'../../../../Embeddings/glove.6B.50d.txt') "
                          "(Default: '../../../../Embeddings/glove.6B.50d.txt')")
-    ap.add_argument("--emb_outfile", type=str, default="../../../GENIA_term_3.02/tag_w2v_emb.txt",
+    ap.add_argument("--emb_outfile", type=str, default="../../data/GENIA_term_3.02/tag_w2v_emb.txt",
                     help="embeddings output file path (tag_w2v_emb.txt|std_tag_w2v_emb.txt|jnlpba_tag_w2v_emb.txt) "
-                         "(Default: '../../../GENIA_term_3.02/tag_w2v_emb.txt')")
+                         "(Default: '../../data/GENIA_term_3.02/tag_w2v_emb.txt')")
     ap = ap.parse_args()
     main(ap)

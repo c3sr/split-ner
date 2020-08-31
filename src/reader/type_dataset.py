@@ -124,7 +124,7 @@ class TypeDataset(Dataset):
 
     def parse_vocab(self):
         self.word_vocab.append(self.pad_tag)
-        with open(self.word_vocab_path, "r") as f:
+        with open(self.word_vocab_path, "r", encoding="utf8") as f:
             for line in f:
                 line = line.strip()
                 if line:

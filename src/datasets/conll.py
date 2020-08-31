@@ -28,7 +28,8 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="CoNLL2003 corpus parser (convert to TSV)")
-    ap.add_argument("--dir", type=str, default="../../../CoNLL2003", help="corpus dir (Default: '../../../CoNLL2003')")
+    ap.add_argument("--dir", type=str, default="../../data/CoNLL2003",
+                    help="corpus dir (Default: '../../data/CoNLL2003')")
     ap.add_argument("--inp_train", type=str, default="train.bertner.txt",
                     help="path to input train (.txt) file, relative to corpus dir (Default: 'train.bertner.txt')")
     ap.add_argument("--inp_dev", type=str, default="dev.bertner.txt",

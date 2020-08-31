@@ -56,8 +56,8 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="OntoNotes corpus parser (convert to TSV)")
-    ap.add_argument("--dir", type=str, default="../../../OntoNotes-5.0-NER-BIO",
-                    help="corpus dir (Default: '../../../OntoNotes-5.0-NER-BIO')")
+    ap.add_argument("--dir", type=str, default="../../data/OntoNotes-5.0-NER-BIO",
+                    help="corpus dir (Default: '../../data/OntoNotes-5.0-NER-BIO')")
     ap.add_argument("--inp_train", type=str, default="onto.train.ner",
                     help="path to input train (.txt) file, relative to corpus dir (Default: 'onto.train.ner')")
     ap.add_argument("--inp_dev", type=str, default="onto.development.ner",
