@@ -60,11 +60,11 @@ def generate_use_embeddings(tag_texts):
 
 
 # generate BERT/SciBERT embeddings
-def generate_bert_embeddings(tag_texts, bert_model_name="allenai/scibert_scivocab_uncased"):
+def generate_bert_embeddings(tag_texts, bert_model_name="allenai/scibert_scivocab_uncased", from_tf=False):
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     bert_tokenizer = BertTokenizer.from_pretrained(bert_model_name)
-    bert_model = BertModel.from_pretrained(bert_model_name)
+    bert_model = BertModel.from_pretrained(bert_model_name, from_tf=from_tf).to(device)
 
     emb_dict = dict()
     for tag_key, tag_text in tag_texts.items():
@@ -118,7 +118,7 @@ def main(args):
     emb_dict = generate_use_embeddings(tag_dict)
     write_emb_to_file(emb_dict, args.use_tag_emb_file)
 
-    emb_dict = generate_bert_embeddings(tag_texts=tag_dict, bert_model_name=args.bert_model)
+    emb_dict = generate_bert_embeddings(tag_texts=tag_dict, bert_model_name=args.bert_model, from_tf=args.from_tf)
     write_emb_to_file(emb_dict, args.bert_tag_emb_file)
 
     concatenate_w2v_with_use(args.use_tag_emb_file, args.w2v_tag_emb_file, args.full_tag_emb_file)
@@ -146,8 +146,12 @@ if __name__ == "__main__":
                          "(tag_scibert_emb.txt|std_tag_scibert_emb.txt|jnlpba_tag_scibert_emb.txt) "
                          "(Default: 'tag_scibert_emb.txt')")
     ap.add_argument("--bert_model", type=str, default="allenai/scibert_scivocab_uncased",
-                    help="BERT model name (allenai/scibert_scivocab_uncased|bert-base-uncased|etc.)"
+                    help="BERT model name (allenai/scibert_scivocab_uncased|bert-base-uncased"
+                         "|../../../resources/biobert_v1.1_pubmed|etc.)"
                          "(Default: 'allenai/scibert_scivocab_uncased')")
+    ap.add_argument("--from_tf", action="store_true",
+                    help="tag embedding generator model is a pretrained tensorflow model. Use 'True' for models like, "
+                         "'../../../resources/biobert_v1.1_pubmed' (Default: False)")
     ap.add_argument("--full_tag_emb_file", type=str, default="tag_full_emb.txt",
                     help="W2V+USE (Full) tag emb file, relative to root dir "
                          "(tag_full_emb.txt|std_tag_full_emb.txt|jnlpba_tag_full_emb.txt) "

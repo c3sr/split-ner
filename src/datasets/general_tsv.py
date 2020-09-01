@@ -56,6 +56,10 @@ def generate_corpus_files(root_dir, corpus, corpus_train, corpus_dev, corpus_tes
     bert_emb_dict = generate_bert_embeddings(tag_texts=tag_dict, bert_model_name="bert-base-uncased")
     write_emb_to_file(bert_emb_dict, os.path.join(root_dir, "tag_bert_emb.txt"))
 
+    biobert_emb_dict = generate_bert_embeddings(tag_texts=tag_dict,
+                                                bert_model_name="../../../resources/biobert_v1.1_pubmed", from_tf=True)
+    write_emb_to_file(biobert_emb_dict, os.path.join(root_dir, "tag_biobert_emb.txt"))
+
     concatenate_w2v_with_use(use_emb_file=os.path.join(root_dir, "tag_use_emb.txt"),
                              w2v_emb_file=os.path.join(root_dir, "tag_w2v_emb.txt"),
                              out_file=os.path.join(root_dir, "tag_full_emb.txt"))
