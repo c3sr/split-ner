@@ -107,6 +107,8 @@ def main(args):
     args.use_tag_emb_file = os.path.join(args.root_dir, args.use_tag_emb_file)
     args.w2v_tag_emb_file = os.path.join(args.root_dir, args.w2v_tag_emb_file)
     args.bert_tag_emb_file = os.path.join(args.root_dir, args.bert_tag_emb_file)
+    args.annotation_guideline_bert_tag_emb_file = os.path.join(args.root_dir,
+                                                               args.annotation_guideline_bert_tag_emb_file)
     args.full_tag_emb_file = os.path.join(args.root_dir, args.full_tag_emb_file)
 
     # for default GENIA corpus
@@ -120,6 +122,14 @@ def main(args):
 
     emb_dict = generate_bert_embeddings(tag_texts=tag_dict, bert_model_name=args.bert_model, from_tf=args.from_tf)
     write_emb_to_file(emb_dict, args.bert_tag_emb_file)
+
+    # for JNLPBA annotation guidelines-based tag embeddings (uncomment the following lines)
+    # annotation_guideline_tag_dict = read_tags(args.tag_vocab_file,
+    #                                           tag_to_text_fn=tag_to_text_annotation_guidelines_jnlpba)
+    #
+    # annotation_guideline_emb_dict = generate_bert_embeddings(tag_texts=annotation_guideline_tag_dict,
+    #                                                          bert_model_name=args.bert_model, from_tf=args.from_tf)
+    # write_emb_to_file(annotation_guideline_emb_dict, args.annotation_guideline_bert_tag_emb_file)
 
     concatenate_w2v_with_use(args.use_tag_emb_file, args.w2v_tag_emb_file, args.full_tag_emb_file)
 
@@ -145,6 +155,12 @@ if __name__ == "__main__":
                     help="BERT/SciBERT tag emb file, relative to root dir "
                          "(tag_scibert_emb.txt|std_tag_scibert_emb.txt|jnlpba_tag_scibert_emb.txt) "
                          "(Default: 'tag_scibert_emb.txt')")
+    ap.add_argument("--annotation_guideline_bert_tag_emb_file", type=str,
+                    default="jnlpba_tag_annotation_guideline_scibert_emb.txt",
+                    help="BERT/SciBERT tag emb file, relative to root dir ""(tag_annotation_guideline_scibert_emb.txt"
+                         "|std_tag_annotation_guideline_scibert_emb.txt"
+                         "|jnlpba_tag_annotation_guideline_scibert_emb.txt) "
+                         "(Default: 'jnlpba_tag_annotation_guideline_scibert_emb.txt')")
     ap.add_argument("--bert_model", type=str, default="allenai/scibert_scivocab_uncased",
                     help="BERT model name (allenai/scibert_scivocab_uncased|bert-base-uncased"
                          "|../../../resources/biobert_v1.1_pubmed|etc.)"

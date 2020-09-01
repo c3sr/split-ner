@@ -358,6 +358,20 @@ def tag_to_text_genia(tag):
     return " ".join(tag[2:].split("_"))  # line: G#<tag name>
 
 
+def tag_to_text_annotation_guidelines_jnlpba(tag):
+    if tag == "DNA":
+        return "deoxyribonucleic acid"
+    if tag == "RNA":
+        return "ribonucleic acid"
+    if tag == "cell_line":
+        return "cell line"
+    if tag == "cell_type":
+        return "cell type"
+    if tag == "protein":
+        return "protein entities are limited to nitrogenous organic compounds and are parts of all living organisms, " \
+               "as structural components of body tissues such as muscle, hair, collagen and as enzymes and antibodies."
+
+
 def main(args):
     corpus_term = ET.parse(args.inp_term).getroot()
     corpus_pos = ET.parse(args.inp_pos).getroot()
