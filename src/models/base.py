@@ -31,6 +31,7 @@ class BaseExecutor:
         self.args.dev_path = os.path.join(self.args.data_dir, self.args.dev_path)
         self.args.test_path = os.path.join(self.args.data_dir, self.args.test_path)
         self.args.tags_path = os.path.join(self.args.data_dir, self.args.tags_path)
+        self.args.out_tag_names_path = os.path.join(self.args.data_dir, self.args.out_tag_names_path)
 
         self.args.word_vocab_path = os.path.join(self.args.data_dir, self.args.word_vocab_path)
         self.args.pos_tag_vocab_path = os.path.join(self.args.data_dir, self.args.pos_tag_vocab_path)

@@ -74,6 +74,7 @@ class TypeCNN_LSTMCustomLossExecutor(BaseExecutor):
 
         self.train_dataset = TypeMaskedDataset(corpus_path=self.args.train_path, out_tag_vocab_path=self.args.tags_path,
                                                word_vocab_path=self.args.word_vocab_path,
+                                               out_tag_names_path=self.args.out_tag_names_path,
                                                pos_tag_vocab_path=self.args.pos_tag_vocab_path,
                                                dep_tag_vocab_path=self.args.dep_tag_vocab_path,
                                                word_emb_path=self.args.emb_path,
@@ -92,6 +93,7 @@ class TypeCNN_LSTMCustomLossExecutor(BaseExecutor):
         # not parsing the embedding file again when processing the dev/test sets
 
         self.dev_dataset = TypeMaskedDataset(corpus_path=self.args.dev_path, out_tag_vocab_path=self.args.tags_path,
+                                             out_tag_names_path=self.args.out_tag_names_path,
                                              word_vocab_path=self.args.word_vocab_path, word_emb_path=None,
                                              unk_tag=self.unk_tag, mask_tag_vocab_path=self.args.mask_tag_vocab_path,
                                              pos_tag_vocab_path=self.args.pos_tag_vocab_path,
@@ -108,6 +110,7 @@ class TypeCNN_LSTMCustomLossExecutor(BaseExecutor):
                                              window_size=self.args.window_size)
 
         self.test_dataset = TypeMaskedDataset(corpus_path=self.args.test_path, out_tag_vocab_path=self.args.tags_path,
+                                              out_tag_names_path=self.args.out_tag_names_path,
                                               word_vocab_path=self.args.word_vocab_path,
                                               pos_tag_vocab_path=self.args.pos_tag_vocab_path,
                                               dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
@@ -336,6 +339,16 @@ if __name__ == "__main__":
                          "and input tag information. "
                          "tag_vocab_two_step.txt' for reduced tags, when considering two-step labelling. "
                          "(Default: 'tag_vocab_two_step.txt')")
+    ap.add_argument("--out_tag_names_path", type=str, default="tag_names_two_step.txt",
+                    help="path to output tags vocab. Use 'tag_names.txt' for full tags vocab. "
+                         "Use 'std_tag_names.txt' for standard 5 tags vocab. "
+                         "Use 'jnlpba_tag_names.tsv' for exact (5-tag) settings used by MTL-BioInformatics-2016 "
+                         "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
+                         "Use 'out_freq_tag_names.txt' for reduced tags, when considering input tags information. "
+                         "Use 'out_freq_tag_names_two_step.txt' for reduced tags, when considering two-step labelling "
+                         "and input tag information. "
+                         "tag_names_two_step.txt' for reduced tags, when considering two-step labelling. "
+                         "(Default: 'tag_names_two_step.txt')")
     ap.add_argument("--inp_tag_vocab_path", type=str, default="empty_inp_tag_vocab.txt",
                     help="path to input tags vocab. Use 'empty_inp_tag_vocab.txt' if don't want to use tag info. "
                          "Use 'inp_freq_tag_vocab.txt' for specifying default input tag info."

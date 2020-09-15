@@ -21,11 +21,13 @@ def main(args):
     # set specific args from parent args
     args1.name = args.name1
     args1.tags_path = args.tags_path1
+    args1.out_tag_names_path = args.out_tag_names_path1
     args1.use_maxpool = args.use_maxpool1
     args1.use_tag_cosine_sim = args.use_tag_cosine_sim1
 
     args2.name = args.name2
     args2.tags_path = args.tags_path2
+    args2.out_tag_names_path = args.out_tag_names_path2
     args2.use_maxpool = args.use_maxpool2
     args2.use_tag_cosine_sim = args.use_tag_cosine_sim2
 
@@ -155,6 +157,14 @@ if __name__ == "__main__":
                          "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
                          "Use 'out_freq_tag_vocab.txt' for reduced tags, when considering input tags information. "
                          "(Default: 'tag_vocab.txt')")
+    ap.add_argument("--out_tag_names_path1", type=str, default="tag_names.txt",
+                    help="path to output tag general names for 1st models. "
+                         "Use 'tag_names.txt' for full tags vocab names. "
+                         "Use 'std_tag_names.txt' for standard 5 tags vocab names. "
+                         "Use 'jnlpba_tag_names.txt' for exact (5-tag) settings used by MTL-BioInformatics-2016 "
+                         "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
+                         "Use 'out_freq_tag_names.txt' for reduced tags, when considering input tags information. "
+                         "(Default: 'tag_names.txt')")
     ap.add_argument("--tags_path2", type=str, default="tag_vocab_two_step.txt",
                     help="path to output tags vocab for 2nd model. Use 'tag_vocab.txt' for full tags vocab. "
                          "Use 'std_tag_vocab.txt' for standard 5 tags vocab. "
@@ -162,6 +172,14 @@ if __name__ == "__main__":
                          "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
                          "Use 'out_freq_tag_vocab.txt' for reduced tags, when considering input tags information. "
                          "(Default: 'tag_vocab_two_step.txt')")
+    ap.add_argument("--out_tag_names_path2", type=str, default="tag_names_two_step.txt",
+                    help="path to output tag general names for 2nd model. "
+                         "Use 'tag_names.txt' for full tags vocab names. "
+                         "Use 'std_tag_names.txt' for standard 5 tags vocab names. "
+                         "Use 'jnlpba_tag_names.txt' for exact (5-tag) settings used by MTL-BioInformatics-2016 "
+                         "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
+                         "Use 'out_freq_tag_names.txt' for reduced tags, when considering input tags information. "
+                         "(Default: 'tag_names_two_step.txt')")
     ap.add_argument("--inp_tag_vocab_path", type=str, default="empty_inp_tag_vocab.txt",
                     help="path to input tags vocab. Use 'empty_inp_tag_vocab.txt' if don't want to use tag info. "
                          "Use 'inp_freq_tag_vocab.txt' for specifying default input tag info."

@@ -131,7 +131,8 @@ class CNN_LSTM_Base(nn.Module):
 
         if self.use_word != "none":
             if "bert" in self.use_word:
-                word_emb_x = self.get_bert_embeddings(text, seq_len)
+                word_emb_x = CNN_LSTM_Base.get_bert_embeddings(text, seq_len, self.bert_tokenizer, self.bert_model,
+                                                               self.device, self.use_tfo, self.tfo_model)
             else:
                 word_emb_x = self.emb(word_x[:, :, 0])
             x = torch.cat((x, word_emb_x), dim=2)
@@ -140,11 +141,11 @@ class CNN_LSTM_Base(nn.Module):
             x = torch.cat((x, type_x), dim=2)
 
         if self.use_pos_tag:
-            pos_tag_x = self.pos_tag_emb(word_x[:, :, 1])
+            pos_tag_x = self.pos_tag_emb(word_x[:, :, 1].to(torch.int64))
             x = torch.cat((x, pos_tag_x), dim=2)
 
         if self.use_dep_tag:
-            dep_tag_x = self.dep_tag_emb(word_x[:, :, 2])
+            dep_tag_x = self.dep_tag_emb(word_x[:, :, 2].to(torch.int64))
             x = torch.cat((x, dep_tag_x), dim=2)
 
         x = self.dropout(x)
@@ -175,19 +176,19 @@ class CNN_LSTM_Base(nn.Module):
 
         return x
 
-    def get_bert_embeddings(self, batch_text, seq_len):
-        bert_batch_tokens = self.bert_tokenizer(batch_text, is_pretokenized=True, return_tensors="pt",
-                                                padding="max_length",
-                                                max_length=(CNN_LSTM_Base.EXPAND_FACTOR * seq_len))["input_ids"]
-        bert_batch_vectors = self.bert_model(bert_batch_tokens.to(self.device))[0]
+    @staticmethod
+    def get_bert_embeddings(batch_text, seq_len, bert_tokenizer, bert_model, device, use_tfo="none", tfo_model=None):
+        bert_batch_tokens = bert_tokenizer(batch_text, is_pretokenized=True, return_tensors="pt", padding="max_length",
+                                           max_length=(CNN_LSTM_Base.EXPAND_FACTOR * seq_len))["input_ids"]
+        bert_batch_vectors = bert_model(bert_batch_tokens.to(device))[0]
 
-        if self.use_tfo == "xl":
-            bert_batch_vectors = self.tfo_model(inputs_embeds=bert_batch_vectors)[0]
+        if use_tfo == "xl":
+            bert_batch_vectors = tfo_model(inputs_embeds=bert_batch_vectors)[0]
 
         emb = []
         for sent_index in range(len(batch_text)):
             sent = [[token] for token in batch_text[sent_index]]
-            bert_sent_tokens = self.bert_tokenizer(sent, is_pretokenized=True)["input_ids"]
+            bert_sent_tokens = bert_tokenizer(sent, is_pretokenized=True)["input_ids"]
             word_ending = [max(1, len(bert_word_tokens) - 2) for bert_word_tokens in bert_sent_tokens]
             word_ending[0] -= 1
             for i in range(1, len(word_ending)):
@@ -197,7 +198,7 @@ class CNN_LSTM_Base(nn.Module):
             curr_word_index = 0
             curr_word_vectors = []
             for token_index in range(len(bert_sent_vectors)):
-                bert_token_vector = bert_sent_vectors[token_index].to(self.device)
+                bert_token_vector = bert_sent_vectors[token_index].to(device)
                 curr_word_vectors.append(bert_token_vector)
                 if word_ending[curr_word_index] == token_index:
                     sent_emb.append(torch.mean(torch.stack(curr_word_vectors), dim=0))

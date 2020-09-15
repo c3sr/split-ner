@@ -68,6 +68,7 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
 
         self.train_dataset = TypeDataset(corpus_path=self.args.train_path, out_tag_vocab_path=self.args.tags_path,
                                          word_vocab_path=self.args.word_vocab_path, word_emb_path=self.args.emb_path,
+                                         out_tag_names_path=self.args.out_tag_names_path,
                                          pos_tag_vocab_path=self.args.pos_tag_vocab_path,
                                          dep_tag_vocab_path=self.args.dep_tag_vocab_path,
                                          tag_emb_path=self.args.tag_emb_path,
@@ -85,6 +86,7 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
 
         self.dev_dataset = TypeDataset(corpus_path=self.args.dev_path, out_tag_vocab_path=self.args.tags_path,
                                        word_vocab_path=self.args.word_vocab_path,
+                                       out_tag_names_path=self.args.out_tag_names_path,
                                        pos_tag_vocab_path=self.args.pos_tag_vocab_path,
                                        dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
                                        unk_tag=self.unk_tag,
@@ -101,6 +103,7 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
 
         self.test_dataset = TypeDataset(corpus_path=self.args.test_path, out_tag_vocab_path=self.args.tags_path,
                                         word_vocab_path=self.args.word_vocab_path,
+                                        out_tag_names_path=self.args.out_tag_names_path,
                                         pos_tag_vocab_path=self.args.pos_tag_vocab_path,
                                         dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
                                         unk_tag=self.unk_tag,
@@ -265,6 +268,13 @@ if __name__ == "__main__":
                          "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
                          "Use 'out_freq_tag_vocab.txt' for reduced tags, when considering input tags information. "
                          "(Default: 'tag_vocab.txt')")
+    ap.add_argument("--out_tag_names_path", type=str, default="tag_names.txt",
+                    help="path to output tag general names. Use 'tag_names.txt' for full tags vocab names. "
+                         "Use 'std_tag_names.txt' for standard 5 tags vocab names. "
+                         "Use 'jnlpba_tag_names.txt' for exact (5-tag) settings used by MTL-BioInformatics-2016 "
+                         "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
+                         "Use 'out_freq_tag_names.txt' for reduced tags, when considering input tags information. "
+                         "(Default: 'tag_names.txt')")
     ap.add_argument("--inp_tag_vocab_path", type=str, default="empty_inp_tag_vocab.txt",
                     help="path to input tags vocab. Use 'empty_inp_tag_vocab.txt' if don't want to use tag info. "
                          "Use 'inp_freq_tag_vocab.txt' for specifying default input tag info."

@@ -5,9 +5,8 @@ from src.reader.type_dataset import TypeDataset
 
 class TypeMaskedDataset(TypeDataset):
 
-    def __init__(self, corpus_path, word_vocab_path, out_tag_vocab_path, inp_tag_vocab_path, mask_tag_vocab_path,
-                 pos_tag_vocab_path,
-                 dep_tag_vocab_path,
+    def __init__(self, corpus_path, word_vocab_path, out_tag_vocab_path, inp_tag_vocab_path, out_tag_names_path,
+                 mask_tag_vocab_path, pos_tag_vocab_path, dep_tag_vocab_path,
                  word_emb_path=None, tag_emb_path=None, use_char="lower", use_pattern="condensed", use_word="glove",
                  include_word_lengths=False, retain_digits=False, pad_tag="<PAD>", none_tag="O", unk_tag="<UNK>",
                  word_emb_dim=50, max_word_len=20, max_seq_len=20, post_padding=True, use_tag_info="self",
@@ -17,7 +16,7 @@ class TypeMaskedDataset(TypeDataset):
         self.mask_tags = []
 
         super(TypeMaskedDataset, self).__init__(corpus_path, word_vocab_path, out_tag_vocab_path, inp_tag_vocab_path,
-                                                pos_tag_vocab_path, dep_tag_vocab_path,
+                                                out_tag_names_path, pos_tag_vocab_path, dep_tag_vocab_path,
                                                 word_emb_path, tag_emb_path, use_char, use_pattern, use_word,
                                                 include_word_lengths, retain_digits, pad_tag, none_tag, unk_tag,
                                                 word_emb_dim, max_word_len, max_seq_len, post_padding, use_tag_info,

@@ -7,96 +7,44 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from src.components.cnn_lstm import CNN_LSTM
+from src.components.bert_mrc import BERT_MRC
 from src.components.crf import CRF
 from src.models.base import BaseExecutor
-from src.reader.type_dataset import TypeDataset
+from src.models.type_cnn_lstm_crf import TypeCRFDataset
 from src.utils.evaluator import Evaluator
 from src.utils.general import set_all_seeds
 
 
-class CNN_LSTM_CRF(nn.Module):
+class BERT_MRC_CRF(nn.Module):
 
-    def __init__(self, out_tags, inp_dim, conv1_dim, hidden_dim, out_dim, kernel_size, word_len, device,
-                 word_vocab_size=None, pos_tag_vocab_size=None, dep_tag_vocab_size=None, word_emb_dim=None,
-                 pos_tag_emb_dim=None, dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word=True,
-                 use_char=True, use_maxpool=False, use_pos_tag=False, use_dep_tag=False, use_lstm=False,
-                 use_tag_info="self", post_padding=True,
-                 pad_tag="<PAD>", use_tag_cosine_sim=False, fine_tune_bert=False, use_tfo="none",
-                 use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False):
-        super(CNN_LSTM_CRF, self).__init__()
+    def __init__(self, out_tag_names, out_tags, hidden_dim, out_dim, device, use_word=True, post_padding=True,
+                 pad_tag="<PAD>", word_emb_model_from_tf=False):
+        super(BERT_MRC_CRF, self).__init__()
 
-        self.cnn_lstm = CNN_LSTM(inp_dim=inp_dim, conv1_dim=conv1_dim, out_dim=out_dim, hidden_dim=hidden_dim,
-                                 kernel_size=kernel_size, word_len=word_len, word_vocab_size=word_vocab_size,
-                                 pos_tag_vocab_size=pos_tag_vocab_size,
-                                 dep_tag_vocab_size=dep_tag_vocab_size,
-                                 tag_emb_dim=tag_emb_dim, pos_tag_emb_dim=pos_tag_emb_dim,
-                                 dep_tag_emb_dim=dep_tag_emb_dim, use_lstm=use_lstm,
-                                 word_emb_dim=word_emb_dim,
-                                 pre_trained_emb=pre_trained_emb, use_char=use_char, use_word=use_word,
-                                 use_pos_tag=use_pos_tag, use_dep_tag=use_dep_tag,
-                                 use_maxpool=use_maxpool, use_tag_info=use_tag_info, device=device,
-                                 use_tag_cosine_sim=use_tag_cosine_sim, fine_tune_bert=fine_tune_bert, use_tfo=use_tfo,
-                                 use_class_guidance=use_class_guidance, tag_emb=tag_emb,
-                                 word_emb_model_from_tf=word_emb_model_from_tf)
-
+        self.bert_mrc = BERT_MRC(out_tag_names=out_tag_names, out_dim=out_dim, hidden_dim=hidden_dim,
+                                 use_word=use_word, device=device, word_emb_model_from_tf=word_emb_model_from_tf)
         self.crf = CRF(out_tags=out_tags, device=device, post_padding=post_padding, pad_tag=pad_tag)
 
     def neg_log_likelihood(self, text, word_x, char_x, type_x, word_mask, char_mask, tags):
-        feats = self.cnn_lstm(text, word_x, char_x, type_x, word_mask, char_mask)
+        feats = self.bert_mrc(text, word_x, char_x, type_x, word_mask, char_mask)
         forward_score = self.crf.forward_algo(feats, word_mask)
         gold_score = self.crf.score_sentence(feats, word_mask, tags)
         return torch.sum(forward_score - gold_score)
 
     def forward(self, text, word_x, char_x, type_x, word_mask, char_mask):
-        feats = self.cnn_lstm(text, word_x, char_x, type_x, word_mask, char_mask)
+        feats = self.bert_mrc(text, word_x, char_x, type_x, word_mask, char_mask)
         score, tag_seq = self.crf.veterbi_decode(feats, word_mask)
         return score, tag_seq
 
 
-class TypeCRFDataset(TypeDataset):
-
-    def parse_tags(self):
-        TypeDataset.parse_tags(self)
-        self.out_tags.append(CRF.START_TAG)
-        self.out_tags.append(CRF.STOP_TAG)
-
-    def read_tag_emb(self, tags, emb_dict, tag_emb_dim):
-        tag_emb = []
-        for tag in tags:
-            if tag.startswith("B-") or tag.startswith("I-"):
-                root = tag[2:]
-                root_vec = emb_dict[root] if root in emb_dict else [0.0] * tag_emb_dim  # send 0's if not found
-                bi_vec = [0.0] if tag.startswith("B-") else [1.0]
-                tag_emb.append(root_vec + bi_vec + [0.0, 0.0])
-            else:
-                # special tags
-                if tag not in emb_dict:
-                    main_vec = [0.0] * tag_emb_dim + [0.0]
-                else:
-                    main_vec = emb_dict[tag] + [0.0]
-
-                if tag == self.none_tag:
-                    tag_emb.append(main_vec + [1.0, 0.0])
-                elif tag == self.pad_tag:
-                    tag_emb.append(main_vec + [0.0, 1.0])
-                elif tag == CRF.START_TAG or tag == CRF.STOP_TAG:  # not used, but embedded to avoid errors
-                    tag_emb.append(main_vec + [0.0, 0.0])
-                else:
-                    raise ValueError("unexpected tag: {0}".format(tag))
-        return tag_emb
-
-
-class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
+class BERT_MRC_CRFExecutor(BaseExecutor):
 
     def __init__(self, args):
-        super(TypeCNN_LSTM_CRFExecutor, self).__init__(args)
+        super(BERT_MRC_CRFExecutor, self).__init__(args)
 
         self.args.inp_tag_vocab_path = os.path.join(self.args.data_dir, self.args.inp_tag_vocab_path)
         self.args.tag_emb_path = os.path.join(self.args.data_dir, self.args.tag_emb_path)
 
-        train_char_emb = self.args.use_char != "none" or self.args.use_pattern != "none"
-        use_lstm = not self.args.no_lstm
         post_padding = not self.args.use_pre_padding
 
         self.define_datasets()
@@ -106,32 +54,11 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
         self.dev_data_loader = DataLoader(dataset=self.dev_dataset, batch_size=args.batch_size, shuffle=False)
         self.test_data_loader = DataLoader(dataset=self.test_dataset, batch_size=args.batch_size, shuffle=False)
 
-        pre_trained_emb = None
-        if self.args.use_word == "glove":
-            pre_trained_emb = torch.as_tensor(self.train_dataset.word_emb, device=self.device)
-
-        tag_emb = None
-        if self.args.use_tag_cosine_sim or self.args.use_class_guidance:
-            tag_emb = self.prep_tag_emb_tensor()
-
-        self.model = CNN_LSTM_CRF(out_tags=self.get_model_training_out_tags(), inp_dim=self.train_dataset.inp_dim,
-                                  conv1_dim=self.args.conv1_dim, out_dim=self.get_model_training_out_dim(),
-                                  hidden_dim=self.args.hidden_dim, kernel_size=args.kernel_size,
-                                  word_len=self.train_dataset.max_word_len, device=self.device,
-                                  word_vocab_size=len(self.train_dataset.word_vocab),
-                                  pos_tag_vocab_size=len(self.train_dataset.pos_tag_vocab),
-                                  dep_tag_vocab_size=len(self.train_dataset.dep_tag_vocab), use_lstm=use_lstm,
-                                  word_emb_dim=self.train_dataset.word_emb_dim,
-                                  tag_emb_dim=self.train_dataset.tag_emb_dim, pos_tag_emb_dim=self.args.pos_tag_emb_dim,
-                                  dep_tag_emb_dim=self.args.dep_tag_emb_dim, pre_trained_emb=pre_trained_emb,
-                                  use_char=train_char_emb, use_word=self.args.use_word,
-                                  use_maxpool=self.args.use_maxpool, use_pos_tag=self.args.use_pos_tag,
-                                  use_dep_tag=self.args.use_dep_tag,
-                                  use_tag_info=self.args.use_tag_info, pad_tag=self.pad_tag,
-                                  post_padding=post_padding, use_tag_cosine_sim=self.args.use_tag_cosine_sim,
-                                  fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
-                                  use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
-                                  word_emb_model_from_tf=self.args.word_emb_model_from_tf)
+        self.model = BERT_MRC_CRF(out_tags=self.get_model_training_out_tags(),
+                                  out_dim=self.get_model_training_out_dim(), hidden_dim=self.args.hidden_dim,
+                                  device=self.device, use_word=self.args.use_word, pad_tag=self.pad_tag,
+                                  post_padding=post_padding, word_emb_model_from_tf=self.args.word_emb_model_from_tf,
+                                  out_tag_names=self.train_dataset.out_tag_names)
 
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -197,14 +124,6 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
     def get_model_training_out_tags(self):
         return self.train_dataset.out_tags
 
-    def prep_tag_emb_tensor(self):
-        model_training_out_tags = self.get_model_training_out_tags()
-        tag_emb = []
-        for tag in model_training_out_tags:
-            index = self.train_dataset.out_tags.index(tag)
-            tag_emb.append(self.train_dataset.out_tag_emb[index])
-        return torch.as_tensor(np.array(tag_emb), device=self.device)
-
     def train_epoch(self, epoch):
         self.model.train()
         train_loss = 0.0
@@ -269,7 +188,7 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
     def query(self, sentence_text):
         self.model.eval()
 
-        sentence_tokens = TypeCNN_LSTM_CRFExecutor.get_query_tokens(sentence_text)
+        sentence_tokens = BERT_MRC_CRFExecutor.get_query_tokens(sentence_text)
         text, word_feature, char_feature, type_feature, word_mask, char_mask, _ = self.test_dataset.get_query_given_tokens(
             sentence_tokens)
         text = [text]
@@ -287,14 +206,14 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
 
 def main(args):
     set_all_seeds(args.seed)
-    executor = TypeCNN_LSTM_CRFExecutor(args)
+    executor = BERT_MRC_CRFExecutor(args)
     executor.run()
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Type CNN-LSTM-CRF Model for Sequence Labeling")
-    ap.add_argument("--name", type=str, default="type-cnn-lstm-crf",
-                    help="model name (Default: 'type-cnn-lstm-crf')")
+    ap = argparse.ArgumentParser(description="BERT-MRC-CRF Model for Sequence Labeling")
+    ap.add_argument("--name", type=str, default="bert-mrc-crf",
+                    help="model name (Default: 'bert-mrc-crf')")
     ap.add_argument("--checkpoint_dir", type=str, default="../../checkpoints",
                     help="checkpoints directory (Default: '../../checkpoints')")
     ap.add_argument("--eval", type=str, default="none",

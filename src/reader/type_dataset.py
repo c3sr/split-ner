@@ -24,17 +24,18 @@ class ProcessedSentenceAndTag:
 
 class TypeDataset(Dataset):
 
-    def __init__(self, corpus_path, word_vocab_path, out_tag_vocab_path, inp_tag_vocab_path, pos_tag_vocab_path,
-                 dep_tag_vocab_path, word_emb_path=None, tag_emb_path=None, use_char="lower", use_pattern="condensed",
-                 use_word="glove", include_word_lengths=False, retain_digits=False, pad_tag="<PAD>", none_tag="O",
-                 unk_tag="<UNK>", word_emb_dim=50, max_word_len=20, max_seq_len=20, post_padding=True,
-                 use_tag_info="self", window_size=5):
+    def __init__(self, corpus_path, word_vocab_path, out_tag_vocab_path, out_tag_names_path, inp_tag_vocab_path,
+                 pos_tag_vocab_path, dep_tag_vocab_path, word_emb_path=None, tag_emb_path=None, use_char="lower",
+                 use_pattern="condensed", use_word="glove", include_word_lengths=False, retain_digits=False,
+                 pad_tag="<PAD>", none_tag="O", unk_tag="<UNK>", word_emb_dim=50, max_word_len=20, max_seq_len=20,
+                 post_padding=True, use_tag_info="self", window_size=5):
         super(TypeDataset, self).__init__()
         self.corpus_path = corpus_path
         self.word_vocab_path = word_vocab_path
         self.pos_tag_vocab_path = pos_tag_vocab_path
         self.dep_tag_vocab_path = dep_tag_vocab_path
         self.out_tag_vocab_path = out_tag_vocab_path
+        self.out_tag_names_path = out_tag_names_path
         self.inp_tag_vocab_path = inp_tag_vocab_path
         self.word_emb_path = word_emb_path
         self.tag_emb_path = tag_emb_path
@@ -83,6 +84,7 @@ class TypeDataset(Dataset):
 
         self.inp_tags = []
         self.out_tags = []
+        self.out_tag_names = []
         self.parse_tags()
 
         self.word_vocab = []
@@ -114,6 +116,12 @@ class TypeDataset(Dataset):
                 line = line.strip()
                 if line:
                     self.out_tags.append(line)
+
+        with open(self.out_tag_names_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    self.out_tag_names.append(line)
 
         with open(self.inp_tag_vocab_path, "r") as f:
             for line in f:
