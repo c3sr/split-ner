@@ -65,6 +65,8 @@ class CNN_LSTM_Base(nn.Module):
                 word_emb_dim = self.bert_model.config.hidden_size
                 if self.use_tfo == "xl":
                     self.tfo_model = TransfoXLModel(TransfoXLConfig(n_layer=1, d_model=word_emb_dim, d_inner=256))
+                else:
+                    self.tfo_model = None
                 if not self.fine_tune_bert:
                     for param in self.bert_model.parameters():
                         param.requires_grad = False
