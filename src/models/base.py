@@ -92,10 +92,10 @@ class BaseExecutor:
             _, dev_evaluator = self.evaluate_epoch(self.dev_data_loader, epoch=epoch, prefix="DEV")
             _, test_evaluator = self.evaluate_epoch(self.test_data_loader, epoch=epoch, prefix="TEST")
 
-            dev_micro_f1 = dev_evaluator.significant_token_metric.micro_avg_f1()
+            dev_micro_f1 = dev_evaluator.entity_metric.micro_avg_f1()
             is_curr_best = dev_micro_f1 >= self.monitor_best
             if is_curr_best:
-                print("Found new best model with dev token-level Micro F1: {0:.3f}. (prev. best dev Micro F1: {1:.3f})"
+                print("Found new best model with dev entity-level Micro F1: {0:.3f}. (prev. best dev Micro F1: {1:.3f})"
                       .format(dev_micro_f1, self.monitor_best))
                 self.monitor_best = dev_micro_f1
             self.save_checkpoint(epoch, save_best=is_curr_best)
