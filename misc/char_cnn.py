@@ -178,6 +178,7 @@ if __name__ == "__main__":
     ap.add_argument("--batch_size", type=int, default=128, help="batch size (Default: 128)")
     ap.add_argument("--hidden_dim", type=int, default=256, help="intermediate CNN output channels (Default: 256)")
     ap.add_argument("--kernel_size", type=int, default=5, help="kernel size for CNN (Default: 5)")
+    ap.add_argument("--num_lstm_layers", type=int, default=1, help="no. of LSTM layers (Default: 1)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")

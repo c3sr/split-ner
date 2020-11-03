@@ -12,7 +12,7 @@ class CNN_LSTM_Base(nn.Module):
                  dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word="glove", use_pos_tag=False,
                  use_dep_tag=False, use_char=True, use_maxpool=False, use_lstm=True, use_tag_info="self",
                  use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none", tag_emb=None,
-                 word_emb_model_from_tf=False):
+                 word_emb_model_from_tf=False, num_lstm_layers=1):
         super(CNN_LSTM_Base, self).__init__()
 
         self.use_maxpool = use_maxpool
@@ -92,7 +92,7 @@ class CNN_LSTM_Base(nn.Module):
         # TODO: can add a Conv layer (over words) here (instead of LSTM)
         if self.use_lstm:
             self.lstm = nn.LSTM(input_size=next_inp_dim, hidden_size=self.hidden_dim, bidirectional=True,
-                                batch_first=True)
+                                batch_first=True, num_layers=num_lstm_layers, dropout=dropout_ratio)
             next_inp_dim = self.hidden_dim * 2
 
         if self.use_tfo == "simple":
@@ -220,14 +220,15 @@ class CNN_LSTM(nn.Module):
                  dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word="glove", use_pos_tag=False,
                  use_dep_tag=False, use_char=True, use_maxpool=False, use_lstm=True, use_tag_info="self",
                  use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none",
-                 use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False):
+                 use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False, num_lstm_layers=1):
         super(CNN_LSTM, self).__init__()
 
         self.base = CNN_LSTM_Base(inp_dim, conv1_dim, hidden_dim, kernel_size, word_len, device,
                                   word_vocab_size, pos_tag_vocab_size, dep_tag_vocab_size, word_emb_dim,
                                   pos_tag_emb_dim, dep_tag_emb_dim, tag_emb_dim, pre_trained_emb, use_word, use_pos_tag,
                                   use_dep_tag, use_char, use_maxpool, use_lstm, use_tag_info, use_tag_cosine_sim,
-                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb, word_emb_model_from_tf)
+                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb, word_emb_model_from_tf,
+                                  num_lstm_layers)
         self.use_class_guidance = use_class_guidance
         if self.use_class_guidance:
             assert isinstance(tag_emb, torch.Tensor), "tag embeddings tensor is needed for class guidance calculations"
@@ -252,14 +253,16 @@ class CNN_LSTM_Span(nn.Module):
                  dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word="glove", use_pos_tag=False,
                  use_dep_tag=False, use_char=True, use_maxpool=False, use_lstm=True, use_tag_info="self",
                  use_tag_cosine_sim=False, dropout_ratio=0.5, fine_tune_bert=False, use_tfo="none",
-                 use_class_guidance=False, tag_emb=None, span_pooling="boundary", word_emb_model_from_tf=False):
+                 use_class_guidance=False, tag_emb=None, span_pooling="boundary", word_emb_model_from_tf=False,
+                 num_lstm_layers=1):
         super(CNN_LSTM_Span, self).__init__()
 
         self.base = CNN_LSTM_Base(inp_dim, conv1_dim, hidden_dim, kernel_size, word_len, device,
                                   word_vocab_size, pos_tag_vocab_size, dep_tag_vocab_size, word_emb_dim,
                                   pos_tag_emb_dim, dep_tag_emb_dim, tag_emb_dim, pre_trained_emb, use_word, use_pos_tag,
                                   use_dep_tag, use_char, use_maxpool, use_lstm, use_tag_info, use_tag_cosine_sim,
-                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb, word_emb_model_from_tf)
+                                  dropout_ratio, fine_tune_bert, use_tfo, tag_emb, word_emb_model_from_tf,
+                                  num_lstm_layers)
 
         self.use_class_guidance = use_class_guidance
         self.begin_outputs = nn.Linear(self.base.next_inp_dim, 2)

@@ -40,13 +40,18 @@ class BERT_MRC(nn.Module):
             x_list.append(CNN_LSTM_Base.get_bert_embeddings(new_text, seq_len + 1,
                                                             self.bert_tokenizer, self.bert_model, self.device)[:, 1:,
                           :])
-        x = torch.stack(x_list, dim=2)
+
+        # sentences
+        # every sentence, labels -> duplicate for every output class -> BERT -> collate them -> CRF
+        # generate sentence, labels for every output class -> BERT -> classifying
+
+        x = torch.stack(x_list, dim=2)  # B(32) x S(60) x T(36) X E(768)
         x = self.dropout(x)
-        x = self.fc1(x)
+        x = self.fc1(x)  # B(32) x S(60) x T(36) X E(96)
         x = F.relu(x)
-        x = x.reshape(batch_size, seq_len, -1)
+        x = x.reshape(batch_size, seq_len, -1)  # B(32) x S(60) x L(36x96)
         x = self.dropout(x)
-        x = self.fc2(x)
+        x = self.fc2(x)  # B(32) x S(60) x T(36) -> CRF
 
         return x
 

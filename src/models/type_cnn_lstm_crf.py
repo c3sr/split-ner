@@ -23,7 +23,7 @@ class CNN_LSTM_CRF(nn.Module):
                  use_char=True, use_maxpool=False, use_pos_tag=False, use_dep_tag=False, use_lstm=False,
                  use_tag_info="self", post_padding=True,
                  pad_tag="<PAD>", use_tag_cosine_sim=False, fine_tune_bert=False, use_tfo="none",
-                 use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False):
+                 use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False, num_lstm_layers=1):
         super(CNN_LSTM_CRF, self).__init__()
 
         self.cnn_lstm = CNN_LSTM(inp_dim=inp_dim, conv1_dim=conv1_dim, out_dim=out_dim, hidden_dim=hidden_dim,
@@ -38,7 +38,7 @@ class CNN_LSTM_CRF(nn.Module):
                                  use_maxpool=use_maxpool, use_tag_info=use_tag_info, device=device,
                                  use_tag_cosine_sim=use_tag_cosine_sim, fine_tune_bert=fine_tune_bert, use_tfo=use_tfo,
                                  use_class_guidance=use_class_guidance, tag_emb=tag_emb,
-                                 word_emb_model_from_tf=word_emb_model_from_tf)
+                                 word_emb_model_from_tf=word_emb_model_from_tf, num_lstm_layers=num_lstm_layers)
 
         self.crf = CRF(out_tags=out_tags, device=device, post_padding=post_padding, pad_tag=pad_tag)
 
@@ -99,6 +99,16 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
         use_lstm = not self.args.no_lstm
         post_padding = not self.args.use_pre_padding
 
+        # TODO: DEBUG LOGGING
+        # self.logger = ConfigParser().get_logger('trainer', config['trainer']['verbosity'])
+        # self.logger = ConfigParser().get_logger('trainer')
+        # # self.writer = WriterTensorboardX("temp_dir", self.logger, cfg_trainer['tensorboardX'])
+        # self.writer = WriterTensorboardX("temp_dir", self.logger, True)
+        #
+        # self.logger.info('    {:15s}: {}'.format(str("key"), 10.0))
+        # self.writer.add_text('Text', 'Model Architecture: {}'.format("abcd"), 0)
+        # self.writer.add_scalar('{}'.format("accuracy"), 93.56)
+
         self.define_datasets()
 
         self.train_data_loader = DataLoader(dataset=self.train_dataset, batch_size=args.batch_size,
@@ -131,7 +141,8 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
                                   post_padding=post_padding, use_tag_cosine_sim=self.args.use_tag_cosine_sim,
                                   fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
                                   use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
-                                  word_emb_model_from_tf=self.args.word_emb_model_from_tf)
+                                  word_emb_model_from_tf=self.args.word_emb_model_from_tf,
+                                  num_lstm_layers=self.args.num_lstm_layers)
 
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -362,6 +373,7 @@ if __name__ == "__main__":
     ap.add_argument("--use_tag_cosine_sim", action="store_true",
                     help="compute cosine sim with tag embeddings as additional layer in model (Default: False)")
     ap.add_argument("--kernel_size", type=int, default=5, help="kernel size for CNN (Default: 5)")
+    ap.add_argument("--num_lstm_layers", type=int, default=1, help="no. of LSTM layers (Default: 1)")
     ap.add_argument("--use_char", type=str, default="lower",
                     help="char embedding type (none/lower/all) (Default: 'lower')")
     ap.add_argument("--use_pattern", type=str, default="condensed",

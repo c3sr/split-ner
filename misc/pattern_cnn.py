@@ -206,6 +206,7 @@ if __name__ == "__main__":
     ap.add_argument("--conv2_dim", type=int, default=512, help="conv2 layer output channels (Default: 512)")
     ap.add_argument("--fc1_dim", type=int, default=1024, help="fc1 layer output dimension (Default: 1024)")
     ap.add_argument("--kernel_size", type=int, default=5, help="kernel size for CNN (Default: 5)")
+    ap.add_argument("--num_lstm_layers", type=int, default=1, help="no. of LSTM layers (Default: 1)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")

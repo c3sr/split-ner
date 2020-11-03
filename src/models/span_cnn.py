@@ -118,7 +118,8 @@ class SpanExecutor(BaseExecutor):
                                    fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
                                    use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
                                    span_pooling=self.args.span_pooling,
-                                   word_emb_model_from_tf=self.args.word_emb_model_from_tf)
+                                   word_emb_model_from_tf=self.args.word_emb_model_from_tf,
+                                   num_lstm_layers=self.args.num_lstm_layers)
 
         self.criterion = SpanLoss(masking=self.args.loss_masking)
         params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -505,6 +506,7 @@ if __name__ == "__main__":
     ap.add_argument("--use_tag_cosine_sim", action="store_true",
                     help="compute cosine sim with tag embeddings as additional layer in model (Default: False)")
     ap.add_argument("--kernel_size", type=int, default=5, help="kernel size for CNN (Default: 5)")
+    ap.add_argument("--num_lstm_layers", type=int, default=1, help="no. of LSTM layers (Default: 1)")
     ap.add_argument("--use_char", type=str, default="lower",
                     help="char embedding type (none/lower/all) (Default: 'lower')")
     ap.add_argument("--use_pattern", type=str, default="condensed",
