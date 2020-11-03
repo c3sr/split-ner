@@ -155,7 +155,8 @@ class CNN_LSTM_Base(nn.Module):
         apply_dropout = False
         if self.use_lstm:
             apply_dropout = True
-            packed_inp = nn.utils.rnn.pack_padded_sequence(input=x, lengths=word_mask.sum(1).int(),
+            lengths = torch.as_tensor(word_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
+            packed_inp = nn.utils.rnn.pack_padded_sequence(input=x, lengths=lengths,
                                                            batch_first=True,
                                                            enforce_sorted=False)
             packed_out, _ = self.lstm(packed_inp)
