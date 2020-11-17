@@ -21,7 +21,7 @@ class CNN_LSTM_CRF(nn.Module):
                  word_vocab_size=None, pos_tag_vocab_size=None, dep_tag_vocab_size=None, word_emb_dim=None,
                  pos_tag_emb_dim=None, dep_tag_emb_dim=None, tag_emb_dim=None, pre_trained_emb=None, use_word=True,
                  use_char=True, use_maxpool=False, use_pos_tag=False, use_dep_tag=False, use_lstm=False,
-                 use_tag_info="self", post_padding=True,
+                 use_tag_info="self", post_padding=True, dropout_ratio=0.5,
                  pad_tag="<PAD>", use_tag_cosine_sim=False, fine_tune_bert=False, use_tfo="none",
                  use_class_guidance=False, tag_emb=None, word_emb_model_from_tf=False, num_lstm_layers=1):
         super(CNN_LSTM_CRF, self).__init__()
@@ -32,7 +32,7 @@ class CNN_LSTM_CRF(nn.Module):
                                  dep_tag_vocab_size=dep_tag_vocab_size,
                                  tag_emb_dim=tag_emb_dim, pos_tag_emb_dim=pos_tag_emb_dim,
                                  dep_tag_emb_dim=dep_tag_emb_dim, use_lstm=use_lstm,
-                                 word_emb_dim=word_emb_dim,
+                                 word_emb_dim=word_emb_dim, dropout_ratio=dropout_ratio,
                                  pre_trained_emb=pre_trained_emb, use_char=use_char, use_word=use_word,
                                  use_pos_tag=use_pos_tag, use_dep_tag=use_dep_tag,
                                  use_maxpool=use_maxpool, use_tag_info=use_tag_info, device=device,
@@ -142,7 +142,7 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
                                   fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
                                   use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
                                   word_emb_model_from_tf=self.args.word_emb_model_from_tf,
-                                  num_lstm_layers=self.args.num_lstm_layers)
+                                  num_lstm_layers=self.args.num_lstm_layers, dropout_ratio=self.args.dropout_ratio)
 
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -405,6 +405,7 @@ if __name__ == "__main__":
                     help="take guidance through pre-trained class embeddings (Default: False)")
     ap.add_argument("--fine_tune_bert", action="store_true", help="fine-tune bert embeddings (Default: False)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
+    ap.add_argument("--dropout_ratio", type=float, default=0.5, help="dropout ratio (Default: 0.5)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")
     ap.add_argument("--no_eval_print", action="store_true",

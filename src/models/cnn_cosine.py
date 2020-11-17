@@ -156,7 +156,7 @@ class TypeCNN_LSTMCustomLossExecutor(BaseExecutor):
                               use_pos_tag=self.args.use_pos_tag, use_dep_tag=self.args.use_dep_tag,
                               use_tag_info=self.args.use_tag_info, device=self.device,
                               fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
-                              use_tag_cosine_sim=self.args.use_tag_cosine_sim,
+                              use_tag_cosine_sim=self.args.use_tag_cosine_sim, dropout_ratio=self.args.dropout_ratio,
                               use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
                               word_emb_model_from_tf=self.args.word_emb_model_from_tf,
                               num_lstm_layers=self.args.num_lstm_layers)
@@ -423,6 +423,7 @@ if __name__ == "__main__":
                     help="take guidance through pre-trained class embeddings (Default: False)")
     ap.add_argument("--fine_tune_bert", action="store_true", help="fine-tune bert embeddings (Default: False)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
+    ap.add_argument("--dropout_ratio", type=float, default=0.5, help="dropout ratio (Default: 0.5)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")
     ap.add_argument("--no_eval_print", action="store_true",

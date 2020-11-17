@@ -46,7 +46,7 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
                               word_vocab_size=len(self.train_dataset.word_vocab),
                               pos_tag_vocab_size=len(self.train_dataset.pos_tag_vocab),
                               dep_tag_vocab_size=len(self.train_dataset.dep_tag_vocab), use_lstm=use_lstm,
-                              word_emb_dim=self.train_dataset.word_emb_dim,
+                              word_emb_dim=self.train_dataset.word_emb_dim, dropout_ratio=self.args.dropout_ratio,
                               tag_emb_dim=self.train_dataset.tag_emb_dim, pos_tag_emb_dim=self.args.pos_tag_emb_dim,
                               dep_tag_emb_dim=self.args.dep_tag_emb_dim, pre_trained_emb=pre_trained_emb,
                               use_char=train_char_emb, use_word=self.args.use_word, use_maxpool=self.args.use_maxpool,
@@ -342,6 +342,7 @@ if __name__ == "__main__":
                     help="take guidance through pre-trained class embeddings (Default: False)")
     ap.add_argument("--fine_tune_bert", action="store_true", help="fine-tune bert embeddings (Default: False)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
+    ap.add_argument("--dropout_ratio", type=float, default=0.5, help="dropout ratio (Default: 0.5)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")
     ap.add_argument("--no_eval_print", action="store_true",

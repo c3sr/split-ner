@@ -394,6 +394,7 @@ if __name__ == "__main__":
                     help="take guidance through pre-trained class embeddings (Default: False)")
     ap.add_argument("--fine_tune_bert", action="store_true", help="fine-tune bert embeddings (Default: False)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
+    ap.add_argument("--dropout_ratio", type=float, default=0.5, help="dropout ratio (Default: 0.5)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")
     ap.add_argument("--no_eval_print", action="store_true",

@@ -450,6 +450,7 @@ if __name__ == "__main__":
     ap.add_argument("--rand_embedding", action="store_true",
                     help="randomly initialize word embeddings (Default: False)")
     ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
+    ap.add_argument("--dropout_ratio", type=float, default=0.5, help="dropout ratio (Default: 0.5)")
     ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
     ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")
     ap = ap.parse_args()
