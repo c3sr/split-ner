@@ -1,5 +1,4 @@
 import argparse
-import os
 
 import numpy as np
 import torch
@@ -76,9 +75,9 @@ class TypeCRFDataset(TypeDataset):
                 else:
                     main_vec = emb_dict[tag] + [0.0]
 
-                if tag == self.none_tag:
+                if tag == self.config.none_tag:
                     tag_emb.append(main_vec + [1.0, 0.0])
-                elif tag == self.pad_tag:
+                elif tag == self.config.pad_tag:
                     tag_emb.append(main_vec + [0.0, 1.0])
                 elif tag == CRF.START_TAG or tag == CRF.STOP_TAG:  # not used, but embedded to avoid errors
                     tag_emb.append(main_vec + [0.0, 0.0])
@@ -89,15 +88,11 @@ class TypeCRFDataset(TypeDataset):
 
 class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
 
-    def __init__(self, args):
-        super(TypeCNN_LSTM_CRFExecutor, self).__init__(args)
+    def __init__(self, config):
+        super(TypeCNN_LSTM_CRFExecutor, self).__init__(config)
 
-        self.args.inp_tag_vocab_path = os.path.join(self.args.data_dir, self.args.inp_tag_vocab_path)
-        self.args.tag_emb_path = os.path.join(self.args.data_dir, self.args.tag_emb_path)
-
-        train_char_emb = self.args.use_char != "none" or self.args.use_pattern != "none"
-        use_lstm = not self.args.no_lstm
-        post_padding = not self.args.use_pre_padding
+        train_char_emb = self.config.use_char != "none" or self.config.pattern.use_pattern != "none"
+        use_lstm = not self.config.no_lstm
 
         # TODO: DEBUG LOGGING
         # self.logger = ConfigParser().get_logger('trainer', config['trainer']['verbosity'])
@@ -111,96 +106,49 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
 
         self.define_datasets()
 
-        self.train_data_loader = DataLoader(dataset=self.train_dataset, batch_size=args.batch_size,
+        self.train_data_loader = DataLoader(dataset=self.train_dataset, batch_size=config.batch_size,
                                             shuffle=self.shuffle_train_data)
-        self.dev_data_loader = DataLoader(dataset=self.dev_dataset, batch_size=args.batch_size, shuffle=False)
-        self.test_data_loader = DataLoader(dataset=self.test_dataset, batch_size=args.batch_size, shuffle=False)
+        self.dev_data_loader = DataLoader(dataset=self.dev_dataset, batch_size=config.batch_size, shuffle=False)
+        self.test_data_loader = DataLoader(dataset=self.test_dataset, batch_size=config.batch_size, shuffle=False)
 
         pre_trained_emb = None
-        if self.args.use_word == "glove":
+        if self.config.use_word == "glove":
             pre_trained_emb = torch.as_tensor(self.train_dataset.word_emb, device=self.device)
 
         tag_emb = None
-        if self.args.use_tag_cosine_sim or self.args.use_class_guidance:
+        if self.config.use_tag_cosine_sim or self.config.use_class_guidance:
             tag_emb = self.prep_tag_emb_tensor()
 
         self.model = CNN_LSTM_CRF(out_tags=self.get_model_training_out_tags(), inp_dim=self.train_dataset.inp_dim,
-                                  conv1_dim=self.args.conv1_dim, out_dim=self.get_model_training_out_dim(),
-                                  hidden_dim=self.args.hidden_dim, kernel_size=args.kernel_size,
-                                  word_len=self.train_dataset.max_word_len, device=self.device,
+                                  conv1_dim=self.config.conv1_dim, out_dim=self.get_model_training_out_dim(),
+                                  hidden_dim=self.config.hidden_dim, kernel_size=config.kernel_size,
+                                  word_len=self.config.max_word_len, device=self.device,
                                   word_vocab_size=len(self.train_dataset.word_vocab),
                                   pos_tag_vocab_size=len(self.train_dataset.pos_tag_vocab),
                                   dep_tag_vocab_size=len(self.train_dataset.dep_tag_vocab), use_lstm=use_lstm,
-                                  word_emb_dim=self.train_dataset.word_emb_dim,
-                                  tag_emb_dim=self.train_dataset.tag_emb_dim, pos_tag_emb_dim=self.args.pos_tag_emb_dim,
-                                  dep_tag_emb_dim=self.args.dep_tag_emb_dim, pre_trained_emb=pre_trained_emb,
-                                  use_char=train_char_emb, use_word=self.args.use_word,
-                                  use_maxpool=self.args.use_maxpool, use_pos_tag=self.args.use_pos_tag,
-                                  use_dep_tag=self.args.use_dep_tag,
-                                  use_tag_info=self.args.use_tag_info, pad_tag=self.pad_tag,
-                                  post_padding=post_padding, use_tag_cosine_sim=self.args.use_tag_cosine_sim,
-                                  fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
-                                  use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
-                                  word_emb_model_from_tf=self.args.word_emb_model_from_tf,
-                                  num_lstm_layers=self.args.num_lstm_layers, dropout_ratio=self.args.dropout_ratio)
+                                  word_emb_dim=self.config.word_emb_dim,
+                                  tag_emb_dim=self.train_dataset.tag_emb_dim,
+                                  pos_tag_emb_dim=self.config.pos_tag_emb_dim,
+                                  dep_tag_emb_dim=self.config.dep_tag_emb_dim, pre_trained_emb=pre_trained_emb,
+                                  use_char=train_char_emb, use_word=self.config.use_word,
+                                  use_maxpool=self.config.use_maxpool, use_pos_tag=self.config.use_pos_tag,
+                                  use_dep_tag=self.config.use_dep_tag,
+                                  use_tag_info=self.config.use_tag_info, pad_tag=self.config.pad_tag,
+                                  post_padding=self.config.post_padding,
+                                  use_tag_cosine_sim=self.config.use_tag_cosine_sim,
+                                  fine_tune_bert=self.config.fine_tune_bert, use_tfo=self.config.use_tfo,
+                                  use_class_guidance=self.config.use_class_guidance, tag_emb=tag_emb,
+                                  word_emb_model_from_tf=self.config.word_emb_model_from_tf,
+                                  num_lstm_layers=self.config.num_lstm_layers, dropout_ratio=self.config.dropout_ratio)
 
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         params = filter(lambda p: p.requires_grad, self.model.parameters())
-        self.optimizer = torch.optim.Adam(params=params, lr=args.lr)
+        self.optimizer = torch.optim.Adam(params=params, lr=config.lr)
 
     def define_datasets(self):
-        post_padding = not self.args.use_pre_padding
-        include_word_lengths = not self.args.ignore_word_lengths
-        retain_digits = not self.args.escape_digits
-        self.train_dataset = TypeCRFDataset(corpus_path=self.args.train_path, out_tag_vocab_path=self.args.tags_path,
-                                            word_vocab_path=self.args.word_vocab_path,
-                                            out_tag_names_path=self.args.out_tag_names_path,
-                                            pos_tag_vocab_path=self.args.pos_tag_vocab_path,
-                                            dep_tag_vocab_path=self.args.dep_tag_vocab_path,
-                                            word_emb_path=self.args.emb_path,
-                                            tag_emb_path=self.args.tag_emb_path,
-                                            unk_tag=self.unk_tag, pad_tag=self.pad_tag, none_tag=self.none_tag,
-                                            use_char=self.args.use_char, use_word=self.args.use_word,
-                                            use_pattern=self.args.use_pattern, word_emb_dim=self.args.word_emb_dim,
-                                            max_word_len=self.args.max_word_len, max_seq_len=self.args.max_seq_len,
-                                            post_padding=post_padding, retain_digits=retain_digits,
-                                            include_word_lengths=include_word_lengths,
-                                            use_tag_info=self.args.use_tag_info,
-                                            inp_tag_vocab_path=self.args.inp_tag_vocab_path,
-                                            window_size=self.args.window_size)
-        # not parsing the embedding file again when processing the dev/test sets
-        self.dev_dataset = TypeCRFDataset(corpus_path=self.args.dev_path, out_tag_vocab_path=self.args.tags_path,
-                                          word_vocab_path=self.args.word_vocab_path,
-                                          out_tag_names_path=self.args.out_tag_names_path,
-                                          pos_tag_vocab_path=self.args.pos_tag_vocab_path,
-                                          dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
-                                          unk_tag=self.unk_tag,
-                                          tag_emb_path=self.args.tag_emb_path,
-                                          pad_tag=self.pad_tag, none_tag=self.none_tag, use_char=self.args.use_char,
-                                          use_pattern=self.args.use_pattern, use_word=self.args.use_word,
-                                          word_emb_dim=self.args.word_emb_dim, max_word_len=self.args.max_word_len,
-                                          max_seq_len=self.args.max_seq_len, post_padding=post_padding,
-                                          retain_digits=retain_digits,
-                                          include_word_lengths=include_word_lengths,
-                                          use_tag_info=self.args.use_tag_info,
-                                          inp_tag_vocab_path=self.args.inp_tag_vocab_path,
-                                          window_size=self.args.window_size)
-        self.test_dataset = TypeCRFDataset(corpus_path=self.args.test_path, out_tag_vocab_path=self.args.tags_path,
-                                           word_vocab_path=self.args.word_vocab_path,
-                                           out_tag_names_path=self.args.out_tag_names_path,
-                                           pos_tag_vocab_path=self.args.pos_tag_vocab_path,
-                                           dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
-                                           unk_tag=self.unk_tag,
-                                           tag_emb_path=self.args.tag_emb_path,
-                                           pad_tag=self.pad_tag, none_tag=self.none_tag, use_char=self.args.use_char,
-                                           use_pattern=self.args.use_pattern, use_word=self.args.use_word,
-                                           word_emb_dim=self.args.word_emb_dim, max_word_len=self.args.max_word_len,
-                                           max_seq_len=self.args.max_seq_len, post_padding=post_padding,
-                                           retain_digits=retain_digits,
-                                           include_word_lengths=include_word_lengths,
-                                           use_tag_info=self.args.use_tag_info,
-                                           inp_tag_vocab_path=self.args.inp_tag_vocab_path,
-                                           window_size=self.args.window_size)
+        self.train_dataset = TypeCRFDataset(config=self.config, corpus_path=self.config.data.train_path)
+        self.dev_dataset = TypeCRFDataset(config=self.config, corpus_path=self.config.data.dev_path)
+        self.test_dataset = TypeCRFDataset(config=self.config, corpus_path=self.config.data.test_path)
 
     def get_model_training_out_dim(self):
         return len(self.train_dataset.out_tags)
@@ -265,11 +213,12 @@ class TypeCNN_LSTM_CRFExecutor(BaseExecutor):
             self.print_outputs(corpus=total_text, gold=total_label, predicted=total_prediction,
                                mapping=self.get_model_training_out_tags(), outfile=outfile)
         evaluator = Evaluator(gold=total_label, predicted=total_prediction, tags=self.get_model_training_out_tags(),
-                              ignore_tags=[self.none_tag, self.pad_tag], none_tag=self.none_tag, pad_tag=self.pad_tag)
+                              ignore_tags=[self.config.none_tag, self.config.pad_tag], none_tag=self.config.none_tag,
+                              pad_tag=self.config.pad_tag)
         mean_score = total_score / len(data_loader.dataset)
         print("{0}: Epoch: {1} | Token-Level Micro F1: {2:.3f} | Score: {3:.3f}".format(
             prefix, epoch, evaluator.significant_token_metric.micro_avg_f1(), mean_score))
-        if self.args.verbose:
+        if self.config.verbose:
             print("Entity-Level Metrics:")
             print(evaluator.entity_metric.report())
             print("Token-Level Metrics:")

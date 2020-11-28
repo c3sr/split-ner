@@ -1,4 +1,5 @@
 import csv
+import os
 
 import numpy as np
 from torch.utils.data import Dataset
@@ -39,66 +40,58 @@ class BertToken(Token):
 
 class TypeDataset(Dataset):
 
-    def __init__(self, corpus_path, word_vocab_path, out_tag_vocab_path, out_tag_names_path, inp_tag_vocab_path,
-                 pos_tag_vocab_path, dep_tag_vocab_path, word_emb_path=None, tag_emb_path=None, use_char="lower",
-                 use_pattern="condensed", use_word="glove", include_word_lengths=False, retain_digits=False,
-                 pad_tag="<PAD>", none_tag="O", unk_tag="<UNK>", word_emb_dim=50, max_word_len=20, max_seq_len=20,
-                 post_padding=True, use_tag_info="self", window_size=5):
+    def __init__(self, corpus_path, config):
         super(TypeDataset, self).__init__()
+        self.config = config
         self.corpus_path = corpus_path
-        self.word_vocab_path = word_vocab_path
-        self.pos_tag_vocab_path = pos_tag_vocab_path
-        self.dep_tag_vocab_path = dep_tag_vocab_path
-        self.out_tag_vocab_path = out_tag_vocab_path
-        self.out_tag_names_path = out_tag_names_path
-        self.inp_tag_vocab_path = inp_tag_vocab_path
-        self.word_emb_path = word_emb_path
-        self.tag_emb_path = tag_emb_path
-        self.use_char = use_char
-        self.use_pattern = use_pattern
-        self.use_word = use_word
-        self.pad_tag = pad_tag
-        self.unk_tag = unk_tag
-        self.none_tag = none_tag
-        self.word_emb_dim = word_emb_dim
-        self.max_word_len = max_word_len
-        self.max_seq_len = max_seq_len
-        self.post_padding = post_padding
-        self.use_tag_info = use_tag_info
-        self.window_size = window_size
 
         self.punct_tag = "punct"
-
         self.bert_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
+        self.config.data.tags_path = os.path.join(self.config.data.data_dir, self.config.data.tags_path)
+        self.config.data.out_tag_names_path = os.path.join(self.config.data.data_dir,
+                                                           self.config.data.out_tag_names_path)
+
+        self.config.data.word_vocab_path = os.path.join(self.config.data.data_dir, self.config.data.word_vocab_path)
+        self.config.data.pos_tag_vocab_path = os.path.join(self.config.data.data_dir,
+                                                           self.config.data.pos_tag_vocab_path)
+        self.config.data.dep_tag_vocab_path = os.path.join(self.config.data.data_dir,
+                                                           self.config.data.dep_tag_vocab_path)
+        self.config.data.inp_tag_vocab_path = os.path.join(self.config.data.data_dir,
+                                                           self.config.data.inp_tag_vocab_path)
+        self.config.data.tag_emb_path = os.path.join(self.config.data.data_dir, self.config.data.tag_emb_path)
+
         # we prepare char/pattern level embeddings even if not training on it, to get input dimension etc. set
-        assert self.use_char != "none" or self.use_pattern != "none", \
+        assert self.config.use_char != "none" or self.config.pattern.use_pattern != "none", \
             "either char or pattern embeddings need to be used"
 
-        if self.use_char != "none":
+        if self.config.use_char != "none":
             print("dataset using char embeddings")
-        if self.use_pattern != "none":
+        if self.config.pattern.use_pattern != "none":
             print("dataset using pattern embeddings")
 
-        if self.use_char == "lower":
-            self.char_parser = LowercaseCharParser(max_word_len=self.max_word_len, include_special_chars=True,
-                                                   post_padding=post_padding)
+        if self.config.use_char == "lower":
+            self.char_parser = LowercaseCharParser(max_word_len=self.config.max_word_len, include_special_chars=True,
+                                                   post_padding=self.config.post_padding)
         else:
-            self.char_parser = CharParser(max_word_len=self.max_word_len, include_special_chars=True,
-                                          post_padding=post_padding)
+            self.char_parser = CharParser(max_word_len=self.config.max_word_len, include_special_chars=True,
+                                          post_padding=self.config.post_padding)
 
-        if self.use_pattern == "one-to-one":
-            self.pattern_parser = OneToOnePatternParser(max_word_len=self.max_word_len, include_special_chars=True,
-                                                        post_padding=post_padding)
-        elif self.use_pattern == "condensed":
-            self.pattern_parser = WordCondensedPatternParser(max_word_len=self.max_word_len, include_special_chars=True,
-                                                             post_padding=post_padding, retain_digits=retain_digits,
-                                                             include_word_lengths=include_word_lengths)
+        if self.config.pattern.use_pattern == "one-to-one":
+            self.pattern_parser = OneToOnePatternParser(max_word_len=self.config.max_word_len,
+                                                        include_special_chars=True,
+                                                        post_padding=self.config.post_padding)
+        elif self.config.pattern.use_pattern == "condensed":
+            self.pattern_parser = WordCondensedPatternParser(max_word_len=self.config.max_word_len,
+                                                             include_special_chars=True,
+                                                             post_padding=self.config.post_padding,
+                                                             retain_digits=self.config.pattern.retain_digits,
+                                                             include_word_lengths=self.config.pattern.include_word_lengths)
 
         self.inp_dim = 0
-        if self.use_char != "none":
+        if self.config.use_char != "none":
             self.inp_dim += len(self.char_parser.vocab)
-        if self.use_pattern != "none":
+        if self.config.pattern.use_pattern != "none":
             self.inp_dim += len(self.pattern_parser.vocab)
 
         self.inp_tags = []
@@ -128,20 +121,20 @@ class TypeDataset(Dataset):
         self.parse_dataset()
 
     def parse_tags(self):
-        self.out_tags.append(self.pad_tag)
-        with open(self.out_tag_vocab_path, "r") as f:
+        self.out_tags.append(self.config.pad_tag)
+        with open(self.config.data.tags_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     self.out_tags.append(line)
 
-        with open(self.out_tag_names_path, "r") as f:
+        with open(self.config.data.out_tag_names_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     self.out_tag_names.append(line)
 
-        with open(self.inp_tag_vocab_path, "r") as f:
+        with open(self.config.data.inp_tag_vocab_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -149,44 +142,44 @@ class TypeDataset(Dataset):
                     assert line not in self.out_tags, "found overlapping tokens between inputs/output tag files"
 
     def parse_vocab(self):
-        self.word_vocab.append(self.pad_tag)
-        with open(self.word_vocab_path, "r", encoding="utf8") as f:
+        self.word_vocab.append(self.config.pad_tag)
+        with open(self.config.data.word_vocab_path, "r", encoding="utf8") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     self.word_vocab.append(line)
-        self.word_vocab.append(self.unk_tag)
+        self.word_vocab.append(self.config.unk_tag)
 
-        self.pos_tag_vocab.append(self.pad_tag)
-        with open(self.pos_tag_vocab_path, "r") as f:
+        self.pos_tag_vocab.append(self.config.pad_tag)
+        with open(self.config.data.pos_tag_vocab_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     self.pos_tag_vocab.append(line)
 
-        self.dep_tag_vocab.append(self.pad_tag)
-        with open(self.dep_tag_vocab_path, "r") as f:
+        self.dep_tag_vocab.append(self.config.pad_tag)
+        with open(self.config.data.dep_tag_vocab_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     self.dep_tag_vocab.append(line)
 
     def parse_embfile(self):
-        if self.word_emb_path and self.use_word == "glove":
-            emb_dict = parse_emb_file(self.word_emb_path, has_header_line=False)
-            emb_dict[self.unk_tag] = [0.0] * self.word_emb_dim
-            emb_dict[self.pad_tag] = [0.0] * self.word_emb_dim
+        if self.config.data.word_emb_path and self.config.use_word == "glove":
+            emb_dict = parse_emb_file(self.config.data.word_emb_path, has_header_line=False)
+            emb_dict[self.config.unk_tag] = [0.0] * self.config.word_emb_dim
+            emb_dict[self.config.pad_tag] = [0.0] * self.config.word_emb_dim
             self.word_emb = np.array([emb_dict[word] for word in self.word_vocab], dtype=np.float32)
 
-        assert self.tag_emb_path, "tag embeddings input file always needs to be provided even if not being used"
-        emb_dict = parse_emb_file(self.tag_emb_path, has_header_line=False)
+        assert self.config.data.tag_emb_path, "tag embeddings input file always needs to be provided even if not being used"
+        emb_dict = parse_emb_file(self.config.data.tag_emb_path, has_header_line=False)
         tag_emb_dim = 0
         for k in emb_dict.keys():
             tag_emb_dim = len(emb_dict[k])
             break
         self.out_tag_emb = np.array(self.read_tag_emb(self.out_tags, emb_dict, tag_emb_dim), dtype=np.float32)
 
-        if self.use_tag_info == "pretrained":
+        if self.config.use_tag_info == "pretrained":
             self.inp_tag_emb = np.array(self.read_tag_emb(self.inp_tags, emb_dict, tag_emb_dim), dtype=np.float32)
             self.tag_emb_dim = self.out_tag_emb.shape[1]
         else:
@@ -208,17 +201,17 @@ class TypeDataset(Dataset):
                 else:
                     main_vec = emb_dict[tag] + [0.0]
 
-                if tag == self.none_tag:
+                if tag == self.config.none_tag:
                     tag_emb.append(main_vec + [1.0, 0.0])
-                elif tag == self.pad_tag:
+                elif tag == self.config.pad_tag:
                     tag_emb.append(main_vec + [0.0, 1.0])
                 else:
                     raise ValueError("unexpected tag: {0}".format(tag))
         return tag_emb
 
     def parse_dataset(self):
-        text_sentences = self.read_dataset()
-        for text_sentence in text_sentences:
+        text_sentences, text_tags = self.read_dataset()
+        for text_sentence, text_tag in zip(text_sentences, text_tags):
             self.add_processed_sentence_tag(self.process_sentence_and_tag(text_sentence))
 
     def add_processed_sentence_tag(self, out):
@@ -235,7 +228,7 @@ class TypeDataset(Dataset):
         # use self.seq_length
         text = [token.text for token in text_sentence]
         bert_batch_tokens = self.bert_tokenizer(text, is_pretokenized=True,
-                                                padding="max_length", max_length=self.max_seq_len)["input_ids"]
+                                                padding="max_length", max_length=self.config.max_seq_len)["input_ids"]
         # run for loop for individual tokens and duplicate tokens
         # TODO: Figure out word-level masking, padding, B/I-tag copy to final
         # TODO: then commit and run on server
@@ -245,8 +238,8 @@ class TypeDataset(Dataset):
         bert_tokens_text = [tok.replace("##", "") for tok in
                             self.bert_tokenizer.convert_ids_to_tokens(bert_batch_tokens)]
         new_text_sentence = [
-            BertToken(start=0, text=bert_tokens_text[0], bert_id=bert_batch_tokens[0], tag=self.none_tag,
-                      pos_tag=self.none_tag, dep_tag=self.punct_tag)]
+            BertToken(start=0, text=bert_tokens_text[0], bert_id=bert_batch_tokens[0], tag=self.config.none_tag,
+                      pos_tag=self.config.none_tag, dep_tag=self.punct_tag)]
         cnt = 1
         for i in range(len(text_sentence)):
             token = text_sentence[i]
@@ -294,10 +287,10 @@ class TypeDataset(Dataset):
 
         for word_index in range(len(self.text_sentences[index])):
             mappings = []
-            if self.use_char != "none":
+            if self.config.use_char != "none":
                 indexed_sentence = self.char_indexed_sentences[index][word_index]
                 mappings.append(self.char_parser.get_mapping(indexed_sentence))
-            if self.use_pattern != "none":
+            if self.config.pattern.use_pattern != "none":
                 indexed_sentence = self.pattern_indexed_sentences[index][word_index]
                 mappings.append(self.pattern_parser.get_mapping(indexed_sentence))
             overall_char_indexed_sentence.append(np.hstack(mappings))
@@ -321,8 +314,10 @@ class TypeDataset(Dataset):
 
     def get_query_given_tokens(self, text_sentence):
         text_tag = []
-        token_sentence = [Token(start=0, text=text, pos_tag=self.pad_tag, dep_tag=self.pad_tag, tag=self.pad_tag) for
-                          text in text_sentence]
+        token_sentence = [
+            Token(start=0, text=text, pos_tag=self.config.pad_tag, dep_tag=self.config.pad_tag, tag=self.config.pad_tag)
+            for
+            text in text_sentence]
         out = self.process_sentence_and_tag(token_sentence)
         indexed_tag = self.get_indexed_tag(out.text_tag)
 
@@ -341,46 +336,49 @@ class TypeDataset(Dataset):
             if curr_tag in self.out_tags:
                 indexed_tag.append(self.out_tags.index(curr_tag))
             else:
-                indexed_tag.append(self.out_tags.index(self.none_tag))
+                indexed_tag.append(self.out_tags.index(self.config.none_tag))
         return np.array(indexed_tag)
 
     def get_char_indexed_sentence(self, out):
         overall_char_indexed_sentence = []
         for word_index in range(len(out.text_sentence)):
             mappings = []
-            if self.use_char != "none":
+            if self.config.use_char != "none":
                 mappings.append(self.char_parser.get_mapping(out.char_indexed_sentence[word_index]))
-            if self.use_pattern != "none":
+            if self.config.pattern.use_pattern != "none":
                 mappings.append(self.pattern_parser.get_mapping(out.pattern_indexed_sentence[word_index]))
             overall_char_indexed_sentence.append(np.hstack(mappings))
         overall_char_indexed_sentence = np.array(overall_char_indexed_sentence, dtype=np.float32)
         return overall_char_indexed_sentence
 
     def process_sentence_and_tag(self, token_sentence):
-        if len(token_sentence) > self.max_seq_len:
-            word_level_sentence_mask = [1] * self.max_seq_len
-            token_sentence = token_sentence[:self.max_seq_len]
+        if len(token_sentence) > self.config.max_seq_len:
+            word_level_sentence_mask = [1] * self.config.max_seq_len
+            token_sentence = token_sentence[:self.config.max_seq_len]
         else:
-            if self.post_padding:
-                word_level_sentence_mask = [1] * len(token_sentence) + [0] * (self.max_seq_len - len(token_sentence))
+            if self.config.post_padding:
+                word_level_sentence_mask = [1] * len(token_sentence) + [0] * (
+                        self.config.max_seq_len - len(token_sentence))
                 token_sentence = token_sentence + [
-                    BertToken(start=0, text="", tag=self.pad_tag, pos_tag=self.none_tag, dep_tag=self.punct_tag,
+                    BertToken(start=0, text="", tag=self.config.pad_tag, pos_tag=self.config.none_tag,
+                              dep_tag=self.config.punct_tag,
                               bert_id=0)] * (
-                                         self.max_seq_len - len(token_sentence))
+                                         self.config.max_seq_len - len(token_sentence))
             else:
-                word_level_sentence_mask = [0] * (self.max_seq_len - len(token_sentence)) + [1] * len(token_sentence)
-                token_sentence = [BertToken(start=0, text="", tag=self.none_tag, pos_tag=self.punct_tag,
-                                            dep_tag=self.pad_tag, bert_id=0)] * (
-                                         self.max_seq_len - len(token_sentence)) + token_sentence
+                word_level_sentence_mask = [0] * (self.config.max_seq_len - len(token_sentence)) + [1] * len(
+                    token_sentence)
+                token_sentence = [BertToken(start=0, text="", tag=self.config.none_tag, pos_tag=self.config.punct_tag,
+                                            dep_tag=self.config.pad_tag, bert_id=0)] * (
+                                         self.config.max_seq_len - len(token_sentence)) + token_sentence
         word_indexed_sentence = []
         char_indexed_sentence = []
         pattern_indexed_sentence = []
         type_indexed_sentence = []
         char_level_sentence_mask = []
         for index in range(len(token_sentence)):
-            if self.use_tag_info == "window":
+            if self.config.use_tag_info == "window":
                 tag_context = []
-                for i in range(max(0, index - self.window_size), index):
+                for i in range(max(0, index - self.config.window_size), index):
                     if token_sentence[i].tag in self.inp_tags:
                         tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[i].tag)]
                     else:
@@ -388,7 +386,7 @@ class TypeDataset(Dataset):
                     tag_context.append(tag_vec)
                     # not taking the output tag info of the current tag (since, it might make the model do trivial copy
                     # from input to output)
-                for i in range(index + 1, min(index + self.window_size + 1, len(token_sentence))):
+                for i in range(index + 1, min(index + self.config.window_size + 1, len(token_sentence))):
                     if token_sentence[i].tag in self.inp_tags:
                         tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[i].tag)]
                     else:
@@ -411,9 +409,9 @@ class TypeDataset(Dataset):
 
             char_indexed_word, char_level_word_mask = self.char_parser.get_indexed_text(word.text)
             char_level_sentence_mask.append(char_level_word_mask)
-            if self.use_char != "none":
+            if self.config.use_char != "none":
                 char_indexed_sentence.append(char_indexed_word)
-            if self.use_pattern != "none":
+            if self.config.pattern.use_pattern != "none":
                 pattern_indexed_word, char_level_word_mask = self.pattern_parser.get_indexed_text(word.text)
                 pattern_indexed_sentence.append(pattern_indexed_word)
 

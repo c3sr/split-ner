@@ -11,113 +11,63 @@ from src.components.cnn_lstm import CNN_LSTM
 from src.models.base import BaseExecutor
 from src.reader.type_dataset import TypeDataset
 from src.utils.evaluator import Evaluator
-from src.utils.general import set_all_seeds
+from src.utils.general import set_all_seeds, parse_config
 
 
 class TypeCNN_LSTMExecutor(BaseExecutor):
 
-    def __init__(self, args):
-        super(TypeCNN_LSTMExecutor, self).__init__(args)
+    def __init__(self, config):
+        super(TypeCNN_LSTMExecutor, self).__init__(config)
 
-        self.args.inp_tag_vocab_path = os.path.join(self.args.data_dir, self.args.inp_tag_vocab_path)
-        self.args.tag_emb_path = os.path.join(self.args.data_dir, self.args.tag_emb_path)
+        self.config.data.inp_tag_vocab_path = os.path.join(self.config.data.data_dir,
+                                                           self.config.data.inp_tag_vocab_path)
+        self.config.data.tag_emb_path = os.path.join(self.config.data.data_dir, self.config.data.tag_emb_path)
 
         self.define_datasets()
 
-        self.train_data_loader = DataLoader(dataset=self.train_dataset, batch_size=args.batch_size,
+        self.train_data_loader = DataLoader(dataset=self.train_dataset, batch_size=config.batch_size,
                                             shuffle=self.shuffle_train_data)
-        self.dev_data_loader = DataLoader(dataset=self.dev_dataset, batch_size=args.batch_size, shuffle=False)
-        self.test_data_loader = DataLoader(dataset=self.test_dataset, batch_size=args.batch_size, shuffle=False)
+        self.dev_data_loader = DataLoader(dataset=self.dev_dataset, batch_size=config.batch_size, shuffle=False)
+        self.test_data_loader = DataLoader(dataset=self.test_dataset, batch_size=config.batch_size, shuffle=False)
 
         pre_trained_emb = None
-        if self.args.use_word == "glove":
+        if self.config.use_word == "glove":
             pre_trained_emb = torch.as_tensor(self.train_dataset.word_emb, device=self.device)
 
         tag_emb = None
-        if self.args.use_tag_cosine_sim or self.args.use_class_guidance:
+        if self.config.use_tag_cosine_sim or self.config.use_class_guidance:
             tag_emb = self.prep_tag_emb_tensor()
 
-        train_char_emb = self.args.use_char != "none" or self.args.use_pattern != "none"
-        use_lstm = not self.args.no_lstm
+        train_char_emb = self.config.use_char != "none" or self.config.pattern.use_pattern != "none"
+        use_lstm = not self.config.no_lstm
 
-        self.model = CNN_LSTM(inp_dim=self.train_dataset.inp_dim, conv1_dim=self.args.conv1_dim,
-                              out_dim=self.get_model_training_out_dim(), hidden_dim=self.args.hidden_dim,
-                              kernel_size=args.kernel_size, word_len=self.train_dataset.max_word_len,
+        self.model = CNN_LSTM(inp_dim=self.train_dataset.inp_dim, conv1_dim=self.config.conv1_dim,
+                              out_dim=self.get_model_training_out_dim(), hidden_dim=self.config.hidden_dim,
+                              kernel_size=config.kernel_size, word_len=self.config.max_word_len,
                               word_vocab_size=len(self.train_dataset.word_vocab),
                               pos_tag_vocab_size=len(self.train_dataset.pos_tag_vocab),
                               dep_tag_vocab_size=len(self.train_dataset.dep_tag_vocab), use_lstm=use_lstm,
-                              word_emb_dim=self.train_dataset.word_emb_dim, dropout_ratio=self.args.dropout_ratio,
-                              tag_emb_dim=self.train_dataset.tag_emb_dim, pos_tag_emb_dim=self.args.pos_tag_emb_dim,
-                              dep_tag_emb_dim=self.args.dep_tag_emb_dim, pre_trained_emb=pre_trained_emb,
-                              use_char=train_char_emb, use_word=self.args.use_word, use_maxpool=self.args.use_maxpool,
-                              use_pos_tag=self.args.use_pos_tag, use_dep_tag=self.args.use_dep_tag,
-                              use_tag_info=self.args.use_tag_info, device=self.device,
-                              use_tag_cosine_sim=self.args.use_tag_cosine_sim,
-                              fine_tune_bert=self.args.fine_tune_bert, use_tfo=self.args.use_tfo,
-                              use_class_guidance=self.args.use_class_guidance, tag_emb=tag_emb,
-                              word_emb_model_from_tf=self.args.word_emb_model_from_tf,
-                              num_lstm_layers=self.args.num_lstm_layers)
+                              word_emb_dim=self.config.word_emb_dim, dropout_ratio=self.config.dropout_ratio,
+                              tag_emb_dim=self.train_dataset.tag_emb_dim, pos_tag_emb_dim=self.config.pos_tag_emb_dim,
+                              dep_tag_emb_dim=self.config.dep_tag_emb_dim, pre_trained_emb=pre_trained_emb,
+                              use_char=train_char_emb, use_word=self.config.use_word,
+                              use_maxpool=self.config.use_maxpool,
+                              use_pos_tag=self.config.use_pos_tag, use_dep_tag=self.config.use_dep_tag,
+                              use_tag_info=self.config.use_tag_info, device=self.device,
+                              use_tag_cosine_sim=self.config.use_tag_cosine_sim,
+                              fine_tune_bert=self.config.fine_tune_bert, use_tfo=self.config.use_tfo,
+                              use_class_guidance=self.config.use_class_guidance, tag_emb=tag_emb,
+                              word_emb_model_from_tf=self.config.word_emb_model_from_tf,
+                              num_lstm_layers=self.config.num_lstm_layers)
 
         self.criterion = nn.CrossEntropyLoss(reduction="sum")
         params = filter(lambda p: p.requires_grad, self.model.parameters())
-        self.optimizer = torch.optim.Adam(params=params, lr=args.lr)
+        self.optimizer = torch.optim.Adam(params=params, lr=config.lr)
 
     def define_datasets(self):
-        post_padding = not self.args.use_pre_padding
-        include_word_lengths = not self.args.ignore_word_lengths
-        retain_digits = not self.args.escape_digits
-
-        self.train_dataset = TypeDataset(corpus_path=self.args.train_path, out_tag_vocab_path=self.args.tags_path,
-                                         word_vocab_path=self.args.word_vocab_path, word_emb_path=self.args.emb_path,
-                                         out_tag_names_path=self.args.out_tag_names_path,
-                                         pos_tag_vocab_path=self.args.pos_tag_vocab_path,
-                                         dep_tag_vocab_path=self.args.dep_tag_vocab_path,
-                                         tag_emb_path=self.args.tag_emb_path,
-                                         unk_tag=self.unk_tag, pad_tag=self.pad_tag, none_tag=self.none_tag,
-                                         use_char=self.args.use_char, use_word=self.args.use_word,
-                                         use_pattern=self.args.use_pattern, word_emb_dim=self.args.word_emb_dim,
-                                         max_word_len=self.args.max_word_len, max_seq_len=self.args.max_seq_len,
-                                         post_padding=post_padding, retain_digits=retain_digits,
-                                         include_word_lengths=include_word_lengths,
-                                         use_tag_info=self.args.use_tag_info,
-                                         inp_tag_vocab_path=self.args.inp_tag_vocab_path,
-                                         window_size=self.args.window_size)
-
-        # not parsing the embedding file again when processing the dev/test sets
-
-        self.dev_dataset = TypeDataset(corpus_path=self.args.dev_path, out_tag_vocab_path=self.args.tags_path,
-                                       word_vocab_path=self.args.word_vocab_path,
-                                       out_tag_names_path=self.args.out_tag_names_path,
-                                       pos_tag_vocab_path=self.args.pos_tag_vocab_path,
-                                       dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
-                                       unk_tag=self.unk_tag,
-                                       tag_emb_path=self.args.tag_emb_path,
-                                       pad_tag=self.pad_tag, none_tag=self.none_tag, use_char=self.args.use_char,
-                                       use_pattern=self.args.use_pattern, use_word=self.args.use_word,
-                                       word_emb_dim=self.args.word_emb_dim, max_word_len=self.args.max_word_len,
-                                       max_seq_len=self.args.max_seq_len, post_padding=post_padding,
-                                       retain_digits=retain_digits,
-                                       include_word_lengths=include_word_lengths,
-                                       use_tag_info=self.args.use_tag_info,
-                                       inp_tag_vocab_path=self.args.inp_tag_vocab_path,
-                                       window_size=self.args.window_size)
-
-        self.test_dataset = TypeDataset(corpus_path=self.args.test_path, out_tag_vocab_path=self.args.tags_path,
-                                        word_vocab_path=self.args.word_vocab_path,
-                                        out_tag_names_path=self.args.out_tag_names_path,
-                                        pos_tag_vocab_path=self.args.pos_tag_vocab_path,
-                                        dep_tag_vocab_path=self.args.dep_tag_vocab_path, word_emb_path=None,
-                                        unk_tag=self.unk_tag,
-                                        tag_emb_path=self.args.tag_emb_path,
-                                        pad_tag=self.pad_tag, none_tag=self.none_tag, use_char=self.args.use_char,
-                                        use_pattern=self.args.use_pattern, use_word=self.args.use_word,
-                                        word_emb_dim=self.args.word_emb_dim, max_word_len=self.args.max_word_len,
-                                        max_seq_len=self.args.max_seq_len, post_padding=post_padding,
-                                        retain_digits=retain_digits,
-                                        include_word_lengths=include_word_lengths,
-                                        use_tag_info=self.args.use_tag_info,
-                                        inp_tag_vocab_path=self.args.inp_tag_vocab_path,
-                                        window_size=self.args.window_size)
+        self.train_dataset = TypeDataset(config=self.config, corpus_path=self.config.data.train_path)
+        self.dev_dataset = TypeDataset(config=self.config, corpus_path=self.config.data.dev_path)
+        self.test_dataset = TypeDataset(config=self.config, corpus_path=self.config.data.test_path)
 
     def get_model_training_out_dim(self):
         return len(self.train_dataset.out_tags)
@@ -166,7 +116,8 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
         train_label = torch.cat(train_label, dim=0).cpu().numpy()
 
         evaluator = Evaluator(gold=train_label, predicted=train_prediction, tags=self.train_dataset.out_tags,
-                              ignore_tags=[self.none_tag, self.pad_tag], none_tag=self.none_tag, pad_tag=self.pad_tag)
+                              ignore_tags=[self.config.none_tag, self.config.pad_tag], none_tag=self.config.none_tag,
+                              pad_tag=self.config.pad_tag)
         print("TRAIN: Epoch: {0} | Loss:{1:.3f} | Token-Level Micro F1: {2:.3f}".format(epoch, train_loss / len(
             self.train_data_loader.dataset), evaluator.significant_token_metric.micro_avg_f1()))
 
@@ -202,11 +153,12 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
             self.print_outputs(corpus=total_text, gold=total_label, predicted=total_prediction,
                                mapping=data_loader.dataset.out_tags, outfile=outfile)
         evaluator = Evaluator(gold=total_label, predicted=total_prediction, tags=data_loader.dataset.out_tags,
-                              ignore_tags=[self.none_tag, self.pad_tag], none_tag=self.none_tag, pad_tag=self.pad_tag)
+                              ignore_tags=[self.config.none_tag, self.config.pad_tag], none_tag=self.config.none_tag,
+                              pad_tag=self.config.pad_tag)
         mean_loss = total_loss / len(data_loader.dataset)
         print("{0}: Epoch: {1} | Token-Level Micro F1: {2:.3f} | Loss: {3:.3f}".format(
             prefix, epoch, evaluator.significant_token_metric.micro_avg_f1(), mean_loss))
-        if self.args.verbose:
+        if self.config.verbose:
             print("Entity-Level Metrics:")
             print(evaluator.entity_metric.report())
             print("Token-Level Metrics:")
@@ -234,118 +186,14 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
 
 
 def main(args):
-    set_all_seeds(args.seed)
-    executor = TypeCNN_LSTMExecutor(args)
+    config = parse_config(args.config)
+    set_all_seeds(config.seed)
+    executor = TypeCNN_LSTMExecutor(config)
     executor.run()
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Type-CNN Model for Sequence Labeling")
-    ap.add_argument("--name", type=str, default="type-cnn",
-                    help="model name (Default: 'type-cnn')")
-    ap.add_argument("--checkpoint_dir", type=str, default="../../checkpoints",
-                    help="checkpoints directory (Default: '../../checkpoints')")
-    ap.add_argument("--eval", type=str, default="none",
-                    help="only evaluate existing checkpoint model (none/best/<checkpoint-id>) (Default: 'none')")
-    ap.add_argument("--query", action="store_true",
-                    help="query mode, can be used with eval to work with best model (Default: False)")
-
-    ap.add_argument("--data_dir", type=str, default="../../data/GENIA_term_3.02",
-                    help="path to input dataset directory (Default: '../../data/GENIA_term_3.02')")
-    ap.add_argument("--out_dir", type=str, default="../../data/GENIA_term_3.02/out",
-                    help="path to output directory (Default: '../../data/GENIA_term_3.02/out')")
-    ap.add_argument("--train_path", type=str, default="train.tsv",
-                    help="path to train dataset (train.tsv|std_train.tsv|jnlpba_train.tsv) (Default: 'train.tsv')")
-    ap.add_argument("--dev_path", type=str, default="dev.tsv",
-                    help="path to dev dataset (dev.tsv|std_dev.tsv|jnlpba_dev.tsv) (Default: 'dev.tsv')")
-    ap.add_argument("--test_path", type=str, default="test.tsv",
-                    help="path to test dataset (test.tsv|std_test.tsv|jnlpba_test.tsv) (Default: 'test.tsv')")
-    ap.add_argument("--word_vocab_path", type=str, default="glove_vocab.txt",
-                    help="path to word vocab (Default: 'glove_vocab.txt')")
-    ap.add_argument("--tags_path", type=str, default="tag_vocab.txt",
-                    help="path to output tags vocab. Use 'tag_vocab.txt' for full tags vocab. "
-                         "Use 'std_tag_vocab.txt' for standard 5 tags vocab. "
-                         "Use 'jnlpba_tag_vocab.tsv' for exact (5-tag) settings used by MTL-BioInformatics-2016 "
-                         "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
-                         "Use 'out_freq_tag_vocab.txt' for reduced tags, when considering input tags information. "
-                         "(Default: 'tag_vocab.txt')")
-    ap.add_argument("--out_tag_names_path", type=str, default="tag_names.txt",
-                    help="path to output tag general names. Use 'tag_names.txt' for full tags vocab names. "
-                         "Use 'std_tag_names.txt' for standard 5 tags vocab names. "
-                         "Use 'jnlpba_tag_names.txt' for exact (5-tag) settings used by MTL-BioInformatics-2016 "
-                         "(ref: https://github.com/cambridgeltl/MTL-Bioinformatics-2016)"
-                         "Use 'out_freq_tag_names.txt' for reduced tags, when considering input tags information. "
-                         "(Default: 'tag_names.txt')")
-    ap.add_argument("--inp_tag_vocab_path", type=str, default="empty_inp_tag_vocab.txt",
-                    help="path to input tags vocab. Use 'empty_inp_tag_vocab.txt' if don't want to use tag info. "
-                         "Use 'inp_freq_tag_vocab.txt' for specifying default input tag info."
-                         "(Default: 'empty_inp_tag_vocab.txt')")
-    ap.add_argument("--pos_tag_vocab_path", type=str, default="pos_tag_vocab.txt",
-                    help="path to POS tags vocab. (pos_tag_vocab.txt|jnlpba_pos_tag_vocab.txt) "
-                         "(Default: 'pos_tag_vocab.txt')")
-    ap.add_argument("--dep_tag_vocab_path", type=str, default="dep_tag_vocab.txt",
-                    help="path to dependency-parse tags vocab. (dep_tag_vocab.txt|jnlpba_dep_tag_vocab.txt) "
-                         "(Default: 'dep_tag_vocab.txt')")
-    ap.add_argument("--emb_path", type=str, default="../../../../Embeddings/glove.6B.50d.txt",
-                    help="path to pre-trained word embeddings (Default: '../../../../Embeddings/glove.6B.50d.txt')")
-    ap.add_argument("--tag_emb_path", type=str, default="tag_w2v_emb.txt",
-                    help="path to pre-trained tag embeddings, relative to data_dir "
-                         "(jnlpba_tag_w2v_emb.txt|jnlpba_tag_use_emb.txt|jnlpba_tag_full_emb.txt) "
-                         "(std_tag_w2v_emb.txt|std_tag_use_emb.txt|std_tag_full_emb.txt) "
-                         "(tag_w2v_emb.txt|tag_use_emb.txt|tag_full_emb.txt) (Default: 'tag_w2v_emb.txt')")
-
-    ap.add_argument("--num_epochs", type=int, default=500, help="# epochs to train (Default: 500)")
-    ap.add_argument("--batch_size", type=int, default=128, help="batch size (Default: 128)")
-    ap.add_argument("--word_emb_dim", type=int, default=50, help="word embedding dimension (Default: 50)")
-    ap.add_argument("--pos_tag_emb_dim", type=int, default=15, help="POS tag embedding dimension (Default: 15)")
-    ap.add_argument("--dep_tag_emb_dim", type=int, default=15, help="dep-parse tag embedding dimension (Default: 15)")
-    ap.add_argument("--max_word_len", type=int, default=30, help="max. #chars in word (Default: 30)")
-    ap.add_argument("--max_seq_len", type=int, default=60, help="max. #words in sentence (Default: 60)")
-    ap.add_argument("--conv1_dim", type=int, default=128, help="conv1 layer output channels (Default: 128)")
-    ap.add_argument("--hidden_dim", type=int, default=256, help="hidden state dim for LSTM, if used (Default: 256)")
-    ap.add_argument("--use_maxpool", action="store_true",
-                    help="max pool over CNN output to get char embeddings, else does concatenation (Default: False)")
-    ap.add_argument("--use_pos_tag", action="store_true", help="embed POS tag information (Default: False)")
-    ap.add_argument("--use_dep_tag", action="store_true", help="embed dep-parse tag information (Default: False)")
-    ap.add_argument("--use_tag_cosine_sim", action="store_true",
-                    help="compute cosine sim with tag embeddings as additional layer in model (Default: False)")
-    ap.add_argument("--kernel_size", type=int, default=5, help="kernel size for CNN (Default: 5)")
-    ap.add_argument("--num_lstm_layers", type=int, default=1, help="no. of LSTM layers (Default: 1)")
-    ap.add_argument("--use_char", type=str, default="lower",
-                    help="char embedding type (none/lower/all) (Default: 'lower')")
-    ap.add_argument("--use_pattern", type=str, default="condensed",
-                    help="pattern embedding type (none/one-to-one/condensed) (Default: 'condensed')")
-    ap.add_argument("--escape_digits", action="store_true",
-                    help="replace digits(0-9) with 'd' tag in pattern capturing (Default: False)")
-    ap.add_argument("--ignore_word_lengths", action="store_true",
-                    help="ignore word lengths in pattern capturing (Default: False)")
-    ap.add_argument("--no_lstm", action="store_true",
-                    help="don't use LSTM to capture neighbor context. Directly CRF over individual token level CNN "
-                         "(Default: False)")
-    ap.add_argument("--use_tag_info", type=str, default="pretrained",
-                    help="type information (none/self/window/pretrained) (Default: 'pretrained')")
-    ap.add_argument("--use_tfo", type=str, default="none",
-                    help="use transformer (may not use LSTM then). 'simple' creates a basic tfo. "
-                         "'xl' uses TransformerXL model layer. (none|simple|xl) (Default: 'none')")
-    ap.add_argument("--window_size", type=int, default=5,
-                    help="size of context window for type info on either side of current token (Default: 5)")
-    ap.add_argument("--use_word", type=str, default="allenai/scibert_scivocab_uncased",
-                    help="use word(token) embeddings "
-                         "(none|rand|glove|allenai/scibert_scivocab_uncased|bert-base-uncased"
-                         "|../../../resources/biobert_v1.1_pubmed) "
-                         "(Default: allenai/scibert_scivocab_uncased)")
-    ap.add_argument("--use_pre_padding", action="store_true", help="pre-padding for char/word (Default: False)")
-    ap.add_argument("--word_emb_model_from_tf", action="store_true",
-                    help="word embedding generator model is a pretrained tensorflow model. Use 'True' for models like, "
-                         "'../../../resources/biobert_v1.1_pubmed' (Default: False)")
-    ap.add_argument("--use_class_guidance", action="store_true",
-                    help="take guidance through pre-trained class embeddings (Default: False)")
-    ap.add_argument("--fine_tune_bert", action="store_true", help="fine-tune bert embeddings (Default: False)")
-    ap.add_argument("--lr", type=float, default=0.001, help="learning rate (Default: 0.001)")
-    ap.add_argument("--dropout_ratio", type=float, default=0.5, help="dropout ratio (Default: 0.5)")
-    ap.add_argument("--seed", type=int, default=42, help="manual seed for reproducibility (Default: 42)")
-    ap.add_argument("--use_cpu", action="store_true", help="force CPU usage (Default: False)")
-    ap.add_argument("--no_eval_print", action="store_true",
-                    help="don't output verbose evaluation matrices (Default: False)")
+    ap = argparse.ArgumentParser(description="CNN-LSTM Model for Sequence Labeling")
+    ap.add_argument("--config", default="../configs/config.json", help="config file")
     ap = ap.parse_args()
     main(ap)

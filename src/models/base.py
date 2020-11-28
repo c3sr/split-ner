@@ -12,36 +12,29 @@ from src.utils.general import get_compute_device
 class BaseExecutor:
     CHECKPOINT_PATTERN = re.compile("checkpoint-epoch-(\\d+)\\.pth")
 
-    def __init__(self, args):
-        self.args = args
-        self.device = get_compute_device(self.args.use_cpu)
+    def __init__(self, config):
+        self.config = config
+        self.device = get_compute_device(self.config.use_cpu)
         print("using device: {0}".format(self.device))
 
-        self.checkpoint_dir = os.path.join(self.args.checkpoint_dir, self.args.name)
+        self.checkpoint_dir = os.path.join(self.config.checkpoint_dir, self.config.name)
         if not os.path.exists(self.checkpoint_dir):
             os.makedirs(self.checkpoint_dir)
 
-        self.args.out_dir = os.path.join(self.args.out_dir, self.args.name)
-        if not os.path.exists(self.args.out_dir):
-            os.makedirs(self.args.out_dir)
+        self.config.data.out_dir = os.path.join(self.config.data.out_dir, self.config.name)
+        if not os.path.exists(self.config.data.out_dir):
+            os.makedirs(self.config.data.out_dir)
 
-        self.args.verbose = not self.args.no_eval_print
+        self.config.data.train_path = os.path.join(self.config.data.data_dir, self.config.data.train_path)
+        self.config.data.dev_path = os.path.join(self.config.data.data_dir, self.config.data.dev_path)
+        self.config.data.test_path = os.path.join(self.config.data.data_dir, self.config.data.test_path)
+        self.config.verbose = not self.config.no_eval_print
 
-        self.args.train_path = os.path.join(self.args.data_dir, self.args.train_path)
-        self.args.dev_path = os.path.join(self.args.data_dir, self.args.dev_path)
-        self.args.test_path = os.path.join(self.args.data_dir, self.args.test_path)
-        self.args.tags_path = os.path.join(self.args.data_dir, self.args.tags_path)
-        self.args.out_tag_names_path = os.path.join(self.args.data_dir, self.args.out_tag_names_path)
+        self.config.pad_tag = "<PAD>"
+        self.config.unk_tag = "<UNK>"
+        self.config.none_tag = "O"
 
-        self.args.word_vocab_path = os.path.join(self.args.data_dir, self.args.word_vocab_path)
-        self.args.pos_tag_vocab_path = os.path.join(self.args.data_dir, self.args.pos_tag_vocab_path)
-        self.args.dep_tag_vocab_path = os.path.join(self.args.data_dir, self.args.dep_tag_vocab_path)
-
-        self.pad_tag = "<PAD>"
-        self.unk_tag = "<UNK>"
-        self.none_tag = "O"
-
-        self.shuffle_train_data = not (self.args.eval != "none" or self.args.query)
+        self.shuffle_train_data = not (self.config.eval != "none" or self.config.query)
 
         self.train_dataset = None
         self.dev_dataset = None
@@ -61,8 +54,8 @@ class BaseExecutor:
     def print_model_summary(self):
         print("Run Configuration:")
         print("------------------")
-        for arg in vars(self.args):
-            print("{0}: {1}".format(arg, getattr(self.args, arg)))
+        for arg in vars(self.config):
+            print("{0}: {1}".format(arg, getattr(self.config, arg)))
         print()
 
         print("Model Summary:")
@@ -77,15 +70,15 @@ class BaseExecutor:
         self.resume_checkpoint()
         self.print_model_summary()
 
-        if self.args.query:
+        if self.config.query:
             self.query(input("Query Sentence:"))
-        elif self.args.eval != "none":
+        elif self.config.eval != "none":
             return self.evaluate()
         else:
             self.train()
 
     def train(self):
-        for epoch in range(self.start_epoch, self.start_epoch + self.args.num_epochs):
+        for epoch in range(self.start_epoch, self.start_epoch + self.config.num_epochs):
             self.train_epoch(epoch)
             self.save_checkpoint(epoch, save_best=False)
 
@@ -124,16 +117,17 @@ class BaseExecutor:
         train_prediction = np.argmax(train_prediction, axis=2)
         train_label = torch.cat(train_label, dim=0).cpu().numpy()
         evaluator = Evaluator(gold=train_label, predicted=train_prediction, tags=self.train_dataset.out_tags,
-                              ignore_tags=[self.none_tag, self.pad_tag], none_tag=self.none_tag, pad_tag=self.pad_tag)
+                              ignore_tags=[self.config.none_tag, self.config.pad_tag], none_tag=self.config.none_tag,
+                              pad_tag=self.config.pad_tag)
         print("TRAIN: Epoch: {0} | Loss:{1:.3f} | Token-Level Micro F1: {2:.3f}".format(epoch, train_loss / len(
             self.train_data_loader.dataset), evaluator.significant_token_metric.micro_avg_f1()))
 
     def evaluate(self):
-        if not os.path.exists(self.args.out_dir):
-            os.makedirs(self.args.out_dir)
-        train_outfile = os.path.join(self.args.out_dir, "train.out.tsv")
-        dev_outfile = os.path.join(self.args.out_dir, "dev.out.tsv")
-        test_outfile = os.path.join(self.args.out_dir, "test.out.tsv")
+        if not os.path.exists(self.config.out_dir):
+            os.makedirs(self.config.out_dir)
+        train_outfile = os.path.join(self.config.out_dir, "train.out.tsv")
+        dev_outfile = os.path.join(self.config.out_dir, "dev.out.tsv")
+        test_outfile = os.path.join(self.config.out_dir, "test.out.tsv")
         last_trained_epoch = self.start_epoch - 1
         _, train_evaluator = self.evaluate_epoch(self.train_data_loader, epoch=last_trained_epoch, prefix="TRAIN",
                                                  outfile=train_outfile)
@@ -169,11 +163,12 @@ class BaseExecutor:
             self.print_outputs(corpus=total_text, gold=total_label, predicted=total_prediction,
                                mapping=data_loader.dataset.out_tags, outfile=outfile)
         evaluator = Evaluator(gold=total_label, predicted=total_prediction, tags=data_loader.dataset.out_tags,
-                              ignore_tags=[self.none_tag, self.pad_tag], none_tag=self.none_tag, pad_tag=self.pad_tag)
+                              ignore_tags=[self.config.none_tag, self.config.pad_tag], none_tag=self.config.none_tag,
+                              pad_tag=self.config.pad_tag)
         mean_loss = total_loss / len(data_loader.dataset)
         print("{0}: Epoch: {1} | Token-Level Micro F1: {2:.3f} | Loss: {3:.3f}".format(
             prefix, epoch, evaluator.significant_token_metric.micro_avg_f1(), mean_loss))
-        if self.args.verbose:
+        if self.config.verbose:
             print("Entity-Level Metrics:")
             print(evaluator.entity_metric.report())
             print("Token-Level (Without 'O' Tag) Metrics:")
@@ -211,7 +206,7 @@ class BaseExecutor:
                     token = corpus[sent_index][word_index]
                     gold_tag = mapping[int(gold[sent_index][word_index])]
                     predicted_tag = mapping[int(predicted[sent_index][word_index])]
-                    if gold_tag == self.pad_tag:
+                    if gold_tag == self.config.pad_tag:
                         continue
                     if mask[sent_index][word_index] == 0:
                         gold_tag = "<MASK>"
@@ -258,10 +253,10 @@ class BaseExecutor:
         self.load_model_to_device()
 
     def get_model_resume_path(self):
-        if self.args.eval == "best":
+        if self.config.eval == "best":
             return os.path.join(self.checkpoint_dir, "model-best.pth")
-        if self.args.eval.isdigit():
-            return os.path.join(self.checkpoint_dir, "checkpoint-epoch-{0}.pth".format(self.args.eval))
+        if self.config.eval.isdigit():
+            return os.path.join(self.checkpoint_dir, "checkpoint-epoch-{0}.pth".format(self.config.eval))
         return BaseExecutor.get_latest_checkpoint_path(self.checkpoint_dir)
 
     @staticmethod
