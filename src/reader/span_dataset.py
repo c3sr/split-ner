@@ -218,7 +218,7 @@ class SpanTypeDataset(Dataset):
                         text_sentence.append(Token(start=0, text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1]))
                     text_tag.append(row[-1])
 
-        return text_sentences[:10], text_tags[:10]
+        return text_sentences, text_tags
 
     def __len__(self):
         return len(self.text_sentences)
