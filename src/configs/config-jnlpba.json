@@ -20,7 +20,7 @@
     "tag_emb_path": "tag_w2v_emb.txt"
   },
   "num_epochs": 500,
-  "batch_size": 256,
+  "batch_size": 128,
   "word_emb_dim": 50,
   "pos_tag_emb_dim": 15,
   "dep_tag_emb_dim": 15,
