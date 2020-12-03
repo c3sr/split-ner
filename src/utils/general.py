@@ -1,8 +1,26 @@
+import json
 import os
 import random
+from collections import OrderedDict
+from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import torch
+
+
+class Timer:
+    def __init__(self):
+        self.cache = datetime.now()
+
+    def check(self):
+        now = datetime.now()
+        duration = now - self.cache
+        self.cache = now
+        return duration.total_seconds()
+
+    def reset(self):
+        self.cache = datetime.now()
 
 
 def set_all_seeds(seed=42):
@@ -46,3 +64,30 @@ def parse_emb_file(emb_path, has_header_line=False):
                     key = "(AND G#protein_complex G#protein_complex)"
                 emb_dict[key] = [float(x) for x in s[1:]]
     return emb_dict
+
+
+def ensure_dir(dirname):
+    dirname = Path(dirname)
+    if not dirname.is_dir():
+        dirname.mkdir(parents=True, exist_ok=False)
+
+
+def read_json(file_path):
+    with file_path.open("rt") as f:
+        return json.load(f, object_hook=OrderedDict)
+
+
+def write_json(content, file_path):
+    with file_path.open("wt") as f:
+        json.dump(content, f, indent=4, sort_keys=False)
+
+
+class Config:
+    def __init__(self, config_dict):
+        self.__dict__.update(config_dict)
+
+
+def parse_config(config_file):
+    with open(config_file, "r") as f:
+        d = json.load(f)
+    return json.loads(json.dumps(d), object_hook=Config)
