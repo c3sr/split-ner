@@ -1,0 +1,9 @@
+B-Cancer
+B-Cell
+B-Gene_or_gene_product
+B-Simple_chemical
+I-Cancer
+I-Cell
+I-Gene_or_gene_product
+I-Simple_chemical
+O
