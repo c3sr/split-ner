@@ -111,11 +111,11 @@ class TypeDataset(Dataset):
                 if line:
                     self.out_tags.append(line)
 
-        with open(self.config.data.out_tag_names_path, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    self.out_tag_names.append(line)
+        # with open(self.config.data.out_tag_names_path, "r") as f:
+        #     for line in f:
+        #         line = line.strip()
+        #         if line:
+        #             self.out_tag_names.append(line)
 
         with open(self.config.data.inp_tag_vocab_path, "r") as f:
             for line in f:
@@ -213,7 +213,7 @@ class TypeDataset(Dataset):
     def read_dataset(self):
         text_sentences = []
         text_tags = []
-        with open(self.corpus_path, "r") as f:
+        with open(self.corpus_path, "r", encoding="utf-8") as f:
             reader = csv.reader(f, delimiter="\t", quotechar=None)
             text_sentence = []
             text_tag = []

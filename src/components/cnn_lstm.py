@@ -1,7 +1,7 @@
 import torch
 from torch import nn as nn
 from torch.nn import functional as F
-from transformers import BertTokenizer, BertModel, TransfoXLModel, TransfoXLConfig
+from transformers import BertTokenizer, BertModel
 
 
 class CNN_LSTM_Base(nn.Module):
@@ -27,7 +27,6 @@ class CNN_LSTM_Base(nn.Module):
         self.use_dep_tag = use_dep_tag
         self.dropout = nn.Dropout(p=dropout_ratio)
         self.fine_tune_bert = fine_tune_bert
-        self.use_tfo = use_tfo
         self.tag_emb = tag_emb
 
         assert self.use_char or self.use_word != "none", "either of char or word embeddings need to be used"
@@ -63,10 +62,6 @@ class CNN_LSTM_Base(nn.Module):
                 self.bert_tokenizer = BertTokenizer.from_pretrained(self.use_word)
                 self.bert_model = BertModel.from_pretrained(self.use_word, from_tf=word_emb_model_from_tf)
                 word_emb_dim = self.bert_model.config.hidden_size
-                if self.use_tfo == "xl":
-                    self.tfo_model = TransfoXLModel(TransfoXLConfig(n_layer=1, d_model=word_emb_dim, d_inner=256))
-                else:
-                    self.tfo_model = None
                 if not self.fine_tune_bert:
                     for param in self.bert_model.parameters():
                         param.requires_grad = False
@@ -94,10 +89,6 @@ class CNN_LSTM_Base(nn.Module):
             self.lstm = nn.LSTM(input_size=next_inp_dim, hidden_size=self.hidden_dim, bidirectional=True,
                                 batch_first=True, num_layers=num_lstm_layers, dropout=dropout_ratio)
             next_inp_dim = self.hidden_dim * 2
-
-        if self.use_tfo == "simple":
-            tfo_layer = nn.TransformerEncoderLayer(d_model=next_inp_dim, nhead=4, dim_feedforward=256)
-            self.tfo = nn.TransformerEncoder(encoder_layer=tfo_layer, num_layers=2)
 
         if use_tag_cosine_sim:
             assert isinstance(self.tag_emb,
@@ -134,7 +125,7 @@ class CNN_LSTM_Base(nn.Module):
         if self.use_word != "none":
             if "bert" in self.use_word:
                 word_emb_x = CNN_LSTM_Base.get_bert_embeddings(text, seq_len, self.bert_tokenizer, self.bert_model,
-                                                               self.device, self.use_tfo, self.tfo_model)
+                                                               self.device)
             else:
                 word_emb_x = self.emb(word_x[:, :, 0])
             x = torch.cat((x, word_emb_x), dim=2)
@@ -162,10 +153,6 @@ class CNN_LSTM_Base(nn.Module):
             packed_out, _ = self.lstm(packed_inp)
             x, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out, batch_first=True, total_length=seq_len)
 
-        if self.use_tfo == "simple":
-            apply_dropout = True
-            x = self.tfo(x)
-
         if self.use_tag_cosine_sim:
             apply_dropout = True
             mod_x = self.fc2(x)
@@ -184,9 +171,6 @@ class CNN_LSTM_Base(nn.Module):
         bert_batch_tokens = bert_tokenizer(batch_text, is_pretokenized=True, return_tensors="pt", padding="max_length",
                                            max_length=(CNN_LSTM_Base.EXPAND_FACTOR * seq_len))["input_ids"]
         bert_batch_vectors = bert_model(bert_batch_tokens.to(device))[0]
-
-        if use_tfo == "xl":
-            bert_batch_vectors = tfo_model(inputs_embeds=bert_batch_vectors)[0]
 
         emb = []
         for sent_index in range(len(batch_text)):
