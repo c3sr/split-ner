@@ -44,7 +44,7 @@
   "use_tag_info": "none",
   "use_tfo": "none",
   "window_size": 5,
-  "use_word": "bert-base-uncased",
+  "use_word": "allenai/scibert_scivocab_uncased",
   "post_padding": true,
   "word_emb_model_from_tf": false,
   "use_class_guidance": false,
