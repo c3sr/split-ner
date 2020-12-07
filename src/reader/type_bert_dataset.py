@@ -25,27 +25,35 @@ class ProcessedSentenceAndTag:
 
 
 class BertToken(Token):
-    def __init__(self, start, text, bert_id, tag, pos_tag=None, dep_tag=None):
-        super(BertToken, self).__init__(start, text, tag, pos_tag, dep_tag)
+    def __init__(self, start, text, bert_id, tag, pos_tag=None, dep_tag=None, guidance_tag=None):
+        super(BertToken, self).__init__(start, text, tag, pos_tag, dep_tag, guidance_tag)
         self.bert_id = bert_id
 
     def __str__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5})".format(self.start, self.text, self.bert_id, self.tag, self.pos_tag,
-                                                       self.dep_tag)
+        return "({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(self.start, self.text, self.bert_id, self.tag, self.pos_tag,
+                                                            self.dep_tag, self.guidance_tag)
 
     def __repr__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5})".format(self.start, self.text, self.bert_id, self.tag, self.pos_tag,
-                                                       self.dep_tag)
+        return "({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(self.start, self.text, self.bert_id, self.tag, self.pos_tag,
+                                                            self.dep_tag, self.guidance_tag)
 
 
 class TypeDataset(Dataset):
 
-    def __init__(self, corpus_path, config):
+    def __init__(self, config, corpus_type):
         super(TypeDataset, self).__init__()
         self.config = config
-        self.corpus_path = corpus_path
+        if corpus_type == "train":
+            self.corpus_path = self.config.data.train_path
+            self.guidance_path = self.config.data.guidance_train_path
+        elif corpus_type == "dev":
+            self.corpus_path = self.config.data.dev_path
+            self.guidance_path = self.config.data.guidance_dev_path
+        else:
+            self.corpus_path = self.config.data.test_path
+            self.guidance_path = self.config.data.guidance_test_path
 
-        self.punct_tag = "punct"
+        self.config.punct_tag = "punct"
         self.bert_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
         self.config.data.tags_path = os.path.join(self.config.data.data_dir, self.config.data.tags_path)
@@ -210,8 +218,11 @@ class TypeDataset(Dataset):
         return tag_emb
 
     def parse_dataset(self):
-        text_sentences, text_tags = self.read_dataset()
-        for text_sentence, text_tag in zip(text_sentences, text_tags):
+        text_sentences = self.read_dataset(self.corpus_path)
+        if self.config.use_tag_info != "none":
+            guide_sentences = self.read_dataset(self.guidance_path)
+            self.add_guidance(text_sentences, guide_sentences)
+        for text_sentence in text_sentences:
             self.add_processed_sentence_tag(self.process_sentence_and_tag(text_sentence))
 
     def add_processed_sentence_tag(self, out):
@@ -239,7 +250,7 @@ class TypeDataset(Dataset):
                             self.bert_tokenizer.convert_ids_to_tokens(bert_batch_tokens)]
         new_text_sentence = [
             BertToken(start=0, text=bert_tokens_text[0], bert_id=bert_batch_tokens[0], tag=self.config.none_tag,
-                      pos_tag=self.config.none_tag, dep_tag=self.punct_tag)]
+                      pos_tag=self.config.none_tag, dep_tag=self.config.punct_tag)]
         cnt = 1
         for i in range(len(text_sentence)):
             token = text_sentence[i]
@@ -258,26 +269,38 @@ class TypeDataset(Dataset):
 
         return new_text_sentence
 
-    def read_dataset(self):
+    def read_dataset(self, file_path):
         text_sentences = []
-        with open(self.corpus_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             reader = csv.reader(f, delimiter="\t", quotechar=None)
             text_sentence = []
-            text_tag = []
             for row in reader:
                 if len(row) == 0:
                     text_sentences.append(self.process_bert(text_sentence))
                     text_sentence = []
-                    text_tag = []
                 else:
-                    if len(row) == 2:
+                    if len(row) >= 3:
                         # also have word_level_sentence_mask here (in each BertToken) [pre/post-padding]
-                        text_sentence.append(Token(start=0, text=row[0], tag=row[-1]))
-                    else:
                         text_sentence.append(Token(start=0, text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1]))
-                    text_tag.append(row[-1])
+                    else:
+                        text_sentence.append(Token(start=0, text=row[0], tag=row[-1]))
 
         return text_sentences
+
+    def add_guidance(self, text_sentences, guidance_sentences):
+        if self.config.use_tag_info == "none":
+            return
+        assert len(text_sentences) == len(guidance_sentences), "guidance and input corpus need to have same sentences"
+        for sent_index in range(len(text_sentences)):
+            for token_index in range(len(text_sentences[sent_index])):
+                token = text_sentences[sent_index][token_index]
+                if token_index < len(guidance_sentences[sent_index]):
+                    guide = guidance_sentences[sent_index][token_index]
+                    assert token.text == guide.text, "token text mismatch at token {0} in sentence {1}" \
+                        .format(token_index, sent_index)
+                    token.guidance_tag = guide.tag
+                else:
+                    token.guidance_tag = self.config.none_tag
 
     def __len__(self):
         return len(self.text_sentences)
@@ -313,11 +336,9 @@ class TypeDataset(Dataset):
             indexed_tag
 
     def get_query_given_tokens(self, text_sentence):
-        text_tag = []
         token_sentence = [
             Token(start=0, text=text, pos_tag=self.config.pad_tag, dep_tag=self.config.pad_tag, tag=self.config.pad_tag)
-            for
-            text in text_sentence]
+            for text in text_sentence]
         out = self.process_sentence_and_tag(token_sentence)
         indexed_tag = self.get_indexed_tag(out.text_tag)
 
@@ -337,7 +358,7 @@ class TypeDataset(Dataset):
                 indexed_tag.append(self.out_tags.index(curr_tag))
             else:
                 indexed_tag.append(self.out_tags.index(self.config.none_tag))
-        return np.array(indexed_tag)
+        return np.array(indexed_tag, dtype=np.int64)
 
     def get_char_indexed_sentence(self, out):
         overall_char_indexed_sentence = []
@@ -361,8 +382,7 @@ class TypeDataset(Dataset):
                         self.config.max_seq_len - len(token_sentence))
                 token_sentence = token_sentence + [
                     BertToken(start=0, text="", tag=self.config.pad_tag, pos_tag=self.config.none_tag,
-                              dep_tag=self.config.punct_tag,
-                              bert_id=0)] * (
+                              dep_tag=self.config.punct_tag, bert_id=0)] * (
                                          self.config.max_seq_len - len(token_sentence))
             else:
                 word_level_sentence_mask = [0] * (self.config.max_seq_len - len(token_sentence)) + [1] * len(
@@ -376,28 +396,9 @@ class TypeDataset(Dataset):
         type_indexed_sentence = []
         char_level_sentence_mask = []
         for index in range(len(token_sentence)):
-            if self.config.use_tag_info == "window":
-                tag_context = []
-                for i in range(max(0, index - self.config.window_size), index):
-                    if token_sentence[i].tag in self.inp_tags:
-                        tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[i].tag)]
-                    else:
-                        tag_vec = np.zeros(self.tag_emb_dim, dtype=np.float32)
-                    tag_context.append(tag_vec)
-                    # not taking the output tag info of the current tag (since, it might make the model do trivial copy
-                    # from input to output)
-                for i in range(index + 1, min(index + self.config.window_size + 1, len(token_sentence))):
-                    if token_sentence[i].tag in self.inp_tags:
-                        tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[i].tag)]
-                    else:
-                        tag_vec = np.zeros(self.tag_emb_dim, dtype=np.float32)
-                    tag_context.append(tag_vec)
-                tag_context = np.vstack(tag_context)
-                tag_context = np.amax(tag_context, axis=0)
-                type_indexed_sentence.append(tag_context)
-            else:  # context: none / self
-                if token_sentence[index].tag in self.inp_tags:
-                    tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[index].tag)]
+            if self.config.use_tag_info != "none":
+                if token_sentence[index].guidance_tag in self.inp_tags:
+                    tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[index].guidance_tag)]
                 else:
                     tag_vec = np.zeros(self.tag_emb_dim, dtype=np.float32)
                 type_indexed_sentence.append(tag_vec)

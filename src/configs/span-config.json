@@ -5,8 +5,8 @@
   "eval": "none",
   "query": false,
   "data": {
-    "data_dir": "../../data/GENIA_term_3.02",
-    "out_dir": "../../data/GENIA_term_3.02/out",
+    "data_dir": "../../data/genia",
+    "out_dir": "../../data/genia/out",
     "train_path": "train.tsv",
     "dev_path": "dev.tsv",
     "test_path": "test.tsv",
@@ -17,7 +17,8 @@
     "pos_tag_vocab_path": "pos_tag_vocab.txt",
     "dep_tag_vocab_path": "dep_tag_vocab.txt",
     "word_emb_path": "../../../../Embeddings/glove.6B.50d.txt",
-    "tag_emb_path": "tag_w2v_emb.txt"
+    "tag_emb_path": "tag_scibert_emb.txt",
+    "guidance_dir": "../../data/genia/out/span-cnn-lstm-high"
   },
   "num_epochs": 500,
   "batch_size": 128,
@@ -41,7 +42,7 @@
     "include_word_lengths": true
   },
   "no_lstm": false,
-  "use_tag_info": "pretrained",
+  "use_tag_info": "none",
   "span_pooling": "boundary",
   "loss_masking": "pre",
   "use_tfo": "none",

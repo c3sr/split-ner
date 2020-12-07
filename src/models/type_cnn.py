@@ -65,9 +65,9 @@ class TypeCNN_LSTMExecutor(BaseExecutor):
         self.optimizer = torch.optim.Adam(params=params, lr=config.lr)
 
     def define_datasets(self):
-        self.train_dataset = TypeDataset(config=self.config, corpus_path=self.config.data.train_path)
-        self.dev_dataset = TypeDataset(config=self.config, corpus_path=self.config.data.dev_path)
-        self.test_dataset = TypeDataset(config=self.config, corpus_path=self.config.data.test_path)
+        self.train_dataset = TypeDataset(config=self.config, corpus_type="train")
+        self.dev_dataset = TypeDataset(config=self.config, corpus_type="dev")
+        self.test_dataset = TypeDataset(config=self.config, corpus_type="test")
 
     def get_model_training_out_dim(self):
         return len(self.train_dataset.out_tags)

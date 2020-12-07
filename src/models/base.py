@@ -25,13 +25,19 @@ class BaseExecutor:
         if not os.path.exists(self.config.data.out_dir):
             os.makedirs(self.config.data.out_dir)
 
+        self.config.data.guidance_train_path = os.path.join(self.config.data.guidance_dir, self.config.data.train_path)
+        self.config.data.guidance_dev_path = os.path.join(self.config.data.guidance_dir, self.config.data.dev_path)
+        self.config.data.guidance_test_path = os.path.join(self.config.data.guidance_dir, self.config.data.test_path)
+
         self.config.data.train_path = os.path.join(self.config.data.data_dir, self.config.data.train_path)
         self.config.data.dev_path = os.path.join(self.config.data.data_dir, self.config.data.dev_path)
         self.config.data.test_path = os.path.join(self.config.data.data_dir, self.config.data.test_path)
+
         self.config.verbose = not self.config.no_eval_print
 
         self.config.pad_tag = "<PAD>"
         self.config.unk_tag = "<UNK>"
+        self.config.mask_tag = "<MASK>"
         self.config.none_tag = "O"
 
         self.shuffle_train_data = not (self.config.eval != "none" or self.config.query)
@@ -123,11 +129,11 @@ class BaseExecutor:
             self.train_data_loader.dataset), evaluator.significant_token_metric.micro_avg_f1()))
 
     def evaluate(self):
-        if not os.path.exists(self.config.out_dir):
-            os.makedirs(self.config.out_dir)
-        train_outfile = os.path.join(self.config.out_dir, "train.out.tsv")
-        dev_outfile = os.path.join(self.config.out_dir, "dev.out.tsv")
-        test_outfile = os.path.join(self.config.out_dir, "test.out.tsv")
+        if not os.path.exists(self.config.data.out_dir):
+            os.makedirs(self.config.data.out_dir)
+        train_outfile = os.path.join(self.config.data.out_dir, "train.tsv")
+        dev_outfile = os.path.join(self.config.data.out_dir, "dev.tsv")
+        test_outfile = os.path.join(self.config.data.out_dir, "test.tsv")
         last_trained_epoch = self.start_epoch - 1
         _, train_evaluator = self.evaluate_epoch(self.train_data_loader, epoch=last_trained_epoch, prefix="TRAIN",
                                                  outfile=train_outfile)
@@ -200,7 +206,7 @@ class BaseExecutor:
         if not isinstance(mask, np.ndarray):
             mask = np.ones(gold.shape)
         with open(outfile, "w") as f:
-            f.write("Token\tGold\tPredicted\n")
+            # f.write("Token\tGold\tPredicted\n")
             for sent_index in range(len(corpus)):
                 for word_index in range(len(corpus[sent_index])):
                     token = corpus[sent_index][word_index]
@@ -209,8 +215,8 @@ class BaseExecutor:
                     if gold_tag == self.config.pad_tag:
                         continue
                     if mask[sent_index][word_index] == 0:
-                        gold_tag = "<MASK>"
-                        predicted_tag = "<MASK>"
+                        gold_tag = self.config.mask_tag
+                        predicted_tag = self.config.mask_tag
                     f.write("{0}\t{1}\t{2}\n".format(token, gold_tag, predicted_tag))
                 f.write("\n")
 

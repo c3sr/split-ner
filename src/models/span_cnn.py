@@ -127,9 +127,9 @@ class SpanExecutor(BaseExecutor):
         self.optimizer = torch.optim.Adam(params=params, lr=config.lr)
 
     def define_datasets(self):
-        self.train_dataset = SpanTypeDataset(corpus_path=self.config.data.train_path, config=self.config)
-        self.dev_dataset = SpanTypeDataset(corpus_path=self.config.data.dev_path, config=self.config)
-        self.test_dataset = SpanTypeDataset(corpus_path=self.config.data.test_path, config=self.config)
+        self.train_dataset = SpanTypeDataset(config=self.config, corpus_type="train")
+        self.dev_dataset = SpanTypeDataset(config=self.config, corpus_type="dev")
+        self.test_dataset = SpanTypeDataset(config=self.config, corpus_type="test")
 
     def get_model_training_out_dim(self):
         return len(self.train_dataset.out_tags)

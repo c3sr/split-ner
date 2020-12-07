@@ -10,10 +10,42 @@ from tqdm import tqdm
 from src.components.bert_mrc import BERT_MRC
 from src.components.crf import CRF
 from src.models.base import BaseExecutor
-from src.models.type_cnn_lstm_crf import TypeCRFDataset
+from src.reader.type_bert_dataset import TypeDataset
 from src.utils.evaluator import Evaluator
 from src.utils.general import set_all_seeds, parse_config
 
+
+class TypeCRFDataset(TypeDataset):
+
+    def parse_tags(self):
+        TypeDataset.parse_tags(self)
+        self.out_tags.append(CRF.START_TAG)
+        self.out_tags.append(CRF.STOP_TAG)
+
+    def read_tag_emb(self, tags, emb_dict, tag_emb_dim):
+        tag_emb = []
+        for tag in tags:
+            if tag.startswith("B-") or tag.startswith("I-"):
+                root = tag[2:]
+                root_vec = emb_dict[root] if root in emb_dict else [0.0] * tag_emb_dim  # send 0's if not found
+                bi_vec = [0.0] if tag.startswith("B-") else [1.0]
+                tag_emb.append(root_vec + bi_vec + [0.0, 0.0])
+            else:
+                # special tags
+                if tag not in emb_dict:
+                    main_vec = [0.0] * tag_emb_dim + [0.0]
+                else:
+                    main_vec = emb_dict[tag] + [0.0]
+
+                if tag == self.config.none_tag:
+                    tag_emb.append(main_vec + [1.0, 0.0])
+                elif tag == self.config.pad_tag:
+                    tag_emb.append(main_vec + [0.0, 1.0])
+                elif tag == CRF.START_TAG or tag == CRF.STOP_TAG:  # not used, but embedded to avoid errors
+                    tag_emb.append(main_vec + [0.0, 0.0])
+                else:
+                    raise ValueError("unexpected tag: {0}".format(tag))
+        return tag_emb
 
 class BERT_MRC_CRF(nn.Module):
 
@@ -65,9 +97,9 @@ class BERT_MRC_CRFExecutor(BaseExecutor):
         self.optimizer = torch.optim.Adam(params=params, lr=config.lr)
 
     def define_datasets(self):
-        self.train_dataset = TypeCRFDataset(config=self.config, corpus_path=self.config.data.train_path)
-        self.dev_dataset = TypeCRFDataset(config=self.config, corpus_path=self.config.data.dev_path)
-        self.test_dataset = TypeCRFDataset(config=self.config, corpus_path=self.config.data.test_path)
+        self.train_dataset = TypeCRFDataset(config=self.config, corpus_type="train")
+        self.dev_dataset = TypeCRFDataset(config=self.config, corpus_type="dev")
+        self.test_dataset = TypeCRFDataset(config=self.config, corpus_type="test")
 
     def get_model_training_out_dim(self):
         return len(self.train_dataset.out_tags)

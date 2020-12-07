@@ -25,10 +25,18 @@ class ProcessedSentenceAndTag:
 
 class TypeDataset(Dataset):
 
-    def __init__(self, corpus_path, config):
+    def __init__(self, config, corpus_type):
         super(TypeDataset, self).__init__()
         self.config = config
-        self.corpus_path = corpus_path
+        if corpus_type == "train":
+            self.corpus_path = self.config.data.train_path
+            self.guidance_path = self.config.data.guidance_train_path
+        elif corpus_type == "dev":
+            self.corpus_path = self.config.data.dev_path
+            self.guidance_path = self.config.data.guidance_dev_path
+        else:
+            self.corpus_path = self.config.data.test_path
+            self.guidance_path = self.config.data.guidance_test_path
 
         self.config.data.tags_path = os.path.join(self.config.data.data_dir, self.config.data.tags_path)
         self.config.data.out_tag_names_path = os.path.join(self.config.data.data_dir,
@@ -196,9 +204,12 @@ class TypeDataset(Dataset):
         return tag_emb
 
     def parse_dataset(self):
-        text_sentences, text_tags = self.read_dataset()
-        for text_sentence, text_tag in zip(text_sentences, text_tags):
-            self.add_processed_sentence_tag(self.process_sentence_and_tag(text_sentence, text_tag))
+        text_sentences = self.read_dataset(self.corpus_path)
+        if self.config.use_tag_info != "none":
+            guide_sentences = self.read_dataset(self.guidance_path)
+            self.add_guidance(text_sentences, guide_sentences)
+        for text_sentence in text_sentences:
+            self.add_processed_sentence_tag(self.process_sentence_and_tag(text_sentence))
 
     def add_processed_sentence_tag(self, out):
         self.text_sentences.append(out.text_sentence)
@@ -210,27 +221,37 @@ class TypeDataset(Dataset):
         self.type_indexed_sentences.append(out.type_indexed_sentence)
         self.text_tags.append(out.text_tag)
 
-    def read_dataset(self):
+    def read_dataset(self, file_path):
         text_sentences = []
-        text_tags = []
-        with open(self.corpus_path, "r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             reader = csv.reader(f, delimiter="\t", quotechar=None)
             text_sentence = []
-            text_tag = []
             for row in reader:
                 if len(row) == 0:
                     text_sentences.append(text_sentence)
-                    text_tags.append(text_tag)
                     text_sentence = []
-                    text_tag = []
                 else:
-                    if len(row) == 2:
-                        text_sentence.append(Token(start=0, text=row[0], tag=row[-1]))
-                    else:
+                    if len(row) >= 3:
                         text_sentence.append(Token(start=0, text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1]))
-                    text_tag.append(row[-1])
+                    else:
+                        text_sentence.append(Token(start=0, text=row[0], tag=row[-1]))
 
-        return text_sentences, text_tags
+        return text_sentences
+
+    def add_guidance(self, text_sentences, guidance_sentences):
+        if self.config.use_tag_info == "none":
+            return
+        assert len(text_sentences) == len(guidance_sentences), "guidance and input corpus need to have same sentences"
+        for sent_index in range(len(text_sentences)):
+            for token_index in range(len(text_sentences[sent_index])):
+                token = text_sentences[sent_index][token_index]
+                if token_index < len(guidance_sentences[sent_index]):
+                    guide = guidance_sentences[sent_index][token_index]
+                    assert token.text == guide.text, "token text mismatch at token {0} in sentence {1}" \
+                        .format(token_index, sent_index)
+                    token.guidance_tag = guide.tag
+                else:
+                    token.guidance_tag = self.config.none_tag
 
     def __len__(self):
         return len(self.text_sentences)
@@ -266,12 +287,10 @@ class TypeDataset(Dataset):
             indexed_tag
 
     def get_query_given_tokens(self, text_sentence):
-        text_tag = []
         token_sentence = [
             Token(start=0, text=text, pos_tag=self.config.pad_tag, dep_tag=self.config.pad_tag, tag=self.config.pad_tag)
-            for
-            text in text_sentence]
-        out = self.process_sentence_and_tag(token_sentence, text_tag)
+            for text in text_sentence]
+        out = self.process_sentence_and_tag(token_sentence)
         indexed_tag = self.get_indexed_tag(out.text_tag)
 
         return \
@@ -304,55 +323,32 @@ class TypeDataset(Dataset):
         overall_char_indexed_sentence = np.array(overall_char_indexed_sentence, dtype=np.float32)
         return overall_char_indexed_sentence
 
-    def process_sentence_and_tag(self, token_sentence, text_tag):
+    def process_sentence_and_tag(self, token_sentence):
         if len(token_sentence) > self.config.max_seq_len:
             word_level_sentence_mask = [1] * self.config.max_seq_len
             token_sentence = token_sentence[:self.config.max_seq_len]
-            text_tag = text_tag[:self.config.max_seq_len]
         else:
             if self.config.post_padding:
                 word_level_sentence_mask = [1] * len(token_sentence) + [0] * (
                         self.config.max_seq_len - len(token_sentence))
                 token_sentence = token_sentence + [
                     Token(start=0, text="", tag=self.config.pad_tag, pos_tag=self.config.pad_tag,
-                          dep_tag=self.config.pad_tag)] * (
-                                         self.config.max_seq_len - len(token_sentence))
-                text_tag = text_tag + [self.config.pad_tag] * (self.config.max_seq_len - len(text_tag))
+                          dep_tag=self.config.pad_tag)] * (self.config.max_seq_len - len(token_sentence))
             else:
                 word_level_sentence_mask = [0] * (self.config.max_seq_len - len(token_sentence)) + [1] * len(
                     token_sentence)
                 token_sentence = [Token(start=0, text="", tag=self.config.pad_tag, pos_tag=self.config.pad_tag,
                                         dep_tag=self.config.pad_tag)] * (
                                          self.config.max_seq_len - len(token_sentence)) + token_sentence
-                text_tag = [self.config.pad_tag] * (self.config.max_seq_len - len(text_tag)) + text_tag
         word_indexed_sentence = []
         char_indexed_sentence = []
         pattern_indexed_sentence = []
         type_indexed_sentence = []
         char_level_sentence_mask = []
         for index in range(len(token_sentence)):
-            if self.config.use_tag_info == "window":
-                tag_context = []
-                for i in range(max(0, index - self.config.window_size), index):
-                    if text_tag[i] in self.inp_tags:
-                        tag_vec = self.inp_tag_emb[self.inp_tags.index(text_tag[i])]
-                    else:
-                        tag_vec = np.zeros(self.tag_emb_dim, dtype=np.float32)
-                    tag_context.append(tag_vec)
-                    # not taking the output tag info of the current tag (since, it might make the model do trivial copy
-                    # from input to output)
-                for i in range(index + 1, min(index + self.config.window_size + 1, len(text_tag))):
-                    if text_tag[i] in self.inp_tags:
-                        tag_vec = self.inp_tag_emb[self.inp_tags.index(text_tag[i])]
-                    else:
-                        tag_vec = np.zeros(self.tag_emb_dim, dtype=np.float32)
-                    tag_context.append(tag_vec)
-                tag_context = np.vstack(tag_context)
-                tag_context = np.amax(tag_context, axis=0)
-                type_indexed_sentence.append(tag_context)
-            else:  # context: none / self
-                if text_tag[index] in self.inp_tags:
-                    tag_vec = self.inp_tag_emb[self.inp_tags.index(text_tag[index])]
+            if self.config.use_tag_info != "none":
+                if token_sentence[index].guidance_tag in self.inp_tags:
+                    tag_vec = self.inp_tag_emb[self.inp_tags.index(token_sentence[index].guidance_tag)]
                 else:
                     tag_vec = np.zeros(self.tag_emb_dim, dtype=np.float32)
                 type_indexed_sentence.append(tag_vec)
@@ -378,12 +374,13 @@ class TypeDataset(Dataset):
                 pattern_indexed_word, char_level_word_mask = self.pattern_parser.get_indexed_text(word.text)
                 pattern_indexed_sentence.append(pattern_indexed_word)
 
-        word_indexed_sentence = np.array(word_indexed_sentence)
+        word_indexed_sentence = np.array(word_indexed_sentence, dtype=np.int64)
         type_indexed_sentence = np.array(type_indexed_sentence)
         char_level_sentence_mask = np.array(char_level_sentence_mask)
         word_level_sentence_mask = np.array(word_level_sentence_mask)
 
         text_sentence = [token.text for token in token_sentence]
+        text_tag = [token.tag for token in token_sentence]
 
         return ProcessedSentenceAndTag(text_sentence, char_indexed_sentence, pattern_indexed_sentence,
                                        word_indexed_sentence, type_indexed_sentence, word_level_sentence_mask,
