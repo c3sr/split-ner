@@ -21,7 +21,7 @@
     "guidance_dir": "../../data/onto/out/typecnn-pattern-lstm2-crf-pool-bert-cosinefc-tagbert-posdep-conv64-hidden128-high"
   },
   "num_epochs": 500,
-  "batch_size": 128,
+  "batch_size": 256,
   "word_emb_dim": 50,
   "pos_tag_emb_dim": 15,
   "dep_tag_emb_dim": 15,
