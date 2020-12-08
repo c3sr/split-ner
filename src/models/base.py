@@ -25,9 +25,15 @@ class BaseExecutor:
         if not os.path.exists(self.config.data.out_dir):
             os.makedirs(self.config.data.out_dir)
 
-        self.config.data.guidance_train_path = os.path.join(self.config.data.guidance_dir, self.config.data.train_path)
-        self.config.data.guidance_dev_path = os.path.join(self.config.data.guidance_dir, self.config.data.dev_path)
-        self.config.data.guidance_test_path = os.path.join(self.config.data.guidance_dir, self.config.data.test_path)
+        if self.config.data.guidance_dir:
+            guidance_dir = self.config.data.guidance_dir
+            self.config.data.guidance_train_path = os.path.join(guidance_dir, self.config.data.train_path)
+            self.config.data.guidance_dev_path = os.path.join(guidance_dir, self.config.data.dev_path)
+            self.config.data.guidance_test_path = os.path.join(guidance_dir, self.config.data.test_path)
+        else:
+            self.config.data.guidance_train_path = None
+            self.config.data.guidance_dev_path = None
+            self.config.data.guidance_test_path = None
 
         self.config.data.train_path = os.path.join(self.config.data.data_dir, self.config.data.train_path)
         self.config.data.dev_path = os.path.join(self.config.data.data_dir, self.config.data.dev_path)

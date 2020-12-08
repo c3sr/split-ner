@@ -18,7 +18,7 @@
     "dep_tag_vocab_path": "dep_tag_vocab.txt",
     "word_emb_path": "../../../../Embeddings/glove.6B.50d.txt",
     "tag_emb_path": "tag_scibert_emb.txt",
-    "guidance_dir": "../../data/genia/out/type-cnn-lstm-crf-high"
+    "guidance_dir": null
   },
   "num_epochs": 500,
   "batch_size": 128,

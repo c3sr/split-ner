@@ -1,6 +1,6 @@
 {
   "config": "../configs/config-onto.json",
-  "name": "typecnn-pattern-lstm2-crf-pool-bert-cosinefc-tagbert-posdep-conv64-hidden128-high",
+  "name": "typecnn-pattern-lstm2-crf-pool-bert-cosinefc-tagbert-posdep-conv64-hidden128",
   "checkpoint_dir": "../../checkpoints/onto",
   "eval": "none",
   "query": false,
@@ -11,16 +11,17 @@
     "dev_path": "dev.tsv",
     "test_path": "test.tsv",
     "word_vocab_path": "glove_vocab.txt",
-    "tags_path": "tag_vocab_high_resource.txt",
+    "tags_path": "tag_vocab.txt",
     "out_tag_names_path": "tag_names.txt",
     "inp_tag_vocab_path": "empty_inp_tag_vocab.txt",
     "pos_tag_vocab_path": "pos_tag_vocab.txt",
     "dep_tag_vocab_path": "dep_tag_vocab.txt",
     "word_emb_path": null,
-    "tag_emb_path": "tag_w2v_emb.txt"
+    "tag_emb_path": "tag_w2v_emb.txt",
+    "guidance_dir": null
   },
   "num_epochs": 500,
-  "batch_size": 128,
+  "batch_size": 256,
   "word_emb_dim": 50,
   "pos_tag_emb_dim": 15,
   "dep_tag_emb_dim": 15,

@@ -1,6 +1,6 @@
 {
   "config": "../configs/config-jnlpba.json",
-  "name": "typecnn-pattern-lstm2-crf-pool-bert-cosinefc-tagbert-posdep-conv64-hidden128",
+  "name": "typecnn-pattern-lstm2-crf-pool-bert-cosinefc-tagbert-posdep-conv64-hidden128-high",
   "checkpoint_dir": "../../checkpoints/jnlpba",
   "eval": "none",
   "query": false,
@@ -11,7 +11,7 @@
     "dev_path": "dev.tsv",
     "test_path": "test.tsv",
     "word_vocab_path": "glove_vocab.txt",
-    "tags_path": "tag_vocab.txt",
+    "tags_path": "tag_vocab_high_resource.txt",
     "out_tag_names_path": "tag_names.txt",
     "inp_tag_vocab_path": "empty_inp_tag_vocab.txt",
     "pos_tag_vocab_path": "pos_tag_vocab.txt",
