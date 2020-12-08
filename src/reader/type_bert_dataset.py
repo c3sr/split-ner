@@ -145,7 +145,7 @@ class TypeDataset(Dataset):
         with open(self.config.data.inp_tag_vocab_path, "r") as f:
             for line in f:
                 line = line.strip()
-                if line:
+                if line not in [self.config.pad_tag, self.config.none_tag]:
                     self.inp_tags.append(line)
                     assert line not in self.out_tags, "found overlapping tokens between inputs/output tag files"
 
