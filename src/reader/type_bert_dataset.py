@@ -5,8 +5,8 @@ import numpy as np
 from torch.utils.data import Dataset
 from transformers import BertTokenizer
 
-from src.datasets.genia import Token
 from src.utils.char_parsers import LowercaseCharParser, CharParser, OneToOnePatternParser, WordCondensedPatternParser
+from src.utils.dataset_utils import Token, BertToken
 from src.utils.general import parse_emb_file
 
 
@@ -22,20 +22,6 @@ class ProcessedSentenceAndTag:
         self.word_level_sentence_mask, = word_level_sentence_mask,
         self.char_level_sentence_mask = char_level_sentence_mask
         self.text_tag = text_tag
-
-
-class BertToken(Token):
-    def __init__(self, start, text, bert_id, tag, pos_tag=None, dep_tag=None, guidance_tag=None):
-        super(BertToken, self).__init__(start, text, tag, pos_tag, dep_tag, guidance_tag)
-        self.bert_id = bert_id
-
-    def __str__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(self.start, self.text, self.bert_id, self.tag, self.pos_tag,
-                                                            self.dep_tag, self.guidance_tag)
-
-    def __repr__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(self.start, self.text, self.bert_id, self.tag, self.pos_tag,
-                                                            self.dep_tag, self.guidance_tag)
 
 
 class TypeDataset(Dataset):

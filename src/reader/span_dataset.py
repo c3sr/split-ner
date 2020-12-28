@@ -4,8 +4,8 @@ import os
 import numpy as np
 from torch.utils.data import Dataset
 
-from src.datasets.genia import Token
 from src.utils.char_parsers import LowercaseCharParser, CharParser, OneToOnePatternParser, WordCondensedPatternParser
+from src.utils.dataset_utils import Token
 from src.utils.general import parse_emb_file
 
 
