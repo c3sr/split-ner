@@ -7,24 +7,7 @@ from _collections import defaultdict
 from sklearn.model_selection import train_test_split
 
 from src.utils.corpus_utils import add_linguistic_features
-
-
-class Token:
-    def __init__(self, start, text, tag, pos_tag=None, dep_tag=None, guidance_tag=None):
-        self.start = start
-        self.text = text
-        self.tag = tag
-        self.pos_tag = pos_tag
-        self.dep_tag = dep_tag
-        self.guidance_tag = guidance_tag
-
-    def __str__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5})".format(self.start, self.text, self.tag, self.pos_tag, self.dep_tag,
-                                                       self.guidance_tag)
-
-    def __repr__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5})".format(self.start, self.text, self.tag, self.pos_tag, self.dep_tag,
-                                                       self.guidance_tag)
+from src.utils.dataset_utils import Token, Entity, Sentence
 
 
 def begin_tag(tag):

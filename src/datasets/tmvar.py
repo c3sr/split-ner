@@ -6,8 +6,8 @@ import spacy
 from sklearn.model_selection import train_test_split
 
 from src.datasets.general_tsv import generate_corpus_files
-from src.datasets.genia import Token
 from src.utils.corpus_utils import create_vocab_from_embeddings
+from src.utils.dataset_utils import Token
 
 nlp = spacy.load("en_core_sci_sm")
 
