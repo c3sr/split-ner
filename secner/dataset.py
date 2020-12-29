@@ -1,42 +1,35 @@
-import csv
+import argparse
 import os
+import time
 
-import numpy as np
 from torch.utils.data import Dataset
+from transformers import BertTokenizerFast
 
-from src.utils.dataset_utils import Token
-
-
-class ProcessedSentenceAndTag:
-
-    def __init__(self, text_sentence, word_indexed_sentence, word_level_sentence_mask, text_tag):
-        self.text_sentence = text_sentence
-        self.word_indexed_sentence = word_indexed_sentence
-        self.word_level_sentence_mask, = word_level_sentence_mask,
-        self.text_tag = text_tag
+from secner.utils import Token, parse_config, set_all_seeds, BertToken, Sentence
 
 
-class TypeDataset(Dataset):
+class NerDataset(Dataset):
 
     def __init__(self, config, corpus_type):
-        super(TypeDataset, self).__init__()
+        super(NerDataset, self).__init__()
         self.config = config
         self.corpus_path = self.set_corpus_path(corpus_type)
-        
-        self.config.data.tags_path = os.path.join(self.config.data.data_dir, self.config.data.tags_path)
-        
-        self.out_tags = []
-        self.parse_tags()
+        self.set_absolute_paths()
 
-        self.text_sentences = []
-        self.word_indexed_sentences = []
-        self.word_level_masks = []
-        self.text_tags = []
-        self.bert_tokenizer = BertTokenizer.from_pretrained(self.use_word)
+        self.tag_vocab = []
+        self.parse_tag_vocab()
+
+        self.sentences = []
+        self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
+        self.bert_start_token, self.bert_end_token = self.get_bert_special_tokens()
         self.parse_dataset()
 
+    def set_absolute_paths(self):
+        self.config.data.tags_path = os.path.join(self.config.data.data_dir, self.config.data.tags_path)
+        self.corpus_path = os.path.join(self.config.data.data_dir, self.corpus_path)
+
     def set_corpus_path(self, corpus_type):
-    	if corpus_type == "train":
+        if corpus_type == "train":
             return self.config.data.train_path
         if corpus_type == "dev":
             return self.config.data.dev_path
@@ -44,107 +37,82 @@ class TypeDataset(Dataset):
             return self.config.data.test_path
         return None
 
-    def parse_tags(self):
-        self.out_tags.append(self.config.pad_tag)
+    def parse_tag_vocab(self):
+        self.tag_vocab.append(self.config.pad_tag)
         with open(self.config.data.tags_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
-                    self.out_tags.append(line)
+                    self.tag_vocab.append(line)
 
     def parse_dataset(self):
-        text_sentences = self.read_dataset(self.corpus_path)
-        for text_sentence in text_sentences:
-            self.add_processed_sentence_tag(self.process_sentence_and_tag(text_sentence))
+        self.sentences = NerDataset.read_dataset(self.corpus_path)
+        for index in range(len(self.sentences)):
+            self.process_sentence(index)
 
-    def add_processed_sentence_tag(self, out):
-        self.text_sentences.append(out.text_sentence)
-        self.word_indexed_sentences.append(out.word_indexed_sentence)
-        self.word_level_masks.append(out.word_level_sentence_mask)
-        self.text_tags.append(out.text_tag)
-
-    def read_dataset(self, file_path):
+    @staticmethod
+    def read_dataset(file_path):
         sentences = []
         with open(file_path, "r", encoding="utf-8") as f:
-            sentence = []
+            tokens = []
             for line in f:
-            	line = line.strip()
+                line = line.strip()
                 if line:
-                	s = line.split("\t")
-                    if len(s) >= 3:
-                        sentence.append(Token(start=0, text=s[0], pos_tag=s[1], dep_tag=s[2], tag=s[-1]))
+                    row = line.split("\t")
+                    if len(row) >= 3:
+                        tokens.append(Token(text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1]))
                     else:
-                        sentence.append(Token(start=0, text=s[0], tag=s[-1]))
+                        tokens.append(Token(text=row[0], tag=row[-1]))
                 else:
-                    sentences.append(sentence)
-                    sentence = []
+                    sentences.append(Sentence(tokens))
+                    tokens = []
         return sentences
 
     def __len__(self):
-        return len(self.text_sentences)
+        return len(self.sentences)
 
     def __getitem__(self, index):
-        text_sentence = self.text_sentences[index]
-        word_indexed_sentence = self.word_indexed_sentences[index]
-        word_level_mask = self.word_level_masks[index]
-        indexed_tag = self.get_indexed_tag(self.text_tags[index])
+        sentence = self.sentences[index]
+        bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
+        bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
-        return \
-            text_sentence, \
-            word_indexed_sentence, \
-            word_level_mask, \
-            indexed_tag
+        return bert_token_ids, bert_tag_ids
 
-    def get_indexed_tag(self, text_tag):
-        indexed_tag = []
-        for curr_tag in text_tag:
-            if curr_tag in self.out_tags:
-                indexed_tag.append(self.out_tags.index(curr_tag))
-            else:
-                indexed_tag.append(self.out_tags.index(self.config.none_tag))
-        return np.array(indexed_tag, dtype=np.int64)
+    def get_tag_index(self, text_tag):
+        if text_tag not in self.tag_vocab:
+            text_tag = self.config.none_tag
+        return self.tag_vocab.index(text_tag)
 
-    def process_sentence_and_tag(self, token_sentence):
+    def get_bert_special_tokens(self):
+        start_id, end_id = self.tokenizer.encode("")
+        start_text, end_text = self.tokenizer.decode([start_id, end_id]).split()
+        start_token = BertToken(start_id, Token(start_text, self.config.none_tag))
+        end_token = BertToken(end_id, Token(end_text, self.config.none_tag))
+        return start_token, end_token
 
-        # check how to get masks also from here itself.. truncation to max_len may be handled here itself.. padding might be removed from here and taken care off by collate_fn! check!
-        bert_batch_tokens = self.bert_tokenizer(batch_text, is_pretokenized=True, return_tensors="pt", padding="max_length",
-                                           max_length=(CNN_LSTM_Base.EXPAND_FACTOR * seq_len))["input_ids"]
+    def process_sentence(self, index):
+        sentence = self.sentences[index]
+        sentence.bert_tokens = [self.bert_start_token]
+        for token in sentence.tokens:
+            bert_ids = self.tokenizer.encode(token.text, add_special_tokens=False)
+            for i in range(len(bert_ids)):
+                if i == 0 or not token.tag.startswith("B-"):
+                    tag = token.tag
+                else:
+                    tag = "I-" + token.tag[2:]
+                bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
+                sentence.bert_tokens.append(BertToken(bert_ids[i], bert_token))
+        sentence.bert_tokens.append(self.bert_end_token)
 
-        if len(token_sentence) > self.config.max_seq_len:
-            word_level_sentence_mask = [1] * self.config.max_seq_len
-            token_sentence = token_sentence[:self.config.max_seq_len]
-        else:
-            if self.config.post_padding:
-                word_level_sentence_mask = [1] * len(token_sentence) + [0] * (
-                        self.config.max_seq_len - len(token_sentence))
-                token_sentence = token_sentence + [
-                    Token(start=0, text="", tag=self.config.pad_tag, pos_tag=self.config.pad_tag,
-                          dep_tag=self.config.pad_tag)] * (self.config.max_seq_len - len(token_sentence))
-            else:
-                word_level_sentence_mask = [0] * (self.config.max_seq_len - len(token_sentence)) + [1] * len(
-                    token_sentence)
-                token_sentence = [Token(start=0, text="", tag=self.config.pad_tag, pos_tag=self.config.pad_tag,
-                                        dep_tag=self.config.pad_tag)] * (
-                                         self.config.max_seq_len - len(token_sentence)) + token_sentence
-        word_indexed_sentence = []
-        for index in range(len(token_sentence)):
-            word = token_sentence[index]
-            if word_level_sentence_mask[index] == 0:
-                word_index = [self.word_vocab_index[self.config.pad_tag], self.pos_tag_vocab.index(word.pos_tag),
-                              self.dep_tag_vocab.index(word.dep_tag)]
-                word_indexed_sentence.append(word_index)  # pad tag
-            else:
-                lw = word.text.lower()
-                if lw not in self.word_vocab_index:
-                    lw = self.config.unk_tag  # unknown tag
-                word_index = [self.word_vocab_index[lw], self.pos_tag_vocab.index(word.pos_tag),
-                              self.dep_tag_vocab.index(word.dep_tag)]
-                word_indexed_sentence.append(word_index)
 
-        word_indexed_sentence = np.array(word_indexed_sentence, dtype=np.int64)
-        word_level_sentence_mask = np.array(word_level_sentence_mask)
-
-        text_sentence = [token.text for token in token_sentence]
-        text_tag = [token.tag for token in token_sentence]
-
-        return ProcessedSentenceAndTag(text_sentence, word_indexed_sentence, word_level_sentence_mask, text_tag)
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser("Dataset Runner")
+    ap.add_argument("--config", type=str, default="config.json", help="config json file (Default: config.json)")
+    args = ap.parse_args()
+    config = parse_config(args.config)
+    set_all_seeds(config.seed)
+    st = time.time()
+    dataset = NerDataset(config, corpus_type="test")
+    end = time.time()
+    print(end - st)
+    print()
