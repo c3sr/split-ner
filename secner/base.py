@@ -98,23 +98,25 @@ class BaseExecutor:
     def evaluate_epoch(self, data_loader, epoch, prefix, outfile=None):
         pass
 
-    def print_outputs(self, corpus, gold, predicted, mapping, outfile, mask=None):
+    def print_outputs(self, corpus, gold, predicted, offsets, mapping, outfile):
+        data = []
+        none_tag = self.config.none_tag
+        for i in range(len(corpus)):
+            data.append([[text, none_tag, none_tag] for text in corpus[i] if text != self.config.pad_tag])
+            ptr = 0
+            for j in range(len(offsets[i])):
+                if offsets[i][j] != ptr:
+                    continue
+                data[i][ptr][1] = mapping[gold[i][j]]
+                data[i][ptr][2] = mapping[predicted[i][j]]
+                ptr += 1
+
         print("Outputs published in file: {0}".format(outfile))
-        if not isinstance(mask, np.ndarray):
-            mask = np.ones(gold.shape)
         with open(outfile, "w") as f:
             # f.write("Token\tGold\tPredicted\n")
-            for sent_index in range(len(corpus)):
-                for word_index in range(len(corpus[sent_index])):
-                    token = corpus[sent_index][word_index]
-                    gold_tag = mapping[int(gold[sent_index][word_index])]
-                    predicted_tag = mapping[int(predicted[sent_index][word_index])]
-                    if gold_tag == self.config.pad_tag:
-                        continue
-                    if mask[sent_index][word_index] == 0:
-                        gold_tag = self.config.mask_tag
-                        predicted_tag = self.config.mask_tag
-                    f.write("{0}\t{1}\t{2}\n".format(token, gold_tag, predicted_tag))
+            for sent in data:
+                for word in sent:
+                    f.write("{0}\t{1}\t{2}\n".format(word[0], word[1], word[2]))
                 f.write("\n")
 
     def load_model_to_device(self):

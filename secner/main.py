@@ -35,7 +35,7 @@ class NerExecutor(BaseExecutor):
         self.model.train()
         train_loss = []
         with tqdm(self.train_data_loader) as progress_bar:
-            for text, token_ids, tag_ids in progress_bar:
+            for text, token_ids, offsets, tag_ids in progress_bar:
                 self.optimizer.zero_grad()
                 loss = self.model.forward_train(token_ids, tag_ids)
                 progress_bar.set_postfix(Epoch=epoch, Batch_Loss="{0:.3f}".format(loss.item()))
@@ -47,17 +47,19 @@ class NerExecutor(BaseExecutor):
     def evaluate_epoch(self, data_loader, epoch, prefix, outfile=None):
         self.model.eval()
         total_text = []
+        total_offsets = []
         total_prediction = []
         total_tags = []
         with tqdm(data_loader) as progress_bar:
-            for text, token_ids, tag_ids in progress_bar:
+            for text, token_ids, offsets, tag_ids in progress_bar:
                 total_text.extend(text)
+                total_offsets.extend(offsets.detach().cpu().numpy().tolist())
                 with torch.no_grad():
                     prediction_ids = self.model.forward_eval(token_ids)
                     total_prediction.extend(prediction_ids.detach().cpu().numpy().tolist())
                     total_tags.extend(tag_ids.detach().cpu().numpy().tolist())
         if outfile:
-            self.print_outputs(corpus=total_text, gold=total_tags, predicted=total_prediction,
+            self.print_outputs(corpus=total_text, gold=total_tags, predicted=total_prediction, offsets=total_offsets,
                                mapping=data_loader.dataset.tag_vocab, outfile=outfile)
         evaluator = Evaluator(gold=total_tags, predicted=total_prediction, tags=data_loader.dataset.tag_vocab)
         print("Entity-Level Metrics:")

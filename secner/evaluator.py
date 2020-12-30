@@ -10,14 +10,14 @@ class Evaluator:
         self.b_to_i = self.generate_bi_tag_mapping()
         self.i_to_b = {v: k for k, v in self.b_to_i.items()}
         self.b_to_tag = {k: v[2:] for k, v in enumerate(self.tags) if v.startswith("B-")}
+
+        self.gold_entity_spans = self.get_spans(self.gold)
+        self.predicted_entity_spans = self.get_spans(self.predicted)
         self.entity_metric = self.calc_entity_metrics()
 
     def calc_entity_metrics(self):
-        gold_spans = self.get_spans(self.gold)
-        predicted_spans = self.get_spans(self.predicted)
-
         entity_metric = Metric([tag[2:] for tag in self.tags if tag.startswith("B-")])
-        for gold_sent_spans, predicted_sent_spans in zip(gold_spans, predicted_spans):
+        for gold_sent_spans, predicted_sent_spans in zip(self.gold_entity_spans, self.predicted_entity_spans):
             for span in predicted_sent_spans:
                 if span in gold_sent_spans:
                     entity_metric.add_tp(span)
@@ -43,22 +43,22 @@ class Evaluator:
 
     def get_spans(self, batch):
         batch_spans = []
-        for sent in range(len(batch)):
+        for sent_index in range(len(batch)):
             sent_spans = []
             prev_span = None
-            for tok in range(len(batch[sent])):
-                if self.gold[sent][tok] == 0:
+            for tok_index in range(len(batch[sent_index])):
+                if self.gold[sent_index][tok_index] == 0:
                     prev_span = None
                     continue
-                if batch[sent][tok] in self.b_to_i:
-                    tag = self.b_to_tag[batch[sent][tok]]
-                    curr_span = Span(tok, tok, tag)
+                if batch[sent_index][tok_index] in self.b_to_i:
+                    tag = self.b_to_tag[batch[sent_index][tok_index]]
+                    curr_span = Span(sent_index, tok_index, tok_index, tag)
                     sent_spans.append(curr_span)
                     prev_span = curr_span
-                elif prev_span and batch[sent][tok] in self.i_to_b:
-                    tag = self.b_to_tag[self.i_to_b[batch[sent][tok]]]
+                elif prev_span and batch[sent_index][tok_index] in self.i_to_b:
+                    tag = self.b_to_tag[self.i_to_b[batch[sent_index][tok_index]]]
                     if tag == prev_span.tag:
-                        prev_span.end = tok
+                        prev_span.end = tok_index
                     else:
                         prev_span = None
             batch_spans.append(sent_spans)
@@ -67,7 +67,8 @@ class Evaluator:
 
 class Span:
 
-    def __init__(self, start, end, tag):
+    def __init__(self, sent, start, end, tag):
+        self.sent = sent
         self.start = start
         self.end = end
         self.tag = tag
@@ -75,10 +76,10 @@ class Span:
     def __eq__(self, other):
         if not isinstance(other, Span):
             return NotImplemented
-        return self.start == other.start and self.end == other.end and self.tag == other.tag
+        return self.sent == other.sent and self.start == other.start and self.end == other.end and self.tag == other.tag
 
     def __repr__(self):
-        return "{0} ({1}, {2})".format(self.tag, self.start, self.end)
+        return "{0} (sent: {1}, start: {2}, end: {3})".format(self.tag, self.sent, self.start, self.end)
 
 
 class Metric:
@@ -149,14 +150,14 @@ class Metric:
     def report(self):
         s = "Tag\tTP\tFP\tFN\tPrecision(%)\tRecall(%)\tF1(%)\n"
         s += "{0}\t{1}\t{2}\t{3}\t{4:.3f}\t{5:.3f}\t{6:.3f}\n".format(
-            "OVERALL (Macro)", self.get_tp(None), self.get_fp(None), self.get_fn(None),
+            "Macro", self.get_tp(None), self.get_fp(None), self.get_fn(None),
             100.0 * self.macro_avg_precision(), 100.0 * self.macro_avg_recall(), 100.0 * self.macro_avg_f1())
         s += "{0}\t{1}\t{2}\t{3}\t{4:.3f}\t{5:.3f}\t{6:.3f}\n".format(
-            "OVERALL (Micro)", self.get_tp(None), self.get_fp(None), self.get_fn(None),
+            "Micro", self.get_tp(None), self.get_fp(None), self.get_fn(None),
             100.0 * self.micro_avg_precision(), 100.0 * self.micro_avg_recall(), 100.0 * self.micro_avg_f1())
-        for tag in self.tags:
-            s += "{0}\t{1}\t{2}\t{3}\t{4:.3f}\t{5:.3f}\t{6:.3f}\n".format(
-                tag, self.get_tp(tag), self.get_fp(tag), self.get_fn(tag),
-                100.0 * self.precision(tag), 100.0 * self.recall(tag), 100.0 * self.f1(tag))
+        # for tag in self.tags:
+        #     s += "{0}\t{1}\t{2}\t{3}\t{4:.3f}\t{5:.3f}\t{6:.3f}\n".format(
+        #         tag, self.get_tp(tag), self.get_fp(tag), self.get_fn(tag),
+        #         100.0 * self.precision(tag), 100.0 * self.recall(tag), 100.0 * self.f1(tag))
 
         return s

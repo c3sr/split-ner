@@ -2,7 +2,7 @@
   "config": "config.json",
   "name": "ner-bert",
   "checkpoint_dir": "../checkpoints/bio",
-  "eval": "none",
+  "eval": "8",
   "query": false,
   "data": {
     "data_dir": "../data/bio",

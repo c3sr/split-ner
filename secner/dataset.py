@@ -49,18 +49,21 @@ class NerDataset(Dataset):
         sentences = []
         with open(file_path, "r", encoding="utf-8") as f:
             tokens = []
+            offset = 0
             for line in f:
                 line = line.strip()
                 if line:
                     row = line.split("\t")
                     if len(row) >= 3:
-                        tokens.append(Token(text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1]))
+                        tokens.append(Token(text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1], offset=offset))
                     else:
-                        tokens.append(Token(text=row[0], tag=row[-1]))
+                        tokens.append(Token(text=row[0], tag=row[-1], offset=offset))
+                    offset += 1
                 else:
                     sentences.append(Sentence(tokens))
                     tokens = []
-        return sentences[:100]
+                    offset = 0
+        return sentences
 
     def __len__(self):
         return len(self.sentences)
@@ -69,9 +72,10 @@ class NerDataset(Dataset):
         sentence = self.sentences[index]
         text = [tok.text for tok in sentence.tokens]
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
+        offsets = [tok.token.offset for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
-        return text, bert_token_ids, bert_tag_ids
+        return text, bert_token_ids, offsets, bert_tag_ids
 
     def get_tag_index(self, text_tag):
         if text_tag not in self.tag_vocab:
@@ -81,8 +85,8 @@ class NerDataset(Dataset):
     def get_bert_special_tokens(self):
         start_id, end_id = self.tokenizer.encode("")
         start_text, end_text = self.tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, Token(start_text, self.config.none_tag))
-        end_token = BertToken(end_id, Token(end_text, self.config.none_tag))
+        start_token = BertToken(start_id, Token(start_text, self.config.none_tag, offset=-1))
+        end_token = BertToken(end_id, Token(end_text, self.config.none_tag, offset=-1))
         return start_token, end_token
 
     def process_sentence(self, index):
@@ -103,21 +107,21 @@ class NerDataset(Dataset):
         # post-padding
         max_len = max(len(b[-1]) for b in batch)
         max_len = min(max_len, self.config.max_seq_len)
+        pad_char = [self.config.pad_tag, 0, -1, 0]
         output = []
 
         entry = []
         for i in range(len(batch)):
             pad_len = max_len - len(batch[i][0][:max_len])
-            entry.append(batch[i][0][:max_len] + [self.config.pad_tag] * pad_len)
+            entry.append(batch[i][0][:max_len] + [pad_char[0]] * pad_len)
         output.append(entry)
 
-        for k in range(1, 3):
+        for k in range(1, len(batch[0])):
             entry = []
             for i in range(len(batch)):
-                pad_len = max_len - len(batch[i][1][:max_len])
-                entry.append(torch.tensor(batch[i][k][:max_len] + [0] * pad_len))
+                pad_len = max_len - len(batch[i][k][:max_len])
+                entry.append(torch.tensor(batch[i][k][:max_len] + [pad_char[k]] * pad_len))
             output.append(torch.stack(entry))
-
         return output
 
 
