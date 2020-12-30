@@ -62,3 +62,18 @@ def set_all_seeds(seed=42):
     torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
+
+
+def get_compute_device(is_cpu_forced):
+    if is_cpu_forced or not torch.cuda.is_available():
+        return "cpu"
+    return "cuda:0"
+
+
+def set_absolute_paths(config):
+    config.data.tags_path = os.path.join(config.data.data_dir, config.data.tags_path)
+    config.data.train_path = os.path.join(config.data.data_dir, config.data.train_path)
+    config.data.dev_path = os.path.join(config.data.data_dir, config.data.dev_path)
+    config.data.test_path = os.path.join(config.data.data_dir, config.data.test_path)
+    config.checkpoint_dir = os.path.join(config.checkpoint_dir, config.name)
+    config.data.out_dir = os.path.join(config.data.out_dir, config.name)

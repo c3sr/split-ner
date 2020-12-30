@@ -1,11 +1,10 @@
 import argparse
-import os
-import time
 
+import torch
 from torch.utils.data import Dataset
 from transformers import BertTokenizerFast
 
-from secner.utils import Token, parse_config, set_all_seeds, BertToken, Sentence
+from secner.utils import Token, parse_config, set_all_seeds, BertToken, Sentence, set_absolute_paths
 
 
 class NerDataset(Dataset):
@@ -14,7 +13,6 @@ class NerDataset(Dataset):
         super(NerDataset, self).__init__()
         self.config = config
         self.corpus_path = self.set_corpus_path(corpus_type)
-        self.set_absolute_paths()
 
         self.tag_vocab = []
         self.parse_tag_vocab()
@@ -23,10 +21,6 @@ class NerDataset(Dataset):
         self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
         self.bert_start_token, self.bert_end_token = self.get_bert_special_tokens()
         self.parse_dataset()
-
-    def set_absolute_paths(self):
-        self.config.data.tags_path = os.path.join(self.config.data.data_dir, self.config.data.tags_path)
-        self.corpus_path = os.path.join(self.config.data.data_dir, self.corpus_path)
 
     def set_corpus_path(self, corpus_type):
         if corpus_type == "train":
@@ -66,17 +60,18 @@ class NerDataset(Dataset):
                 else:
                     sentences.append(Sentence(tokens))
                     tokens = []
-        return sentences
+        return sentences[:100]
 
     def __len__(self):
         return len(self.sentences)
 
     def __getitem__(self, index):
         sentence = self.sentences[index]
+        text = [tok.text for tok in sentence.tokens]
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
-        return bert_token_ids, bert_tag_ids
+        return text, bert_token_ids, bert_tag_ids
 
     def get_tag_index(self, text_tag):
         if text_tag not in self.tag_vocab:
@@ -104,6 +99,27 @@ class NerDataset(Dataset):
                 sentence.bert_tokens.append(BertToken(bert_ids[i], bert_token))
         sentence.bert_tokens.append(self.bert_end_token)
 
+    def collate(self, batch):
+        # post-padding
+        max_len = max(len(b[-1]) for b in batch)
+        max_len = min(max_len, self.config.max_seq_len)
+        output = []
+
+        entry = []
+        for i in range(len(batch)):
+            pad_len = max_len - len(batch[i][0][:max_len])
+            entry.append(batch[i][0][:max_len] + [self.config.pad_tag] * pad_len)
+        output.append(entry)
+
+        for k in range(1, 3):
+            entry = []
+            for i in range(len(batch)):
+                pad_len = max_len - len(batch[i][1][:max_len])
+                entry.append(torch.tensor(batch[i][k][:max_len] + [0] * pad_len))
+            output.append(torch.stack(entry))
+
+        return output
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Dataset Runner")
@@ -111,8 +127,6 @@ if __name__ == "__main__":
     args = ap.parse_args()
     config = parse_config(args.config)
     set_all_seeds(config.seed)
-    st = time.time()
+    set_absolute_paths(config)
     dataset = NerDataset(config, corpus_type="test")
-    end = time.time()
-    print(end - st)
     print()
