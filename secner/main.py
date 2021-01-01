@@ -3,6 +3,7 @@ import argparse
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from transformers import BertConfig
 
 from secner.base import BaseExecutor
 from secner.dataset import NerDataset
@@ -27,7 +28,9 @@ class NerExecutor(BaseExecutor):
         self.test_data_loader = DataLoader(self.test_dataset, batch_size=self.config.batch_size, shuffle=False,
                                            collate_fn=self.test_dataset.collate)
 
-        self.model = NerModel(self.config, self.device)
+        self.num_tags = 34
+        bert_config = BertConfig.from_pretrained("bert-base-uncased", num_labels=self.num_tags)
+        self.model = NerModel.from_pretrained("bert-base-uncased", config=bert_config, ner_params=self.config)
         params = filter(lambda p: p.requires_grad, self.model.parameters())
         self.optimizer = torch.optim.Adam(params=params, lr=self.config.lr)
 
@@ -35,9 +38,9 @@ class NerExecutor(BaseExecutor):
         self.model.train()
         train_loss = []
         with tqdm(self.train_data_loader) as progress_bar:
-            for text, token_ids, offsets, tag_ids in progress_bar:
+            for text, attention_mask, token_ids, offsets, tag_ids in progress_bar:
                 self.optimizer.zero_grad()
-                loss = self.model.forward_train(token_ids, tag_ids)
+                loss = self.model(token_ids, attention_mask, tag_ids)
                 progress_bar.set_postfix(Epoch=epoch, Batch_Loss="{0:.3f}".format(loss.item()))
                 train_loss.append(loss.item())
                 loss.backward()
@@ -51,11 +54,11 @@ class NerExecutor(BaseExecutor):
         total_prediction = []
         total_tags = []
         with tqdm(data_loader) as progress_bar:
-            for text, token_ids, offsets, tag_ids in progress_bar:
+            for text, attention_mask, token_ids, offsets, tag_ids in progress_bar:
                 total_text.extend(text)
                 total_offsets.extend(offsets.detach().cpu().numpy().tolist())
                 with torch.no_grad():
-                    prediction_ids = self.model.forward_eval(token_ids)
+                    prediction_ids = self.model(token_ids, attention_mask)
                     total_prediction.extend(prediction_ids.detach().cpu().numpy().tolist())
                     total_tags.extend(tag_ids.detach().cpu().numpy().tolist())
         if outfile:

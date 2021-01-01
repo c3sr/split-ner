@@ -100,9 +100,9 @@ class BaseExecutor:
 
     def print_outputs(self, corpus, gold, predicted, offsets, mapping, outfile):
         data = []
-        none_tag = self.config.none_tag
+        pad_tag = self.config.pad_tag
         for i in range(len(corpus)):
-            data.append([[text, none_tag, none_tag] for text in corpus[i] if text != self.config.pad_tag])
+            data.append([[text, pad_tag, pad_tag] for text in corpus[i] if text != pad_tag])
             ptr = 0
             for j in range(len(offsets[i])):
                 if offsets[i][j] != ptr:

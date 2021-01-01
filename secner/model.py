@@ -1,33 +1,44 @@
 import torch
 import torch.nn as nn
-from transformers import BertModel
+from transformers import BertModel, BertPreTrainedModel
 
 
-class NerModel(nn.Module):
+class NerModel(BertPreTrainedModel):
 
-    def __init__(self, config, device):
-        super(NerModel, self).__init__()
-        self.config = config
-        self.device = device
-        self.bert_model = BertModel.from_pretrained("bert-base-uncased")
-        for param in self.bert_model.parameters():
+    def __init__(self, config, ner_params):
+        super(NerModel, self).__init__(config)
+        self.ner_params = ner_params
+        self.num_tags = config.num_labels
+        self.bert = BertModel(config)
+        self.dropout = nn.Dropout(self.bert.config.hidden_dropout_prob)
+        self.fc = nn.Linear(self.bert.config.hidden_size, config.num_labels)
+        for param in self.bert.parameters():
             param.requires_grad = False
-        self.fc = nn.Linear(self.bert_model.config.hidden_size, 34)
         self.criterion = nn.CrossEntropyLoss()
+        self.init_weights()
 
-    def forward(self, token_ids):
-        token_ids = token_ids.to(self.device)
-        x = self.bert_model(token_ids)
-        x = self.fc(x[0])
-        return x
+    def forward(self, token_ids, attention_mask=None, tag_ids=None):
+        token_ids, attention_mask, tag_ids = self.push_to_device(token_ids, attention_mask, tag_ids)
+        bert_outputs = self.bert(token_ids, attention_mask=attention_mask)
+        output = self.dropout(bert_outputs[0])
+        logits = self.fc(output)
+        if tag_ids is None:
+            # evaluation flow
+            return torch.argmax(logits, dim=-1)
+        # training flow
+        if attention_mask is not None:
+            active_loss = attention_mask.view(-1) == 1
+            active_logits = logits.view(-1, self.num_tags)
+            active_labels = torch.where(
+                active_loss, tag_ids.view(-1), torch.tensor(self.criterion.ignore_index).type_as(tag_ids)
+            )
+            return self.criterion(active_logits, active_labels)
+        return self.criterion(logits.view(-1, self.num_tags), tag_ids.view(-1))
 
-    def forward_train(self, token_ids, tag_ids):
+    def push_to_device(self, token_ids, attention_mask=None, tag_ids=None):
         token_ids = token_ids.to(self.device)
-        tag_ids = tag_ids.to(self.device)
-        out = self(token_ids)
-        return self.criterion(out.permute(0, 2, 1), tag_ids)
-
-    def forward_eval(self, token_ids):
-        token_ids = token_ids.to(self.device)
-        token_ids = self(token_ids)
-        return torch.argmax(token_ids, dim=-1)
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(self.device)
+        if tag_ids is not None:
+            tag_ids = tag_ids.to(self.device)
+        return token_ids, attention_mask, tag_ids

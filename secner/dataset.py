@@ -70,7 +70,7 @@ class NerDataset(Dataset):
 
     def __getitem__(self, index):
         sentence = self.sentences[index]
-        text = [tok.text for tok in sentence.tokens]
+        text = [tok.text for tok in sentence.tokens]  # original full sentence (with padding), for output file
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
         offsets = [tok.token.offset for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
@@ -101,26 +101,34 @@ class NerDataset(Dataset):
                     tag = "I-" + token.tag[2:]
                 bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
                 sentence.bert_tokens.append(BertToken(bert_ids[i], bert_token))
+        sentence.bert_tokens = sentence.bert_tokens[:self.config.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
 
     def collate(self, batch):
         # post-padding
         max_len = max(len(b[-1]) for b in batch)
-        max_len = min(max_len, self.config.max_seq_len)
         pad_char = [self.config.pad_tag, 0, -1, 0]
         output = []
 
         entry = []
         for i in range(len(batch)):
-            pad_len = max_len - len(batch[i][0][:max_len])
-            entry.append(batch[i][0][:max_len] + [pad_char[0]] * pad_len)
+            pad_len = max_len - len(batch[i][0])
+            entry.append(batch[i][0] + [pad_char[0]] * pad_len)
         output.append(entry)
+
+        # attention mask
+        entry = []
+        for i in range(len(batch)):
+            good_len = len(batch[i][-1])
+            pad_len = max_len - good_len
+            entry.append(torch.tensor([1] * good_len + [0] * pad_len))
+        output.append(torch.stack(entry))
 
         for k in range(1, len(batch[0])):
             entry = []
             for i in range(len(batch)):
-                pad_len = max_len - len(batch[i][k][:max_len])
-                entry.append(torch.tensor(batch[i][k][:max_len] + [pad_char[k]] * pad_len))
+                pad_len = max_len - len(batch[i][k])
+                entry.append(torch.tensor(batch[i][k] + [pad_char[k]] * pad_len))
             output.append(torch.stack(entry))
         return output
 
