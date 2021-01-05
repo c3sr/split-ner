@@ -33,7 +33,7 @@ class NerExecutor:
         self.num_labels = additional_args.num_labels
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
-        self.model = NerModel.from_pretrained(model_path, config=bert_config)
+        self.model = NerModel.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
@@ -52,7 +52,7 @@ class NerExecutor:
         predictions = np.argmax(eval_prediction.predictions, axis=2)
         evaluator = Evaluator(gold=eval_prediction.label_ids, predicted=predictions, tags=self.dev_dataset.tag_vocab)
         logger.info("entity metrics:\n{0}".format(evaluator.entity_metric.report()))
-        return {"accuracy": evaluator.entity_metric.micro_avg_f1()}
+        return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset: NerDataset):
         model_predictions: np.ndarray = np.argmax(self.trainer.predict(dataset).predictions, axis=2)

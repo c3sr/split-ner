@@ -28,6 +28,7 @@ class AdditionalArguments:
 
     max_seq_len: int = field(default=128, metadata={"help": "maximum sequence length"})
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
+    freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
