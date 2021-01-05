@@ -1,9 +1,17 @@
 import json
+import logging
 import os
 import random
+from pathlib import Path
+from typing import Tuple
 
+import dataclasses
 import numpy as np
 import torch
+import wandb
+from transformers import HfArgumentParser
+from transformers.hf_argparser import DataClass
+from transformers.training_args import default_logdir
 
 
 class Token:
@@ -41,17 +49,6 @@ class Sentence:
         self.bert_tokens = bert_tokens
 
 
-class Config:
-    def __init__(self, config_dict):
-        self.__dict__.update(config_dict)
-
-
-def parse_config(config_file):
-    with open(config_file, "r") as f:
-        d = json.load(f)
-    return json.loads(json.dumps(d), object_hook=Config)
-
-
 def set_all_seeds(seed=42):
     random.seed(seed)
     np.random.seed(seed)
@@ -64,16 +61,29 @@ def set_all_seeds(seed=42):
     torch.backends.cudnn.deterministic = True
 
 
-def get_compute_device(is_cpu_forced):
-    if is_cpu_forced or not torch.cuda.is_available():
-        return "cpu"
-    return "cuda:0"
+def setup_logging():
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        level=logging.INFO)
 
 
-def set_absolute_paths(config):
-    config.data.tags_path = os.path.join(config.data.data_dir, config.data.tags_path)
-    config.data.train_path = os.path.join(config.data.data_dir, config.data.train_path)
-    config.data.dev_path = os.path.join(config.data.data_dir, config.data.dev_path)
-    config.data.test_path = os.path.join(config.data.data_dir, config.data.test_path)
-    config.checkpoint_dir = os.path.join(config.checkpoint_dir, config.name)
-    config.data.out_dir = os.path.join(config.data.out_dir, config.name)
+def set_wandb(wandb_dir):
+    os.environ["WANDB_WATCH"] = "all"
+    wandb.init(project=os.getenv("WANDB_PROJECT", "sec-ner"), dir=wandb_dir)
+
+
+def parse_config(parser: HfArgumentParser, json_file: str) -> Tuple[DataClass, ...]:
+    data = json.loads(Path(json_file).read_text())
+
+    curr_run_output_dir = os.path.join(data["out_root"], data["dataset_dir"], data["model_name"])
+    data["output_dir"] = os.path.join(curr_run_output_dir, "checkpoints")
+    data["logging_dir"] = os.path.join(curr_run_output_dir, default_logdir())
+
+    outputs = []
+    for dtype in parser.dataclass_types:
+        keys = {f.name for f in dataclasses.fields(dtype)}
+        inputs = {k: v for k, v in data.items() if k in keys}
+        obj = dtype(**inputs)
+        outputs.append(obj)
+    return (*outputs,)

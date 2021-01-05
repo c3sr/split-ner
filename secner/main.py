@@ -1,80 +1,104 @@
 import argparse
+import logging
+import os
 
-import torch
-from torch.utils.data import DataLoader
-from tqdm import tqdm
-from transformers import BertConfig
+import numpy as np
+from transformers import DataCollatorForTokenClassification, AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import Trainer, TrainingArguments
 
-from secner.base import BaseExecutor
+from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.evaluator import Evaluator
 from secner.model import NerModel
-from secner.utils import set_all_seeds, parse_config
+from secner.utils import set_all_seeds, set_wandb, parse_config, setup_logging
+
+logger = logging.getLogger(__name__)
 
 
-class NerExecutor(BaseExecutor):
+class NerExecutor:
+    def __init__(self, train_args, additional_args):
+        set_wandb(additional_args.wandb_dir)
+        logger.info("training args: {0}".format(train_args.to_json_string()))
+        logger.info("additional args: {0}".format(additional_args.to_json_string()))
+        set_all_seeds(train_args.seed)
 
-    def __init__(self, config):
-        super(NerExecutor, self).__init__(config)
+        self.train_args = train_args
+        self.additional_args = additional_args
 
-        self.train_dataset = NerDataset(self.config, "train")
-        self.dev_dataset = NerDataset(self.config, "dev")
-        self.test_dataset = NerDataset(self.config, "test")
+        self.train_dataset = NerDataset(additional_args, "train")
+        self.dev_dataset = NerDataset(additional_args, "dev")
+        self.test_dataset = NerDataset(additional_args, "test")
 
-        self.train_data_loader = DataLoader(self.train_dataset, batch_size=self.config.batch_size, shuffle=False,
-                                            collate_fn=self.train_dataset.collate)
-        self.dev_data_loader = DataLoader(self.dev_dataset, batch_size=self.config.batch_size, shuffle=False,
-                                          collate_fn=self.dev_dataset.collate)
-        self.test_data_loader = DataLoader(self.test_dataset, batch_size=self.config.batch_size, shuffle=False,
-                                           collate_fn=self.test_dataset.collate)
+        self.num_labels = additional_args.num_labels
+        model_path = additional_args.resume if additional_args.resume else additional_args.base_model
+        bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
+        self.model = NerModel.from_pretrained(model_path, config=bert_config)
 
-        self.num_tags = 34
-        bert_config = BertConfig.from_pretrained("bert-base-uncased", num_labels=self.num_tags)
-        self.model = NerModel.from_pretrained("bert-base-uncased", config=bert_config, ner_params=self.config)
-        params = filter(lambda p: p.requires_grad, self.model.parameters())
-        self.optimizer = torch.optim.Adam(params=params, lr=self.config.lr)
+        trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
+        logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
-    def train_epoch(self, epoch):
-        self.model.train()
-        train_loss = []
-        with tqdm(self.train_data_loader) as progress_bar:
-            for text, attention_mask, token_ids, offsets, tag_ids in progress_bar:
-                self.optimizer.zero_grad()
-                loss = self.model(token_ids, attention_mask, tag_ids)
-                progress_bar.set_postfix(Epoch=epoch, Batch_Loss="{0:.3f}".format(loss.item()))
-                train_loss.append(loss.item())
-                loss.backward()
-                self.optimizer.step()
-        print("TRAIN: Epoch: {0} | Loss:{1:.3f}".format(epoch, sum(train_loss) / len(train_loss)))
+        tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
+        data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
+        self.trainer = Trainer(model=self.model,
+                               args=train_args,
+                               tokenizer=tokenizer,
+                               data_collator=data_collator,
+                               train_dataset=self.train_dataset,
+                               eval_dataset=self.dev_dataset,
+                               compute_metrics=self.compute_metrics)
 
-    def evaluate_epoch(self, data_loader, epoch, prefix, outfile=None):
-        self.model.eval()
-        total_text = []
-        total_offsets = []
-        total_prediction = []
-        total_tags = []
-        with tqdm(data_loader) as progress_bar:
-            for text, attention_mask, token_ids, offsets, tag_ids in progress_bar:
-                total_text.extend(text)
-                total_offsets.extend(offsets.detach().cpu().numpy().tolist())
-                with torch.no_grad():
-                    prediction_ids = self.model(token_ids, attention_mask)
-                    total_prediction.extend(prediction_ids.detach().cpu().numpy().tolist())
-                    total_tags.extend(tag_ids.detach().cpu().numpy().tolist())
-        if outfile:
-            self.print_outputs(corpus=total_text, gold=total_tags, predicted=total_prediction, offsets=total_offsets,
-                               mapping=data_loader.dataset.tag_vocab, outfile=outfile)
-        evaluator = Evaluator(gold=total_tags, predicted=total_prediction, tags=data_loader.dataset.tag_vocab)
-        print("Entity-Level Metrics:")
-        print(evaluator.entity_metric.report())
+    def compute_metrics(self, eval_prediction):
+        predictions = np.argmax(eval_prediction.predictions, axis=2)
+        evaluator = Evaluator(gold=eval_prediction.label_ids, predicted=predictions, tags=self.dev_dataset.tag_vocab)
+        logger.info("entity metrics:\n{0}".format(evaluator.entity_metric.report()))
+        return {"accuracy": evaluator.entity_metric.micro_avg_f1()}
 
-        return evaluator
+    def dump_predictions(self, dataset: NerDataset):
+        model_predictions: np.ndarray = np.argmax(self.trainer.predict(dataset).predictions, axis=2)
+        data = []
+        pad_tag = self.additional_args.pad_tag
+        for i in range(len(dataset)):
+            sentence = dataset.sentences[i]
+            prediction = model_predictions[i]
+            data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
+            offsets = [tok.token.offset for tok in sentence.bert_tokens]
+            ptr = 0
+            r = min(prediction.shape[0], len(offsets))
+            for j in range(r):
+                if offsets[j] != ptr:
+                    continue
+                data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
+                ptr += 1
+
+        os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
+        predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
+        logger.info("Outputs published in file: {0}".format(predictions_file))
+        with open(predictions_file, "w") as f:
+            # f.write("Token\tGold\tPredicted\n")
+            for sent in data:
+                for word in sent:
+                    f.write("{0}\t{1}\t{2}\n".format(word[0], word[1], word[2]))
+                f.write("\n")
+
+    def run(self):
+        if self.train_args.do_train:
+            logger.info("training mode")
+            self.trainer.train(self.additional_args.resume)
+        else:
+            logger.info("prediction mode")
+            assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
+            self.dump_predictions(self.train_dataset)
+            self.dump_predictions(self.dev_dataset)
+            self.dump_predictions(self.test_dataset)
+            # throws some threading related tqdm/wandb exception in the end (but code fully works)
 
 
 def main(args):
-    config = parse_config(args.config)
-    set_all_seeds(config.seed)
-    executor = NerExecutor(config)
+    setup_logging()
+    parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
+    train_args, additional_args = parse_config(parser, args.config)
+    executor = NerExecutor(train_args, additional_args)
     executor.run()
 
 

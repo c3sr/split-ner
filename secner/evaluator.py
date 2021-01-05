@@ -1,11 +1,13 @@
 from collections import defaultdict
 
+import numpy as np
+
 
 class Evaluator:
 
     def __init__(self, gold, predicted, tags):
-        self.gold = gold
-        self.predicted = predicted
+        self.gold = gold.tolist() if isinstance(gold, np.ndarray) else gold
+        self.predicted = predicted.tolist() if isinstance(predicted, np.ndarray) else predicted
         self.tags = tags
         self.b_to_i = self.generate_bi_tag_mapping()
         self.i_to_b = {v: k for k, v in self.b_to_i.items()}
@@ -47,7 +49,7 @@ class Evaluator:
             sent_spans = []
             prev_span = None
             for tok_index in range(len(batch[sent_index])):
-                if self.gold[sent_index][tok_index] == 0:
+                if self.gold[sent_index][tok_index] == -100:
                     prev_span = None
                     continue
                 if batch[sent_index][tok_index] in self.b_to_i:

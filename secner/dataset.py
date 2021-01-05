@@ -2,38 +2,39 @@ import argparse
 
 import torch
 from torch.utils.data import Dataset
-from transformers import BertTokenizerFast
+from transformers import HfArgumentParser, AutoTokenizer
 
-from secner.utils import Token, parse_config, set_all_seeds, BertToken, Sentence, set_absolute_paths
+from secner.additional_args import AdditionalArguments
+from secner.utils import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 
 
 class NerDataset(Dataset):
 
-    def __init__(self, config, corpus_type):
+    def __init__(self, args, corpus_type):
         super(NerDataset, self).__init__()
-        self.config = config
-        self.corpus_path = self.set_corpus_path(corpus_type)
+        self.args = args
+        self.corpus_type = corpus_type
+        self.corpus_path = self.set_corpus_path()
 
         self.tag_vocab = []
         self.parse_tag_vocab()
 
         self.sentences = []
-        self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
+        self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
         self.bert_start_token, self.bert_end_token = self.get_bert_special_tokens()
         self.parse_dataset()
 
-    def set_corpus_path(self, corpus_type):
-        if corpus_type == "train":
-            return self.config.data.train_path
-        if corpus_type == "dev":
-            return self.config.data.dev_path
-        if corpus_type == "test":
-            return self.config.data.test_path
+    def set_corpus_path(self):
+        if self.corpus_type == "train":
+            return self.args.train_path
+        if self.corpus_type == "dev":
+            return self.args.dev_path
+        if self.corpus_type == "test":
+            return self.args.test_path
         return None
 
     def parse_tag_vocab(self):
-        self.tag_vocab.append(self.config.pad_tag)
-        with open(self.config.data.tags_path, "r") as f:
+        with open(self.args.tag_vocab_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -70,23 +71,21 @@ class NerDataset(Dataset):
 
     def __getitem__(self, index):
         sentence = self.sentences[index]
-        text = [tok.text for tok in sentence.tokens]  # original full sentence (with padding), for output file
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
-        offsets = [tok.token.offset for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
-        return text, bert_token_ids, offsets, bert_tag_ids
+        return {"input_ids": bert_token_ids, "labels": bert_tag_ids}
 
     def get_tag_index(self, text_tag):
         if text_tag not in self.tag_vocab:
-            text_tag = self.config.none_tag
+            text_tag = self.args.none_tag
         return self.tag_vocab.index(text_tag)
 
     def get_bert_special_tokens(self):
         start_id, end_id = self.tokenizer.encode("")
         start_text, end_text = self.tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, Token(start_text, self.config.none_tag, offset=-1))
-        end_token = BertToken(end_id, Token(end_text, self.config.none_tag, offset=-1))
+        start_token = BertToken(start_id, Token(start_text, self.args.none_tag, offset=-1))
+        end_token = BertToken(end_id, Token(end_text, self.args.none_tag, offset=-1))
         return start_token, end_token
 
     def process_sentence(self, index):
@@ -101,44 +100,59 @@ class NerDataset(Dataset):
                     tag = "I-" + token.tag[2:]
                 bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
                 sentence.bert_tokens.append(BertToken(bert_ids[i], bert_token))
-        sentence.bert_tokens = sentence.bert_tokens[:self.config.max_seq_len - 1]
+        sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
 
-    def collate(self, batch):
+    @staticmethod
+    def data_collator(features):
+        """
+        Function not being used in the current flow (can be used later)
+        """
+
         # post-padding
-        max_len = max(len(b[-1]) for b in batch)
-        pad_char = [self.config.pad_tag, 0, -1, 0]
-        output = []
+        max_len = max(len(b["labels"]) for b in features)
+        # max_len = self.args.max_seq_len
+        batch = dict()
 
+        # input_ids
         entry = []
-        for i in range(len(batch)):
-            pad_len = max_len - len(batch[i][0])
-            entry.append(batch[i][0] + [pad_char[0]] * pad_len)
-        output.append(entry)
+        for i in range(len(features)):
+            pad_len = max_len - len(features[i]["input_ids"])
+            entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
+        batch["input_ids"] = torch.stack(entry)
 
-        # attention mask
+        # attention_mask
         entry = []
-        for i in range(len(batch)):
-            good_len = len(batch[i][-1])
+        for i in range(len(features)):
+            good_len = len(features[i]["labels"])
             pad_len = max_len - good_len
             entry.append(torch.tensor([1] * good_len + [0] * pad_len))
-        output.append(torch.stack(entry))
+        batch["attention_mask"] = torch.stack(entry)
 
-        for k in range(1, len(batch[0])):
-            entry = []
-            for i in range(len(batch)):
-                pad_len = max_len - len(batch[i][k])
-                entry.append(torch.tensor(batch[i][k] + [pad_char[k]] * pad_len))
-            output.append(torch.stack(entry))
-        return output
+        # token_type_ids
+        batch["token_type_ids"] = torch.zeros(size=(len(features), max_len), dtype=torch.int64)
+
+        # labels
+        entry = []
+        for i in range(len(features)):
+            pad_len = max_len - len(features[i]["labels"])
+            entry.append(torch.tensor(features[i]["labels"] + [-100] * pad_len))
+        batch["labels"] = torch.stack(entry)
+
+        return batch
+
+
+def main(args):
+    setup_logging()
+    parser = HfArgumentParser([AdditionalArguments])
+    additional_args = parse_config(parser, args.config)[0]
+    set_all_seeds(42)
+    dataset = NerDataset(additional_args, corpus_type="test")
+    print(len(dataset))
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser("Dataset Runner")
-    ap.add_argument("--config", type=str, default="config.json", help="config json file (Default: config.json)")
-    args = ap.parse_args()
-    config = parse_config(args.config)
-    set_all_seeds(config.seed)
-    set_absolute_paths(config)
-    dataset = NerDataset(config, corpus_type="test")
-    print()
+    ap = argparse.ArgumentParser(description="Dataset Runner")
+    ap.add_argument("--config", default="config.json", help="config json file (Default: config.json)")
+    ap = ap.parse_args()
+    main(ap)
