@@ -3,12 +3,10 @@ import torch.nn as nn
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
-from secner.additional_args import AdditionalArguments
-
 
 class NerModel(BertPreTrainedModel):
 
-    def __init__(self, config: BertConfig, additional_args: AdditionalArguments):
+    def __init__(self, config: BertConfig):
         super(NerModel, self).__init__(config)
         self.num_labels = config.num_labels
 
@@ -18,9 +16,8 @@ class NerModel(BertPreTrainedModel):
 
         self.init_weights()
 
-        if additional_args.freeze_bert:
-            for param in self.bert.parameters():
-                param.requires_grad = False
+        # for param in self.bert.parameters():
+        #     param.requires_grad = False
 
     def forward(
             self,

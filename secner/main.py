@@ -33,7 +33,7 @@ class NerExecutor:
         self.num_labels = additional_args.num_labels
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
-        self.model = NerModel.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
+        self.model = NerModel.from_pretrained(model_path, config=bert_config)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
