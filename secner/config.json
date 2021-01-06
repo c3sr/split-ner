@@ -16,7 +16,6 @@
   "max_seq_len": 256,
   "freeze_bert": false,
   "base_model": "bert-base-uncased",
-  "overwrite_output_dir": true,
   "evaluation_strategy": "steps",
   "logging_steps": 20,
   "save_total_limit": 3,
