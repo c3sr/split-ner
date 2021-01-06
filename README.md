@@ -8,7 +8,6 @@ pip install -r requirements.txt
 pip install -e .
 ```
 Run training, in corresponding config.json, do:
-For evaluation, in config.json, do:
  ```json
 {
  "do_train": true,
