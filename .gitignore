@@ -1,2 +1,3 @@
 out/
 **/wandb/
+*.egg-info/
