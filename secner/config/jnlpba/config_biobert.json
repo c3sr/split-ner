@@ -1,7 +1,7 @@
 {
   "model_name": "ner-biobert",
   "dataset_dir": "jnlpba",
-  "num_labels": 33,
+  "num_labels": 11,
   "do_train": true,
   "resume": null,
   "num_train_epochs": 300,
@@ -17,7 +17,7 @@
   "freeze_bert": false,
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",
-  "logging_steps": 20,
+  "logging_steps": 500,
   "save_total_limit": 3,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
