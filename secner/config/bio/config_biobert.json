@@ -1,10 +1,10 @@
 {
-  "model_name": "ner-bert",
+  "model_name": "ner-biobert",
   "dataset_dir": "bio",
   "num_labels": 33,
-  "do_train": true,
-  "resume": null,
-  "num_train_epochs": 100,
+  "do_train": false,
+  "resume": "11620",
+  "num_train_epochs": 200,
   "data_root": "../data",
   "out_root": "../out",
   "train_path": "train.tsv",
@@ -13,7 +13,7 @@
   "tag_vocab_path": "tag_vocab.txt",
   "pad_tag": "[PAD]",
   "none_tag": "O",
-  "max_seq_len": 128,
+  "max_seq_len": 256,
   "freeze_bert": false,
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",
@@ -21,6 +21,7 @@
   "save_total_limit": 3,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
-  "per_device_train_batch_size": 8,
-  "per_device_eval_batch_size": 8
+  "per_device_train_batch_size": 16,
+  "per_device_eval_batch_size": 16,
+  "learning_rate": 1e-5
 }

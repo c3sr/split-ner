@@ -104,6 +104,6 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Model Runner")
-    ap.add_argument("--config", default="config.json", help="config json file (Default: config.json)")
+    ap.add_argument("--config", default="config/config.json", help="config json file")
     ap = ap.parse_args()
     main(ap)
