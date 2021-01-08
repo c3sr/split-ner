@@ -56,6 +56,22 @@ class NerExecutor:
 
     def dump_predictions(self, dataset: NerDataset):
         model_predictions: np.ndarray = np.argmax(self.trainer.predict(dataset).predictions, axis=2)
+        data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
+        # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+
+        os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
+        predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
+        logger.info("Outputs published in file: {0}".format(predictions_file))
+        with open(predictions_file, "w") as f:
+            # f.write("Token\tGold\tPredicted\n")
+            for sent in data:
+                for word in sent:
+                    f.write("{0}\t{1}\t{2}\n".format(word[0], word[1], word[2]))
+                f.write("\n")
+
+    # take the tag output for the first bert token as the tag for the original token
+    # found to give almost similar "true positives", "false positives", "false negatives"
+    def bert_to_orig_token_mapping1(self, dataset, model_predictions):
         data = []
         pad_tag = self.additional_args.pad_tag
         for i in range(len(dataset)):
@@ -70,16 +86,28 @@ class NerExecutor:
                     continue
                 data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
                 ptr += 1
+        return data
 
-        os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
-        predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
-        logger.info("Outputs published in file: {0}".format(predictions_file))
-        with open(predictions_file, "w") as f:
-            # f.write("Token\tGold\tPredicted\n")
-            for sent in data:
-                for word in sent:
-                    f.write("{0}\t{1}\t{2}\n".format(word[0], word[1], word[2]))
-                f.write("\n")
+    # for each original token, if the output for bert sub-tokens is inconsistent, then map to NONE_TAG else take the tag
+    # found to give almost the same "true positives", "false negatives". Greatly reduces the "false negatives"
+    def bert_to_orig_token_mapping2(self, dataset, model_predictions):
+        data = []
+        pad_tag = self.additional_args.pad_tag
+        none_tag = self.additional_args.none_tag
+        for i in range(len(dataset)):
+            sentence = dataset.sentences[i]
+            prediction = model_predictions[i]
+            data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
+            offsets = [tok.token.offset for tok in sentence.bert_tokens]
+            ptr = -1
+            r = min(prediction.shape[0], len(offsets))
+            for j in range(1, r - 1):
+                if offsets[j] > ptr:
+                    ptr += 1
+                    data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
+                elif ("I-" + data[i][ptr][2][2:]) != dataset.tag_vocab[prediction[j]]:
+                    data[i][ptr][2] = none_tag
+        return data
 
     def run(self):
         if self.train_args.do_train:
