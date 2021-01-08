@@ -70,7 +70,7 @@ class NerExecutor:
                 f.write("\n")
 
     # take the tag output for the first bert token as the tag for the original token
-    # found to give almost similar "true positives", "false positives", "false negatives"
+    # slightly more: "true positives", slightly less: "false positives", "false negatives"
     def bert_to_orig_token_mapping1(self, dataset, model_predictions):
         data = []
         pad_tag = self.additional_args.pad_tag
@@ -89,7 +89,7 @@ class NerExecutor:
         return data
 
     # for each original token, if the output for bert sub-tokens is inconsistent, then map to NONE_TAG else take the tag
-    # found to give almost the same "true positives", "false negatives". Greatly reduces the "false negatives"
+    # slightly more: "true positives", slightly less: "false negatives", considerably less: "false positives"
     def bert_to_orig_token_mapping2(self, dataset, model_predictions):
         data = []
         pad_tag = self.additional_args.pad_tag
