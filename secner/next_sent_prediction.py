@@ -47,6 +47,7 @@ class PreviousSentenceSelector:
         return new_sentence
 
     def make_new_dataset(self):
+        open(self.args.output_dataset_path, "w", encoding="utf-8").close()
         for index, sent in enumerate(self.dataset):
             logger.info("processing dataset sentence: {0}".format(index))
             new_sent = self.get_best_prev_sentence(sent)
