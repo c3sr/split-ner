@@ -18,14 +18,14 @@ class PreviousSentenceSelector:
         self.train_path = os.path.join("..", "data", args.input_dataset, "train.tsv")
         self.dataset_path = os.path.join("..", "data", args.input_dataset, args.file)
         self.output_dataset_path = os.path.join("..", "data", args.output_dataset, args.file)
-        training_sentences = NerDataset.read_dataset(self.train_path)[:10]
+        training_sentences = NerDataset.read_dataset(self.train_path)
         self.candidates = [Sentence([Token(text=token.text,
                                            tag=args.none_tag,
                                            pos_tag=token.pos_tag,
                                            dep_tag=token.dep_tag,
                                            guidance_tag=token.guidance_tag)
                                      for token in sent.tokens]) for sent in training_sentences]
-        self.dataset = NerDataset.read_dataset(self.dataset_path)[:10]
+        self.dataset = NerDataset.read_dataset(self.dataset_path)
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
         self.model = AutoModelForNextSentencePrediction.from_pretrained(args.base_model).to(args.device)
         self.model.eval()
