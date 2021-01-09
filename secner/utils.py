@@ -30,6 +30,9 @@ class Token:
     def __repr__(self):
         return self.__str__()
 
+    def to_tsv_form(self):
+        return "\t".join([self.text, self.pos_tag, self.dep_tag, self.tag])
+
 
 class BertToken:
     def __init__(self, bert_id, token):
@@ -47,6 +50,9 @@ class Sentence:
     def __init__(self, tokens=None, bert_tokens=None):
         self.tokens = tokens
         self.bert_tokens = bert_tokens
+
+    def to_tsv_form(self):
+        return "\n".join([token.to_tsv_form() for token in self.tokens])
 
 
 def set_all_seeds(seed=42):
