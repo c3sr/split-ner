@@ -53,6 +53,8 @@ class PreviousSentenceSelector:
     def make_new_dataset(self):
         open(self.output_dataset_path, "w", encoding="utf-8").close()
         for index, sent in enumerate(self.dataset):
+            if index < self.args.resume:
+                continue
             logger.info("processing dataset sentence: {0}".format(index))
             new_sent = self.get_best_prev_sentence(sent)
             with open(self.output_dataset_path, "a", encoding="utf-8") as f:
@@ -72,6 +74,7 @@ if __name__ == "__main__":
     ap.add_argument("--file", type=str, default="train.tsv", help="file (train.tsv/dev.tsv/test.tsv) to convert")
     ap.add_argument("--base_model", type=str, default="dmis-lab/biobert-base-cased-v1.1", help="base model name")
     ap.add_argument("--batch_size", type=int, default=16, help="batch size")
+    ap.add_argument("--resume", type=int, default=0, help="resume from sentence index (default: 0)")
     ap.add_argument("--device", type=str, default="cuda:0", help="device")
     ap.add_argument("--none_tag", type=str, default="O", help="none tag")
     ap = ap.parse_args()
