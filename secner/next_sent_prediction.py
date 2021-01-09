@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 
 import numpy as np
 from tqdm import tqdm
@@ -14,14 +15,17 @@ logger = logging.getLogger(__name__)
 class PreviousSentenceSelector:
     def __init__(self, args):
         self.args = args
-        training_sentences = NerDataset.read_dataset(args.train_path)
+        self.train_path = os.path.join("..", "data", args.input_dataset, "train.tsv")
+        self.dataset_path = os.path.join("..", "data", args.input_dataset, args.file)
+        self.output_dataset_path = os.path.join("..", "data", args.output_dataset, args.file)
+        training_sentences = NerDataset.read_dataset(self.train_path)[:10]
         self.candidates = [Sentence([Token(text=token.text,
                                            tag=args.none_tag,
                                            pos_tag=token.pos_tag,
                                            dep_tag=token.dep_tag,
                                            guidance_tag=token.guidance_tag)
                                      for token in sent.tokens]) for sent in training_sentences]
-        self.dataset = NerDataset.read_dataset(args.dataset_path)
+        self.dataset = NerDataset.read_dataset(self.dataset_path)[:10]
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
         self.model = AutoModelForNextSentencePrediction.from_pretrained(args.base_model).to(args.device)
         self.model.eval()
@@ -47,11 +51,11 @@ class PreviousSentenceSelector:
         return new_sentence
 
     def make_new_dataset(self):
-        open(self.args.output_dataset_path, "w", encoding="utf-8").close()
+        open(self.output_dataset_path, "w", encoding="utf-8").close()
         for index, sent in enumerate(self.dataset):
             logger.info("processing dataset sentence: {0}".format(index))
             new_sent = self.get_best_prev_sentence(sent)
-            with open(self.args.output_dataset_path, "a", encoding="utf-8") as f:
+            with open(self.output_dataset_path, "a", encoding="utf-8") as f:
                 f.write("{0}\n\n".format(new_sent.to_tsv_form()))
 
 
@@ -63,13 +67,11 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Previous Sentence Selector")
-    ap.add_argument("--train_path", type=str, default="../data/bio/train.tsv", help="train file path")
-    ap.add_argument("--dataset_path", type=str, default="../data/bio/train.tsv",
-                    help="original single sentence dataset file path")
-    ap.add_argument("--output_dataset_path", type=str, default="../data/bio_pair/train.tsv",
-                    help="paired sentence dataset output file path")
-    ap.add_argument("--base_model", type=str, default="bert-base-uncased", help="base model name")
-    ap.add_argument("--batch_size", type=int, default=8, help="batch size")
+    ap.add_argument("--input_dataset", type=str, default="bio", help="input dataset dir name")
+    ap.add_argument("--output_dataset", type=str, default="bio_pair", help="output paired dataset dir name")
+    ap.add_argument("--file", type=str, default="train.tsv", help="file (train.tsv/dev.tsv/test.tsv) to convert")
+    ap.add_argument("--base_model", type=str, default="dmis-lab/biobert-base-cased-v1.1", help="base model name")
+    ap.add_argument("--batch_size", type=int, default=16, help="batch size")
     ap.add_argument("--device", type=str, default="cuda:0", help="device")
     ap.add_argument("--none_tag", type=str, default="O", help="none tag")
     ap = ap.parse_args()
