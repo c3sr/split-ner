@@ -1,6 +1,5 @@
 import argparse
 
-import torch
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
 
@@ -21,7 +20,8 @@ class NerDataset(Dataset):
 
         self.sentences = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
-        self.bert_start_token, self.bert_end_token = self.get_bert_special_tokens()
+        self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
+            self.tokenizer, self.args.none_tag)
         self.parse_dataset()
 
     def set_corpus_path(self):
@@ -81,12 +81,14 @@ class NerDataset(Dataset):
             text_tag = self.args.none_tag
         return self.tag_vocab.index(text_tag)
 
-    def get_bert_special_tokens(self):
-        start_id, end_id = self.tokenizer.encode("")
-        start_text, end_text = self.tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, Token(start_text, self.args.none_tag, offset=-1))
-        end_token = BertToken(end_id, Token(end_text, self.args.none_tag, offset=-1))
-        return start_token, end_token
+    @staticmethod
+    def get_bert_special_tokens(tokenizer, none_tag):
+        start_id, end_id = tokenizer.encode("")
+        start_text, end_text = tokenizer.decode([start_id, end_id]).split()
+        start_token = BertToken(start_id, 0, Token(start_text, none_tag, offset=-1))
+        mid_sep_token = BertToken(end_id, 0, Token(end_text, none_tag, offset=-1))
+        end_token = BertToken(end_id, 1, Token(end_text, none_tag, offset=-1))
+        return start_token, mid_sep_token, end_token
 
     def process_sentence(self, index):
         sentence = self.sentences[index]
@@ -99,47 +101,9 @@ class NerDataset(Dataset):
                 else:
                     tag = "I-" + token.tag[2:]
                 bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
-                sentence.bert_tokens.append(BertToken(bert_ids[i], bert_token))
+                sentence.bert_tokens.append(BertToken(bert_ids[i], 0, bert_token))
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
-
-    @staticmethod
-    def data_collator(features):
-        """
-        Function not being used in the current flow (can be used later)
-        """
-
-        # post-padding
-        max_len = max(len(b["labels"]) for b in features)
-        # max_len = self.args.max_seq_len
-        batch = dict()
-
-        # input_ids
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["input_ids"])
-            entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
-        batch["input_ids"] = torch.stack(entry)
-
-        # attention_mask
-        entry = []
-        for i in range(len(features)):
-            good_len = len(features[i]["labels"])
-            pad_len = max_len - good_len
-            entry.append(torch.tensor([1] * good_len + [0] * pad_len))
-        batch["attention_mask"] = torch.stack(entry)
-
-        # token_type_ids
-        batch["token_type_ids"] = torch.zeros(size=(len(features), max_len), dtype=torch.int64)
-
-        # labels
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["labels"])
-            entry.append(torch.tensor(features[i]["labels"] + [-100] * pad_len))
-        batch["labels"] = torch.stack(entry)
-
-        return batch
 
 
 def main(args):
@@ -153,6 +117,6 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Dataset Runner")
-    ap.add_argument("--config", default="config/config_small.json", help="config json file")
+    ap.add_argument("--config", default="config/config_debug.json", help="config json file")
     ap = ap.parse_args()
     main(ap)

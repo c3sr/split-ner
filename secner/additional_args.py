@@ -13,7 +13,7 @@ class AdditionalArguments:
     resume: Optional[str] = field(default=None,
                                   metadata={"help": "checkpoint to resume training. Starts from scratch, if None"})
     dataset_dir: str = field(default="bio", metadata={"help": "dataset dir relative to data root dir"})
-    num_labels: int = field(default=34, metadata={"help": "# output labels in NER dataset"})
+    num_labels: int = field(default=33, metadata={"help": "# output labels in NER dataset"})
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
@@ -29,6 +29,7 @@ class AdditionalArguments:
     max_seq_len: int = field(default=128, metadata={"help": "maximum sequence length"})
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
+    query_type: str = field(default="question", metadata={"help": "query type for entities fed in QA model"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)

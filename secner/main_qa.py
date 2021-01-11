@@ -3,20 +3,20 @@ import logging
 import os
 
 import numpy as np
-from transformers import DataCollatorForTokenClassification, AutoConfig, AutoTokenizer
+from transformers import AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser
 from transformers.trainer import Trainer, TrainingArguments
 
 from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.evaluator import Evaluator
+from secner.dataset_qa import NerQADataset
+from secner.evaluator_qa import EvaluatorQA
 from secner.model import NerModel
 from secner.utils import set_all_seeds, set_wandb, parse_config, setup_logging
 
 logger = logging.getLogger(__name__)
 
 
-class NerExecutor:
+class NerQAExecutor:
     def __init__(self, train_args, additional_args):
         set_wandb(additional_args.wandb_dir)
         logger.info("training args: {0}".format(train_args.to_json_string()))
@@ -26,11 +26,11 @@ class NerExecutor:
         self.train_args = train_args
         self.additional_args = additional_args
 
-        self.train_dataset = NerDataset(additional_args, "train")
-        self.dev_dataset = NerDataset(additional_args, "dev")
-        self.test_dataset = NerDataset(additional_args, "test")
+        self.train_dataset = NerQADataset(additional_args, "train")
+        self.dev_dataset = NerQADataset(additional_args, "dev")
+        self.test_dataset = NerQADataset(additional_args, "test")
 
-        self.num_labels = additional_args.num_labels
+        self.num_labels = 3
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
         self.model = NerModel.from_pretrained(model_path, config=bert_config)
@@ -39,22 +39,21 @@ class NerExecutor:
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
         tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
-        data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
         self.trainer = Trainer(model=self.model,
                                args=train_args,
                                tokenizer=tokenizer,
-                               data_collator=data_collator,
+                               data_collator=NerQADataset.data_collator,
                                train_dataset=self.train_dataset,
                                eval_dataset=self.dev_dataset,
                                compute_metrics=self.compute_metrics)
 
     def compute_metrics(self, eval_prediction):
         predictions = np.argmax(eval_prediction.predictions, axis=2)
-        evaluator = Evaluator(gold=eval_prediction.label_ids, predicted=predictions, tags=self.dev_dataset.tag_vocab)
+        evaluator = EvaluatorQA(gold=eval_prediction.label_ids, predicted=predictions)
         logger.info("entity metrics:\n{0}".format(evaluator.entity_metric.report()))
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
-    def dump_predictions(self, dataset: NerDataset):
+    def dump_predictions(self, dataset: NerQADataset):
         model_predictions: np.ndarray = np.argmax(self.trainer.predict(dataset).predictions, axis=2)
         data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
         # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
@@ -72,41 +71,94 @@ class NerExecutor:
     # take the tag output for the first bert token as the tag for the original token
     # slightly more: "true positives", slightly less: "false positives", "false negatives"
     def bert_to_orig_token_mapping1(self, dataset, model_predictions):
-        data = []
+        data_dict = {}
         pad_tag = self.additional_args.pad_tag
+        none_tag = self.additional_args.none_tag
         for i in range(len(dataset)):
-            sentence = dataset.sentences[i]
+            context = dataset.contexts[i]
+            text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
             prediction = model_predictions[i]
-            data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
-            offsets = [tok.token.offset for tok in sentence.bert_tokens]
+            if text_sentence not in data_dict:
+                data_dict[text_sentence] = [[tok.text, tok.tag, pad_tag] for tok in context.sentence.tokens]
             ptr = 0
-            r = min(prediction.shape[0], len(offsets))
+            r = min(prediction.shape[0], len(context.bert_tokens))
             for j in range(r):
-                if offsets[j] != ptr:
+                if context.bert_tokens[j].token_type == 0:
                     continue
-                data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
+
+                if context.bert_tokens[j].token.offset != ptr:
+                    continue
+
+                if data_dict[text_sentence][ptr][2] not in [pad_tag, none_tag]:
+                    ptr += 1
+                    continue
+
+                if prediction[j] == NerQADataset.get_tag_index("B", none_tag):
+                    tag_assignment = "B-" + context.entity
+                elif prediction[j] == NerQADataset.get_tag_index("I", none_tag):
+                    tag_assignment = "I-" + context.entity
+                else:
+                    tag_assignment = none_tag
+
+                data_dict[text_sentence][ptr][2] = tag_assignment
                 ptr += 1
+
+        data = []
+        for context in dataset.contexts:
+            text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
+            if text_sentence in data_dict:
+                data.append(data_dict[text_sentence])
+                del data_dict[text_sentence]
+
         return data
 
     # for each original token, if the output for bert sub-tokens is inconsistent, then map to NONE_TAG else take the tag
     # slightly more: "true positives", slightly less: "false negatives", considerably less: "false positives"
+    # TODO: needs proof-reading
     def bert_to_orig_token_mapping2(self, dataset, model_predictions):
-        data = []
+        data_dict = {}
         pad_tag = self.additional_args.pad_tag
         none_tag = self.additional_args.none_tag
         for i in range(len(dataset)):
-            sentence = dataset.sentences[i]
+            context = dataset.contexts[i]
+            text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
             prediction = model_predictions[i]
-            data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
-            offsets = [tok.token.offset for tok in sentence.bert_tokens]
+            if text_sentence not in data_dict:
+                data_dict[text_sentence] = [[tok.text, tok.tag, pad_tag] for tok in context.sentence.tokens]
             ptr = -1
-            r = min(prediction.shape[0], len(offsets))
+            r = min(prediction.shape[0], len(context.bert_tokens))
             for j in range(1, r - 1):
-                if offsets[j] > ptr:
+                if context.bert_tokens[j].token_type == 0:
+                    continue
+
+                curr_assigned_tag = data_dict[text_sentence][ptr][2]
+                if curr_assigned_tag not in [pad_tag, none_tag] and curr_assigned_tag[2:] != context.entity:
                     ptr += 1
-                    data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
-                elif ("I-" + data[i][ptr][2][2:]) != dataset.tag_vocab[prediction[j]]:
-                    data[i][ptr][2] = none_tag
+                    continue
+
+                if context.bert_tokens[j].token.offset > ptr:
+                    ptr += 1
+
+                    if prediction[j] == NerQADataset.get_tag_index("B", none_tag):
+                        tag_assignment = "B-" + context.entity
+                    elif prediction[j] == NerQADataset.get_tag_index("I", none_tag):
+                        tag_assignment = "I-" + context.entity
+                    else:
+                        tag_assignment = none_tag
+                    if data_dict[text_sentence][ptr][2] in [none_tag, pad_tag]:
+                        data_dict[text_sentence][ptr][2] = tag_assignment
+
+                elif prediction[j] != NerQADataset.get_tag_index("I", none_tag) \
+                        and data_dict[text_sentence][ptr][2][2:] == context.entity:
+                    data_dict[text_sentence][ptr][2] = none_tag
+
+        data = []
+        for context in dataset.contexts:
+            text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
+            if text_sentence in data_dict:
+                data.append(data_dict[text_sentence])
+                del data_dict[text_sentence]
+
         return data
 
     def run(self):
@@ -126,12 +178,12 @@ def main(args):
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
     train_args, additional_args = parse_config(parser, args.config)
-    executor = NerExecutor(train_args, additional_args)
+    executor = NerQAExecutor(train_args, additional_args)
     executor.run()
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Model Runner")
+    ap = argparse.ArgumentParser(description="QA Model Runner")
     ap.add_argument("--config", default="config/config_debug.json", help="config json file")
     ap = ap.parse_args()
     main(ap)

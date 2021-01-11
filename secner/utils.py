@@ -35,12 +35,13 @@ class Token:
 
 
 class BertToken:
-    def __init__(self, bert_id, token):
+    def __init__(self, bert_id, token_type, token):
         self.bert_id = bert_id
+        self.token_type = token_type
         self.token = token
 
     def __str__(self):
-        return "({0}, {1})".format(self.bert_id, self.token)
+        return "({0}, {1}, {2})".format(self.bert_id, self.token_type, self.token)
 
     def __repr__(self):
         return self.__str__()
@@ -53,6 +54,14 @@ class Sentence:
 
     def to_tsv_form(self):
         return "\n".join([token.to_tsv_form() for token in self.tokens])
+
+
+class Context:
+    def __init__(self, sentence=None, entity=None, entity_text=None, bert_tokens=None):
+        self.sentence = sentence
+        self.entity = entity
+        self.entity_text = entity_text
+        self.bert_tokens = bert_tokens
 
 
 def set_all_seeds(seed=42):
