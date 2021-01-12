@@ -11,6 +11,7 @@
   "dev_path": "dev.tsv",
   "test_path": "test.tsv",
   "tag_vocab_path": "tag_vocab.txt",
+  "tag_names_path": "tag_names.txt",
   "pad_tag": "[PAD]",
   "none_tag": "O",
   "max_seq_len": 256,

@@ -22,6 +22,8 @@ class AdditionalArguments:
     test_path: str = field(default="test.tsv", metadata={"help": "test file path relative to data root"})
     tag_vocab_path: str = field(default="tag_vocab.txt",
                                 metadata={"help": "tag vocab file path relative to data root"})
+    tag_names_path: str = field(default="tag_names.txt",
+                                metadata={"help": "tag to its english name (text) mapping"})
 
     pad_tag: str = field(default="[PAD]", metadata={"help": "symbol for padding token/tag"})
     none_tag: str = field(default="O", metadata={"help": "symbol for NONE tag"})
@@ -43,6 +45,7 @@ class AdditionalArguments:
         self.dev_path = os.path.join(self.abs_dataset_dir, self.dev_path)
         self.test_path = os.path.join(self.abs_dataset_dir, self.test_path)
         self.tag_vocab_path = os.path.join(self.abs_dataset_dir, self.tag_vocab_path)
+        self.tag_names_path = os.path.join(self.abs_dataset_dir, self.tag_names_path)
 
     def to_dict(self):
         """
