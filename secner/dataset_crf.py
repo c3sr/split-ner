@@ -6,7 +6,7 @@ from transformers import HfArgumentParser, AutoTokenizer
 
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
-from secner.utils import Token, set_all_seeds, BertToken, parse_config, setup_logging
+from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging
 
 
 class NerCrfDataset(Dataset):

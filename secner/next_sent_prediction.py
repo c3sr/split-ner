@@ -7,7 +7,7 @@ from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForNextSentencePrediction
 
 from secner.dataset import NerDataset
-from secner.utils import Sentence, Token, setup_logging
+from secner.utils.general import Sentence, Token, setup_logging
 
 logger = logging.getLogger(__name__)
 

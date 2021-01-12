@@ -11,7 +11,7 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset_crf import NerCrfDataset
 from secner.evaluator import Evaluator
 from secner.model_crf import NerModelWithCrf
-from secner.utils import set_all_seeds, set_wandb, parse_config, setup_logging
+from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
 logger = logging.getLogger(__name__)
 
