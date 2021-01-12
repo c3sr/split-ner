@@ -42,7 +42,8 @@ class NerModelWithCrf(BertPreTrainedModel):
         emissions = self.classifier(sequence_output)
         attention_mask = attention_mask.type(torch.uint8) if torch.is_tensor(attention_mask) else None
         predictions = self.crf.decode(log_softmax(emissions, dim=-1), attention_mask)
-        tag_seq = torch.Tensor([p + [-100] * (input_ids.shape[1] - len(p)) for p in predictions]).type(torch.int64)
+        padded_predictions = [p + [-100] * (input_ids.shape[1] - len(p)) for p in predictions]
+        tag_seq = torch.Tensor(padded_predictions).to(dtype=torch.int64, device=input_ids.device)
 
         outputs = (tag_seq,) + outputs[2:]  # add hidden states and attention if they are here
         if labels is not None:
