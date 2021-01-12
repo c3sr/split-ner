@@ -54,7 +54,7 @@ class NerExecutorCrf:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        model_predictions: np.ndarray = np.argmax(self.trainer.predict(dataset).predictions, axis=2)
+        model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
         data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
         # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
 
