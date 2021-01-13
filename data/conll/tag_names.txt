@@ -1,0 +1,4 @@
+LOC	Location
+MISC	Miscellaneous
+ORG	Organization
+PER	Person
