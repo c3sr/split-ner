@@ -78,6 +78,9 @@ class NerQADataset(Dataset):
             return 1
         if text_tag == "I":
             return 2
+        if text_tag == "E":
+            return 3
+        # should never occur
         return -100
 
     def tokenize_with_cache(self, text):
@@ -110,6 +113,17 @@ class NerQADataset(Dataset):
                 bert_tag = new_tag if i == 0 or new_tag != "B" else "I"
                 bert_token = Token(tok.text, bert_tag, tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
                 bert_sent_tokens.append(BertToken(bert_id=bert_ids[i], token_type=1, token=bert_token))
+
+        if self.args.num_labels == 4:
+            # BIOE tagging scheme
+            is_end_token = False
+            for i in range(len(bert_sent_tokens), 0, -1):
+                if bert_sent_tokens[i].token.tag == "I":
+                    if is_end_token:
+                        bert_sent_tokens[i].token.tag = "E"
+                        is_end_token = False
+                else:
+                    is_end_token = True
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)

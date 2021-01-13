@@ -30,7 +30,9 @@ class NerQAExecutor:
         self.dev_dataset = NerQADataset(additional_args, "dev")
         self.test_dataset = NerQADataset(additional_args, "test")
 
-        self.num_labels = 3
+        # num_labels = 3 (for BIO tagging scheme), num_labels = 4 (for BIOE tagging scheme)
+        self.num_labels = self.additional_args.num_labels
+
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
         self.model = NerModel.from_pretrained(model_path, config=bert_config)
@@ -95,7 +97,8 @@ class NerQAExecutor:
 
                 if prediction[j] == NerQADataset.get_tag_index("B", none_tag):
                     tag_assignment = "B-" + context.entity
-                elif prediction[j] == NerQADataset.get_tag_index("I", none_tag):
+                elif prediction[j] == NerQADataset.get_tag_index("I", none_tag) or \
+                        prediction[j] == NerQADataset.get_tag_index("E", none_tag):
                     tag_assignment = "I-" + context.entity
                 else:
                     tag_assignment = none_tag
@@ -141,14 +144,17 @@ class NerQAExecutor:
 
                     if prediction[j] == NerQADataset.get_tag_index("B", none_tag):
                         tag_assignment = "B-" + context.entity
-                    elif prediction[j] == NerQADataset.get_tag_index("I", none_tag):
+                    elif prediction[j] == NerQADataset.get_tag_index("I", none_tag) or \
+                            prediction[j] == NerQADataset.get_tag_index("E", none_tag):
                         tag_assignment = "I-" + context.entity
                     else:
                         tag_assignment = none_tag
                     if data_dict[text_sentence][ptr][2] in [none_tag, pad_tag]:
                         data_dict[text_sentence][ptr][2] = tag_assignment
 
-                elif prediction[j] != NerQADataset.get_tag_index("I", none_tag) \
+                # TODO: need to make this condition stricter (last tag should be "E", all intermediate ones "I"
+                elif (prediction[j] != NerQADataset.get_tag_index("I", none_tag) or
+                      prediction[j] != NerQADataset.get_tag_index("E", none_tag)) \
                         and data_dict[text_sentence][ptr][2][2:] == context.entity:
                     data_dict[text_sentence][ptr][2] = none_tag
 

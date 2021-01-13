@@ -43,7 +43,7 @@ class EvaluatorQA:
                     curr_span = Span(context_index, tok_index, tok_index, tag)
                     context_spans.append(curr_span)
                     prev_span = curr_span
-                elif prev_span and batch[context_index][tok_index] == NerQADataset.get_tag_index("I", none_tag="O"):
+                elif prev_span and batch[context_index][tok_index] == NerQADataset.get_tag_index("E", none_tag="O"):
                     tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
                     if tag == prev_span.tag:
                         prev_span.end = tok_index
