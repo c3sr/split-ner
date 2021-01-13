@@ -11,7 +11,7 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.evaluator import Evaluator
 from secner.model import NerModel
-from secner.utils import set_all_seeds, set_wandb, parse_config, setup_logging
+from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from transformers import HfArgumentParser, AutoTokenizer
 
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
-from secner.utils import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
+from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
 
 
 class NerQADataset(Dataset):
@@ -19,7 +19,7 @@ class NerQADataset(Dataset):
 
         self.tag_vocab = []
         self.parse_tag_vocab()
-        self.entities = [tag[2:] for tag in self.tag_vocab if tag.startswith("B-")]
+        self.tag_to_text_mapping = self.parse_tag_names()
 
         self.contexts = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
@@ -43,6 +43,16 @@ class NerQADataset(Dataset):
                 line = line.strip()
                 if line:
                     self.tag_vocab.append(line)
+
+    def parse_tag_names(self):
+        tag_to_text_mapping = dict()
+        with open(self.args.tag_names_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    s = line.split("\t")
+                    tag_to_text_mapping[s[0]] = s[1]
+        return tag_to_text_mapping
 
     def parse_dataset(self):
         sentences = NerDataset.read_dataset(self.corpus_path)
@@ -76,7 +86,7 @@ class NerQADataset(Dataset):
         return self.tokenizer_cache[text]
 
     def get_tag_query_text(self, tag):
-        tag_text = " ".join(tag.split("_"))
+        tag_text = self.tag_to_text_mapping[tag]
         if self.args.query_type == "question":
             return "What is the {0} mentioned in the text ?".format(tag_text)
         return tag_text
@@ -109,7 +119,7 @@ class NerQADataset(Dataset):
         return Context(sentence, tag, tag_text, bert_tokens)
 
     def process_sentence(self, sentence):
-        for tag in self.entities:
+        for tag in self.tag_to_text_mapping.keys():
             self.contexts.append(self.prep_context(sentence, tag))
 
     @staticmethod

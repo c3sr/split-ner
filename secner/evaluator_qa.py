@@ -10,7 +10,7 @@ class EvaluatorQA:
         self.gold = gold.tolist() if isinstance(gold, np.ndarray) else gold
         self.predicted = predicted.tolist() if isinstance(predicted, np.ndarray) else predicted
         self.dataset = dataset
-        self.tags = self.dataset.entities if self.dataset else ["TAG"]
+        self.tags = list(self.dataset.tag_to_text_mapping.keys()) if self.dataset else ["TAG"]
 
         self.gold_entity_spans = self.get_spans(self.gold)
         self.predicted_entity_spans = self.get_spans(self.predicted)

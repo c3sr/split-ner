@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
 
 from secner.additional_args import AdditionalArguments
-from secner.utils import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
+from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 
 
 class NerDataset(Dataset):
