@@ -51,7 +51,7 @@ class NerQAExecutor:
 
     def compute_metrics(self, eval_prediction):
         predictions = np.argmax(eval_prediction.predictions, axis=2)
-        evaluator = EvaluatorQA(gold=eval_prediction.label_ids, predicted=predictions)
+        evaluator = EvaluatorQA(gold=eval_prediction.label_ids, predicted=predictions, num_labels=self.num_labels)
         logger.info("entity metrics:\n{0}".format(evaluator.entity_metric.report()))
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 

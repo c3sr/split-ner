@@ -117,7 +117,7 @@ class NerQADataset(Dataset):
         if self.args.num_labels == 4:
             # BIOE tagging scheme
             is_end_token = False
-            for i in range(len(bert_sent_tokens), 0, -1):
+            for i in range(len(bert_sent_tokens) - 1, 0, -1):
                 if bert_sent_tokens[i].token.tag == "I":
                     if is_end_token:
                         bert_sent_tokens[i].token.tag = "E"

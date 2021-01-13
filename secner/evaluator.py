@@ -63,6 +63,8 @@ class Evaluator:
                         prev_span.end = tok_index
                     else:
                         prev_span = None
+                else:
+                    prev_span = None
             batch_spans.append(sent_spans)
         return batch_spans
 

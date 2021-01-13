@@ -6,7 +6,8 @@ from secner.evaluator import Span, Metric
 
 class EvaluatorQA:
 
-    def __init__(self, gold, predicted, dataset: NerQADataset = None):
+    def __init__(self, gold, predicted, num_labels, dataset: NerQADataset = None):
+        self.num_labels = num_labels
         self.gold = gold.tolist() if isinstance(gold, np.ndarray) else gold
         self.predicted = predicted.tolist() if isinstance(predicted, np.ndarray) else predicted
         self.dataset = dataset
@@ -43,11 +44,24 @@ class EvaluatorQA:
                     curr_span = Span(context_index, tok_index, tok_index, tag)
                     context_spans.append(curr_span)
                     prev_span = curr_span
+                elif prev_span and batch[context_index][tok_index] == NerQADataset.get_tag_index("I", none_tag="O"):
+                    if self.num_labels == 3:
+                        # BIO tagging scheme
+                        tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
+                        if tag == prev_span.tag:
+                            prev_span.end = tok_index
+                        else:
+                            prev_span = None
+                    else:
+                        # BIOE tagging scheme
+                        continue
                 elif prev_span and batch[context_index][tok_index] == NerQADataset.get_tag_index("E", none_tag="O"):
                     tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
                     if tag == prev_span.tag:
                         prev_span.end = tok_index
                     else:
                         prev_span = None
+                else:
+                    prev_span = None
             batch_spans.append(context_spans)
         return batch_spans
