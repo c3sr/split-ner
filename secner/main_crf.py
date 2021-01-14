@@ -3,12 +3,12 @@ import logging
 import os
 
 import numpy as np
-from transformers import AutoConfig, AutoTokenizer
+from transformers import DataCollatorForTokenClassification, AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser
 from transformers.trainer import Trainer, TrainingArguments
 
 from secner.additional_args import AdditionalArguments
-from secner.dataset_crf import NerCrfDataset
+from secner.dataset import NerDataset
 from secner.evaluator import Evaluator
 from secner.model_crf import NerModelWithCrf
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
@@ -26,9 +26,9 @@ class NerExecutorCrf:
         self.train_args = train_args
         self.additional_args = additional_args
 
-        self.train_dataset = NerCrfDataset(additional_args, "train")
-        self.dev_dataset = NerCrfDataset(additional_args, "dev")
-        self.test_dataset = NerCrfDataset(additional_args, "test")
+        self.train_dataset = NerDataset(additional_args, "train")
+        self.dev_dataset = NerDataset(additional_args, "dev")
+        self.test_dataset = NerDataset(additional_args, "test")
 
         self.num_labels = additional_args.num_labels
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
@@ -39,10 +39,11 @@ class NerExecutorCrf:
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
         tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
+        data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
         self.trainer = Trainer(model=self.model,
                                args=train_args,
                                tokenizer=tokenizer,
-                               data_collator=NerCrfDataset.data_collator,
+                               data_collator=data_collator,
                                train_dataset=self.train_dataset,
                                eval_dataset=self.dev_dataset,
                                compute_metrics=self.compute_metrics)
