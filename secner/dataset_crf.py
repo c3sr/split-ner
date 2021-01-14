@@ -18,14 +18,11 @@ class NerCrfDataset(Dataset):
         self.corpus_path = self.set_corpus_path()
 
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
-        # special start and end tokens are tagged with [PAD] tag and all [PAD] tokens are also tagged with [PAD] tag
         self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerCrfDataset.get_bert_special_tokens(
-            self.tokenizer, self.args.pad_tag)
+            self.tokenizer, self.args.none_tag)
 
         self.tag_vocab = []
         self.parse_tag_vocab()
-        # tag_vocab includes [PAD] tag
-        self.tag_vocab.append(self.args.pad_tag)
 
         self.sentences = []
         self.parse_dataset()
@@ -68,12 +65,12 @@ class NerCrfDataset(Dataset):
         return self.tag_vocab.index(text_tag)
 
     @staticmethod
-    def get_bert_special_tokens(tokenizer, pad_tag):
+    def get_bert_special_tokens(tokenizer, tag_for_special_tokens):
         start_id, end_id = tokenizer.encode("")
         start_text, end_text = tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, 0, Token(start_text, pad_tag, offset=-1))
-        mid_sep_token = BertToken(end_id, 0, Token(end_text, pad_tag, offset=-1))
-        end_token = BertToken(end_id, 1, Token(end_text, pad_tag, offset=-1))
+        start_token = BertToken(start_id, 0, Token(start_text, tag_for_special_tokens, offset=-1))
+        mid_sep_token = BertToken(end_id, 0, Token(end_text, tag_for_special_tokens, offset=-1))
+        end_token = BertToken(end_id, 1, Token(end_text, tag_for_special_tokens, offset=-1))
         return start_token, mid_sep_token, end_token
 
     def process_sentence(self, index):
@@ -91,7 +88,8 @@ class NerCrfDataset(Dataset):
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
 
-    def data_collator(self, features):
+    @staticmethod
+    def data_collator(features):
         # post-padding
         max_len = max(len(b["labels"]) for b in features)
         # max_len = self.args.max_seq_len

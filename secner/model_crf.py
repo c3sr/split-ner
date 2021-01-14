@@ -10,8 +10,7 @@ class NerModelWithCrf(BertPreTrainedModel):
 
     def __init__(self, config: BertConfig):
         super(NerModelWithCrf, self).__init__(config)
-        # self.num_labels = config.num_labels
-        self.num_labels = config.num_labels + 1
+        self.num_labels = config.num_labels
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)

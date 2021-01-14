@@ -42,7 +42,7 @@ class NerExecutorCrf:
         self.trainer = Trainer(model=self.model,
                                args=train_args,
                                tokenizer=tokenizer,
-                               data_collator=self.train_dataset.data_collator,
+                               data_collator=NerCrfDataset.data_collator,
                                train_dataset=self.train_dataset,
                                eval_dataset=self.dev_dataset,
                                compute_metrics=self.compute_metrics)
