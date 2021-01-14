@@ -39,15 +39,19 @@ class NerModelWithCrf(BertPreTrainedModel):
         sequence_output = outputs[0]
 
         sequence_output = self.dropout(sequence_output)
-        emissions = self.classifier(sequence_output)
-        attention_mask = attention_mask.type(torch.uint8) if torch.is_tensor(attention_mask) else None
-        predictions = self.crf.decode(log_softmax(emissions, dim=-1), attention_mask)
+        emissions = log_softmax(self.classifier(sequence_output), dim=-1)
+        crf_attention_mask = attention_mask.type(torch.uint8) if torch.is_tensor(attention_mask) else None
+        predictions = self.crf.decode(emissions, crf_attention_mask)
         padded_predictions = [p + [-100] * (input_ids.shape[1] - len(p)) for p in predictions]
         tag_seq = torch.Tensor(padded_predictions).to(dtype=torch.int64, device=input_ids.device)
 
         outputs = (tag_seq,) + outputs[2:]  # add hidden states and attention if they are here
         if labels is not None:
-            loss = -self.crf.forward(log_softmax(emissions, dim=-1), labels, attention_mask, reduction="mean")
+            crf_labels = labels.clone()
+            # since negative idandices is not supported by the CRF library
+            # (changing it to any positive index should have no effect)
+            crf_labels[crf_labels == -100] = 0
+            loss = -self.crf.forward(emissions, crf_labels, crf_attention_mask, reduction="mean")
             outputs = (loss,) + outputs
 
         return outputs  # (loss), scores, (hidden_states), (attentions)

@@ -24,6 +24,7 @@ class NerCrfDataset(Dataset):
 
         self.tag_vocab = []
         self.parse_tag_vocab()
+        # tag_vocab includes [PAD] tag
         self.tag_vocab.append(self.args.pad_tag)
 
         self.sentences = []
@@ -122,7 +123,7 @@ class NerCrfDataset(Dataset):
         entry = []
         for i in range(len(features)):
             pad_len = max_len - len(features[i]["labels"])
-            entry.append(torch.tensor(features[i]["labels"] + [self.get_tag_index(self.args.pad_tag)] * pad_len))
+            entry.append(torch.tensor(features[i]["labels"] + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)
 
         return batch

@@ -6,8 +6,9 @@ from secner.evaluator import Span, Metric
 
 class EvaluatorQA:
 
-    def __init__(self, gold, predicted, num_labels, dataset: NerQADataset = None):
+    def __init__(self, gold, predicted, num_labels, none_tag, dataset: NerQADataset = None):
         self.num_labels = num_labels
+        self.none_tag = none_tag
         self.gold = gold.tolist() if isinstance(gold, np.ndarray) else gold
         self.predicted = predicted.tolist() if isinstance(predicted, np.ndarray) else predicted
         self.dataset = dataset
@@ -32,6 +33,9 @@ class EvaluatorQA:
 
     def get_spans(self, batch):
         batch_spans = []
+        b_tag_index = NerQADataset.get_tag_index("B", none_tag=self.none_tag)
+        i_tag_index = NerQADataset.get_tag_index("I", none_tag=self.none_tag)
+        e_tag_index = NerQADataset.get_tag_index("E", none_tag=self.none_tag)
         for context_index in range(len(batch)):
             context_spans = []
             prev_span = None
@@ -39,23 +43,19 @@ class EvaluatorQA:
                 if self.gold[context_index][tok_index] == -100:
                     prev_span = None
                     continue
-                if batch[context_index][tok_index] == NerQADataset.get_tag_index("B", none_tag="O"):
+                if batch[context_index][tok_index] == b_tag_index:
                     tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
                     curr_span = Span(context_index, tok_index, tok_index, tag)
                     context_spans.append(curr_span)
                     prev_span = curr_span
-                elif prev_span and batch[context_index][tok_index] == NerQADataset.get_tag_index("I", none_tag="O"):
-                    if self.num_labels == 3:
-                        # BIO tagging scheme
-                        tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
-                        if tag == prev_span.tag:
+                elif prev_span and batch[context_index][tok_index] == i_tag_index:
+                    tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
+                    if tag == prev_span.tag:
+                        if self.num_labels == 3:
                             prev_span.end = tok_index
-                        else:
-                            prev_span = None
                     else:
-                        # BIOE tagging scheme
-                        continue
-                elif prev_span and batch[context_index][tok_index] == NerQADataset.get_tag_index("E", none_tag="O"):
+                        prev_span = None
+                elif prev_span and batch[context_index][tok_index] == e_tag_index:
                     tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
                     if tag == prev_span.tag:
                         prev_span.end = tok_index
