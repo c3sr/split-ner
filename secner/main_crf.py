@@ -3,15 +3,14 @@ import logging
 import os
 
 import numpy as np
-from transformers import DataCollatorForTokenClassification, AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import Trainer, TrainingArguments
-
 from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
+from secner.dataset import NerDataset, NerDataCollator
 from secner.evaluator import Evaluator
 from secner.model_crf import NerModelWithCrf
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import Trainer, TrainingArguments
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +32,13 @@ class NerExecutorCrf:
         self.num_labels = additional_args.num_labels
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
-        self.model = NerModelWithCrf.from_pretrained(model_path, config=bert_config)
+        self.model = NerModelWithCrf.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
         tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
-        data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
+        data_collator = NerDataCollator(args=additional_args)
         self.trainer = Trainer(model=self.model,
                                args=train_args,
                                tokenizer=tokenizer,

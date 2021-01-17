@@ -1,40 +1,55 @@
 import torch
 import torch.nn as nn
+from secner.additional_args import AdditionalArguments
+from secner.cnn import CharCNN
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModel(BertPreTrainedModel):
 
-    def __init__(self, config: BertConfig):
+    def __init__(self, config: BertConfig, additional_args: AdditionalArguments):
         super(NerModel, self).__init__(config)
+        self.additional_args = additional_args
         self.num_labels = config.num_labels
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
-        self.classifier = nn.Linear(self.bert.config.hidden_size, self.num_labels)
+        classifier_inp_dim = self.bert.config.hidden_size
+
+        if self.additional_args.use_char_cnn:
+            self.char_cnn = CharCNN(additional_args)
+            classifier_inp_dim += self.char_cnn.char_out_dim
+
+        self.classifier = nn.Linear(classifier_inp_dim, self.num_labels)
 
         self.init_weights()
 
-        # for param in self.bert.parameters():
-        #     param.requires_grad = False
+        if self.additional_args.freeze_bert:
+            for param in self.bert.parameters():
+                param.requires_grad = False
 
     def forward(
             self,
             input_ids=None,
             attention_mask=None,
             token_type_ids=None,
-            labels=None):
+            char_ids=None,
+            labels=None,
+            **kwargs):
 
         outputs = self.bert(
             input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids
         )
-
         sequence_output = outputs[0]
-
         sequence_output = self.dropout(sequence_output)
+
+        if self.additional_args.use_char_cnn:
+            char_vec = self.char_cnn(char_ids)
+            sequence_output = torch.cat([sequence_output, char_vec], dim=2)
+
         logits = self.classifier(sequence_output)
 
         outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here

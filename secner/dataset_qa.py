@@ -1,17 +1,15 @@
 import argparse
 
-import torch
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerQADataset(Dataset):
 
-    def __init__(self, args, corpus_type):
+    def __init__(self, args: AdditionalArguments, corpus_type):
         super(NerQADataset, self).__init__()
         self.args = args
         self.corpus_type = corpus_type
@@ -66,9 +64,13 @@ class NerQADataset(Dataset):
         context = self.contexts[index]
         bert_token_ids = [tok.bert_id for tok in context.bert_tokens]
         bert_token_type_ids = [tok.token_type for tok in context.bert_tokens]
+        bert_token_text = [tok.token.text for tok in context.bert_tokens]
         bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tag, self.args.none_tag) for tok in context.bert_tokens]
 
-        return {"input_ids": bert_token_ids, "token_type_ids": bert_token_type_ids, "labels": bert_tag_ids}
+        return {"input_ids": bert_token_ids,
+                "token_type_ids": bert_token_type_ids,
+                "text": bert_token_text,
+                "labels": bert_tag_ids}
 
     @staticmethod
     def get_tag_index(text_tag, none_tag):
@@ -135,44 +137,6 @@ class NerQADataset(Dataset):
     def process_sentence(self, sentence):
         for tag in self.tag_to_text_mapping.keys():
             self.contexts.append(self.prep_context(sentence, tag))
-
-    @staticmethod
-    def data_collator(features):
-        # post-padding
-        max_len = max(len(b["labels"]) for b in features)
-        # max_len = self.args.max_seq_len
-        batch = dict()
-
-        # input_ids
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["input_ids"])
-            entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
-        batch["input_ids"] = torch.stack(entry)
-
-        # attention_mask
-        entry = []
-        for i in range(len(features)):
-            good_len = len(features[i]["labels"])
-            pad_len = max_len - good_len
-            entry.append(torch.tensor([1] * good_len + [0] * pad_len))
-        batch["attention_mask"] = torch.stack(entry)
-
-        # token_type_ids
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["token_type_ids"])
-            entry.append(torch.tensor(features[i]["token_type_ids"] + [0] * pad_len))
-        batch["token_type_ids"] = torch.stack(entry)
-
-        # labels
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["labels"])
-            entry.append(torch.tensor(features[i]["labels"] + [-100] * pad_len))
-        batch["labels"] = torch.stack(entry)
-
-        return batch
 
 
 def main(args):

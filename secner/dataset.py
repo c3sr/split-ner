@@ -1,15 +1,16 @@
 import argparse
 
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
-
+import torch
+from dataclasses import dataclass
 from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerDataset(Dataset):
 
-    def __init__(self, args, corpus_type):
+    def __init__(self, args: AdditionalArguments, corpus_type):
         super(NerDataset, self).__init__()
         self.args = args
         self.corpus_type = corpus_type
@@ -72,9 +73,14 @@ class NerDataset(Dataset):
     def __getitem__(self, index):
         sentence = self.sentences[index]
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
+        bert_token_type_ids = [tok.token_type for tok in sentence.bert_tokens]
+        bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
-        return {"input_ids": bert_token_ids, "labels": bert_tag_ids}
+        return {"input_ids": bert_token_ids,
+                "token_type_ids": bert_token_type_ids,
+                "text": bert_token_text,
+                "labels": bert_tag_ids}
 
     def get_tag_index(self, text_tag):
         if text_tag not in self.tag_vocab:
@@ -104,6 +110,79 @@ class NerDataset(Dataset):
                 sentence.bert_tokens.append(BertToken(bert_ids[i], 0, bert_token))
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
+
+    @staticmethod
+    def get_char_ids(batch_text, max_len):
+        vocab = NerDataset.get_vocab()
+        max_word_len = max(len(word) for sent in batch_text for word in sent)
+        batch_ids = []
+        for sent_text in batch_text:
+            sent_ids = []
+            for word_text in sent_text:
+                word_ids = [(vocab.index(c) + 1) for c in word_text if c in vocab]
+                pad_word_len = max_word_len - len(word_ids)
+                sent_ids.append(torch.tensor(word_ids + [0] * pad_word_len, dtype=torch.int64))
+            pad_len = max_len - len(sent_ids)
+            sent_ids += [torch.zeros(max_word_len, dtype=torch.int64)] * pad_len
+            batch_ids.append(torch.stack(sent_ids))
+        return torch.stack(batch_ids)
+
+    @staticmethod
+    def get_vocab():
+        # size: 94 (does not include space, newline)
+        # additional: can also use list(string.printable) here (size: 100)
+        vocab = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
+        vocab += list("abcdefghijklmnopqrstuvwxyz")
+        vocab += list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        vocab += list("0123456789")
+        return vocab
+
+
+@dataclass
+class NerDataCollator:
+    args: AdditionalArguments
+
+    def __call__(self, features):
+        # post-padding
+        max_len = max(len(b["labels"]) for b in features)
+        # max_len = self.args.max_seq_len
+        batch = dict()
+
+        # input_ids
+        entry = []
+        for i in range(len(features)):
+            pad_len = max_len - len(features[i]["input_ids"])
+            entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
+        batch["input_ids"] = torch.stack(entry)
+
+        # attention_mask
+        entry = []
+        for i in range(len(features)):
+            good_len = len(features[i]["labels"])
+            pad_len = max_len - good_len
+            entry.append(torch.tensor([1] * good_len + [0] * pad_len))
+        batch["attention_mask"] = torch.stack(entry)
+
+        # token_type_ids
+        entry = []
+        for i in range(len(features)):
+            pad_len = max_len - len(features[i]["token_type_ids"])
+            entry.append(torch.tensor(features[i]["token_type_ids"] + [0] * pad_len))
+        batch["token_type_ids"] = torch.stack(entry)
+
+        # char_ids
+        if self.args.use_char_cnn:
+            batch_text = [entry["text"] for entry in features]
+            batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len)
+
+        # labels
+        entry = []
+        for i in range(len(features)):
+            pad_len = max_len - len(features[i]["labels"])
+            entry.append(torch.tensor(features[i]["labels"] + [-100] * pad_len))
+        batch["labels"] = torch.stack(entry)
+
+        return batch
 
 
 def main(args):

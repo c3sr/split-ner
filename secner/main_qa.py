@@ -3,15 +3,15 @@ import logging
 import os
 
 import numpy as np
-from transformers import AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import Trainer, TrainingArguments
-
 from secner.additional_args import AdditionalArguments
+from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
 from secner.evaluator_qa import EvaluatorQA
 from secner.model import NerModel
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import Trainer, TrainingArguments
 
 logger = logging.getLogger(__name__)
 
@@ -35,16 +35,17 @@ class NerQAExecutor:
 
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
-        self.model = NerModel.from_pretrained(model_path, config=bert_config)
+        self.model = NerModel.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
         tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
+        data_collator = NerDataCollator(args=additional_args)
         self.trainer = Trainer(model=self.model,
                                args=train_args,
                                tokenizer=tokenizer,
-                               data_collator=NerQADataset.data_collator,
+                               data_collator=data_collator,
                                train_dataset=self.train_dataset,
                                eval_dataset=self.dev_dataset,
                                compute_metrics=self.compute_metrics)

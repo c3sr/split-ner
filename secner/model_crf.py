@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from secner.additional_args import AdditionalArguments
 from torch.nn.functional import log_softmax
 from torchcrf import CRF
 from transformers import BertConfig
@@ -8,8 +9,9 @@ from transformers.models.bert import BertModel, BertPreTrainedModel
 
 class NerModelWithCrf(BertPreTrainedModel):
 
-    def __init__(self, config: BertConfig):
+    def __init__(self, config: BertConfig, additional_args: AdditionalArguments):
         super(NerModelWithCrf, self).__init__(config)
+        self.additional_args = additional_args
         self.num_labels = config.num_labels
 
         self.bert = BertModel(config)
@@ -20,15 +22,18 @@ class NerModelWithCrf(BertPreTrainedModel):
         # TODO: arorja: check if different param initialization for CRF reqd.?
         self.init_weights()
 
-        # for param in self.bert.parameters():
-        #     param.requires_grad = False
+        if self.additional_args.freeze_bert:
+            for param in self.bert.parameters():
+                param.requires_grad = False
 
     def forward(
             self,
             input_ids=None,
             attention_mask=None,
             token_type_ids=None,
-            labels=None):
+            labels=None,
+            **kwargs):
+
         outputs = self.bert(
             input_ids,
             attention_mask=attention_mask,

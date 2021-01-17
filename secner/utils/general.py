@@ -85,6 +85,7 @@ def setup_logging():
 
 def set_wandb(wandb_dir):
     os.environ["WANDB_WATCH"] = "all"
+    os.makedirs(os.path.join(wandb_dir, "wandb"), exist_ok=True)
     wandb.init(project=os.getenv("WANDB_PROJECT", "sec-ner"), dir=wandb_dir)
 
 
