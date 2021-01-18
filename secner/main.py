@@ -7,10 +7,11 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset, NerDataCollator
 from secner.evaluator import Evaluator
 from secner.model import NerModel
+from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 from transformers import AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser
-from transformers.trainer import Trainer, TrainingArguments
+from transformers.trainer import TrainingArguments
 
 logger = logging.getLogger(__name__)
 
@@ -42,13 +43,13 @@ class NerExecutor:
         # data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
         data_collator = NerDataCollator(args=additional_args)
 
-        self.trainer = Trainer(model=self.model,
-                               args=train_args,
-                               tokenizer=tokenizer,
-                               data_collator=data_collator,
-                               train_dataset=self.train_dataset,
-                               eval_dataset=self.dev_dataset,
-                               compute_metrics=self.compute_metrics)
+        self.trainer = NerTrainer(model=self.model,
+                                  args=train_args,
+                                  tokenizer=tokenizer,
+                                  data_collator=data_collator,
+                                  train_dataset=self.train_dataset,
+                                  eval_dataset=self.dev_dataset,
+                                  compute_metrics=self.compute_metrics)
 
     def compute_metrics(self, eval_prediction):
         predictions = np.argmax(eval_prediction.predictions, axis=2)
