@@ -32,10 +32,12 @@ class AdditionalArguments:
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     use_char_cnn: bool = field(default=False, metadata={"help": "use char CNN"})
+    use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     query_type: str = field(default="question", metadata={"help": "query type for entities fed in QA model"})
     char_emb_dim: int = field(default=32, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     cnn_num_filters: int = field(default=16, metadata={"help": "# char CNN filters"})
     cnn_kernel_size: int = field(default=5, metadata={"help": "char CNN kernel size"})
+    end_cnn_channels: int = field(default=8, metadata={"help": "end CNN output channels"})
     cnn_dropout_rate: float = field(default=0.1, metadata={"help": "char CNN dropout rate"})
 
     def __post_init__(self):

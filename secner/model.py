@@ -21,6 +21,15 @@ class NerModel(BertPreTrainedModel):
             self.char_cnn = CharCNN(additional_args)
             classifier_inp_dim += self.char_cnn.char_out_dim
 
+        if self.additional_args.use_end_cnn:
+            self.end_cnn = nn.Conv2d(in_channels=1,
+                                     out_channels=self.additional_args.end_cnn_channels,
+                                     kernel_size=(5, 5),
+                                     stride=(1, 2),
+                                     padding=2,
+                                     padding_mode="circular")
+            classifier_inp_dim *= self.additional_args.end_cnn_channels // 2
+
         self.classifier = nn.Linear(classifier_inp_dim, self.num_labels)
 
         self.init_weights()
@@ -44,12 +53,17 @@ class NerModel(BertPreTrainedModel):
             token_type_ids=token_type_ids
         )
         sequence_output = outputs[0]
-        sequence_output = self.dropout(sequence_output)
 
         if self.additional_args.use_char_cnn:
             char_vec = self.char_cnn(char_ids)
             sequence_output = torch.cat([sequence_output, char_vec], dim=2)
 
+        if self.additional_args.use_end_cnn:
+            batch_size, seq_len = input_ids.shape
+            sequence_output = self.end_cnn(sequence_output.unsqueeze(1))
+            sequence_output = sequence_output.permute(0, 2, 1, 3).reshape(batch_size, seq_len, -1)
+
+        sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
 
         outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
