@@ -43,10 +43,10 @@ BioBERT | 85.64 | 73.75*      | | | | |
 BioBERT-CRF | 85.69 |       | | | | |
 SciBERT | 85.77 | 74.08*      | | | | |
 QA4-BioBERT-CharCNN | Running |       | | | | |
-KGQA |  | Running      | | | | |
+KGQA |  | Running (79.24 reported)      | | | | |
 CNN-LSTM-CRF | 84.1 |      76.2 | 91.6 | 86.4 | 72.4|
 MRC |  |     78.85***  | 93.04** |  | |
-SOTA | 89.58 (KGQA) |      79.24 (KGQA) | 94.3 (LUKE) | 92.07 (MRC-Dice) | -|
+SOTA | 89.58 (KGQA with all datasets) |      79.24 (KGQA with all datasets) | 94.3 (LUKE) | 92.07 (MRC-Dice) | -|
 
 ```
 * on older evaluation code
