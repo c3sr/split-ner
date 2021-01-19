@@ -1,7 +1,7 @@
 {
-  "model_name": "ner-biobert-qa-cnn",
+  "model_name": "ner-biobert-qa4-cnn",
   "dataset_dir": "bio",
-  "num_labels": 3,
+  "num_labels": 4,
   "do_train": true,
   "resume": null,
   "num_train_epochs": 300,
