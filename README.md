@@ -32,3 +32,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
  "eval": "4840"
 }
 ```
+
+## Results
+
+| | BioNLP13CG | JNLPBA | CoNLL03 | OntoNotes | GENIA |
+QA3-BioBERT | 86.02 | 74.52 | | | | |
