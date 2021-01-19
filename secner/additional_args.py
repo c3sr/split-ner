@@ -33,6 +33,7 @@ class AdditionalArguments:
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     use_char_cnn: bool = field(default=False, metadata={"help": "use char CNN"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
+    add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})
     query_type: str = field(default="question", metadata={"help": "query type for entities fed in QA model"})
     char_emb_dim: int = field(default=32, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     cnn_num_filters: int = field(default=16, metadata={"help": "# char CNN filters"})

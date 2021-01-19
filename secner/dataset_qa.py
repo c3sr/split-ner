@@ -1,10 +1,11 @@
 import argparse
 
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
+
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerQADataset(Dataset):
@@ -100,11 +101,29 @@ class NerQADataset(Dataset):
         tag_text = self.get_tag_query_text(tag)
         # query
         bert_query_tokens = []
-        for index, word in enumerate(tag_text.split()):
+        query_tokens = tag_text.split()
+        for index, word in enumerate(query_tokens):
             bert_ids = self.tokenize_with_cache(word)
             for i in range(len(bert_ids)):
                 bert_token = Token(word, self.args.none_tag, index)
                 bert_query_tokens.append(BertToken(bert_id=bert_ids[i], token_type=0, token=bert_token))
+
+        # helper sentence
+        bert_helper_sent_tokens = []
+        if self.args.add_qa_helper_sentence:
+            q = len(query_tokens)
+            for tok in sentence.tokens:
+                if tok.tag[2:] == tag or tok.tag == self.args.none_tag:
+                    helper_text = tok.text
+                elif tok.tag.startswith("B-"):
+                    helper_text = self.tag_to_text_mapping[tok.tag[2:]]
+                else:
+                    continue
+                bert_ids = self.tokenize_with_cache(helper_text)
+                for i in range(len(bert_ids)):
+                    bert_token = Token(helper_text, self.args.none_tag, q + tok.offset, tok.pos_tag, tok.dep_tag,
+                                       tok.guidance_tag)
+                    bert_helper_sent_tokens.append(BertToken(bert_id=bert_ids[i], token_type=0, token=bert_token))
 
         # sentence
         bert_sent_tokens = []
@@ -129,6 +148,7 @@ class NerQADataset(Dataset):
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)
+        bert_tokens.extend(bert_helper_sent_tokens)
         bert_tokens.append(self.bert_mid_sep_token)
         bert_tokens.extend(bert_sent_tokens)
         bert_tokens.append(self.bert_end_token)
@@ -150,6 +170,6 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="QA Dataset Runner")
-    ap.add_argument("--config", default="config/config_small.json", help="config json file")
+    ap.add_argument("--config", default="config/config_debug.json", help="config json file")
     ap = ap.parse_args()
     main(ap)
