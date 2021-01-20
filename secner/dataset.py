@@ -2,10 +2,11 @@ import argparse
 
 import torch
 from dataclasses import dataclass
-from secner.additional_args import AdditionalArguments
-from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+from secner.additional_args import AdditionalArguments
+from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 
 
 class NerDataset(Dataset):
@@ -65,7 +66,7 @@ class NerDataset(Dataset):
                     sentences.append(Sentence(tokens))
                     tokens = []
                     offset = 0
-        return sentences
+        return sentences[:10]
 
     def __len__(self):
         return len(self.sentences)

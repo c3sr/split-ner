@@ -1,7 +1,7 @@
 {
-  "model_name": "ner-bert-qa",
+  "model_name": "ner-bert-qa4",
   "dataset_dir": "onto",
-  "num_labels": 3,
+  "num_labels": 4,
   "do_train": true,
   "resume": null,
   "num_train_epochs": 300,

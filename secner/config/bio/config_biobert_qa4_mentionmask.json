@@ -1,5 +1,5 @@
 {
-  "model_name": "ner-biobert-qa4-cnn-mentionmask",
+  "model_name": "ner-biobert-qa4-mentionmask",
   "dataset_dir": "bio",
   "num_labels": 4,
   "do_train": true,
