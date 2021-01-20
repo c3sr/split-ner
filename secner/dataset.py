@@ -66,7 +66,7 @@ class NerDataset(Dataset):
                     sentences.append(Sentence(tokens))
                     tokens = []
                     offset = 0
-        return sentences[:10]
+        return sentences
 
     def __len__(self):
         return len(self.sentences)
