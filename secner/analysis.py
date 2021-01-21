@@ -25,8 +25,10 @@ def calc_micro_f1(data):
     tp = defaultdict(list)
     fp = defaultdict(list)
     fn = defaultdict(list)
-    gold_spans = [get_spans([[tok[0], tok[1]] for tok in sent]) for sent in data]
-    pred_spans = [get_spans([[tok[0], tok[2]] for tok in sent]) for sent in data]
+    gold_spans = [span_corrector(get_spans([[tok[0], tok[1]] for tok in sent], index)) for index, sent in
+                  enumerate(data)]
+    pred_spans = [span_corrector(get_spans([[tok[0], tok[2]] for tok in sent], index)) for index, sent in
+                  enumerate(data)]
     print()
     for i in range(len(data)):
         for span in gold_spans[i]:
@@ -47,15 +49,24 @@ def calc_micro_f1(data):
     return tp, fp, fn
 
 
-def get_spans(tokens):
+def get_spans(tokens, sent_index):
     spans = []
     for index, tok in enumerate(tokens):
         if tok[1].startswith("B-"):
-            spans.append([tok[1][2:], [tok[0]], [index, index]])
-            # spans.append([tok[1][2:], [], [index, index]]) # using this leads to some more matches.. may enquire cause
+            spans.append([tok[1][2:], sent_index, [tok[0]], [index, index]])
+            # using the below representation leads to more matches.. may enquire cause
+            # spans.append([tok[1][2:], sent_index, [], [index, index]])
         elif tok[1].startswith("I-") and len(spans) > 0 and spans[-1][0] == tok[1][2:]:
-            spans[-1][1].append(tok[0])
-            spans[-1][2][1] = index
+            spans[-1][2].append(tok[0])
+            spans[-1][3][1] = index
+    return spans
+
+
+# can check special corrections and their effect on overall F1 through this
+def span_corrector(spans):
+    # for span in spans:
+    #     if "FVIIa" in span[2]:
+    #         span[0] = "Gene_or_gene_product"
     return spans
 
 
@@ -90,7 +101,7 @@ def print_samples(tp, fp, fn, label):
 
 def main(args):
     train_path = os.path.join(args.path, "train.tsv")
-    dev_path = os.path.join(args.path, "dev1.tsv")  # "dev1" or "dev2" based on the mapping scheme defined in main.py
+    dev_path = os.path.join(args.path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
     test_path = os.path.join(args.path, "test.tsv")
 
     dev_data = parse_file(dev_path)
@@ -99,7 +110,7 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--path", type=str, default="../out/bio/ner-scibert/predictions",
+    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-qa4/predictions",
                     help="dir with prediction outputs")
     ap = ap.parse_args()
     main(ap)
