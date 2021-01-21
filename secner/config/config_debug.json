@@ -16,6 +16,7 @@
   "none_tag": "O",
   "max_seq_len": 128,
   "freeze_bert": true,
+  "model_mode": "std",
   "add_qa_helper_sentence": false,
   "use_char_cnn": false,
   "use_end_cnn": false,

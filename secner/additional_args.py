@@ -31,6 +31,7 @@ class AdditionalArguments:
     max_seq_len: int = field(default=128, metadata={"help": "maximum sequence length"})
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
+    model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf)"})
     use_char_cnn: bool = field(default=False, metadata={"help": "use char CNN"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})

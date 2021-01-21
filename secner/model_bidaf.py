@@ -109,7 +109,7 @@ class NerModelBiDAF(BertPreTrainedModel):
 
         logits = self.classifier(sequence_output)
 
-        outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
+        outputs = (torch.argmax(logits, dim=2),) + outputs[2:]  # add hidden states and attention if they are here
         if labels is not None:
             loss_fct = nn.CrossEntropyLoss()
             # Only keep active parts of the loss

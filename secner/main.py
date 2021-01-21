@@ -3,21 +3,24 @@ import logging
 import os
 
 import numpy as np
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import TrainingArguments
+
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset, NerDataCollator
 from secner.evaluator import Evaluator
 from secner.model import NerModel
+from secner.model_bidaf import NerModelBiDAF
+from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
-from transformers import AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import TrainingArguments
 
 logger = logging.getLogger(__name__)
 
 
 class NerExecutor:
-    def __init__(self, train_args, additional_args):
+    def __init__(self, train_args: TrainingArguments, additional_args: AdditionalArguments):
         set_wandb(additional_args.wandb_dir)
         logger.info("training args: {0}".format(train_args.to_json_string()))
         logger.info("additional args: {0}".format(additional_args.to_json_string()))
@@ -33,7 +36,9 @@ class NerExecutor:
         self.num_labels = additional_args.num_labels
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
-        self.model = NerModel.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
+
+        model_class = NerExecutor.get_model_class(additional_args)
+        self.model = model_class.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
@@ -52,13 +57,13 @@ class NerExecutor:
                                   compute_metrics=self.compute_metrics)
 
     def compute_metrics(self, eval_prediction):
-        predictions = np.argmax(eval_prediction.predictions, axis=2)
-        evaluator = Evaluator(gold=eval_prediction.label_ids, predicted=predictions, tags=self.dev_dataset.tag_vocab)
+        evaluator = Evaluator(gold=eval_prediction.label_ids, predicted=eval_prediction.predictions,
+                              tags=self.dev_dataset.tag_vocab)
         logger.info("entity metrics:\n{0}".format(evaluator.entity_metric.report()))
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        model_predictions: np.ndarray = np.argmax(self.trainer.predict(dataset).predictions, axis=2)
+        model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
         data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
         # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
 
@@ -123,6 +128,15 @@ class NerExecutor:
             self.dump_predictions(self.dev_dataset)
             self.dump_predictions(self.test_dataset)
             # throws some threading related tqdm/wandb exception in the end (but code fully works)
+
+    @staticmethod
+    def get_model_class(additional_args: AdditionalArguments):
+        if additional_args.model_mode == "std":
+            return NerModel
+        if additional_args.model_mode == "crf":
+            return NerModelWithCrf
+        if additional_args.model_mode == "bidaf":
+            return NerModelBiDAF
 
 
 def main(args):

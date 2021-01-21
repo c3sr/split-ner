@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
-from secner.additional_args import AdditionalArguments
-from secner.cnn import CharCNN
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
+
+from secner.additional_args import AdditionalArguments
+from secner.cnn import CharCNN
 
 
 class NerModel(BertPreTrainedModel):
@@ -66,7 +67,7 @@ class NerModel(BertPreTrainedModel):
         sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
 
-        outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
+        outputs = (torch.argmax(logits, dim=2),) + outputs[2:]  # add hidden states and attention if they are here
         if labels is not None:
             loss_fct = nn.CrossEntropyLoss()
             # Only keep active parts of the loss
