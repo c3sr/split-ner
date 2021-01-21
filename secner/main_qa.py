@@ -11,7 +11,9 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
 from secner.evaluator_qa import EvaluatorQA
-from secner.main import NerExecutor
+from secner.model import NerModel
+from secner.model_bidaf import NerModelBiDAF
+from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -38,7 +40,7 @@ class NerQAExecutor:
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
 
-        model_class = NerExecutor.get_model_class(additional_args)
+        model_class = self.get_model_class()
         self.model = model_class.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -183,6 +185,14 @@ class NerQAExecutor:
             self.dump_predictions(self.dev_dataset)
             self.dump_predictions(self.test_dataset)
             # throws some threading related tqdm/wandb exception in the end (but code fully works)
+
+    def get_model_class(self):
+        if self.additional_args.model_mode == "std":
+            return NerModel
+        if self.additional_args.model_mode == "crf":
+            return NerModelWithCrf
+        if self.additional_args.model_mode == "bidaf":
+            return NerModelBiDAF
 
 
 def main(args):

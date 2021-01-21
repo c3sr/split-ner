@@ -9,9 +9,11 @@ from transformers.trainer import TrainingArguments
 
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset, NerDataCollator
+from secner.dataset_char import NerCharDataset, NerCharDataCollator
 from secner.evaluator import Evaluator
 from secner.model import NerModel
 from secner.model_bidaf import NerModelBiDAF
+from secner.model_char import NerModelChar
 from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
@@ -29,29 +31,26 @@ class NerExecutor:
         self.train_args = train_args
         self.additional_args = additional_args
 
-        self.train_dataset = NerDataset(additional_args, "train")
-        self.dev_dataset = NerDataset(additional_args, "dev")
-        self.test_dataset = NerDataset(additional_args, "test")
+        dataset_class = self.get_dataset_class()
+        self.train_dataset = dataset_class(additional_args, "train")
+        self.dev_dataset = dataset_class(additional_args, "dev")
+        self.test_dataset = dataset_class(additional_args, "test")
 
         self.num_labels = additional_args.num_labels
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
 
-        model_class = NerExecutor.get_model_class(additional_args)
+        model_class = self.get_model_class()
         self.model = model_class.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
-        tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
-
-        # data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
-        data_collator = NerDataCollator(args=additional_args)
-
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
         self.trainer = NerTrainer(model=self.model,
                                   args=train_args,
-                                  tokenizer=tokenizer,
-                                  data_collator=data_collator,
+                                  tokenizer=self.tokenizer,
+                                  data_collator=self.get_data_collator(),
                                   train_dataset=self.train_dataset,
                                   eval_dataset=self.dev_dataset,
                                   compute_metrics=self.compute_metrics)
@@ -129,14 +128,27 @@ class NerExecutor:
             self.dump_predictions(self.test_dataset)
             # throws some threading related tqdm/wandb exception in the end (but code fully works)
 
-    @staticmethod
-    def get_model_class(additional_args: AdditionalArguments):
-        if additional_args.model_mode == "std":
+    def get_model_class(self):
+        if self.additional_args.model_mode == "std":
             return NerModel
-        if additional_args.model_mode == "crf":
+        if self.additional_args.model_mode == "crf":
             return NerModelWithCrf
-        if additional_args.model_mode == "bidaf":
+        if self.additional_args.model_mode == "bidaf":
             return NerModelBiDAF
+        if self.additional_args.model_mode == "char":
+            return NerModelChar
+
+    def get_dataset_class(self):
+        if self.additional_args.model_mode == "char":
+            return NerCharDataset
+        return NerDataset
+
+    def get_data_collator(self):
+        if self.additional_args.model_mode == "char":
+            return NerCharDataCollator(args=self.additional_args)
+
+        # return DataCollatorForTokenClassification(tokenizer=self.tokenizer)
+        return NerDataCollator(args=self.additional_args)
 
 
 def main(args):

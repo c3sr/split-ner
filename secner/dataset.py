@@ -145,16 +145,17 @@ class NerDataCollator:
 
     def __call__(self, features):
         # post-padding
-        max_len = max(len(b["labels"]) for b in features)
+        max_len = max(len(entry["labels"]) for entry in features)
         # max_len = self.args.max_seq_len
         batch = dict()
 
         # input_ids
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["input_ids"])
-            entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
-        batch["input_ids"] = torch.stack(entry)
+        if "input_ids" in features[0]:
+            entry = []
+            for i in range(len(features)):
+                pad_len = max_len - len(features[i]["input_ids"])
+                entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
+            batch["input_ids"] = torch.stack(entry)
 
         # attention_mask
         entry = []
@@ -165,11 +166,12 @@ class NerDataCollator:
         batch["attention_mask"] = torch.stack(entry)
 
         # token_type_ids
-        entry = []
-        for i in range(len(features)):
-            pad_len = max_len - len(features[i]["token_type_ids"])
-            entry.append(torch.tensor(features[i]["token_type_ids"] + [0] * pad_len))
-        batch["token_type_ids"] = torch.stack(entry)
+        if "token_type_ids" in features[0]:
+            entry = []
+            for i in range(len(features)):
+                pad_len = max_len - len(features[i]["token_type_ids"])
+                entry.append(torch.tensor(features[i]["token_type_ids"] + [0] * pad_len))
+            batch["token_type_ids"] = torch.stack(entry)
 
         # char_ids
         if self.args.use_char_cnn:

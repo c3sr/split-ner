@@ -1,5 +1,5 @@
 {
-  "model_name": "ner-bert",
+  "model_name": "ner-bert-debug",
   "dataset_dir": "bio",
   "num_labels": 33,
   "do_train": true,
