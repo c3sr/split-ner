@@ -41,6 +41,7 @@ class NerExecutor:
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
 
         model_class = self.get_model_class()
+        # load best model in end fails as additional_args is not passed in Trainer (but training successfully completes)
         self.model = model_class.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
