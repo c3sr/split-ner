@@ -39,20 +39,19 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 |--|--|--|--|--|--|
 QA3-BioBERT | 86.02 | 74.52 | IBM | | | |
 QA4-BioBERT | 86.17 |       | | | | |
-BioBERT | 85.64 | 73.75*      | | | | |
+BioBERT | 85.64 | 74.35      | | | | |
 BioBERT-CRF | 85.69 |       | | | | |
-SciBERT | 85.77 | 74.08*      | | | | |
-QA4-BioBERT-CharCNN | 85.73**** |       | | | | |
+SciBERT | 85.77 | 74.68     | | | | |
+QA4-BioBERT-CharCNN | 85.73*** |       | | | | |
 QA4-MentionMask-BioBERT | IBM |       | | | | |
 QA4-MentionMask-BioBERT-CharCNN | IBM |       | | | | |
 KGQA |  | Running (79.24 reported)      | | | | |
 CNN-LSTM-CRF | 84.1 |      76.2 | 91.6 | 86.4 | 72.4|
-MRC |  |     78.85***  | 93.04** |  | |
+MRC |  |     78.85**  | 93.04* |  | |
 SOTA | 89.58 (KGQA with all datasets) |      79.24 (KGQA with all datasets) | 94.3 (LUKE) | 92.07 (MRC-Dice) | -|
 
 ```
-* on older evaluation code
-** reported training logs in their codebase
-*** on development set
-**** 32: char embedding size, 16: filters, 0.1: dropout, 5: kernel size
+* reported training logs in their codebase
+** on development set
+*** 32: char embedding size, 16: filters, 0.1: dropout, 5: kernel size
 ```
