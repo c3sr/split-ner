@@ -41,7 +41,7 @@ QA3-BioBERT | 86.02 | 74.52 | IBM | | | |
 QA4-BioBERT | 86.17 |       | | | | |
 BioBERT | 85.64 | 73.75*      | | | | |
 BioBERT-CRF | 85.69 |       | | | | |
-SciBERT | 85.77 | 74.08*      | | | | |
+SciBERT | 85.77 | 74.45     | | | | |
 QA4-BioBERT-CharCNN | 85.73**** |       | | | | |
 QA4-MentionMask-BioBERT | IBM |       | | | | |
 QA4-MentionMask-BioBERT-CharCNN | IBM |       | | | | |
