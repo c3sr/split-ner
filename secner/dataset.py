@@ -43,12 +43,12 @@ class NerDataset(Dataset):
                     self.tag_vocab.append(line)
 
     def parse_dataset(self):
-        self.sentences = NerDataset.read_dataset(self.corpus_path)
+        self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
         for index in range(len(self.sentences)):
             self.process_sentence(index)
 
     @staticmethod
-    def read_dataset(file_path):
+    def read_dataset(file_path, args: AdditionalArguments):
         sentences = []
         with open(file_path, "r", encoding="utf-8") as f:
             tokens = []
@@ -57,10 +57,22 @@ class NerDataset(Dataset):
                 line = line.strip()
                 if line:
                     row = line.split("\t")
+                    text = row[0]
+                    tag = row[-1]
+                    if args.use_pattern and tag != "O":
+                        orig_text = text
+                        text = ""
+                        for c in orig_text:
+                            if "a" <= c <= "z":
+                                text += "l"
+                            elif "A" <= c <= "Z":
+                                text += "u"
+                            else:
+                                text += c
                     if len(row) >= 3:
-                        tokens.append(Token(text=row[0], pos_tag=row[1], dep_tag=row[2], tag=row[-1], offset=offset))
+                        tokens.append(Token(text=text, pos_tag=row[1], dep_tag=row[2], tag=tag, offset=offset))
                     else:
-                        tokens.append(Token(text=row[0], tag=row[-1], offset=offset))
+                        tokens.append(Token(text=text, tag=tag, offset=offset))
                     offset += 1
                 else:
                     sentences.append(Sentence(tokens))

@@ -20,6 +20,7 @@
   "add_qa_helper_sentence": false,
   "use_char_cnn": false,
   "use_end_cnn": false,
+  "use_pattern": false,
   "char_emb_dim": 32,
   "cnn_num_filters": 16,
   "cnn_kernel_size": 5,

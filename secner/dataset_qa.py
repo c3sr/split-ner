@@ -54,7 +54,7 @@ class NerQADataset(Dataset):
         return tag_to_text_mapping
 
     def parse_dataset(self):
-        sentences = NerDataset.read_dataset(self.corpus_path)
+        sentences = NerDataset.read_dataset(self.corpus_path, self.args)
         for sentence in sentences:
             self.process_sentence(sentence)
 

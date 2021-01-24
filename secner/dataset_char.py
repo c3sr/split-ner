@@ -21,7 +21,7 @@ class NerCharDataset(Dataset):
         self.tag_vocab = []
         self.parse_tag_vocab()
 
-        self.sentences = NerDataset.read_dataset(self.corpus_path)
+        self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
 
     def set_corpus_path(self):
         if self.corpus_type == "train":
