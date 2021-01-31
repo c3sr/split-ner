@@ -2,12 +2,11 @@ import argparse
 
 import torch
 from dataclasses import dataclass
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import set_all_seeds, parse_config, setup_logging
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser
 
 
 class NerCharDataset(Dataset):
@@ -67,7 +66,8 @@ class NerCharDataCollator:
 
         # input_ids
         batch_text = [entry["text"] for entry in features]
-        batch["input_ids"] = NerDataset.get_char_ids(batch_text, max_len)
+        char_vocab = NerDataset.get_char_vocab()
+        batch["input_ids"] = NerDataset.get_char_ids(batch_text, max_len, char_vocab)
 
         # attention_mask
         entry = []

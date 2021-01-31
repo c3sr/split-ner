@@ -9,7 +9,7 @@ class CharCNN(nn.Module):
     def __init__(self, args):
         super(CharCNN, self).__init__()
         self.args = args
-        num_embeddings = len(NerDataset.get_vocab()) + 1  # +1 (for the special [PAD] char)
+        num_embeddings = len(NerDataset.get_char_vocab()) + 1  # +1 (for the special [PAD] char)
         self.char_out_dim = self.args.char_emb_dim * self.args.cnn_num_filters
 
         self.emb = nn.Embedding(num_embeddings=num_embeddings, embedding_dim=self.args.char_emb_dim)
