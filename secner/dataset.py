@@ -2,11 +2,10 @@ import argparse
 
 import torch
 from dataclasses import dataclass
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
-
 from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerDataset(Dataset):
@@ -57,28 +56,46 @@ class NerDataset(Dataset):
                 line = line.strip()
                 if line:
                     row = line.split("\t")
-                    text = row[0]
-                    tag = row[-1]
-                    if args.use_pattern and tag != "O":
-                        orig_text = text
-                        text = ""
-                        for c in orig_text:
-                            if "a" <= c <= "z":
-                                text += "l"
-                            elif "A" <= c <= "Z":
-                                text += "u"
-                            else:
-                                text += c
-                    if len(row) >= 3:
-                        tokens.append(Token(text=text, pos_tag=row[1], dep_tag=row[2], tag=tag, offset=offset))
-                    else:
-                        tokens.append(Token(text=text, tag=tag, offset=offset))
-                    offset += 1
+                    for rt in NerDataset.get_row_tokens(row, args):
+                        tokens.append(Token(text=rt.text, pos_tag=rt.pos_tag, dep_tag=rt.dep_tag, tag=rt.tag,
+                                            offset=offset))
+                        offset += 1
                 else:
                     sentences.append(Sentence(tokens))
                     tokens = []
                     offset = 0
         return sentences
+
+    @staticmethod
+    def get_row_tokens(row, args: AdditionalArguments):
+        text = row[0]
+        tag = row[-1]
+        pos_tag = row[1] if len(row) >= 3 else None
+        dep_tag = row[2] if len(row) >= 4 else None
+        if tag == args.none_tag or args.use_pattern == "none":
+            return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag)]
+        pattern_text = NerDataset.make_pattern(text)
+        if args.use_pattern == "only":
+            return [Token(text=pattern_text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag)]
+        if args.use_pattern == "both":
+            # E.g.: ABC, a uuu, is investing ...
+            return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag),
+                    Token(text=",", tag=args.none_tag),
+                    Token(text="a", tag=args.none_tag),
+                    Token(text=pattern_text, tag=args.none_tag),
+                    Token(text=",", tag=args.none_tag)]
+
+    @staticmethod
+    def make_pattern(text):
+        pattern_text = ""
+        for c in text:
+            if "a" <= c <= "z":
+                pattern_text += "l"
+            elif "A" <= c <= "Z":
+                pattern_text += "u"
+            else:
+                pattern_text += c
+        return pattern_text
 
     def __len__(self):
         return len(self.sentences)
@@ -125,8 +142,7 @@ class NerDataset(Dataset):
         sentence.bert_tokens.append(self.bert_end_token)
 
     @staticmethod
-    def get_char_ids(batch_text, max_len):
-        vocab = NerDataset.get_vocab()
+    def get_char_ids(batch_text, max_len, vocab):
         max_word_len = max(len(word) for sent in batch_text for word in sent)
         batch_ids = []
         for sent_text in batch_text:
@@ -141,12 +157,19 @@ class NerDataset(Dataset):
         return torch.stack(batch_ids)
 
     @staticmethod
-    def get_vocab():
+    def get_char_vocab():
         # size: 94 (does not include space, newline)
         # additional: can also use list(string.printable) here (size: 100)
         vocab = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
         vocab += list("abcdefghijklmnopqrstuvwxyz")
         vocab += list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        vocab += list("0123456789")
+        return vocab
+
+    @staticmethod
+    def get_pattern_vocab():
+        vocab = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
+        vocab += list("ul")
         vocab += list("0123456789")
         return vocab
 
@@ -186,9 +209,16 @@ class NerDataCollator:
             batch["token_type_ids"] = torch.stack(entry)
 
         # char_ids
-        if self.args.use_char_cnn:
+        if self.args.use_char_cnn in ["char", "both"]:
             batch_text = [entry["text"] for entry in features]
-            batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len)
+            char_vocab = NerDataset.get_char_vocab()
+            batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len, char_vocab)
+
+        # pattern_ids
+        if self.args.use_char_cnn in ["pattern", "both"]:
+            batch_pattern = [[NerDataset.make_pattern(word) for word in entry["text"]] for entry in features]
+            pattern_vocab = NerDataset.get_pattern_vocab()
+            batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
 
         # labels
         entry = []

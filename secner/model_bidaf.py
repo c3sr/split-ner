@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import BertConfig
-from transformers.models.bert import BertModel, BertPreTrainedModel
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
+from transformers import BertConfig
+from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModelBiDAF(BertPreTrainedModel):
@@ -19,7 +18,7 @@ class NerModelBiDAF(BertPreTrainedModel):
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
 
         # Character Embedding Layer
-        num_embeddings = len(NerDataset.get_vocab()) + 1  # +1 (for the special [PAD] char)
+        num_embeddings = len(NerDataset.get_char_vocab()) + 1  # +1 (for the special [PAD] char)
         self.char_emb = nn.Embedding(num_embeddings=num_embeddings,
                                      embedding_dim=self.additional_args.char_emb_dim,
                                      padding_idx=0)

@@ -16,7 +16,7 @@
   "none_tag": "O",
   "max_seq_len": 256,
   "freeze_bert": false,
-  "use_char_cnn": true,
+  "use_char_cnn": "char",
   "char_emb_dim": 32,
   "cnn_num_filters": 16,
   "cnn_kernel_size": 5,

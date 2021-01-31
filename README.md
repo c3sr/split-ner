@@ -40,7 +40,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 QA3-BioBERT | 86.02 | 74.52 | IBM | | | |
 QA4-BioBERT | 86.17 |       | | | | |
 BioBERT | 85.64 | 74.35      | | | | |
-BioBERT-CRF | 85.69 |       | | | | |
+BioBERT-CRF | 85.98 |       | | | | |
 SciBERT | 85.77 | 74.68     | | | | |
 QA4-BioBERT-CharCNN | 85.73*** |       | | | | |
 QA4-MentionMask-BioBERT | IBM |       | | | | |

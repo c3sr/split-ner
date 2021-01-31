@@ -17,7 +17,7 @@
   "max_seq_len": 256,
   "freeze_bert": false,
   "model_mode": "crf",
-  "use_char_cnn": false,
+  "use_char_cnn": "none",
   "query_type": "question",
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",

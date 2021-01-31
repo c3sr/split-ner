@@ -16,7 +16,7 @@
   "max_seq_len": 256,
   "freeze_bert": true,
   "model_mode": "char",
-  "use_char_cnn": true,
+  "use_char_cnn": "char",
   "char_emb_dim": 16,
   "cnn_num_filters": 128,
   "cnn_kernel_size": 5,
