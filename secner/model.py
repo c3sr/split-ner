@@ -71,7 +71,7 @@ class NerModel(BertPreTrainedModel):
 
         if self.additional_args.use_char_cnn in ["pattern", "both"]:
             pattern_vec = self.pattern_cnn(pattern_ids)
-            lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=self.bert.device)
+            lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
             packed_inp = nn.utils.rnn.pack_padded_sequence(input=pattern_vec,
                                                            lengths=lengths,
                                                            batch_first=True,
