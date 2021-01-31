@@ -76,6 +76,7 @@ class NerModel(BertPreTrainedModel):
                                                            lengths=lengths,
                                                            batch_first=True,
                                                            enforce_sorted=False)
+            self.pattern_lstm.flatten_parameters()
             packed_out, _ = self.pattern_lstm(packed_inp)
             pattern_vec, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out,
                                                               batch_first=True,
