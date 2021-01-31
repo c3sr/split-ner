@@ -14,8 +14,13 @@ class EvaluatorQA:
         self.dataset = dataset
         self.tags = list(self.dataset.tag_to_text_mapping.keys()) if self.dataset else ["TAG"]
 
-        self.gold_entity_spans = self.get_spans(self.gold)
-        self.predicted_entity_spans = self.get_spans(self.predicted)
+        if self.num_labels == 2:
+            # "BO" tagging scheme
+            self.gold_entity_spans = self.get_spans_for_2_tag_scheme(self.gold)
+            self.predicted_entity_spans = self.get_spans_for_2_tag_scheme(self.predicted)
+        else:
+            self.gold_entity_spans = self.get_spans(self.gold)
+            self.predicted_entity_spans = self.get_spans(self.predicted)
         self.entity_metric = self.calc_entity_metrics()
 
     def calc_entity_metrics(self):
@@ -61,6 +66,29 @@ class EvaluatorQA:
                         prev_span.end = tok_index
                     else:
                         prev_span = None
+                else:
+                    prev_span = None
+            batch_spans.append(context_spans)
+        return batch_spans
+
+    def get_spans_for_2_tag_scheme(self, batch):
+        batch_spans = []
+        b_tag_index = NerQADataset.get_tag_index("B", none_tag=self.none_tag)
+        for context_index in range(len(batch)):
+            context_spans = []
+            prev_span = None
+            for tok_index in range(len(batch[context_index])):
+                if self.gold[context_index][tok_index] == -100:
+                    prev_span = None
+                    continue
+                if batch[context_index][tok_index] == b_tag_index:
+                    tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
+                    if prev_span and tag == prev_span.tag:
+                        prev_span.end = tok_index
+                    else:
+                        curr_span = Span(context_index, tok_index, tok_index, tag)
+                        context_spans.append(curr_span)
+                        prev_span = curr_span
                 else:
                     prev_span = None
             batch_spans.append(context_spans)

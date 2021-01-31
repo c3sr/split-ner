@@ -15,8 +15,6 @@ class NerQADataset(Dataset):
         self.corpus_type = corpus_type
         self.corpus_path = self.set_corpus_path()
 
-        self.tag_vocab = []
-        self.parse_tag_vocab()
         self.tag_to_text_mapping = self.parse_tag_names()
 
         self.contexts = []
@@ -34,13 +32,6 @@ class NerQADataset(Dataset):
         if self.corpus_type == "test":
             return self.args.test_path
         return None
-
-    def parse_tag_vocab(self):
-        with open(self.args.tag_vocab_path, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    self.tag_vocab.append(line)
 
     def parse_tag_names(self):
         tag_to_text_mapping = dict()
