@@ -13,8 +13,13 @@ class Evaluator:
         self.i_to_b = {v: k for k, v in self.b_to_i.items()}
         self.b_to_tag = {k: v[2:] for k, v in enumerate(self.tags) if v.startswith("B-")}
 
-        self.gold_entity_spans = self.get_spans(self.gold)
-        self.predicted_entity_spans = self.get_spans(self.predicted)
+        if len(self.b_to_i) == 0:
+            # "BO" tagging scheme
+            self.gold_entity_spans = self.get_spans_for_2_tag_scheme(self.gold)
+            self.predicted_entity_spans = self.get_spans_for_2_tag_scheme(self.predicted)
+        else:
+            self.gold_entity_spans = self.get_spans(self.gold)
+            self.predicted_entity_spans = self.get_spans(self.predicted)
         self.entity_metric = self.calc_entity_metrics()
 
     def calc_entity_metrics(self):
@@ -52,7 +57,7 @@ class Evaluator:
                 if self.gold[sent_index][tok_index] == -100:
                     prev_span = None
                     continue
-                if batch[sent_index][tok_index] in self.b_to_i:
+                if batch[sent_index][tok_index] in self.b_to_tag:
                     tag = self.b_to_tag[batch[sent_index][tok_index]]
                     curr_span = Span(sent_index, tok_index, tok_index, tag)
                     sent_spans.append(curr_span)
@@ -63,6 +68,28 @@ class Evaluator:
                         prev_span.end = tok_index
                     else:
                         prev_span = None
+                else:
+                    prev_span = None
+            batch_spans.append(sent_spans)
+        return batch_spans
+
+    def get_spans_for_2_tag_scheme(self, batch):
+        batch_spans = []
+        for sent_index in range(len(batch)):
+            sent_spans = []
+            prev_span = None
+            for tok_index in range(len(batch[sent_index])):
+                if self.gold[sent_index][tok_index] == -100:
+                    prev_span = None
+                    continue
+                if batch[sent_index][tok_index] in self.b_to_tag:
+                    tag = self.b_to_tag[batch[sent_index][tok_index]]
+                    if prev_span and tag == prev_span.tag:
+                        prev_span.end = tok_index
+                    else:
+                        curr_span = Span(sent_index, tok_index, tok_index, tag)
+                        sent_spans.append(curr_span)
+                        prev_span = curr_span
                 else:
                     prev_span = None
             batch_spans.append(sent_spans)
