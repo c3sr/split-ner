@@ -136,6 +136,11 @@ class NerDataset(Dataset):
                     tag = token.tag
                 else:
                     tag = "I-" + token.tag[2:]
+
+                # Handle 'BO' tagging scheme
+                if self.args.tagging == "bo" and tag[:2] == "I-":
+                    tag = "B-" + tag[2:]
+
                 bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
                 sentence.bert_tokens.append(BertToken(bert_ids[i], 0, bert_token))
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]

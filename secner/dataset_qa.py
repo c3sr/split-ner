@@ -1,11 +1,10 @@
 import argparse
 
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerQADataset(Dataset):
@@ -135,7 +134,13 @@ class NerQADataset(Dataset):
                 bert_token = Token(tok.text, bert_tag, tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
                 bert_sent_tokens.append(BertToken(bert_id=bert_ids[i], token_type=1, token=bert_token))
 
-        if self.args.num_labels == 4:
+        if self.args.num_labels == 2:
+            # BO tagging scheme
+            for i in range(len(bert_sent_tokens)):
+                if bert_sent_tokens[i].token.tag == "I":
+                    bert_sent_tokens[i].token.tag = "B"
+
+        elif self.args.num_labels == 4:
             # BIOE tagging scheme
             is_end_token = False
             for i in range(len(bert_sent_tokens) - 1, 0, -1):

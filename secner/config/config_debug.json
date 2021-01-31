@@ -2,6 +2,7 @@
   "model_name": "ner-bert-debug",
   "dataset_dir": "bio",
   "num_labels": 33,
+  "tagging": "bio",
   "do_train": true,
   "resume": null,
   "num_train_epochs": 300,
