@@ -103,7 +103,7 @@ class NerQADataset(Dataset):
         if self.args.add_qa_helper_sentence:
             q = len(query_tokens)
             for tok in sentence.tokens:
-                if tok.tag[2:] == tag or tok.tag == self.args.none_tag:
+                if self.corpus_type != "train" or tok.tag[2:] == tag or tok.tag == self.args.none_tag:
                     helper_text = tok.text
                 elif tok.tag.startswith("B-"):
                     helper_text = self.tag_to_text_mapping[tok.tag[2:]]
