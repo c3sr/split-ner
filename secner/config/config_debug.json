@@ -18,6 +18,7 @@
   "max_seq_len": 128,
   "freeze_bert": true,
   "model_mode": "std",
+  "punctuation_handling": false,
   "add_qa_helper_sentence": false,
   "use_char_cnn": "none",
   "use_end_cnn": false,

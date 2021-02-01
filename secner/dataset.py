@@ -162,6 +162,10 @@ class NerDataset(Dataset):
         return torch.stack(batch_ids)
 
     @staticmethod
+    def is_punctuation(word):
+        return 1 if word in list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}") else 0
+
+    @staticmethod
     def get_char_vocab():
         # size: 94 (does not include space, newline)
         # additional: can also use list(string.printable) here (size: 100)
@@ -224,6 +228,13 @@ class NerDataCollator:
             batch_pattern = [[NerDataset.make_pattern(word) for word in entry["text"]] for entry in features]
             pattern_vocab = NerDataset.get_pattern_vocab()
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
+
+        if self.args.punctuation_handling:
+            entry = []
+            for i in range(len(features)):
+                pad_len = max_len - len(features[i]["text"])
+                entry.append(torch.tensor([NerDataset.is_punctuation(w) for w in features[i]["text"]] + [0] * pad_len))
+            batch["punctuation_vec"] = torch.stack(entry)
 
         # labels
         entry = []

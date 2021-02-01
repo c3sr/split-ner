@@ -17,6 +17,9 @@ class NerModel(BertPreTrainedModel):
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         classifier_inp_dim = self.bert.config.hidden_size
 
+        if self.additional_args.punctuation_handling:
+            classifier_inp_dim += 1
+
         if self.additional_args.use_char_cnn in ["char", "both"]:
             self.char_cnn = CharCNN(additional_args)
             classifier_inp_dim += self.char_cnn.char_out_dim
@@ -54,6 +57,7 @@ class NerModel(BertPreTrainedModel):
             token_type_ids=None,
             char_ids=None,
             pattern_ids=None,
+            punctuation_vec=None,
             labels=None,
             **kwargs):
 
@@ -64,6 +68,8 @@ class NerModel(BertPreTrainedModel):
             token_type_ids=token_type_ids
         )
         sequence_output = outputs[0]
+        if self.additional_args.punctuation_handling:
+            sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             char_vec = self.char_cnn(char_ids)
