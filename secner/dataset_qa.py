@@ -147,6 +147,7 @@ class NerQADataset(Dataset):
         bert_tokens.extend(bert_helper_sent_tokens)
         bert_tokens.append(self.bert_mid_sep_token)
         bert_tokens.extend(bert_sent_tokens)
+        bert_tokens = bert_tokens[:self.args.max_seq_len - 1]
         bert_tokens.append(self.bert_end_token)
         return Context(sentence, tag, tag_text, bert_tokens)
 
