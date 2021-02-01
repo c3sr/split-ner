@@ -37,6 +37,7 @@ class AdditionalArguments:
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char)"})
+    loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|dice)"})
     use_char_cnn: str = field(default="none", metadata={"help": "use char CNN (none|char|pattern|both)"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})

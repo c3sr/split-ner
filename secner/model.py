@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
+from secner.loss import DiceLoss
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
@@ -45,6 +46,9 @@ class NerModel(BertPreTrainedModel):
         self.classifier = nn.Linear(classifier_inp_dim, self.num_labels)
 
         self.init_weights()
+
+        # Downscaling contribution of "O" terms by fixed constant factor for now
+        self.loss_wt = torch.tensor([1.0] * (self.num_labels - 1) + [0.5])
 
         if self.additional_args.freeze_bert:
             for param in self.bert.parameters():
@@ -99,17 +103,23 @@ class NerModel(BertPreTrainedModel):
 
         outputs = (torch.argmax(logits, dim=2),) + outputs[2:]  # add hidden states and attention if they are here
         if labels is not None:
-            loss_fct = nn.CrossEntropyLoss()
             # Only keep active parts of the loss
             if attention_mask is not None:
                 active_loss = attention_mask.view(-1) == 1
                 active_logits = logits.view(-1, self.num_labels)
                 active_labels = torch.where(
-                    active_loss, labels.view(-1), torch.tensor(loss_fct.ignore_index).type_as(labels)
+                    active_loss, labels.view(-1), torch.tensor(nn.CrossEntropyLoss().ignore_index).type_as(labels)
                 )
-                loss = loss_fct(active_logits, active_labels)
             else:
-                loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
+                active_logits = logits.view(-1, self.num_labels)
+                active_labels = labels.view(-1)
+
+            if self.additional_args.loss_type == "dice":
+                loss = DiceLoss()(active_logits, active_labels, attention_mask.view(-1))
+            elif self.additional_args.loss_type == "ce_wt":
+                loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(self.device))(active_logits, active_labels)
+            else:
+                loss = nn.CrossEntropyLoss()(active_logits, active_labels)
             outputs = (loss,) + outputs
 
         return outputs  # (loss), scores, (hidden_states), (attentions)
