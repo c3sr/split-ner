@@ -117,7 +117,7 @@ class NerModel(BertPreTrainedModel):
             if self.additional_args.loss_type == "dice":
                 loss = DiceLoss()(active_logits, active_labels, attention_mask.view(-1))
             elif self.additional_args.loss_type == "ce_wt":
-                loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(self.device))(active_logits, active_labels)
+                loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(active_logits.device))(active_logits, active_labels)
             else:
                 loss = nn.CrossEntropyLoss()(active_logits, active_labels)
             outputs = (loss,) + outputs
