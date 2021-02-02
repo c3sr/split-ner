@@ -35,7 +35,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 
 ## Results
 
-| Test Entity F1(%)            | BioNLP13CG                  | JNLPBA       | CoNLL | OntoNotes | Genia |
+| Test Entity F1(%)            | BioNLP13CG                  | JNLPBA       | CoNLL | Genia     | Onto  |
 |------------------------------|-----------------------------|--------------|-------|-----------|-------|
 | BERT-Base                    | 81.940                      |              |       |           |       |
 | BioBERT                      | 85.644                      | 74.35        |       |           |       |
@@ -51,15 +51,15 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN9-PatternLSTM | running (85.821)            |              |       |           |       |
 | BioBERT-Punctuation          | 86.348                      |              |       |           |       |
 | BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
-| BioBERT-QA4                  | 86.172                      | 74.499       |       |           |       |
+| BioBERT-QA4                  | 86.172                      | 74.499       |90.954 |           |       |
 | BioBERT-QA4-CRF              | 84.950                      |              |       |           |       |
 | BioBERT-QA4-EndCNN           | -                           |              |       |           |       |
 | BioBERT-QA4-CharCNN1         | 85.731                      |              |       |           |       |
 | BioBERT-QA4-CharCNN1-Highway | 86.042                      |              |       |           |       |
-| BioBERT-QA4-Mention          | 81.537                      |              |       |           |       |
-| BioBERT-QA4-Mention-CharCNN  | -                           |              |       |           |       |
+| BioBERT-QA4-Mention          | 81.537                      |              |91.655 |           |       |
+| BioBERT-QA3-Mention-CharCNN  | -                           |              |       |           |       |
 | CNN-LSTM-CRF                 | 84.1                        | 76.2         |       |           |       |
-| SOTA                         | 89.58(KGQA with extra data) | 79.24 (KGQA) |       |           |       |
+| SOTA                         | 89.58(KGQA with extra data) | 79.24 (KGQA) |94.3(LUKE), 93.4   |           |       |
 
 
 | Test Entity F1(%)| BioNLP13CG | JNLPBA | CoNLL03 | OntoNotes | GENIA |
