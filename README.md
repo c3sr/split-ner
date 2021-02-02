@@ -56,7 +56,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-QA4-EndCNN           | -                           |              |       |           |       |
 | BioBERT-QA4-CharCNN1         | 85.731                      |              |       |           |       |
 | BioBERT-QA4-CharCNN1-Highway | 86.042                      |              |       |           |       |
-| BioBERT-QA4-Mention          | 81.389**                    |              |       |           |       |
+| BioBERT-QA4-Mention          | 81.537                      |              |       |           |       |
 | BioBERT-QA4-Mention-CharCNN  | -                           |              |       |           |       |
 | CNN-LSTM-CRF                 | 84.1                        | 76.2         |       |           |       |
 | SOTA                         | 89.58(KGQA with extra data) | 79.24 (KGQA) |       |           |       |
