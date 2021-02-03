@@ -26,12 +26,14 @@ class NerModel(BertPreTrainedModel):
             classifier_inp_dim += self.char_cnn.char_out_dim
 
         if self.additional_args.use_char_cnn in ["pattern", "both"]:
+            dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
             self.pattern_cnn = CharCNN(additional_args)
             self.pattern_lstm = nn.LSTM(input_size=self.pattern_cnn.char_out_dim,
                                         hidden_size=self.additional_args.lstm_hidden_dim,
                                         bidirectional=True,
                                         batch_first=True,
-                                        num_layers=1)
+                                        num_layers=self.additional_args.lstm_num_layers,
+                                        dropout=dropout_prob)
             classifier_inp_dim += 2 * self.additional_args.lstm_hidden_dim
 
         if self.additional_args.use_end_cnn:

@@ -16,8 +16,11 @@ class CharCNN(nn.Module):
         self.emb = nn.Embedding(num_embeddings=num_embeddings, embedding_dim=self.args.char_emb_dim)
         self.dropout = nn.Dropout(p=self.args.cnn_dropout_rate)
 
-        # self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]  # found to work well
-        self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 32], [6, 32], [7, 32], [8, 32], [9, 32]]
+        # found to work well
+        self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]
+
+        # not working as good as the above one
+        # self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 32], [6, 32], [7, 32], [8, 32], [9, 32]]
 
         self.hidden_dim = 0
         for i, (kernel_size, num_filters) in enumerate(self.cnn_layer_config):

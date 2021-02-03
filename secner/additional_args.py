@@ -45,6 +45,7 @@ class AdditionalArguments:
     query_type: str = field(default="question", metadata={"help": "query type for entities fed in QA model"})
     char_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
+    lstm_num_layers: int = field(default=1, metadata={"help": "pattern LSTM: no. of layers"})
     cnn_num_filters: int = field(default=16, metadata={"help": "# char CNN filters"})
     cnn_kernel_size: int = field(default=5, metadata={"help": "char CNN kernel size"})
     end_cnn_channels: int = field(default=8, metadata={"help": "end CNN output channels"})
