@@ -43,13 +43,13 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | SciBERT-PairedSentence       | 85.606*                     |              |       |           |       |
 | BioBERT-BO-Tagging           | 85.218                      |              |       |           |       |
 | BioBERT-CE_Weighted          | 85.575                      |              |       |           |       |
-| BioBERT-Dice                 | 85.966                      |              |       |           |       |
+| BioBERT-Dice                 | 85.966                      |              |90.504 |           |       |
 | BioBERT-CRF                  | 85.685                      |              |       |           |       |
 | CharCNN1                     | 50.283                      |              |       |           |       |
 | BioBERT-CharCNN1-PatternLSTM | 85.048                      |              |       |           |       |
 | BioBERT-CharCNN5-PatternLSTM | 85.915                      |              |       |           |       |
 | BioBERT-CharCNN9-PatternLSTM | 85.857                      |              |       |           |       |
-| BioBERT-Punctuation          | 86.348                      |              |       |           |       |
+| BioBERT-Punctuation          | 86.348                      |              |91.263 |           |       |
 | BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
 | BioBERT-QA4                  | 86.172                      | 74.499       |90.954 |           |       |
 | BioBERT-QA4-CRF              | 84.950                      |              |       |           |       |
