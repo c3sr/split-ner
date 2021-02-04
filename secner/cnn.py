@@ -17,7 +17,9 @@ class CharCNN(nn.Module):
         self.dropout = nn.Dropout(p=self.args.cnn_dropout_rate)
 
         # found to work well
-        self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]
+        # self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]
+
+        self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16], [6, 16], [7, 16]]
 
         # not working as good as the above one
         # self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 32], [6, 32], [7, 32], [8, 32], [9, 32]]
