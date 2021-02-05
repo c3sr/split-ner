@@ -41,6 +41,7 @@ class AdditionalArguments:
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char)"})
     loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|dice)"})
     use_char_cnn: str = field(default="none", metadata={"help": "use char CNN (none|char|pattern|both)"})
+    pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1)"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})
     use_pattern: str = field(default="none", metadata={"help": "use patterns over actual mentions (none|only|both)"})

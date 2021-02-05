@@ -75,7 +75,7 @@ class NerDataset(Dataset):
         dep_tag = row[2] if len(row) >= 4 else None
         if tag == args.none_tag or args.use_pattern == "none":
             return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag)]
-        pattern_text = NerDataset.make_pattern(text)
+        pattern_text = NerDataset.make_pattern_type0(text)
         if args.use_pattern == "only":
             return [Token(text=pattern_text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag)]
         if args.use_pattern == "both":
@@ -87,7 +87,15 @@ class NerDataset(Dataset):
                     Token(text=",", tag=args.none_tag)]
 
     @staticmethod
-    def make_pattern(text):
+    def make_pattern(text, pattern_type):
+        if pattern_type == "0":
+            return NerDataset.make_pattern_type0(text)
+        if pattern_type == "1":
+            return NerDataset.make_pattern_type1(text)
+        return NotImplementedError
+
+    @staticmethod
+    def make_pattern_type0(text):
         pattern_text = ""
         for c in text:
             if "a" <= c <= "z":
@@ -97,6 +105,23 @@ class NerDataset(Dataset):
             else:
                 pattern_text += c
         return pattern_text
+
+    @staticmethod
+    def make_pattern_type1(text):
+        if text == "[CLS]":
+            return "C"
+        if text == "[SEP]":
+            return "S"
+        if re.fullmatch(r"[a-z]+", text):
+            return "L"
+        if re.fullmatch(r"[A-Z]+", text):
+            return "U"
+        if re.fullmatch(r"[A-Z][a-z]+", text):
+            return "F"
+        if re.fullmatch(r"[A-Za-z]+", text):
+            return "M"
+        # for tokens with digits/punctuations
+        return NerDataset.make_pattern_type0(text)
 
     @staticmethod
     def get_word_type(text):
@@ -172,6 +197,7 @@ class NerDataset(Dataset):
     @staticmethod
     def get_char_ids(batch_text, max_len, vocab):
         max_word_len = max(len(word) for sent in batch_text for word in sent)
+        max_word_len = max(max_word_len, 3)
         batch_ids = []
         for sent_text in batch_text:
             sent_ids = []
@@ -199,11 +225,17 @@ class NerDataset(Dataset):
         return vocab
 
     @staticmethod
-    def get_pattern_vocab():
+    def get_pattern_vocab(pattern_type):
         vocab = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
-        vocab += list("ul")
-        vocab += list("0123456789")
-        return vocab
+        if pattern_type == "0":
+            vocab += list("ul")
+            vocab += list("0123456789")
+            return vocab
+        if pattern_type == "1":
+            vocab += list("ulCSLUFM")
+            vocab += list("0123456789")
+            return vocab
+        return NotImplementedError
 
     @staticmethod
     def get_word_type_vocab():
@@ -253,8 +285,9 @@ class NerDataCollator:
 
         # pattern_ids
         if self.args.use_char_cnn in ["pattern", "both"]:
-            batch_pattern = [[NerDataset.make_pattern(word) for word in entry["text"]] for entry in features]
-            pattern_vocab = NerDataset.get_pattern_vocab()
+            batch_pattern = [[NerDataset.make_pattern(word, self.args.pattern_type)
+                              for word in entry["text"]] for entry in features]
+            pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
 
         if self.args.punctuation_handling:

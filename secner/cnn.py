@@ -1,27 +1,39 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 
 
 class CharCNN(nn.Module):
 
-    def __init__(self, args):
+    def __init__(self, args: AdditionalArguments, cnn_type):
         super(CharCNN, self).__init__()
         self.args = args
-        num_embeddings = len(NerDataset.get_char_vocab()) + 1  # +1 (for the special [PAD] char)
+
+        # +1 (for the special [PAD] char)
+        if cnn_type == "char":
+            num_embeddings = len(NerDataset.get_char_vocab()) + 1
+            # found to work well
+            self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]
+        else:
+            num_embeddings = len(NerDataset.get_pattern_vocab(self.args.pattern_type)) + 1
+            if self.args.pattern_type == "0":
+                # found to work well
+                self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]
+            else:
+                # patterns are smaller, so reducing kernel sizes
+                self.cnn_layer_config = [[1, 16], [2, 16], [3, 16]]
+
         self.char_out_dim = 768
 
         self.emb = nn.Embedding(num_embeddings=num_embeddings, embedding_dim=self.args.char_emb_dim)
         self.dropout = nn.Dropout(p=self.args.cnn_dropout_rate)
 
-        # found to work well
-        self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16]]
-
+        # not working as good as CNN-5(Char, PatternType0)
         # self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 16], [6, 16], [7, 16]]
 
-        # not working as good as the above one
+        # not working as good as CNN-5(Char, PatternType0)
         # self.cnn_layer_config = [[1, 16], [2, 16], [3, 16], [4, 16], [5, 32], [6, 32], [7, 32], [8, 32], [9, 32]]
 
         self.hidden_dim = 0
