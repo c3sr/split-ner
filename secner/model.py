@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
+from secner.dataset import NerDataset
 from secner.loss import DiceLoss
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
@@ -13,10 +14,14 @@ class NerModel(BertPreTrainedModel):
         super(NerModel, self).__init__(config)
         self.additional_args = additional_args
         self.num_labels = config.num_labels
+        self.num_word_types = len(NerDataset.get_word_type_vocab())
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         classifier_inp_dim = self.bert.config.hidden_size
+
+        if self.additional_args.word_type_handling == "1hot":
+            classifier_inp_dim += self.num_word_types
 
         if self.additional_args.punctuation_handling:
             classifier_inp_dim += 1
@@ -64,6 +69,7 @@ class NerModel(BertPreTrainedModel):
             char_ids=None,
             pattern_ids=None,
             punctuation_vec=None,
+            word_type_ids=None,
             labels=None,
             **kwargs):
 
@@ -76,6 +82,10 @@ class NerModel(BertPreTrainedModel):
         sequence_output = outputs[0]
         if self.additional_args.punctuation_handling:
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
+
+        if self.additional_args.word_type_handling == "1hot":
+            word_type_vec = torch.eye(self.num_word_types)[word_type_ids].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, word_type_vec], dim=2)
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             char_vec = self.char_cnn(char_ids)

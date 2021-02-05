@@ -1,4 +1,5 @@
 import argparse
+import re
 
 import torch
 from dataclasses import dataclass
@@ -97,6 +98,28 @@ class NerDataset(Dataset):
                 pattern_text += c
         return pattern_text
 
+    @staticmethod
+    def get_word_type(text):
+        if text == "[CLS]":
+            return "C"
+        if text == "[SEP]":
+            return "S"
+        if re.fullmatch(r"[a-z]+", text):
+            return "L"
+        if re.fullmatch(r"[A-Z]+", text):
+            return "U"
+        if re.fullmatch(r"[A-Z][a-z]+", text):
+            return "F"
+        if re.fullmatch(r"[A-Za-z]+", text):
+            return "M"
+        if re.fullmatch(r"[0-9]+", text):
+            return "D"
+        if re.fullmatch(r"[^A-Za-z0-9]+", text):
+            return "P"
+        if re.fullmatch(r"[A-Za-z0-9]+", text):
+            return "A"
+        return "B"
+
     def __len__(self):
         return len(self.sentences)
 
@@ -182,6 +205,11 @@ class NerDataset(Dataset):
         vocab += list("0123456789")
         return vocab
 
+    @staticmethod
+    def get_word_type_vocab():
+        vocab = list("CSLUFMDPAB")
+        return vocab
+
 
 @dataclass
 class NerDataCollator:
@@ -235,6 +263,15 @@ class NerDataCollator:
                 pad_len = max_len - len(features[i]["text"])
                 entry.append(torch.tensor([NerDataset.is_punctuation(w) for w in features[i]["text"]] + [0] * pad_len))
             batch["punctuation_vec"] = torch.stack(entry)
+
+        if self.args.word_type_handling != "none":
+            entry = []
+            word_type_vocab = NerDataset.get_word_type_vocab()
+            for i in range(len(features)):
+                pad_len = max_len - len(features[i]["text"])
+                entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w))
+                                           for w in features[i]["text"]] + [0] * pad_len))
+            batch["word_type_ids"] = torch.stack(entry)
 
         # labels
         entry = []

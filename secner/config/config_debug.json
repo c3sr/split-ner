@@ -20,6 +20,7 @@
   "model_mode": "std",
   "loss_type": "ce",
   "punctuation_handling": false,
+  "word_type_handling": "none",
   "add_qa_helper_sentence": false,
   "use_char_cnn": "none",
   "use_end_cnn": false,
