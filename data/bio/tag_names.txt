@@ -1,16 +1,16 @@
-Amino_acid	Amino acid
-Anatomical_system	Anatomical system
-Cancer	Cancer
-Cell	Cell
-Cellular_component	Cellular component
-Developing_anatomical_structure	Developing anatomical structure
-Gene_or_gene_product	Gene or gene product
-Immaterial_anatomical_entity	Immaterial anatomical entity
-Multi-tissue_structure	Multi-tissue structure
-Organ	Organ
-Organism	Organism
-Organism_subdivision	Organism subdivision
-Organism_substance	Organism substance
-Pathological_formation	Pathological formation
-Simple_chemical	Simple chemical
-Tissue	Tissue
+Amino_acid	amino acid
+Anatomical_system	anatomical system
+Cancer	cancer
+Cell	cell
+Cellular_component	cellular component
+Developing_anatomical_structure	developing anatomical structure
+Gene_or_gene_product	gene or gene product
+Immaterial_anatomical_entity	immaterial anatomical entity
+Multi-tissue_structure	multi-tissue structure
+Organ	organ
+Organism	organism
+Organism_subdivision	organism subdivision
+Organism_substance	organism substance
+Pathological_formation	pathological formation
+Simple_chemical	simple chemical
+Tissue	tissue
