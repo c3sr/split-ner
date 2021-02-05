@@ -52,8 +52,10 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN5-PatternLSTM2| 85.777                      |              |       |           |       |
 | BioBERT-CharCNN9-PatternLSTM | 85.857                      |              |       |           |       |
 | BioBERT-Punctuation          | 86.348                      | 73.844       |91.263 |           |       |
+| BioBERT-WordType             | 86.166                      |              |       |           |       |
 | BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
 | BioBERT-QA4                  | 86.172                      | 74.499       |90.954 |           |       |
+| BioBERT-QA4-Punctuation      | running                     |              |       |           |       |
 | BioBERT-QA4-CRF              | 84.950                      |              |       |           |       |
 | BioBERT-QA4-EndCNN           | -                           |              |       |           |       |
 | BioBERT-QA4-CharCNN1         | 85.731                      |              |       |           |       |
