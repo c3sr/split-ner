@@ -46,11 +46,12 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-Dice                 | 85.966                      | 74.829       |90.504 |           |       |
 | BioBERT-CRF                  | 85.685                      |              |       |           |       |
 | CharCNN1                     | 50.283                      |              |       |           |       |
-| BioBERT-CharCNN1-PatternLSTM | 85.048                      |              |       |           |       |
-| BioBERT-CharCNN5-PatternLSTM | 85.915                      |              |       |           |       |
-| BioBERT-CharCNN7-PatternLSTM | 85.773                      |              |       |           |       |
-| BioBERT-CharCNN5-PatternLSTM2| 85.777                      |              |       |           |       |
-| BioBERT-CharCNN9-PatternLSTM | 85.857                      |              |       |           |       |
+| BioBERT-CharCNN1-Pattern0LSTM | 85.048                      |              |       |           |       |
+| BioBERT-CharCNN5-Pattern0LSTM | 85.915                      |              |       |           |       |
+| BioBERT-CharCNN5-Pattern1LSTM | 86.064                      |              |       |           |       |
+| BioBERT-CharCNN7-Pattern0LSTM | 85.773                      |              |       |           |       |
+| BioBERT-CharCNN5-Pattern0LSTM2| 85.777                      |              |       |           |       |
+| BioBERT-CharCNN9-Pattern0LSTM | 85.857                      |              |       |           |       |
 | BioBERT-Punctuation          | 86.348                      | 73.844       |91.263 |           |       |
 | BioBERT-WordType             | 86.166                      |              |       |           |       |
 | BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
