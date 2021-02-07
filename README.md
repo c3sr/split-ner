@@ -48,7 +48,9 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | CharCNN1                     | 50.283                      |              |       |           |       |
 | BioBERT-CharCNN1-Pattern0LSTM | 85.048                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern0LSTM | 85.915                      |              |       |           |       |
+| BioBERT-CharCNN5              | 85.836                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern1LSTM | 86.064                      |              |       |           |       |
+| BioBERT-Pattern1LSTM          | 85.385                      |              |       |           |       |
 | BioBERT-CharCNN7-Pattern0LSTM | 85.773                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern0LSTM2| 85.777                      |              |       |           |       |
 | BioBERT-CharCNN9-Pattern0LSTM | 85.857                      |              |       |           |       |
