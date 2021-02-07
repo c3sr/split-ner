@@ -21,6 +21,14 @@ def parse_file(file_path):
         return data
 
 
+def make_gold_file(path, outfile, data):
+    with open(os.path.join(path, outfile), "w") as f:
+        for sent in data:
+            for tok in sent:
+                f.write("{0}\t{1}\t{2}\n".format(tok[0], tok[1], tok[1]))
+            f.write("\n")
+
+
 def calc_micro_f1(data):
     tp = defaultdict(list)
     fp = defaultdict(list)
@@ -45,20 +53,24 @@ def calc_micro_f1(data):
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("f1: {0:.4f}".format(100.0 * f1))
+    print("Micro F1: {0:.4f}".format(100.0 * f1))
     return tp, fp, fn
 
 
 def get_spans(tokens, sent_index):
     spans = []
+    can_continue = False
     for index, tok in enumerate(tokens):
         if tok[1].startswith("B-"):
             spans.append([tok[1][2:], sent_index, [tok[0]], [index, index]])
+            can_continue = True
             # using the below representation leads to more matches.. may enquire cause
             # spans.append([tok[1][2:], sent_index, [], [index, index]])
-        elif tok[1].startswith("I-") and len(spans) > 0 and spans[-1][0] == tok[1][2:]:
+        elif tok[1].startswith("I-") and len(spans) > 0 and spans[-1][0] == tok[1][2:] and can_continue:
             spans[-1][2].append(tok[0])
             spans[-1][3][1] = index
+        else:
+            can_continue = False
     return spans
 
 
@@ -71,6 +83,7 @@ def span_corrector(spans):
 
 
 def print_confusion_matrix_csv(data):
+    print("CONFUSION MATRIX:")
     labels = sorted(list(set([tok[1] for sent in data for tok in sent])))
     y_true = [tok[1] for sent in data for tok in sent]
     y_pred = [tok[2] for sent in data for tok in sent]
@@ -80,23 +93,207 @@ def print_confusion_matrix_csv(data):
         print(",".join([labels[i]] + [str(k) for k in mat[i].tolist()]))
 
 
-def analyse(data):
+def print_error_samples(tp, fp, fn, tag):
+    result = sorted([str(span[1:]) for span in fn[tag]])
+    print("#False -ve ({0}): {1}".format(tag, len(result)))
+    print("\n".join(result))
+    print()
+    result = sorted([str(span[1:]) for span in fp[tag]])
+    print("#False +ve ({0}): {1}".format(tag, len(result)))
+    print("\n".join(result))
+
+
+def print_all_gold_samples(data, tag):
+    st = set()
+    entity = ""
+    for sent in data:
+        for tok in sent:
+            if tok[1] == "B-{0}".format(tag):
+                if entity:
+                    st.add(entity)
+                entity = tok[0]
+            elif tok[1] == "I-{0}".format(tag):
+                entity += " " + tok[0]
+    if entity:
+        st.add(entity)
+    print("GOLD SAMPLES ({0}): {1}".format(tag, sorted(list(st))))
+
+
+def analyse_errors(data):
     print_confusion_matrix_csv(data)
     tp, fp, fn = calc_micro_f1(data)
 
-    print_samples(tp, fp, fn, "Gene_or_gene_product")
-    print_samples(tp, fp, fn, "Simple_chemical")
-    print_samples(tp, fp, fn, "Cell")
+    # BioNLP13CG
+    print_error_samples(tp, fp, fn, "Simple_chemical")
+    # print_error_samples(tp, fp, fn, "Gene_or_gene_product")
+    # print_error_samples(tp, fp, fn, "Cell")
+
+    print_all_gold_samples(data, "Simple_chemical")
+
+    # JNLPBA
+    # print_error_samples(tp, fp, fn, "protein")
 
 
-def print_samples(tp, fp, fn, label):
-    result = sorted([str(sp[1:]) for sp in fn[label]])
-    print("False -ve ({0}) count: {1}".format(label, len(result)))
-    print("\n".join(result))
+def analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=None):
+    gold_spans = [get_spans([[tok[0], tok[1]] for tok in sent], index) for index, sent in enumerate(data)]
+    pred_spans = [get_spans([[tok[0], tok[2]] for tok in sent], index) for index, sent in enumerate(data)]
+    overlap_error_cases = []
+    num_multi_word_gold_spans_with_overlap_errors = 0
+    for gold_sent, pred_sent in zip(gold_spans, pred_spans):
+        for g_span in gold_sent:
+            is_multi_word_with_overlap_error = False
+            for p_span in pred_sent:
+                if p_span != g_span and p_span[0] == g_span[0] and g_span[0] == tag:
+                    if not (p_span[-1][0] > g_span[-1][1] or p_span[-1][1] < g_span[-1][0]):
+                        overlap_error_cases.append((g_span, p_span))
+                        # is_multi_word_with_overlap_error = True
+                        if g_span[-1][0] < g_span[-1][1]:
+                            is_multi_word_with_overlap_error = True
+            if is_multi_word_with_overlap_error:
+                num_multi_word_gold_spans_with_overlap_errors += 1
 
-    result = sorted([str(sp[1:]) for sp in fp[label]])
-    print("False +ve ({0}) count: {1}".format(label, len(result)))
-    print("\n".join(result))
+    if verbose:
+        print("Tag: {0}".format(tag))
+        print("#Overlap Errors: {0}".format(len(overlap_error_cases)))
+        print("#Multi-word gold spans with overlap errors: {0}".format(num_multi_word_gold_spans_with_overlap_errors))
+        # print_overlap_error_spans(overlap_error_cases, data)
+
+    # Error Segregation
+    missed_prefix_missed_suffix = []
+    missed_prefix_only = []
+    missed_prefix_extra_suffix = []
+
+    missed_suffix_only = []
+    extra_suffix_only = []
+
+    extra_prefix_missed_suffix = []
+    extra_prefix_only = []
+    extra_prefix_extra_suffix = []
+
+    for g_span, p_span in overlap_error_cases:
+        if g_span[3][0] < p_span[3][0]:
+            if g_span[3][1] > p_span[3][1]:
+                missed_prefix_missed_suffix.append((g_span, p_span))
+            elif g_span[3][1] == p_span[3][1]:
+                missed_prefix_only.append((g_span, p_span))
+            else:
+                missed_prefix_extra_suffix.append((g_span, p_span))
+        elif g_span[3][0] == p_span[3][0]:
+            if g_span[3][1] > p_span[3][1]:
+                missed_suffix_only.append((g_span, p_span))
+            else:
+                extra_suffix_only.append((g_span, p_span))
+        else:
+            if g_span[3][1] > p_span[3][1]:
+                extra_prefix_missed_suffix.append((g_span, p_span))
+            elif g_span[3][1] == p_span[3][1]:
+                extra_prefix_only.append((g_span, p_span))
+            else:
+                extra_prefix_extra_suffix.append((g_span, p_span))
+
+    if verbose:
+        print_overlap_error_spans(missed_prefix_missed_suffix, data, "MISSED PREFIX, MISSED SUFFIX", outfile)
+        print_overlap_error_spans(missed_prefix_only, data, "MISSED PREFIX", outfile)
+        print_overlap_error_spans(missed_prefix_extra_suffix, data, "MISSED PREFIX, EXTRA SUFFIX", outfile)
+        print_overlap_error_spans(missed_suffix_only, data, "MISSED SUFFIX", outfile)
+        print_overlap_error_spans(extra_suffix_only, data, "EXTRA SUFFIX", outfile)
+        print_overlap_error_spans(extra_prefix_missed_suffix, data, "EXTRA PREFIX, MISSED SUFFIX", outfile)
+        print_overlap_error_spans(extra_prefix_only, data, "EXTRA PREFIX", outfile)
+        print_overlap_error_spans(extra_prefix_extra_suffix, data, "EXTRA PREFIX, EXTRA SUFFIX", outfile)
+
+    return num_multi_word_gold_spans_with_overlap_errors
+
+
+def print_overlap_error_spans(error_spans, data, heading=None, outfile=None):
+    if len(error_spans) == 0:
+        return
+    log_str = ""
+    if heading:
+        log_str += "{0}\n".format(heading)
+    for g_span, p_span in error_spans:
+        sent_text = " ".join([tok[0].replace("\"", "'") for tok in data[g_span[1]]])
+        log_str += "gold: {0}\tpred: {1}\tdata: {2}\n".format(g_span[1:], p_span[1:], sent_text)
+    log_str += "\n"
+    if outfile:
+        with open(outfile, "a", encoding="utf-8") as f:
+            f.write(log_str)
+    else:
+        print(log_str, end="")
+
+
+def print_overlap_error_stats(error_dict, data):
+    total_error_cnt = 0
+    num_overlap_error_gold_spans = 0
+    for tag in error_dict:
+        total_error_cnt += len(error_dict[tag])
+        tag_overlap_error_gold_span_cnt = analyse_overlap_errors_for_tag(data, tag, verbose=False)
+        num_overlap_error_gold_spans += tag_overlap_error_gold_span_cnt
+        print("Tag: {0}, #Errors: {1}, #Overlap Errors: {2}"
+              .format(tag, len(error_dict[tag]), tag_overlap_error_gold_span_cnt))
+
+    # note: this ratio is not fully correct. Numerator is not fully contained in denominator!
+    ratio = num_overlap_error_gold_spans * 100.0 / total_error_cnt
+    print("Total: #Errors: {0}, #Overlap Errors: {1}, #Ratio of Overlap Errors: {2:.4f}"
+          .format(total_error_cnt, num_overlap_error_gold_spans, ratio))
+
+
+def analyse_overlap_errors(dir_path, data, dump_errors=False):
+    tp, fp, fn = calc_micro_f1(data)
+
+    print("False +ve Overlap Error Stats:")
+    print_overlap_error_stats(fp, data)
+    print()
+    print("False -ve Overlap Error Stats:")
+    print_overlap_error_stats(fn, data)
+
+    tags = set(tp.keys()).union(fp.keys()).union(fn.keys())
+    for tag in tags:
+        outfile = os.path.join(dir_path, "{0}_miss_new.tsv".format(tag)) if dump_errors else None
+        analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=outfile)
+
+
+def analyse_oov_errors(train_data, test_data):
+    tp, fp, fn = calc_micro_f1(test_data)
+    train_term_vocab = set([tok[0] for sent in train_data for tok in sent])
+
+    total_unigram_error_cnt = 0
+    total_error_cnt = 0
+    total_oov_unigram_error_cnt = 0
+    error_dict = fn
+
+    for tag in error_dict:
+        unigram_error_cnt = 0
+        oov_unigram_error_cnt = 0
+        oov_error_terms = set()
+        in_vocab_error_terms = set()
+        for span in error_dict[tag]:
+            if len(span[2]) == 1:
+                unigram_error_cnt += 1
+                if span[2][0] not in train_term_vocab:
+                    oov_unigram_error_cnt += 1
+            for term in span[2]:
+                if term not in train_term_vocab:
+                    oov_error_terms.add(term)
+                else:
+                    in_vocab_error_terms.add(term)
+
+        total_oov_unigram_error_cnt += oov_unigram_error_cnt
+        total_unigram_error_cnt += unigram_error_cnt
+        total_error_cnt += len(error_dict[tag])
+
+        print("{0}: #oov_unigram_error_terms: {1} | #unigram_error_terms: {2} | #total_errors: {3}"
+              .format(tag, oov_unigram_error_cnt, unigram_error_cnt, len(error_dict[tag])))
+        print("oov_error_terms({0}): {1}".format(len(oov_error_terms), oov_error_terms))
+        print("in_vocab_error_terms({0}): {1}".format(len(in_vocab_error_terms), in_vocab_error_terms))
+        print()
+
+    print("TOTAL: #oov_unigram_error_terms: {0} | #unigram_error_terms: {1} | #total_errors: {2}"
+          .format(total_oov_unigram_error_cnt, total_unigram_error_cnt, total_error_cnt))
+
+    unigram_error_ratio = total_unigram_error_cnt * 100.0 / total_error_cnt
+    oov_unigram_error_ratio = total_oov_unigram_error_cnt * 100.0 / total_error_cnt
+    print("unigram_error_ratio: {0:.4f} | oov_unigram_error_ratio: {1:.4f}"
+          .format(unigram_error_ratio, oov_unigram_error_ratio))
 
 
 def main(args):
@@ -104,13 +301,25 @@ def main(args):
     dev_path = os.path.join(args.path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
     test_path = os.path.join(args.path, "test.tsv")
 
+    train_data = parse_file(train_path)
     dev_data = parse_file(dev_path)
-    analyse(dev_data)
+    test_data = parse_file(test_path)
+
+    # make_gold_file(args.path, "train_gold.tsv", train_data)
+    # make_gold_file(args.path, "dev_gold.tsv", dev_data)
+    # make_gold_file(args.path, "test_gold.tsv", test_data)
+
+    analyse_errors(test_data)
+    analyse_overlap_errors(args.path, test_data, dump_errors=False)
+    analyse_oov_errors(train_data, test_data)
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-qa4/predictions",
-                    help="dir with prediction outputs")
+    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-qa4/predictions")
+    # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-char-pattern-large/predictions")
+    # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-punct/predictions")
+    # ap.add_argument("--path", type=str, default="../out/jnlpba/ner-biobert-punct/predictions")
+    # ap.add_argument("--path", type=str, default="../out/conll/ner-bert-punct/predictions")
     ap = ap.parse_args()
     main(ap)
