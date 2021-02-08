@@ -1,9 +1,9 @@
 {
-  "model_name": "ner-biobert-qa4",
+  "model_name": "ner-biobert-qa4-punct",
   "dataset_dir": "bio",
   "num_labels": 4,
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "188800",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
