@@ -2,7 +2,7 @@
   "model_name": "ner-biobert-qa4-dice",
   "dataset_dir": "jnlpba",
   "num_labels": 4,
-  "do_train": true,
+  "do_train": false,
   "resume": "330400",
   "num_train_epochs": 300,
   "data_root": "../data",

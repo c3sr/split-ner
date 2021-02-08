@@ -2,7 +2,7 @@
   "model_name": "ner-biobert-qa4-char-pattern0-large5",
   "dataset_dir": "bio",
   "num_labels": 4,
-  "do_train": true,
+  "do_train": false,
   "resume": "82000",
   "num_train_epochs": 300,
   "data_root": "../data",
