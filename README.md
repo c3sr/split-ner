@@ -42,18 +42,22 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | SciBERT                      | 86.092                      | 74.68        |       |           |       |
 | SciBERT-PairedSentence       | 85.606*                     |              |       |           |       |
 | BioBERT-BO-Tagging           | 85.218                      |              |       |           |       |
+| BioBERT-BO-Tagging-CE_Weighted| running                    |              |       |           |       |
 | BioBERT-CE_Weighted          | 85.575                      |              |       |           |       |
 | BioBERT-Dice                 | 85.966                      | 74.829       |90.504 |           |       |
 | BioBERT-CRF                  | 85.685                      |              |       |           |       |
 | CharCNN1                     | 50.283                      |              |       |           |       |
 | BioBERT-CharCNN1-Pattern0LSTM | 85.048                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern0LSTM | 85.915                      |              |       |           |       |
-| BioBERT-CharCNN5-Pattern1LSTM | 86.064                      |              |       |           |       |
+| BioBERT-CharCNN5              | 85.836                      |              |       |           |       |
+| BioBERT-CharCNN5-Pattern1LSTM | 86.064                      |              |running|           |       |
+| BioBERT-Pattern1LSTM          | 85.385                      |              |       |           |       |
 | BioBERT-CharCNN7-Pattern0LSTM | 85.773                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern0LSTM2| 85.777                      |              |       |           |       |
 | BioBERT-CharCNN9-Pattern0LSTM | 85.857                      |              |       |           |       |
 | BioBERT-Punctuation          | 86.348                      | 73.844       |91.263 |           |       |
-| BioBERT-WordType             | 86.166                      |              |       |           |       |
+| BioBERT-Punctuation-CRF      | 85.925                      |              |90.993 |           |       |
+| BioBERT-WordType             | 86.166                      |              |running|           |       |
 | BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
 | BioBERT-QA4                  | 86.172                      | 74.499       |90.954 |           |       |
 | BioBERT-QA4-Punctuation      | 86.167                      |              |       |           |       |
