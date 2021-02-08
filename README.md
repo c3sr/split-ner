@@ -50,20 +50,23 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN1-Pattern0LSTM | 85.048                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern0LSTM | 85.915                      |              |       |           |       |
 | BioBERT-CharCNN5              | 85.836                      |              |       |           |       |
-| BioBERT-CharCNN5-Pattern1LSTM | 86.064                      |              |running|           |       |
+| BioBERT-CharCNN5-Pattern1LSTM | 86.064                      |              |90.571 |           |       |
 | BioBERT-Pattern1LSTM          | 85.385                      |              |       |           |       |
 | BioBERT-CharCNN7-Pattern0LSTM | 85.773                      |              |       |           |       |
 | BioBERT-CharCNN5-Pattern0LSTM2| 85.777                      |              |       |           |       |
 | BioBERT-CharCNN9-Pattern0LSTM | 85.857                      |              |       |           |       |
 | BioBERT-Punctuation          | 86.348                      | 73.844       |91.263 |           |       |
+| BioBERT-Punctuation-WordType | running                     |              |       |           |       |
 | BioBERT-Punctuation-CRF      | 85.925                      |              |90.993 |           |       |
 | BioBERT-WordType             | 86.166                      |              |running|           |       |
 | BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
 | BioBERT-QA4                  | 86.172                      | 74.499       |90.954 |           |       |
 | BioBERT-QA4-Punctuation      | 86.167                      |              |       |           |       |
+| BioBERT-QA4-Dice             | ibm                         | ibm          |       |           |       |
 | BioBERT-QA4-CRF              | 84.950                      |              |       |           |       |
 | BioBERT-QA4-EndCNN           | -                           |              |       |           |       |
 | BioBERT-QA4-CharCNN1         | 85.731                      |              |       |           |       |
+| BioBERT-QA4-CharCNN5-Pattern0LSTM| ibm                     |              |       |           |       |
 | BioBERT-QA4-CharCNN1-Highway | 86.042                      |              |       |           |       |
 | BioBERT-QA4-Mention          | 81.537                      |              |91.655 |           |       |
 | BioBERT-QA3-Mention-CharCNN  | -                           |              |       |           |       |
