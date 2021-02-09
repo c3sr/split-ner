@@ -35,43 +35,43 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 
 ## Results
 
-| Test Entity F1(%)            | BioNLP13CG                  | JNLPBA       | CoNLL | Genia     | Onto  |
-|------------------------------|-----------------------------|--------------|-------|-----------|-------|
-| BERT-Base                    | 81.940                      |              |       |           |       |
-| BioBERT                      | 85.644                      | 74.35        |90.932 |           |       |
-| SciBERT                      | 86.092                      | 74.68        |       |           |       |
-| SciBERT-PairedSentence       | 85.606*                     |              |       |           |       |
-| BioBERT-BO-Tagging           | 85.218                      |              |       |           |       |
-| BioBERT-BO-Tagging-CE_Weighted| 85.502                     |              |       |           |       |
-| BioBERT-CE_Weighted          | 85.575                      |              |       |           |       |
-| BioBERT-Dice                 | 85.966                      | 74.829       |90.504 |           |       |
-| BioBERT-CRF                  | 85.685                      |              |       |           |       |
-| CharCNN1                     | 50.283                      |              |       |           |       |
-| BioBERT-CharCNN1-Pattern0LSTM | 85.048                      |              |       |           |       |
-| BioBERT-CharCNN5-Pattern0LSTM | 85.915                      |              |       |           |       |
-| BioBERT-CharCNN5              | 85.836                      |              |       |           |       |
-| BioBERT-CharCNN5-Pattern1LSTM | 86.064                      | ibm          |90.571 |           |       |
-| BioBERT-Pattern1LSTM          | 85.385                      |              |       |           |       |
-| BioBERT-CharCNN7-Pattern0LSTM | 85.773                      |              |       |           |       |
-| BioBERT-CharCNN5-Pattern0LSTM2| 85.777                      |              |       |           |       |
-| BioBERT-CharCNN9-Pattern0LSTM | 85.857                      |              |       |           |       |
-| BioBERT-Punctuation          | 86.348                      | 73.844       |91.263 |           |       |
-| BioBERT-Punctuation-WordType | running                     |              |       |           |       |
-| BioBERT-Punctuation-CRF      | 85.925                      |              |90.993 |           |       |
-| BioBERT-WordType             | 86.166                      |              |running|           |       |
-| BioBERT-QA3                  | 86.023                      | 74.52        |       |           |       |
-| BioBERT-QA4                  | 86.172                      | 74.499       |90.954 |           |       |
-| BioBERT-QA4-Punctuation      | 86.167                      |              |       |           |       |
-| BioBERT-QA4-Dice             | 75.323*                     | 73.232*      |       |           |       |
-| BioBERT-QA4-CRF              | 84.950                      |              |       |           |       |
-| BioBERT-QA4-EndCNN           | -                           |              |       |           |       |
-| BioBERT-QA4-CharCNN1         | 85.731                      |              |       |           |       |
-| BioBERT-QA4-CharCNN5-Pattern0LSTM| 85.550*                 |              |       |           |       |
-| BioBERT-QA4-CharCNN1-Highway | 86.042                      |              |       |           |       |
-| BioBERT-QA4-Mention          | 81.537                      |              |91.655 |           |       |
-| BioBERT-QA3-Mention-CharCNN  | -                           |              |       |           |       |
-| CNN-LSTM-CRF                 | 84.1                        | 76.2         |91.6   | 72.4      | 86.4  |
-| SOTA                         | 89.58(KGQA with extra data) | 79.24 (KGQA) |94.3(LUKE), 93.4   |   -      | 92.07 (MRC-Dice)      |
+| Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
+|------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
+| BERT-Base                                | 81.940                      |                |                            |           |                      |
+| BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
+| SciBERT                                  | 86.092                      | 74.68          |                            |           |                      |
+| SciBERT-PairedSentence                   | 85.606*                     |                |                            |           |                      |
+| BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
+| BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
+| BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
+| BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
+| BioBERT-CRF                              | 85.685                      |                |                            |           |                      |
+| CharCNN1                                 | 50.283                      |                |                            |           |                      |
+| BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |                            |           |                      |
+| BioBERT-CharCNN5-Pattern0LSTM            | 85.915                      |                |                            |           |                      |
+| BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM            | 86.064                      | ibm            |  90.571                    |           |                      |
+| BioBERT-Pattern1LSTM                     | 85.385                      |                |                            |           |                      |
+| BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
+| BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
+| BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
+| BioBERT-Punctuation                      | 86.348                      | 73.844         |  91.263                    |           |                      |
+| BioBERT-Punctuation-WordType             | running                     |                |                            |           |                      |
+| BioBERT-Punctuation-CRF                  | 85.925                      |                |  90.993                    |           |                      |
+| BioBERT-WordType                         | 86.166                      |                |  running                   |           |                      |
+| BioBERT-QA3                              | 86.023                      | 74.52          |                            |           |                      |
+| BioBERT-QA4                              | 86.172                      | 74.499         |  90.954                    |           |                      |
+| BioBERT-QA4-Punctuation                  | 86.167                      |                |                            |           |                      |
+| BioBERT-QA4-Dice                         | 75.323*                     | 73.232*        |                            |           |                      |
+| BioBERT-QA4-CRF                          | 84.950                      |                |                            |           |                      |
+| BioBERT-QA4-EndCNN                       | -                           |                |                            |           |                      |
+| BioBERT-QA4-CharCNN1                     | 85.731                      |                |                            |           |                      |
+| BioBERT-QA4-CharCNN5-Pattern0LSTM        | 85.550*                     |                |                            |           |                      |
+| BioBERT-QA4-CharCNN1-Highway             | 86.042                      |                |                            |           |                      |
+| BioBERT-QA4-Mention                      | 81.537                      |                |  91.655                    |           |                      |
+| BioBERT-QA3-Mention-CharCNN              | -                           |                |                            |           |                      |
+| CNN-LSTM-CRF                             | 84.1                        | 76.2           |  91.6                      | 72.4      | 86.4                 |
+| SOTA                                     | 89.58(KGQA)                 | 79.24(KGQA)    |  94.3(LUKE), 93.4(Cloze)   |   -       | 92.07 (MRC-Dice)     |
 
 ```
 * trained for 50 epochs (others are trained for 300 epochs)
