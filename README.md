@@ -70,30 +70,10 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-QA4-CharCNN1-Highway | 86.042                      |              |       |           |       |
 | BioBERT-QA4-Mention          | 81.537                      |              |91.655 |           |       |
 | BioBERT-QA3-Mention-CharCNN  | -                           |              |       |           |       |
-| CNN-LSTM-CRF                 | 84.1                        | 76.2         |       |           |       |
-| SOTA                         | 89.58(KGQA with extra data) | 79.24 (KGQA) |94.3(LUKE), 93.4   |          |       |
+| CNN-LSTM-CRF                 | 84.1                        | 76.2         |91.6   | 72.4      | 86.4  |
+| SOTA                         | 89.58(KGQA with extra data) | 79.24 (KGQA) |94.3(LUKE), 93.4   |   -      | 92.07 (MRC-Dice)      |
 
 ```
 * trained for 50 epochs (others are trained for 300 epochs)
-```
-
-| Test Entity F1(%)| BioNLP13CG | JNLPBA | CoNLL03 | OntoNotes | GENIA |
-|--|--|--|--|--|--|
-QA3-BioBERT | 86.02 | 74.52 | IBM | | | |
-QA4-BioBERT | 86.17 |       | | | | |
-BioBERT | 85.64 | 74.35      | | | | |
-BioBERT-CRF | 85.98 |       | | | | |
-SciBERT | 85.77 | 74.68     | | | | |
-QA4-BioBERT-CharCNN | 85.73*** |       | | | | |
-QA4-MentionMask-BioBERT | IBM |       | | | | |
-QA4-MentionMask-BioBERT-CharCNN | IBM |       | | | | |
-KGQA |  | Running (79.24 reported)      | | | | |
-CNN-LSTM-CRF | 84.1 |      76.2 | 91.6 | 86.4 | 72.4|
-MRC |  |     78.85**  | 93.04* |  | |
-SOTA | 89.58 (KGQA with all datasets) |      79.24 (KGQA with all datasets) | 94.3 (LUKE) | 92.07 (MRC-Dice) | -|
-
-```
-* reported training logs in their codebase
-** on development set
-*** 32: char embedding size, 16: filters, 0.1: dropout, 5: kernel size
+For CoNLL, OntoNotes: BERT, BioBERT, SciBERT -> all correspond to general English BERT model
 ```
