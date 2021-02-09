@@ -39,8 +39,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
-| SciBERT                                  | 86.092                      | 74.68          |                            |           |                      |
-| SciBERT-PairedSentence                   | 85.606*                     |                |                            |           |                      |
+| SciBERT                                  | **86.092**                     | 74.68          |                            |           |                      |
+| SciBERT-PairedSentence                   | 85.606*                      |                |                            |           |                      |
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
@@ -50,27 +50,27 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM            | 85.915                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM            | 86.064                      | ibm            |  90.571                    |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                     | 73.516            |  90.571                    |           |                      |
 | BioBERT-Pattern1LSTM                     | 85.385                      |                |                            |           |                      |
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
-| BioBERT-Punctuation                      | 86.348                      | 73.844         |  91.263                    |           |                      |
+| BioBERT-Punctuation                      | **86.348**                     | 73.844         |  **91.263**                    |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
 | BioBERT-Punctuation-CRF                  | 85.925                      |                |  90.993                    |           |                      |
-| BioBERT-WordType                         | 86.166                      |                |  90.772                    |           |                      |
-| BioBERT-QA3                              | 86.023                      | 74.52          |                            |           |                      |
-| BioBERT-QA4                              | 86.172                      | 74.499         |  90.954                    |           |                      |
-| BioBERT-QA4-Punctuation                  | 86.167                      |                |                            |           |                      |
+| BioBERT-WordType                         | **86.166**                      |                |  90.772                    |           |                      |
+| BioBERT-QA3                              | **86.023**                      | 74.52          |                            |           |                      |
+| BioBERT-QA4                              | **86.172**                      | 74.499         |  90.954                    |           |                      |
+| BioBERT-QA4-Punctuation                  | **86.167**                      |                |                            |           |                      |
 | BioBERT-QA4-Dice                         | 75.323*                     | 73.232*        |                            |           |                      |
 | BioBERT-QA4-CRF                          | 84.950                      |                |                            |           |                      |
 | BioBERT-QA4-EndCNN                       | -                           |                |                            |           |                      |
 | BioBERT-QA4-CharCNN1                     | 85.731                      |                |                            |           |                      |
 | BioBERT-QA4-CharCNN5-Pattern0LSTM        | 85.550*                     |                |                            |           |                      |
-| BioBERT-QA4-CharCNN1-Highway             | 86.042                      |                |                            |           |                      |
-| BioBERT-QA4-Mention                      | 81.537                      |                |  91.655                    |           |                      |
+| BioBERT-QA4-CharCNN1-Highway             | **86.042**                      |                |                            |           |                      |
+| BioBERT-QA4-Mention                      | 81.537                      |                |  **91.655**                    |           |                      |
 | BioBERT-QA3-Mention-CharCNN              | -                           |                |                            |           |                      |
-| CNN-LSTM-CRF                             | 84.1                        | 76.2           |  91.6                      | 72.4      | 86.4                 |
+| CNN-LSTM-CRF                             | 84.1                        | **76.2**           |  **91.6**                      | 72.4      | 86.4                 |
 | SOTA                                     | 89.58(KGQA)                 | 79.24(KGQA)    |  94.3(LUKE), 93.4(Cloze)   |   -       | 92.07 (MRC-Dice)     |
 
 ```
