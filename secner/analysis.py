@@ -141,16 +141,33 @@ def analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=None):
     num_multi_word_gold_spans_with_overlap_errors = 0
     for gold_sent, pred_sent in zip(gold_spans, pred_spans):
         for g_span in gold_sent:
+            if not g_span[0] == tag:
+                continue
             is_multi_word_with_overlap_error = False
+            is_fully_missed = True
             for p_span in pred_sent:
-                if p_span != g_span and p_span[0] == g_span[0] and g_span[0] == tag:
-                    if not (p_span[-1][0] > g_span[-1][1] or p_span[-1][1] < g_span[-1][0]):
-                        overlap_error_cases.append((g_span, p_span))
-                        # is_multi_word_with_overlap_error = True
-                        if g_span[-1][0] < g_span[-1][1]:
-                            is_multi_word_with_overlap_error = True
+                if p_span == g_span:
+                    is_fully_missed = False
+                elif not (p_span[-1][0] > g_span[-1][1] or p_span[-1][1] < g_span[-1][0]):
+                    is_fully_missed = False
+                    overlap_error_cases.append((g_span, p_span))
+                    if g_span[-1][0] < g_span[-1][1]:
+                        is_multi_word_with_overlap_error = True
             if is_multi_word_with_overlap_error:
                 num_multi_word_gold_spans_with_overlap_errors += 1
+            if is_fully_missed:
+                overlap_error_cases.append((g_span, None))
+
+        for p_span in pred_sent:
+            if not p_span[0] == tag:
+                continue
+            is_fully_noise = True
+            for g_span in gold_sent:
+                if not (p_span[-1][0] > g_span[-1][1] or p_span[-1][1] < g_span[-1][0]):
+                    is_fully_noise = False
+                    break
+            if is_fully_noise:
+                overlap_error_cases.append((None, p_span))
 
     if verbose:
         print("Tag: {0}".format(tag))
@@ -159,11 +176,15 @@ def analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=None):
         # print_overlap_error_spans(overlap_error_cases, data)
 
     # Error Segregation
+    fully_noise = []
+    missed_completely = []
+
     missed_prefix_missed_suffix = []
     missed_prefix_only = []
     missed_prefix_extra_suffix = []
 
     missed_suffix_only = []
+    exact_match_tag_diff = []
     extra_suffix_only = []
 
     extra_prefix_missed_suffix = []
@@ -171,7 +192,11 @@ def analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=None):
     extra_prefix_extra_suffix = []
 
     for g_span, p_span in overlap_error_cases:
-        if g_span[3][0] < p_span[3][0]:
+        if not g_span:
+            fully_noise.append((g_span, p_span))
+        elif not p_span:
+            missed_completely.append((g_span, p_span))
+        elif g_span[3][0] < p_span[3][0]:
             if g_span[3][1] > p_span[3][1]:
                 missed_prefix_missed_suffix.append((g_span, p_span))
             elif g_span[3][1] == p_span[3][1]:
@@ -181,6 +206,8 @@ def analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=None):
         elif g_span[3][0] == p_span[3][0]:
             if g_span[3][1] > p_span[3][1]:
                 missed_suffix_only.append((g_span, p_span))
+            elif g_span[3][1] == p_span[3][1]:
+                exact_match_tag_diff.append((g_span, p_span))
             else:
                 extra_suffix_only.append((g_span, p_span))
         else:
@@ -192,27 +219,34 @@ def analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=None):
                 extra_prefix_extra_suffix.append((g_span, p_span))
 
     if verbose:
-        print_overlap_error_spans(missed_prefix_missed_suffix, data, "MISSED PREFIX, MISSED SUFFIX", outfile)
-        print_overlap_error_spans(missed_prefix_only, data, "MISSED PREFIX", outfile)
-        print_overlap_error_spans(missed_prefix_extra_suffix, data, "MISSED PREFIX, EXTRA SUFFIX", outfile)
-        print_overlap_error_spans(missed_suffix_only, data, "MISSED SUFFIX", outfile)
-        print_overlap_error_spans(extra_suffix_only, data, "EXTRA SUFFIX", outfile)
-        print_overlap_error_spans(extra_prefix_missed_suffix, data, "EXTRA PREFIX, MISSED SUFFIX", outfile)
-        print_overlap_error_spans(extra_prefix_only, data, "EXTRA PREFIX", outfile)
-        print_overlap_error_spans(extra_prefix_extra_suffix, data, "EXTRA PREFIX, EXTRA SUFFIX", outfile)
+        if outfile and os.path.exists(outfile):
+            os.remove(outfile)
+        print_error_overlap_spans(missed_completely, data, "MISSED COMPLETELY", outfile)
+        print_error_overlap_spans(missed_prefix_missed_suffix, data, "MISSED PREFIX, MISSED SUFFIX", outfile)
+        print_error_overlap_spans(missed_prefix_only, data, "MISSED PREFIX", outfile)
+        print_error_overlap_spans(missed_prefix_extra_suffix, data, "MISSED PREFIX, EXTRA SUFFIX", outfile)
+        print_error_overlap_spans(missed_suffix_only, data, "MISSED SUFFIX", outfile)
+        print_error_overlap_spans(exact_match_tag_diff, data, "EXACT MATCH, TAG DIFFERENT", outfile)
+        print_error_overlap_spans(extra_suffix_only, data, "EXTRA SUFFIX", outfile)
+        print_error_overlap_spans(extra_prefix_missed_suffix, data, "EXTRA PREFIX, MISSED SUFFIX", outfile)
+        print_error_overlap_spans(extra_prefix_only, data, "EXTRA PREFIX", outfile)
+        print_error_overlap_spans(extra_prefix_extra_suffix, data, "EXTRA PREFIX, EXTRA SUFFIX", outfile)
+        print_error_overlap_spans(fully_noise, data, "FULLY NOISE", outfile)
 
     return num_multi_word_gold_spans_with_overlap_errors
 
 
-def print_overlap_error_spans(error_spans, data, heading=None, outfile=None):
+def print_error_overlap_spans(error_spans, data, heading, outfile=None):
     if len(error_spans) == 0:
         return
-    log_str = ""
-    if heading:
-        log_str += "{0}\n".format(heading)
+    log_str = "{0}\n".format(heading)
     for g_span, p_span in error_spans:
-        sent_text = " ".join([tok[0].replace("\"", "'") for tok in data[g_span[1]]])
-        log_str += "gold: {0}\tpred: {1}\tdata: {2}\n".format(g_span[1:], p_span[1:], sent_text)
+        sent_index = g_span[1] if g_span else p_span[1]
+        sent_text = " ".join([tok[0] for tok in data[sent_index]])
+        g_span_str = "({0})'{1}'".format(g_span[0], " ".join(g_span[2])) if g_span else "-"
+        p_span_str = "({0})'{1}'".format(p_span[0], " ".join(p_span[2])) if p_span else "-"
+        log_str += "gold: {0}\tpred: {1}\tdata[{2}]: {3}\n".format(g_span_str, p_span_str, sent_index,
+                                                                   sent_text).replace("\"", "'")
     log_str += "\n"
     if outfile:
         with open(outfile, "a", encoding="utf-8") as f:
@@ -237,7 +271,7 @@ def print_overlap_error_stats(error_dict, data):
           .format(total_error_cnt, num_overlap_error_gold_spans, ratio))
 
 
-def analyse_overlap_errors(dir_path, data, dump_errors=False):
+def analyse_error_overlaps(dir_path, data, dump_errors=False):
     tp, fp, fn = calc_micro_f1(data)
 
     print("False +ve Overlap Error Stats:")
@@ -246,9 +280,10 @@ def analyse_overlap_errors(dir_path, data, dump_errors=False):
     print("False -ve Overlap Error Stats:")
     print_overlap_error_stats(fn, data)
 
+    os.makedirs(dir_path, exist_ok=True)
     tags = set(tp.keys()).union(fp.keys()).union(fn.keys())
     for tag in tags:
-        outfile = os.path.join(dir_path, "{0}_miss_new.tsv".format(tag)) if dump_errors else None
+        outfile = os.path.join(dir_path, "{0}_auto.tsv".format(tag)) if dump_errors else None
         analyse_overlap_errors_for_tag(data, tag, verbose=True, outfile=outfile)
 
 
@@ -310,15 +345,15 @@ def main(args):
     # make_gold_file(args.path, "test_gold.tsv", test_data)
 
     analyse_errors(test_data)
-    analyse_overlap_errors(args.path, test_data, dump_errors=False)
+    analyse_error_overlaps(os.path.join(args.path, "analysis"), test_data, dump_errors=True)
     analyse_oov_errors(train_data, test_data)
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-qa4/predictions")
+    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-punct/predictions")
     # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-char-pattern-large/predictions")
-    # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-punct/predictions")
+    # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-qa4/predictions")
     # ap.add_argument("--path", type=str, default="../out/jnlpba/ner-biobert-punct/predictions")
     # ap.add_argument("--path", type=str, default="../out/conll/ner-bert-punct/predictions")
     ap = ap.parse_args()
