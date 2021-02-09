@@ -58,7 +58,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-Punctuation                      | 86.348                      | 73.844         |  91.263                    |           |                      |
 | BioBERT-Punctuation-WordType             | running                     |                |                            |           |                      |
 | BioBERT-Punctuation-CRF                  | 85.925                      |                |  90.993                    |           |                      |
-| BioBERT-WordType                         | 86.166                      |                |  running                   |           |                      |
+| BioBERT-WordType                         | 86.166                      |                |  90.772                    |           |                      |
 | BioBERT-QA3                              | 86.023                      | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | 86.172                      | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Punctuation                  | 86.167                      |                |                            |           |                      |
