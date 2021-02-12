@@ -96,6 +96,8 @@ Precision, Recall distribution for some good performing models to understand whe
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
-3. Punctuation helped increase precision in normal case but reduced precision (and increased recall) in QA case.
-4. Dice Loss is performing as almost as good as CharCNN+Pattern case.
-5. In the normal training case, nothing is giving as good a precision as normal Punctuation handling.
+3. Dice Loss is performing as almost as good as CharCNN+Pattern case.
+4. In the normal training case, nothing is giving as good a precision as normal Punctuation handling.
+5. In normal training, WordType and CharCNN+Pattern, increased both precision and recall.
+6. In QA, Punctuation reduced precision (and increased recall).
+7. WordType gave the highest recall in the normal case till now.
