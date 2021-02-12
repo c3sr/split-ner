@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
+from transformers import BertConfig
+from transformers.models.bert import BertModel, BertPreTrainedModel
+
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
 from secner.dataset import NerDataset
 from secner.loss import DiceLoss
-from transformers import BertConfig
-from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModel(BertPreTrainedModel):
@@ -23,8 +24,10 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.word_type_handling == "1hot":
             classifier_inp_dim += self.num_word_types
 
-        if self.additional_args.punctuation_handling:
-            classifier_inp_dim += 1
+        if self.additional_args.punctuation_handling != "none":
+            self.punctuation_vocab_size = NerDataset.get_punctuation_vocab_size(
+                self.additional_args.punctuation_handling)
+            classifier_inp_dim += self.punctuation_vocab_size
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             self.char_cnn = CharCNN(additional_args, "char")
@@ -80,8 +83,11 @@ class NerModel(BertPreTrainedModel):
             token_type_ids=token_type_ids
         )
         sequence_output = outputs[0]
-        if self.additional_args.punctuation_handling:
+        if self.additional_args.punctuation_handling == "type1":
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
+        elif self.additional_args.punctuation_handling == "type2":
+            punctuation_one_hot_vec = torch.eye(self.punctuation_vocab_size)[punctuation_vec].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, punctuation_one_hot_vec], dim=2)
 
         if self.additional_args.word_type_handling == "1hot":
             word_type_vec = torch.eye(self.num_word_types)[word_type_ids].to(sequence_output.device)

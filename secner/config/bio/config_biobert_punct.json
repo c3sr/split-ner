@@ -15,7 +15,7 @@
   "none_tag": "O",
   "max_seq_len": 256,
   "freeze_bert": false,
-  "punctuation_handling": true,
+  "punctuation_handling": "type1",
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",
   "logging_steps": 30,

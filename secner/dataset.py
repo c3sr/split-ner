@@ -3,10 +3,11 @@ import re
 
 import torch
 from dataclasses import dataclass
-from secner.additional_args import AdditionalArguments
-from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+from secner.additional_args import AdditionalArguments
+from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 
 
 class NerDataset(Dataset):
@@ -153,11 +154,14 @@ class NerDataset(Dataset):
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
         bert_token_type_ids = [tok.token_type for tok in sentence.bert_tokens]
         bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
+        bert_sub_token_text = [self.tokenizer.decode(tok.bert_id, skip_special_tokens=True).replace("##", "")
+                               for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
                 "text": bert_token_text,
+                "sub_text": bert_sub_token_text,
                 "labels": bert_tag_ids}
 
     def get_tag_index(self, text_tag):
@@ -211,8 +215,26 @@ class NerDataset(Dataset):
         return torch.stack(batch_ids)
 
     @staticmethod
-    def is_punctuation(word):
-        return 1 if word in list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}") else 0
+    def get_punctuation_vocab_size(punctuation_type):
+        if punctuation_type == "type1":
+            return 1
+        if punctuation_type == "type2":
+            return len(list("O.,-/()P"))
+
+    @staticmethod
+    def handle_punctuation(word, punctuation_type):
+        all_punctuations = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
+        if punctuation_type == "type1":
+            return 1 if word in all_punctuations else 0
+        if punctuation_type == "type2":
+            punctuation_vocab = list(".,-/()")
+            if word in punctuation_vocab:
+                return punctuation_vocab.index(word)
+            if word in all_punctuations:
+                # catch all other punctuations (P)
+                return len(punctuation_vocab)
+            return 0  # non-punctuation (O)
+        return NotImplementedError
 
     @staticmethod
     def get_char_vocab():
@@ -290,11 +312,12 @@ class NerDataCollator:
             pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
 
-        if self.args.punctuation_handling:
+        if self.args.punctuation_handling != "none":
             entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["text"])
-                entry.append(torch.tensor([NerDataset.is_punctuation(w) for w in features[i]["text"]] + [0] * pad_len))
+                entry.append(torch.tensor([NerDataset.handle_punctuation(w, self.args.punctuation_handling)
+                                           for w in features[i]["text"]] + [0] * pad_len))
             batch["punctuation_vec"] = torch.stack(entry)
 
         if self.args.word_type_handling != "none":

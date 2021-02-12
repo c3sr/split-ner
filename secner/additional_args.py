@@ -32,8 +32,8 @@ class AdditionalArguments:
     none_tag: str = field(default="O", metadata={"help": "symbol for NONE tag"})
 
     max_seq_len: int = field(default=128, metadata={"help": "maximum sequence length"})
-    punctuation_handling: bool = field(default=False,
-                                       metadata={"help": "add one-hot entry to represent if token is punct"})
+    punctuation_handling: str = field(default="none", metadata={"help": "add one-hot entry to represent if token is "
+                                                                        "punct (none|type1|type2)"})
     word_type_handling: str = field(default="none",
                                     metadata={"help": "add word type info (Ex.: token lower/upper/digit)(none|1hot)"})
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})

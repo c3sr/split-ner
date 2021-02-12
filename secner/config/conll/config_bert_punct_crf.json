@@ -16,7 +16,7 @@
   "max_seq_len": 256,
   "freeze_bert": false,
   "model_mode": "crf",
-  "punctuation_handling": true,
+  "punctuation_handling": "type1",
   "base_model": "bert-base-uncased",
   "evaluation_strategy": "steps",
   "logging_steps": 400,
