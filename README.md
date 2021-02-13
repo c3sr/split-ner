@@ -56,12 +56,14 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  **91.263**                |           |                      |
+| BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
 | BioBERT-Punctuation-CRF                  | 85.925                      |                |  90.993                    |           |                      |
 | BioBERT-WordType                         | **86.166**                  |                |  90.772                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
+| BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
 | BioBERT-QA4-Dice                         | 75.323*                     | 73.232*        |                            |           |                      |
 | BioBERT-QA4-CRF                          | 84.950                      |                |                            |           |                      |
 | BioBERT-QA4-EndCNN                       | -                           |                |                            |           |                      |
@@ -87,17 +89,20 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 86.1666                | 85.8160                | 85.9910                |
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
+| BioBERT-PunctuationExtended              | 86.1328                | 86.7461                | 86.4383                |
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
+| BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
 | BioBERT-QA4-CharCNN1-Highway             | 88.2282                | 84.7406                | 86.4492                |
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
 3. Dice Loss is performing as almost as good as CharCNN+Pattern case.
 4. In the normal training case, nothing is giving as good a precision as normal Punctuation handling.
-5. In normal training, WordType and CharCNN+Pattern, increased both precision and recall.
-6. In QA, Punctuation reduced precision (and increased recall).
-7. WordType gave the highest recall in the normal case till now.
+5. Extended punctuation handling in Normal case gave us the best recall till now, but compromised on precision.
+6. In normal training, WordType and CharCNN+Pattern, increased both precision and recall.
+7. In QA, Punctuation reduced precision (and increased recall).
+8. WordType gave the highest recall in the normal case till now.
