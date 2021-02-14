@@ -23,6 +23,7 @@
   "word_type_handling": "none",
   "add_qa_helper_sentence": false,
   "use_char_cnn": "none",
+  "token_type": "text",
   "pattern_type": "0",
   "use_end_cnn": false,
   "use_pattern": "none",

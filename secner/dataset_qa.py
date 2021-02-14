@@ -1,10 +1,11 @@
 import argparse
 
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
+
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerQADataset(Dataset):
@@ -56,11 +57,13 @@ class NerQADataset(Dataset):
         bert_token_ids = [tok.bert_id for tok in context.bert_tokens]
         bert_token_type_ids = [tok.token_type for tok in context.bert_tokens]
         bert_token_text = [tok.token.text for tok in context.bert_tokens]
+        bert_sub_token_text = [tok.sub_text for tok in context.bert_tokens]
         bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tag, self.args.none_tag) for tok in context.bert_tokens]
 
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
                 "text": bert_token_text,
+                "sub_text": bert_sub_token_text,
                 "labels": bert_tag_ids}
 
     @staticmethod
@@ -78,7 +81,7 @@ class NerQADataset(Dataset):
 
     def tokenize_with_cache(self, text):
         if text not in self.tokenizer_cache:
-            self.tokenizer_cache[text] = self.tokenizer.encode(text, add_special_tokens=False)
+            self.tokenizer_cache[text] = self.tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
         return self.tokenizer_cache[text]
 
     def get_tag_query_text(self, tag):
@@ -93,10 +96,13 @@ class NerQADataset(Dataset):
         bert_query_tokens = []
         query_tokens = tag_text.split()
         for index, word in enumerate(query_tokens):
-            bert_ids = self.tokenize_with_cache(word)
-            for i in range(len(bert_ids)):
+            out = self.tokenize_with_cache(word)
+            for i in range(len(out["input_ids"])):
                 bert_token = Token(word, self.args.none_tag, index)
-                bert_query_tokens.append(BertToken(bert_id=bert_ids[i], token_type=0, token=bert_token))
+                tup = out["offset_mapping"][i]
+                sub_text = word[tup[0]:tup[1]]
+                bert_query_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=0,
+                                                   token=bert_token))
 
         # helper sentence
         bert_helper_sent_tokens = []
@@ -109,21 +115,27 @@ class NerQADataset(Dataset):
                     helper_text = self.tag_to_text_mapping[tok.tag[2:]]
                 else:
                     continue
-                bert_ids = self.tokenize_with_cache(helper_text)
-                for i in range(len(bert_ids)):
+                out = self.tokenize_with_cache(helper_text)
+                for i in range(len(out["input_ids"])):
                     bert_token = Token(helper_text, self.args.none_tag, q + tok.offset, tok.pos_tag, tok.dep_tag,
                                        tok.guidance_tag)
-                    bert_helper_sent_tokens.append(BertToken(bert_id=bert_ids[i], token_type=0, token=bert_token))
+                    tup = out["offset_mapping"][i]
+                    sub_text = helper_text[tup[0]:tup[1]]
+                    bert_helper_sent_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text,
+                                                             token_type=0, token=bert_token))
 
         # sentence
         bert_sent_tokens = []
         for tok in sentence.tokens:
             new_tag = tok.tag[0] if tok.tag[2:] == tag else self.args.none_tag
-            bert_ids = self.tokenize_with_cache(tok.text)
-            for i in range(len(bert_ids)):
+            out = self.tokenize_with_cache(tok.text)
+            for i in range(len(out["input_ids"])):
                 bert_tag = new_tag if i == 0 or new_tag != "B" else "I"
                 bert_token = Token(tok.text, bert_tag, tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
-                bert_sent_tokens.append(BertToken(bert_id=bert_ids[i], token_type=1, token=bert_token))
+                tup = out["offset_mapping"][i]
+                sub_text = tok.text[tup[0]:tup[1]]
+                bert_sent_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=1,
+                                                  token=bert_token))
 
         if self.args.num_labels == 2:
             # BO tagging scheme

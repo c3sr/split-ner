@@ -154,8 +154,7 @@ class NerDataset(Dataset):
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
         bert_token_type_ids = [tok.token_type for tok in sentence.bert_tokens]
         bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
-        bert_sub_token_text = [self.tokenizer.decode(tok.bert_id, skip_special_tokens=True).replace("##", "")
-                               for tok in sentence.bert_tokens]
+        bert_sub_token_text = [tok.sub_text for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
         return {"input_ids": bert_token_ids,
@@ -173,17 +172,17 @@ class NerDataset(Dataset):
     def get_bert_special_tokens(tokenizer, none_tag):
         start_id, end_id = tokenizer.encode("")
         start_text, end_text = tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, 0, Token(start_text, none_tag, offset=-1))
-        mid_sep_token = BertToken(end_id, 0, Token(end_text, none_tag, offset=-1))
-        end_token = BertToken(end_id, 1, Token(end_text, none_tag, offset=-1))
+        start_token = BertToken(start_id, start_text, 0, Token(start_text, none_tag, offset=-1))
+        mid_sep_token = BertToken(end_id, end_text, 0, Token(end_text, none_tag, offset=-1))
+        end_token = BertToken(end_id, end_text, 1, Token(end_text, none_tag, offset=-1))
         return start_token, mid_sep_token, end_token
 
     def process_sentence(self, index):
         sentence = self.sentences[index]
         sentence.bert_tokens = [self.bert_start_token]
         for token in sentence.tokens:
-            bert_ids = self.tokenizer.encode(token.text, add_special_tokens=False)
-            for i in range(len(bert_ids)):
+            out = self.tokenizer(token.text, add_special_tokens=False, return_offsets_mapping=True)
+            for i in range(len(out["input_ids"])):
                 if i == 0 or not token.tag.startswith("B-"):
                     tag = token.tag
                 else:
@@ -194,7 +193,9 @@ class NerDataset(Dataset):
                     tag = "B-" + tag[2:]
 
                 bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
-                sentence.bert_tokens.append(BertToken(bert_ids[i], 0, bert_token))
+                tup = out["offset_mapping"][i]
+                sub_text = token.text[tup[0]:tup[1]]
+                sentence.bert_tokens.append(BertToken(out["input_ids"][i], sub_text, 0, bert_token))
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
 
@@ -301,14 +302,14 @@ class NerDataCollator:
 
         # char_ids
         if self.args.use_char_cnn in ["char", "both"]:
-            batch_text = [entry["text"] for entry in features]
+            batch_text = [entry[self.args.token_type] for entry in features]
             char_vocab = NerDataset.get_char_vocab()
             batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len, char_vocab)
 
         # pattern_ids
         if self.args.use_char_cnn in ["pattern", "both"]:
             batch_pattern = [[NerDataset.make_pattern(word, self.args.pattern_type)
-                              for word in entry["text"]] for entry in features]
+                              for word in entry[self.args.token_type]] for entry in features]
             pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
 

@@ -35,13 +35,14 @@ class Token:
 
 
 class BertToken:
-    def __init__(self, bert_id, token_type, token):
+    def __init__(self, bert_id, sub_text, token_type, token):
         self.bert_id = bert_id
+        self.sub_text = sub_text
         self.token_type = token_type
         self.token = token
 
     def __str__(self):
-        return "({0}, {1}, {2})".format(self.bert_id, self.token_type, self.token)
+        return "({0}, {1}, {2}, {3})".format(self.bert_id, self.sub_text, self.token_type, self.token)
 
     def __repr__(self):
         return self.__str__()
