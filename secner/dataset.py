@@ -316,18 +316,18 @@ class NerDataCollator:
         if self.args.punctuation_handling != "none":
             entry = []
             for i in range(len(features)):
-                pad_len = max_len - len(features[i]["text"])
+                pad_len = max_len - len(features[i][self.args.token_type])
                 entry.append(torch.tensor([NerDataset.handle_punctuation(w, self.args.punctuation_handling)
-                                           for w in features[i]["text"]] + [0] * pad_len))
+                                           for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["punctuation_vec"] = torch.stack(entry)
 
         if self.args.word_type_handling != "none":
             entry = []
             word_type_vocab = NerDataset.get_word_type_vocab()
             for i in range(len(features)):
-                pad_len = max_len - len(features[i]["text"])
+                pad_len = max_len - len(features[i][self.args.token_type])
                 entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w))
-                                           for w in features[i]["text"]] + [0] * pad_len))
+                                           for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["word_type_ids"] = torch.stack(entry)
 
         # labels
