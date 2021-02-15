@@ -50,3 +50,20 @@ class DiceLoss(nn.Module):
         logits_mod = torch.sigmoid(logits) * mask
         intersection = (labels_mod * logits_mod).sum()
         return (2. * intersection + self.eps) / (labels_mod.sum() + logits_mod.sum() + self.eps)
+
+
+class CrossEntropyPunctuationLoss(nn.Module):
+    def __init__(self):
+        super(CrossEntropyPunctuationLoss, self).__init__()
+        self.ignore_index = -100
+
+    def forward(self, logits, labels, mask, word_type):
+        labels_mod = labels.clone()
+        labels_mod[labels_mod == self.ignore_index] = 0
+        log_vec = -F.log_softmax(logits, dim=1)
+        val_vec = torch.gather(log_vec, -1, labels_mod.unsqueeze(-1)).squeeze()
+        weight = torch.ones(logits.shape[-1], device=labels.device)
+        word_type_mod = word_type + 1.0
+        x = weight[labels_mod] * word_type_mod * mask
+        loss = (x * val_vec).sum() / x.sum()
+        return loss

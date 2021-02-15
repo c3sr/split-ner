@@ -6,7 +6,7 @@ from transformers.models.bert import BertModel, BertPreTrainedModel
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
 from secner.dataset import NerDataset
-from secner.loss import DiceLoss
+from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
 
 
 class NerModel(BertPreTrainedModel):
@@ -148,6 +148,9 @@ class NerModel(BertPreTrainedModel):
                 loss = DiceLoss()(active_logits, active_labels, attention_mask.view(-1))
             elif self.additional_args.loss_type == "ce_wt":
                 loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(active_logits.device))(active_logits, active_labels)
+            elif self.additional_args.loss_type == "ce_punct":
+                loss = CrossEntropyPunctuationLoss()(active_logits, active_labels, attention_mask.view(-1),
+                                                     punctuation_vec.view(-1))
             else:
                 loss = nn.CrossEntropyLoss()(active_logits, active_labels)
             outputs = (loss,) + outputs
