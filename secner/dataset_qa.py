@@ -56,12 +56,14 @@ class NerQADataset(Dataset):
         context = self.contexts[index]
         bert_token_ids = [tok.bert_id for tok in context.bert_tokens]
         bert_token_type_ids = [tok.token_type for tok in context.bert_tokens]
+        bert_head_mask = [tok.is_head for tok in context.bert_tokens]
         bert_token_text = [tok.token.text for tok in context.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in context.bert_tokens]
         bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tag, self.args.none_tag) for tok in context.bert_tokens]
 
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
+                "head_mask": bert_head_mask,
                 "text": bert_token_text,
                 "sub_text": bert_sub_token_text,
                 "labels": bert_tag_ids}
@@ -102,7 +104,7 @@ class NerQADataset(Dataset):
                 tup = out["offset_mapping"][i]
                 sub_text = word[tup[0]:tup[1]]
                 bert_query_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=0,
-                                                   token=bert_token))
+                                                   token=bert_token, is_head=(i == 0)))
 
         # helper sentence
         bert_helper_sent_tokens = []
@@ -122,7 +124,7 @@ class NerQADataset(Dataset):
                     tup = out["offset_mapping"][i]
                     sub_text = helper_text[tup[0]:tup[1]]
                     bert_helper_sent_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text,
-                                                             token_type=0, token=bert_token))
+                                                             token_type=0, token=bert_token, is_head=(i == 0)))
 
         # sentence
         bert_sent_tokens = []
@@ -135,7 +137,7 @@ class NerQADataset(Dataset):
                 tup = out["offset_mapping"][i]
                 sub_text = tok.text[tup[0]:tup[1]]
                 bert_sent_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=1,
-                                                  token=bert_token))
+                                                  token=bert_token, is_head=(i == 0)))
 
         if self.args.num_labels == 2:
             # BO tagging scheme

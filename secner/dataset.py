@@ -153,12 +153,14 @@ class NerDataset(Dataset):
         sentence = self.sentences[index]
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
         bert_token_type_ids = [tok.token_type for tok in sentence.bert_tokens]
+        bert_head_mask = [tok.is_head for tok in sentence.bert_tokens]
         bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
+                "head_mask": bert_head_mask,
                 "text": bert_token_text,
                 "sub_text": bert_sub_token_text,
                 "labels": bert_tag_ids}
@@ -172,9 +174,9 @@ class NerDataset(Dataset):
     def get_bert_special_tokens(tokenizer, none_tag):
         start_id, end_id = tokenizer.encode("")
         start_text, end_text = tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, start_text, 0, Token(start_text, none_tag, offset=-1))
-        mid_sep_token = BertToken(end_id, end_text, 0, Token(end_text, none_tag, offset=-1))
-        end_token = BertToken(end_id, end_text, 1, Token(end_text, none_tag, offset=-1))
+        start_token = BertToken(start_id, start_text, 0, Token(start_text, none_tag, offset=-1), is_head=True)
+        mid_sep_token = BertToken(end_id, end_text, 0, Token(end_text, none_tag, offset=-1), is_head=True)
+        end_token = BertToken(end_id, end_text, 1, Token(end_text, none_tag, offset=-1), is_head=True)
         return start_token, mid_sep_token, end_token
 
     def process_sentence(self, index):
@@ -195,7 +197,7 @@ class NerDataset(Dataset):
                 bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
                 tup = out["offset_mapping"][i]
                 sub_text = token.text[tup[0]:tup[1]]
-                sentence.bert_tokens.append(BertToken(out["input_ids"][i], sub_text, 0, bert_token))
+                sentence.bert_tokens.append(BertToken(out["input_ids"][i], sub_text, 0, bert_token, is_head=(i == 0)))
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_end_token)
 
@@ -329,6 +331,13 @@ class NerDataCollator:
                 entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w))
                                            for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["word_type_ids"] = torch.stack(entry)
+
+        # head_mask
+        entry = []
+        for i in range(len(features)):
+            pad_len = max_len - len(features[i]["head_mask"])
+            entry.append(torch.tensor(features[i]["head_mask"] + [0] * pad_len))
+        batch["head_mask"] = torch.stack(entry)
 
         # labels
         entry = []

@@ -54,6 +54,7 @@ class AdditionalArguments:
     cnn_kernel_size: int = field(default=5, metadata={"help": "char CNN kernel size"})
     end_cnn_channels: int = field(default=8, metadata={"help": "end CNN output channels"})
     cnn_dropout_rate: float = field(default=0.3, metadata={"help": "char CNN dropout rate"})
+    use_head_mask: bool = field(default=False, metadata={"help": "use only head sub-token's output from BERT"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)

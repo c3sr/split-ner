@@ -16,6 +16,7 @@ class NerModel(BertPreTrainedModel):
         self.additional_args = additional_args
         self.num_labels = config.num_labels
         self.num_word_types = len(NerDataset.get_word_type_vocab())
+        self.ignore_label = nn.CrossEntropyLoss().ignore_index
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
@@ -69,6 +70,7 @@ class NerModel(BertPreTrainedModel):
             input_ids=None,
             attention_mask=None,
             token_type_ids=None,
+            head_mask=None,
             char_ids=None,
             pattern_ids=None,
             punctuation_vec=None,
@@ -83,6 +85,11 @@ class NerModel(BertPreTrainedModel):
             token_type_ids=token_type_ids
         )
         sequence_output = outputs[0]
+
+        sequence_output = self.compress_with_head_mask(head_mask, sequence_output, 0.0)
+        attention_mask = self.compress_with_head_mask(head_mask, attention_mask, 0)
+        labels = self.compress_with_head_mask(head_mask, labels, self.ignore_label)
+
         if self.additional_args.punctuation_handling == "type1":
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
         elif self.additional_args.punctuation_handling == "type2":
@@ -119,14 +126,16 @@ class NerModel(BertPreTrainedModel):
         sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
 
-        outputs = (torch.argmax(logits, dim=2),) + outputs[2:]  # add hidden states and attention if they are here
+        predictions = self.expand_with_head_mask(head_mask, torch.argmax(logits, dim=2), 0)
+        outputs = (predictions,) + outputs[2:]  # add hidden states and attention if they are here
+
         if labels is not None:
             # Only keep active parts of the loss
             if attention_mask is not None:
-                active_loss = attention_mask.view(-1) == 1
+                active_loss = attention_mask.view(-1).eq(1)
                 active_logits = logits.view(-1, self.num_labels)
                 active_labels = torch.where(
-                    active_loss, labels.view(-1), torch.tensor(nn.CrossEntropyLoss().ignore_index).type_as(labels)
+                    active_loss, labels.view(-1), torch.tensor(self.ignore_label).type_as(labels)
                 )
             else:
                 active_logits = logits.view(-1, self.num_labels)
@@ -141,3 +150,27 @@ class NerModel(BertPreTrainedModel):
             outputs = (loss,) + outputs
 
         return outputs  # (loss), scores, (hidden_states), (attentions)
+
+    def compress_with_head_mask(self, head_mask, x, pad_value):
+        if not self.additional_args.use_head_mask:
+            return x
+        new_x = torch.full(x.shape, fill_value=pad_value, dtype=x.dtype, device=x.device)
+        for i in range(head_mask.shape[0]):
+            k = 0
+            for j in range(head_mask.shape[1]):
+                if head_mask[i, j] == 1:
+                    new_x[i, k] = x[i, j]
+                    k += 1
+        return new_x
+
+    def expand_with_head_mask(self, head_mask, x, pad_value):
+        if not self.additional_args.use_head_mask:
+            return x
+        new_x = torch.full(x.shape, fill_value=pad_value, dtype=x.dtype, device=x.device)
+        for i in range(head_mask.shape[0]):
+            k = -1
+            for j in range(head_mask.shape[1]):
+                if head_mask[i, j] == 1:
+                    k += 1
+                new_x[i, j] = x[i, k]
+        return new_x
