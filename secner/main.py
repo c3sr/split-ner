@@ -86,14 +86,18 @@ class NerExecutor:
             sentence = dataset.sentences[i]
             prediction = model_predictions[i]
             data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
-            offsets = [tok.token.offset for tok in sentence.bert_tokens]
-            ptr = 0
-            r = min(prediction.shape[0], len(offsets))
-            for j in range(r):
-                if offsets[j] != ptr:
-                    continue
-                data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
-                ptr += 1
+            if self.additional_args.use_head_mask:
+                for j in range(len(sentence.tokens)):
+                    data[i][j][2] = dataset.tag_vocab[prediction[j]]
+            else:
+                offsets = [tok.token.offset for tok in sentence.bert_tokens]
+                ptr = 0
+                r = min(prediction.shape[0], len(offsets))
+                for j in range(r):
+                    if offsets[j] != ptr:
+                        continue
+                    data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
+                    ptr += 1
         return data
 
     # for each original token, if the output for bert sub-tokens is inconsistent, then map to NONE_TAG else take the tag

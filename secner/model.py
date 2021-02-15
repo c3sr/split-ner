@@ -88,7 +88,6 @@ class NerModel(BertPreTrainedModel):
 
         sequence_output = self.compress_with_head_mask(head_mask, sequence_output, 0.0)
         attention_mask = self.compress_with_head_mask(head_mask, attention_mask, 0)
-        labels = self.compress_with_head_mask(head_mask, labels, self.ignore_label)
 
         if self.additional_args.punctuation_handling == "type1":
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
@@ -129,7 +128,7 @@ class NerModel(BertPreTrainedModel):
         sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
 
-        predictions = self.expand_with_head_mask(head_mask, torch.argmax(logits, dim=2), 0)
+        predictions = torch.argmax(logits, dim=2)
         outputs = (predictions,) + outputs[2:]  # add hidden states and attention if they are here
 
         if labels is not None:

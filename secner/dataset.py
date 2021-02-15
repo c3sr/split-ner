@@ -350,8 +350,13 @@ class NerDataCollator:
         # labels
         entry = []
         for i in range(len(features)):
-            pad_len = max_len - len(features[i]["labels"])
-            entry.append(torch.tensor(features[i]["labels"] + [-100] * pad_len))
+            if self.args.use_head_mask:
+                labels_mod = [features[i]["labels"][j] for j in range(len(features[i]["labels"])) if
+                              features[i]["head_mask"][j]]
+            else:
+                labels_mod = features[i]["labels"]
+            pad_len = max_len - len(labels_mod)
+            entry.append(torch.tensor(labels_mod + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)
 
         return batch
