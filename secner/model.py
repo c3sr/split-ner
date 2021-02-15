@@ -92,6 +92,9 @@ class NerModel(BertPreTrainedModel):
 
         if self.additional_args.punctuation_handling == "type1":
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
+        elif self.additional_args.punctuation_handling == "type1-and":
+            vec = NerModel.expand_punctuation_vec(punctuation_vec)
+            sequence_output = torch.cat([sequence_output, vec], dim=2)
         elif self.additional_args.punctuation_handling == "type2":
             punctuation_one_hot_vec = torch.eye(self.punctuation_vocab_size)[punctuation_vec].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, punctuation_one_hot_vec], dim=2)
@@ -174,3 +177,12 @@ class NerModel(BertPreTrainedModel):
                     k += 1
                 new_x[i, j] = x[i, k]
         return new_x
+
+    @staticmethod
+    def expand_punctuation_vec(punctuation_vec):
+        vec = torch.zeros(punctuation_vec.shape[0], punctuation_vec.shape[1], 2, device=punctuation_vec.device)
+        for i in range(punctuation_vec.shape[0]):
+            for j in range(punctuation_vec.shape[1]):
+                if punctuation_vec[i, j] != -1:
+                    vec[i, j, punctuation_vec[i, j]] = 1.0
+        return vec

@@ -221,6 +221,8 @@ class NerDataset(Dataset):
     def get_punctuation_vocab_size(punctuation_type):
         if punctuation_type == "type1":
             return 1
+        if punctuation_type == "type1-and":
+            return 2
         if punctuation_type == "type2":
             return len(list("O.,-/()P"))
 
@@ -229,6 +231,12 @@ class NerDataset(Dataset):
         all_punctuations = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
         if punctuation_type == "type1":
             return 1 if word in all_punctuations else 0
+        if punctuation_type == "type1-and":
+            if word in all_punctuations:
+                return 0
+            if word.lower() in ["and"]:
+                return 1
+            return -1
         if punctuation_type == "type2":
             punctuation_vocab = list(".,-/()")
             if word in punctuation_vocab:
