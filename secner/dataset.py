@@ -20,6 +20,8 @@ class NerDataset(Dataset):
 
         self.tag_vocab = []
         self.parse_tag_vocab()
+        self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag)
+        self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag)
 
         self.sentences = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
@@ -42,6 +44,16 @@ class NerDataset(Dataset):
                 line = line.strip()
                 if line:
                     self.tag_vocab.append(line)
+
+    @staticmethod
+    def parse_aux_tag_vocab(vocab_path, none_tag):
+        vocab = [none_tag]
+        with open(vocab_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    vocab.append(line)
+        return vocab
 
     def parse_dataset(self):
         self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
@@ -82,10 +94,10 @@ class NerDataset(Dataset):
         if args.use_pattern == "both":
             # E.g.: ABC, a uuu, is investing ...
             return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag),
-                    Token(text=",", tag=args.none_tag),
-                    Token(text="a", tag=args.none_tag),
-                    Token(text=pattern_text, tag=args.none_tag),
-                    Token(text=",", tag=args.none_tag)]
+                    Token(text=",", pos_tag=",", dep_tag="punct", tag=args.none_tag),
+                    Token(text="a", pos_tag="DT", dep_tag="det", tag=args.none_tag),
+                    Token(text=pattern_text, pos_tag="NN", dep_tag="appos", tag=args.none_tag),
+                    Token(text=",", pos_tag=",", dep_tag="punct", tag=args.none_tag)]
 
     @staticmethod
     def make_pattern(text, pattern_type):
@@ -156,6 +168,8 @@ class NerDataset(Dataset):
         bert_head_mask = [tok.is_head for tok in sentence.bert_tokens]
         bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in sentence.bert_tokens]
+        bert_token_pos = [self.pos_tag_vocab.index(tok.token.pos_tag) for tok in sentence.bert_tokens]
+        bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in sentence.bert_tokens]
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
         return {"input_ids": bert_token_ids,
@@ -163,6 +177,8 @@ class NerDataset(Dataset):
                 "head_mask": bert_head_mask,
                 "text": bert_token_text,
                 "sub_text": bert_sub_token_text,
+                "pos_tag": bert_token_pos,
+                "dep_tag": bert_token_dep,
                 "labels": bert_tag_ids}
 
     def get_tag_index(self, text_tag):
@@ -174,9 +190,21 @@ class NerDataset(Dataset):
     def get_bert_special_tokens(tokenizer, none_tag):
         start_id, end_id = tokenizer.encode("")
         start_text, end_text = tokenizer.decode([start_id, end_id]).split()
-        start_token = BertToken(start_id, start_text, 0, Token(start_text, none_tag, offset=-1), is_head=True)
-        mid_sep_token = BertToken(end_id, end_text, 0, Token(end_text, none_tag, offset=-1), is_head=True)
-        end_token = BertToken(end_id, end_text, 1, Token(end_text, none_tag, offset=-1), is_head=True)
+        start_token = BertToken(bert_id=start_id,
+                                sub_text=start_text,
+                                token_type=0,
+                                token=Token(start_text, none_tag, offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                                is_head=True)
+        mid_sep_token = BertToken(bert_id=end_id,
+                                  sub_text=end_text,
+                                  token_type=0,
+                                  token=Token(end_text, none_tag, offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                                  is_head=True)
+        end_token = BertToken(bert_id=end_id,
+                              sub_text=end_text,
+                              token_type=1,
+                              token=Token(end_text, none_tag, offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                              is_head=True)
         return start_token, mid_sep_token, end_token
 
     def process_sentence(self, index):
@@ -346,6 +374,20 @@ class NerDataCollator:
             pad_len = max_len - len(features[i]["head_mask"])
             entry.append(torch.tensor(features[i]["head_mask"] + [0] * pad_len))
         batch["head_mask"] = torch.stack(entry)
+
+        if self.args.use_pos_tag:
+            entry = []
+            for i in range(len(features)):
+                pad_len = max_len - len(features[i]["pos_tag"])
+                entry.append(torch.tensor(features[i]["pos_tag"] + [0] * pad_len))
+            batch["pos_tag"] = torch.stack(entry)
+
+        if self.args.use_dep_tag:
+            entry = []
+            for i in range(len(features)):
+                pad_len = max_len - len(features[i]["dep_tag"])
+                entry.append(torch.tensor(features[i]["dep_tag"] + [0] * pad_len))
+            batch["dep_tag"] = torch.stack(entry)
 
         # labels
         entry = []

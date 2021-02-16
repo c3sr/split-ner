@@ -23,10 +23,10 @@ class AdditionalArguments:
     train_path: str = field(default="train.tsv", metadata={"help": "train file path relative to data root"})
     dev_path: str = field(default="dev.tsv", metadata={"help": "dev file path relative to data root"})
     test_path: str = field(default="test.tsv", metadata={"help": "test file path relative to data root"})
-    tag_vocab_path: str = field(default="tag_vocab.txt",
-                                metadata={"help": "tag vocab file path relative to data root"})
-    tag_names_path: str = field(default="tag_names.txt",
-                                metadata={"help": "tag to its english name (text) mapping"})
+    tag_vocab_path: str = field(default="tag_vocab.txt", metadata={"help": "tag vocab file path relative to data root"})
+    pos_tag_vocab_path: str = field(default="pos_tag_vocab.txt", metadata={"help": "pos tag vocab file path"})
+    dep_tag_vocab_path: str = field(default="dep_tag_vocab.txt", metadata={"help": "dep tag vocab file path"})
+    tag_names_path: str = field(default="tag_names.txt", metadata={"help": "tag to its english name mapping"})
 
     pad_tag: str = field(default="[PAD]", metadata={"help": "symbol for padding token/tag"})
     none_tag: str = field(default="O", metadata={"help": "symbol for NONE tag"})
@@ -55,6 +55,8 @@ class AdditionalArguments:
     end_cnn_channels: int = field(default=8, metadata={"help": "end CNN output channels"})
     cnn_dropout_rate: float = field(default=0.3, metadata={"help": "char CNN dropout rate"})
     use_head_mask: bool = field(default=False, metadata={"help": "use only head sub-token's output from BERT"})
+    use_pos_tag: bool = field(default=False, metadata={"help": "use 1-hot POS tag vectors for tokens"})
+    use_dep_tag: bool = field(default=False, metadata={"help": "use 1-hot DEP-parse tag vectors for tokens"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
@@ -68,6 +70,8 @@ class AdditionalArguments:
         self.dev_path = os.path.join(self.abs_dataset_dir, self.dev_path)
         self.test_path = os.path.join(self.abs_dataset_dir, self.test_path)
         self.tag_vocab_path = os.path.join(self.abs_dataset_dir, self.tag_vocab_path)
+        self.pos_tag_vocab_path = os.path.join(self.abs_dataset_dir, self.pos_tag_vocab_path)
+        self.dep_tag_vocab_path = os.path.join(self.abs_dataset_dir, self.dep_tag_vocab_path)
         self.tag_names_path = os.path.join(self.abs_dataset_dir, self.tag_names_path)
 
     def to_dict(self):

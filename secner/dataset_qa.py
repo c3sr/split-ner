@@ -1,5 +1,7 @@
 import argparse
 
+import spacy
+from spacy.tokens.doc import Doc
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
 
@@ -15,8 +17,14 @@ class NerQADataset(Dataset):
         self.args = args
         self.corpus_type = corpus_type
         self.corpus_path = self.set_corpus_path()
+        self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag)
+        self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag)
 
         self.tag_to_text_mapping = self.parse_tag_names()
+
+        self.nlp = spacy.load("en_core_web_sm")
+        self.tokenizer_map = dict()
+        self.nlp.tokenizer = lambda x: Doc(self.nlp.vocab, self.tokenizer_map[x])
 
         self.contexts = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
@@ -59,6 +67,8 @@ class NerQADataset(Dataset):
         bert_head_mask = [tok.is_head for tok in context.bert_tokens]
         bert_token_text = [tok.token.text for tok in context.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in context.bert_tokens]
+        bert_token_pos = [self.pos_tag_vocab.index(tok.token.pos_tag) for tok in context.bert_tokens]
+        bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in context.bert_tokens]
         bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tag, self.args.none_tag) for tok in context.bert_tokens]
 
         return {"input_ids": bert_token_ids,
@@ -66,6 +76,8 @@ class NerQADataset(Dataset):
                 "head_mask": bert_head_mask,
                 "text": bert_token_text,
                 "sub_text": bert_sub_token_text,
+                "pos_tag": bert_token_pos,
+                "dep_tag": bert_token_dep,
                 "labels": bert_tag_ids}
 
     @staticmethod
@@ -97,10 +109,14 @@ class NerQADataset(Dataset):
         # query
         bert_query_tokens = []
         query_tokens = tag_text.split()
+        self.tokenizer_map[tag_text] = query_tokens
+        doc = self.nlp(tag_text)
         for index, word in enumerate(query_tokens):
             out = self.tokenize_with_cache(word)
+            pos_tag = doc[index].tag_
+            dep_tag = doc[index].dep_
             for i in range(len(out["input_ids"])):
-                bert_token = Token(word, self.args.none_tag, index)
+                bert_token = Token(word, self.args.none_tag, offset=index, pos_tag=pos_tag, dep_tag=dep_tag)
                 tup = out["offset_mapping"][i]
                 sub_text = word[tup[0]:tup[1]]
                 bert_query_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=0,

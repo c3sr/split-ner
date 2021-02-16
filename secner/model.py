@@ -16,6 +16,9 @@ class NerModel(BertPreTrainedModel):
         self.additional_args = additional_args
         self.num_labels = config.num_labels
         self.num_word_types = len(NerDataset.get_word_type_vocab())
+        none_tag = self.additional_args.none_tag
+        self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag))
+        self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag))
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
 
         self.bert = BertModel(config)
@@ -24,6 +27,12 @@ class NerModel(BertPreTrainedModel):
 
         if self.additional_args.word_type_handling == "1hot":
             classifier_inp_dim += self.num_word_types
+
+        if self.additional_args.use_pos_tag:
+            classifier_inp_dim += self.num_pos_tags
+
+        if self.additional_args.use_dep_tag:
+            classifier_inp_dim += self.num_dep_tags
 
         if self.additional_args.punctuation_handling != "none":
             self.punctuation_vocab_size = NerDataset.get_punctuation_vocab_size(
@@ -75,6 +84,8 @@ class NerModel(BertPreTrainedModel):
             pattern_ids=None,
             punctuation_vec=None,
             word_type_ids=None,
+            pos_tag=None,
+            dep_tag=None,
             labels=None,
             **kwargs):
 
@@ -101,6 +112,14 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.word_type_handling == "1hot":
             word_type_vec = torch.eye(self.num_word_types)[word_type_ids].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, word_type_vec], dim=2)
+
+        if self.additional_args.use_pos_tag:
+            pos_tag_vec = torch.eye(self.num_pos_tags)[pos_tag].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
+
+        if self.additional_args.use_dep_tag:
+            dep_tag_vec = torch.eye(self.num_dep_tags)[dep_tag].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, dep_tag_vec], dim=2)
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             char_vec = self.char_cnn(char_ids)
