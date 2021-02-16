@@ -1,10 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
+
+from secner.additional_args import AdditionalArguments
+from secner.dataset import NerDataset
+from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
+from secner.model import NerModel
 
 
 class NerModelBiDAF(BertPreTrainedModel):
@@ -13,9 +16,29 @@ class NerModelBiDAF(BertPreTrainedModel):
         super(NerModelBiDAF, self).__init__(config)
         self.additional_args = additional_args
         self.num_labels = config.num_labels
+        self.num_word_types = len(NerDataset.get_word_type_vocab())
+        none_tag = self.additional_args.none_tag
+        self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag))
+        self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag))
+        self.ignore_label = nn.CrossEntropyLoss().ignore_index
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        classifier_inp_dim = 0
+
+        if self.additional_args.word_type_handling == "1hot":
+            classifier_inp_dim += self.num_word_types
+
+        if self.additional_args.use_pos_tag:
+            classifier_inp_dim += self.num_pos_tags
+
+        if self.additional_args.use_dep_tag:
+            classifier_inp_dim += self.num_dep_tags
+
+        if self.additional_args.punctuation_handling != "none":
+            self.punctuation_vocab_size = NerDataset.get_punctuation_vocab_size(
+                self.additional_args.punctuation_handling)
+            classifier_inp_dim += self.punctuation_vocab_size
 
         # Character Embedding Layer
         num_embeddings = len(NerDataset.get_char_vocab()) + 1  # +1 (for the special [PAD] char)
@@ -43,9 +66,13 @@ class NerModelBiDAF(BertPreTrainedModel):
                                   self.dropout,
                                   nn.Sigmoid()))
 
-        self.classifier = nn.Linear(self.hidden_size, self.num_labels)
+        classifier_inp_dim += self.hidden_size
+        self.classifier = nn.Linear(classifier_inp_dim, self.num_labels)
 
         self.init_weights()
+
+        # Downscaling contribution of "O" terms by fixed constant factor for now
+        self.loss_wt = torch.tensor([1.0] * (self.num_labels - 1) + [0.5])
 
         if self.additional_args.freeze_bert:
             for param in self.bert.parameters():
@@ -93,6 +120,10 @@ class NerModelBiDAF(BertPreTrainedModel):
             attention_mask=None,
             token_type_ids=None,
             char_ids=None,
+            punctuation_vec=None,
+            word_type_ids=None,
+            pos_tag=None,
+            dep_tag=None,
             labels=None,
             **kwargs):
 
@@ -106,21 +137,53 @@ class NerModelBiDAF(BertPreTrainedModel):
         char_vec = self.char_emb_layer(char_ids)
         sequence_output = self.highway_network(sequence_output, char_vec)
 
+        if self.additional_args.punctuation_handling == "type1":
+            sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
+        elif self.additional_args.punctuation_handling == "type1-and":
+            vec = NerModel.expand_punctuation_vec(punctuation_vec)
+            sequence_output = torch.cat([sequence_output, vec], dim=2)
+        elif self.additional_args.punctuation_handling == "type2":
+            punctuation_one_hot_vec = torch.eye(self.punctuation_vocab_size)[punctuation_vec].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, punctuation_one_hot_vec], dim=2)
+
+        if self.additional_args.word_type_handling == "1hot":
+            word_type_vec = torch.eye(self.num_word_types)[word_type_ids].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, word_type_vec], dim=2)
+
+        if self.additional_args.use_pos_tag:
+            pos_tag_vec = torch.eye(self.num_pos_tags)[pos_tag].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
+
+        if self.additional_args.use_dep_tag:
+            dep_tag_vec = torch.eye(self.num_dep_tags)[dep_tag].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, dep_tag_vec], dim=2)
+
         logits = self.classifier(sequence_output)
 
-        outputs = (torch.argmax(logits, dim=2),) + outputs[2:]  # add hidden states and attention if they are here
+        predictions = torch.argmax(logits, dim=2)
+        outputs = (predictions,) + outputs[2:]  # add hidden states and attention if they are here
+
         if labels is not None:
-            loss_fct = nn.CrossEntropyLoss()
             # Only keep active parts of the loss
             if attention_mask is not None:
-                active_loss = attention_mask.view(-1) == 1
+                active_loss = attention_mask.view(-1).eq(1)
                 active_logits = logits.view(-1, self.num_labels)
                 active_labels = torch.where(
-                    active_loss, labels.view(-1), torch.tensor(loss_fct.ignore_index).type_as(labels)
+                    active_loss, labels.view(-1), torch.tensor(self.ignore_label).type_as(labels)
                 )
-                loss = loss_fct(active_logits, active_labels)
             else:
-                loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
+                active_logits = logits.view(-1, self.num_labels)
+                active_labels = labels.view(-1)
+
+            if self.additional_args.loss_type == "dice":
+                loss = DiceLoss()(active_logits, active_labels, attention_mask.view(-1))
+            elif self.additional_args.loss_type == "ce_wt":
+                loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(active_logits.device))(active_logits, active_labels)
+            elif self.additional_args.loss_type == "ce_punct":
+                loss = CrossEntropyPunctuationLoss()(active_logits, active_labels, attention_mask.view(-1),
+                                                     punctuation_vec.view(-1))
+            else:
+                loss = nn.CrossEntropyLoss()(active_logits, active_labels)
             outputs = (loss,) + outputs
 
         return outputs  # (loss), scores, (hidden_states), (attentions)
