@@ -40,10 +40,13 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
 | SciBERT                                  | **86.092**                  | 74.68          |                            |           |                      |
-| SciBERT-PairedSentence                   | 85.606*                     |                |                            |           |                      |
+| SciBERT-PairedSentence                   | 85.606**                    |                |                            |           |                      |
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
+| BioBERT-HeadToken*                       | run in morning              |                |  **91.487**                |           |                      |
+| BioBERT-POS-Tag*                         | 85.900                      |                |                            |           |                      |
+| BioBERT-DEP-Tag*                         | 85.799 (is still running)   |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
 | BioBERT-CRF                              | 85.685                      |                |                            |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
@@ -51,24 +54,29 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN5-Pattern0LSTM            | 85.915                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM-SubText*   |**86.025**                   |                |                            |           |                      |
 | BioBERT-Pattern1LSTM                     | 85.385                      |                |                            |           |                      |
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
-| BioBERT-Punctuation                      | **86.348**                  | 73.844         |  **91.263**                |           |                      |
-| BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
+| BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
+| BioBERT-PunctuationExtended*             | **86.037**                  |                |  90.657                    |           |                      |
+| BioBERT-Punctuation-HeadToken*           |                             |                |  running                   |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
-| BioBERT-Punctuation-CRF                  | 85.925                      |                |  90.993                    |           |                      |
+| BioBERT-Punctuation-CRF                  | 85.925 (running again)      |                |  90.993                    |           |                      |
+| BioBERT-Punctuation-And*                 | **86.133**                  |                |                            |           |                      |
+| BioBERT-Punctuation-CE-PunctLoss*        | 85.725                      |                |                            |           |                      |
 | BioBERT-WordType                         | **86.166**                  |                |  90.772                    |           |                      |
+| BioBERT-WordType-SubText*                | **86.211**                  |                |                            |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
-| BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
-| BioBERT-QA4-Dice                         | 75.323*                     | 73.232*        |                            |           |                      |
+| BioBERT-QA4-WordType*                    | 85.848                      |                |                            |           |                      |
+| BioBERT-QA4-Dice                         | 75.323**                    | 73.232**       |                            |           |                      |
 | BioBERT-QA4-CRF                          | 84.950                      |                |                            |           |                      |
 | BioBERT-QA4-EndCNN                       | -                           |                |                            |           |                      |
 | BioBERT-QA4-CharCNN1                     | 85.731                      |                |                            |           |                      |
-| BioBERT-QA4-CharCNN5-Pattern0LSTM        | 85.550*                     |                |                            |           |                      |
+| BioBERT-QA4-CharCNN5-Pattern0LSTM        | 85.550**                    |                |                            |           |                      |
 | BioBERT-QA4-CharCNN1-Highway             | **86.042**                  |                |                            |           |                      |
 | BioBERT-QA4-Mention                      | 81.537                      |                |  **91.655**                |           |                      |
 | BioBERT-QA3-Mention-CharCNN              | -                           |                |                            |           |                      |
@@ -76,8 +84,10 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | SOTA                                     | 89.58(KGQA)                 | 79.24(KGQA)    |  94.3(LUKE), 93.4(Cloze)   |   -       | 92.07 (MRC-Dice)     |
 
 ```
-* trained for 50 epochs (others are trained for 300 epochs)
+* new runs
+** trained for 50 epochs (others are trained for 300 epochs)
 For CoNLL, OntoNotes: BERT, BioBERT, SciBERT -> all correspond to general English BERT model
+Note: DiceLoss and PunctLoss helped improve a lot on DEV set but did not improve on the TEST set
 ```
 
 ## Precision / Recall Analysis
