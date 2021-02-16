@@ -5,7 +5,7 @@ from datasets import load_dataset
 from spacy.tokens.doc import Doc
 from tqdm import tqdm
 
-from secner.utils.general import setup_logging
+from secner.utils.general import setup_logging, generate_aux_tag_vocab_from_data
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +45,8 @@ def process(conll03_dataset, dataset_key, out_file):
 
     with open("../../data/conll/{0}.tsv".format(out_file), "w", encoding="utf-8") as f:
         f.write("\n\n".join(processed_dataset) + "\n")
+
+    generate_aux_tag_vocab_from_data("conll")
 
 
 if __name__ == "__main__":

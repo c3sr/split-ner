@@ -1,17 +1,16 @@
+"
 $
 ''
+(
+)
 ,
--LRB-
--RRB-
 .
 :
-ADD
 CC
 CD
 DT
 EX
 FW
-HYPH
 IN
 JJ
 JJR
@@ -22,6 +21,7 @@ NN
 NNP
 NNPS
 NNS
+NN|SYM
 PDT
 POS
 PRP
@@ -43,5 +43,3 @@ WDT
 WP
 WP$
 WRB
-XX
-``

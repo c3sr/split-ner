@@ -32,7 +32,6 @@ RBS
 RP
 SYM
 TO
-UH
 VB
 VBD
 VBG
@@ -43,5 +42,4 @@ WDT
 WP
 WP$
 WRB
-XX
 ``

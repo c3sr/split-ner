@@ -121,3 +121,33 @@ def generate_tag_names_for_underscore_separated_tags(dataset_name):
     with open("{0}/tag_names.txt".format(prefix), "w", encoding="utf-8") as f:
         for tag in tags:
             f.write("{0}\t{1}\n".format(tag, " ".join(tag.split("_"))))
+
+
+# used for all parsed datasets (Eg. BioNLP13CG, OntoNotes, CoNLL, JNLPBA etc.)
+def generate_aux_tag_vocab_from_data(dataset_name):
+    pos_vocab = set()
+    dep_vocab = set()
+    _parse_data_and_add_to_vocab(dataset_name, "train", dep_vocab, pos_vocab)
+    _parse_data_and_add_to_vocab(dataset_name, "dev", dep_vocab, pos_vocab)
+    _parse_data_and_add_to_vocab(dataset_name, "test", dep_vocab, pos_vocab)
+
+    pos_vocab = sorted(list(pos_vocab))
+    dep_vocab = sorted(list(dep_vocab))
+
+    with open("../../data/{0}/pos_tag_vocab.txt".format(dataset_name), "w", encoding="utf-8") as f:
+        for w in pos_vocab:
+            f.write("{0}\n".format(w))
+
+    with open("../../data/{0}/dep_tag_vocab.txt".format(dataset_name), "w", encoding="utf-8") as f:
+        for w in dep_vocab:
+            f.write("{0}\n".format(w))
+
+
+def _parse_data_and_add_to_vocab(dataset_name, corpus_type, dep_vocab, pos_vocab):
+    with open("../../data/{0}/{1}.tsv".format(dataset_name, corpus_type), "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                s = line.split("\t")
+                pos_vocab.add(s[1])
+                dep_vocab.add(s[2])

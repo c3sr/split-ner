@@ -18,6 +18,7 @@ compound
 conj
 cop
 csubj
+csubjpass
 dative
 dep
 det
