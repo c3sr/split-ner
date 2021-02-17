@@ -61,7 +61,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
 | BioBERT-PunctuationExtended*             | **86.037**                  |                |  90.657                    |           |                      |
-| BioBERT-Punctuation-HeadToken*           |                             |                |  **91.681**                |           |                      |
+| BioBERT-Punctuation-HeadToken*           | **86.357**                  |                |  **91.681**                |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
 | BioBERT-Punctuation-CRF*                 | **86.049**                  |                |  90.993                    |           |                      |
 | BioBERT-Punctuation-And*                 | **86.133**                  |                |                            |           |                      |
