@@ -44,9 +44,9 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
-| BioBERT-HeadToken*                       | run in morning              |                |  **91.487**                |           |                      |
+| BioBERT-HeadToken*                       | running                     |                |  **91.487**                |           |                      |
 | BioBERT-POS-Tag*                         | 85.900                      |                |                            |           |                      |
-| BioBERT-DEP-Tag*                         | 85.799 (is still running)   |                |                            |           |                      |
+| BioBERT-DEP-Tag*                         | 85.799                      |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
 | BioBERT-CRF                              | 85.685                      |                |                            |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
@@ -63,7 +63,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-PunctuationExtended*             | **86.037**                  |                |  90.657                    |           |                      |
 | BioBERT-Punctuation-HeadToken*           |                             |                |  running                   |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
-| BioBERT-Punctuation-CRF                  | 85.925 (running again)      |                |  90.993                    |           |                      |
+| BioBERT-Punctuation-CRF*                 | **86.049**                  |                |  90.993                    |           |                      |
 | BioBERT-Punctuation-And*                 | **86.133**                  |                |                            |           |                      |
 | BioBERT-Punctuation-CE-PunctLoss*        | 85.725                      |                |                            |           |                      |
 | BioBERT-WordType                         | **86.166**                  |                |  90.772                    |           |                      |
