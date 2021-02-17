@@ -44,7 +44,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
-| BioBERT-HeadToken*                       | running                     |                |  **91.487**                |           |                      |
+| BioBERT-HeadToken*                       | **86.175**                  |                |  **91.487**                |           |                      |
 | BioBERT-POS-Tag*                         | 85.900                      |                |                            |           |                      |
 | BioBERT-DEP-Tag*                         | 85.799                      |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
@@ -61,7 +61,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
 | BioBERT-PunctuationExtended*             | **86.037**                  |                |  90.657                    |           |                      |
-| BioBERT-Punctuation-HeadToken*           |                             |                |  running                   |           |                      |
+| BioBERT-Punctuation-HeadToken*           |                             |                |  **91.681**                |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
 | BioBERT-Punctuation-CRF*                 | **86.049**                  |                |  90.993                    |           |                      |
 | BioBERT-Punctuation-And*                 | **86.133**                  |                |                            |           |                      |
