@@ -1,13 +1,13 @@
 import argparse
+import re
 
 import spacy
-from spacy.tokens.doc import Doc
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
+from spacy.tokens.doc import Doc
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerQADataset(Dataset):
@@ -31,6 +31,9 @@ class NerQADataset(Dataset):
         self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
             self.tokenizer, self.args.none_tag)
         self.tokenizer_cache = dict()
+        self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
+        self.filter_tags()
+        self.split_tags()
         self.parse_dataset()
 
     def set_corpus_path(self):
@@ -52,9 +55,36 @@ class NerQADataset(Dataset):
                     tag_to_text_mapping[s[0]] = s[1]
         return tag_to_text_mapping
 
+    def filter_tags(self):
+        if self.args.filter_tags is None:
+            return
+        permissible_tags = [self.args.none_tag]
+        permissible_tags.extend(self.args.filter_tags)
+        permissible_tags = set(permissible_tags)
+        remove_tags = set(self.tag_to_text_mapping.keys()) - permissible_tags
+        for tag in remove_tags:
+            del self.tag_to_text_mapping[tag]
+
+        for sent in self.sentences:
+            for tok in sent.tokens:
+                if tok.tag[2:] not in permissible_tags:
+                    tok.tag = self.args.none_tag
+
+    def split_tags(self):
+        if not self.args.split_tags:
+            return
+        if self.args.dataset_dir == "bio":
+            self.tag_to_text_mapping["Symbolic_simple_chemical"] = "symbolic simple chemical"
+            for sent in self.sentences:
+                spans = NerDataset.get_spans(sent)
+                for sp in spans["Simple_chemical"]:
+                    mention = " ".join([sent.tokens[i].text for i in range(sp.start, sp.end + 1)])
+                    if re.search(r"[^A-Za-z0-9]|\d", mention):
+                        for index in range(sp.start, sp.end + 1):
+                            sent.tokens[index].tag = sent.tokens[index].tag[:2] + "Symbolic_simple_chemical"
+
     def parse_dataset(self):
-        sentences = NerDataset.read_dataset(self.corpus_path, self.args)
-        for sentence in sentences:
+        for sentence in self.sentences:
             self.process_sentence(sentence)
 
     def __len__(self):

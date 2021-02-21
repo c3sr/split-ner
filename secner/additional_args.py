@@ -10,13 +10,10 @@ from dataclasses import dataclass, field
 @dataclass
 class AdditionalArguments:
     model_name: str = field(default="ner-bert", metadata={"help": "model identifier"})
-    resume: Optional[str] = field(default=None,
-                                  metadata={"help": "checkpoint to resume training. Starts from scratch, if None"})
+    resume: Optional[str] = field(default=None, metadata={"help": "checkpoint to resume. Starts from scratch, if None"})
     dataset_dir: str = field(default="bio", metadata={"help": "dataset dir relative to data root dir"})
-    num_labels: int = field(default=33,
-                            metadata={"help": "# output labels in NER dataset. In QA setup, 2(BO), 3(BIO), 4(BIOE)"})
-    tagging: str = field(default="bio",
-                         metadata={"help": "tagging scheme (bo|bio). Not used in QA setup currently"})
+    num_labels: int = field(default=4, metadata={"help": "# output labels in QA setup: 2(BO), 3(BIO), 4(BIOE)"})
+    tagging: str = field(default="bio", metadata={"help": "tagging scheme (bo|bio). Not used in QA currently"})
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
@@ -34,8 +31,7 @@ class AdditionalArguments:
     max_seq_len: int = field(default=128, metadata={"help": "maximum sequence length"})
     punctuation_handling: str = field(default="none", metadata={"help": "add one-hot entry to represent if token is "
                                                                         "punct (none|type1|type2|type1-and)"})
-    word_type_handling: str = field(default="none",
-                                    metadata={"help": "add word type info (Ex.: token lower/upper/digit)(none|1hot)"})
+    word_type_handling: str = field(default="none", metadata={"help": "add word type (token lower/digit)(none|1hot)"})
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char)"})
@@ -57,6 +53,10 @@ class AdditionalArguments:
     use_head_mask: bool = field(default=False, metadata={"help": "use only head sub-token's output from BERT"})
     use_pos_tag: bool = field(default=False, metadata={"help": "use 1-hot POS tag vectors for tokens"})
     use_dep_tag: bool = field(default=False, metadata={"help": "use 1-hot DEP-parse tag vectors for tokens"})
+    filter_tags: object = field(default=None, metadata={"help": "consider only given output tags"})
+    split_tags: bool = field(default=False, metadata={"help": "split big categories into smaller ones"})
+    wandb_mode: str = field(default="enabled", metadata={"help": "can enable/disable wandb sync (enabled/disabled)"})
+    debug_mode: bool = field(default=False, metadata={"help": "truncate dataset for faster debugging"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)

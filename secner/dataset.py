@@ -1,13 +1,13 @@
 import argparse
 import re
+from collections import defaultdict
 
 import torch
 from dataclasses import dataclass
+from secner.additional_args import AdditionalArguments
+from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
-
-from secner.additional_args import AdditionalArguments
-from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging
 
 
 class NerDataset(Dataset):
@@ -23,10 +23,12 @@ class NerDataset(Dataset):
         self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag)
         self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag)
 
-        self.sentences = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
         self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
             self.tokenizer, self.args.none_tag)
+        self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
+        self.filter_tags()
+        self.split_tags()
         self.parse_dataset()
 
     def set_corpus_path(self):
@@ -55,8 +57,48 @@ class NerDataset(Dataset):
                     vocab.append(line)
         return vocab
 
+    def split_tags(self):
+        if not self.args.split_tags:
+            return
+        if self.args.dataset_dir == "bio":
+            self.tag_vocab.append("B-Symbolic_simple_chemical")
+            self.tag_vocab.append("I-Symbolic_simple_chemical")
+            for sent in self.sentences:
+                spans = NerDataset.get_spans(sent)
+                for sp in spans["Simple_chemical"]:
+                    mention = " ".join([sent.tokens[i].text for i in range(sp.start, sp.end + 1)])
+                    if re.search(r"[^A-Za-z0-9]|\d", mention):
+                        for index in range(sp.start, sp.end + 1):
+                            sent.tokens[index].tag = sent.tokens[index].tag[:2] + "Symbolic_simple_chemical"
+
+    def filter_tags(self):
+        if self.args.filter_tags is None:
+            return
+        permissible_tags = [self.args.none_tag]
+        permissible_tags.extend(self.args.filter_tags)
+        permissible_tags = set(permissible_tags)
+        new_tag_vocab = []
+        for tag in self.tag_vocab:
+            if tag == self.args.none_tag or tag[2:] in permissible_tags:
+                new_tag_vocab.append(tag)
+        self.tag_vocab = new_tag_vocab
+
+        for sent in self.sentences:
+            for tok in sent.tokens:
+                if tok.tag[2:] not in permissible_tags:
+                    tok.tag = self.args.none_tag
+
+    @staticmethod
+    def get_spans(sentence):
+        spans = defaultdict(list)
+        for index, tok in enumerate(sentence.tokens):
+            if tok.tag.startswith("B-"):
+                spans[tok.tag[2:]].append(PairSpan(index, index))
+            elif tok.tag.startswith("I-"):
+                spans[tok.tag[2:]][-1].end = index
+        return spans
+
     def parse_dataset(self):
-        self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
         for index in range(len(self.sentences)):
             self.process_sentence(index)
 
@@ -78,6 +120,8 @@ class NerDataset(Dataset):
                     sentences.append(Sentence(tokens))
                     tokens = []
                     offset = 0
+        if args.debug_mode:
+            sentences = sentences[:10]
         return sentences
 
     @staticmethod

@@ -3,10 +3,6 @@ import logging
 import os
 
 import numpy as np
-from transformers import AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import TrainingArguments
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
@@ -16,12 +12,16 @@ from secner.model_bidaf import NerModelBiDAF
 from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import TrainingArguments
 
 logger = logging.getLogger(__name__)
 
 
 class NerQAExecutor:
     def __init__(self, train_args: TrainingArguments, additional_args: AdditionalArguments):
+        os.environ["WANDB_MODE"] = additional_args.wandb_mode
         set_wandb(additional_args.wandb_dir)
         logger.info("training args: {0}".format(train_args.to_json_string()))
         logger.info("additional args: {0}".format(additional_args.to_json_string()))

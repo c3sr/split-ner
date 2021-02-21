@@ -3,10 +3,6 @@ import logging
 import os
 
 import numpy as np
-from transformers import AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import TrainingArguments
-
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset, NerDataCollator
 from secner.dataset_char import NerCharDataset, NerCharDataCollator
@@ -17,12 +13,16 @@ from secner.model_char import NerModelChar
 from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import TrainingArguments
 
 logger = logging.getLogger(__name__)
 
 
 class NerExecutor:
     def __init__(self, train_args: TrainingArguments, additional_args: AdditionalArguments):
+        os.environ["WANDB_MODE"] = additional_args.wandb_mode
         set_wandb(additional_args.wandb_dir)
         logger.info("training args: {0}".format(train_args.to_json_string()))
         logger.info("additional args: {0}".format(additional_args.to_json_string()))
@@ -36,7 +36,7 @@ class NerExecutor:
         self.dev_dataset = dataset_class(additional_args, "dev")
         self.test_dataset = dataset_class(additional_args, "test")
 
-        self.num_labels = additional_args.num_labels
+        self.num_labels = len(self.train_dataset.tag_vocab)
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
 
