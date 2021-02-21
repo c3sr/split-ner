@@ -53,7 +53,17 @@ def calc_micro_f1(data):
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("Micro F1: {0:.4f}".format(100.0 * f1))
+    print("P: {0:.4f} | R: {1:.4f} | Micro F1: {2:.4f}".format(100.0 * p, 100.0 * r, 100.0 * f1))
+
+    for tag in tp.keys():
+        tag_tp, tag_fp, tag_fn = len(tp[tag]), len(fp[tag]), len(fn[tag])
+        tag_cnt = tag_fn
+        tag_p = tag_tp * 1.0 / (tag_tp + tag_fp + 1e-7)
+        tag_r = tag_tp * 1.0 / (tag_tp + tag_fn + 1e-7)
+        tag_f1 = 2.0 * tag_p * tag_r / (tag_p + tag_r + 1e-7)
+        print("Tag: {0} | Count: {1} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
+              .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
+
     return tp, fp, fn
 
 
