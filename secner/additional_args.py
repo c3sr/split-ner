@@ -55,7 +55,7 @@ class AdditionalArguments:
     use_dep_tag: bool = field(default=False, metadata={"help": "use 1-hot DEP-parse tag vectors for tokens"})
     filter_tags: object = field(default=None, metadata={"help": "consider only given output tags"})
     split_tags: bool = field(default=False, metadata={"help": "split big categories into smaller ones"})
-    wandb_mode: str = field(default="enabled", metadata={"help": "can enable/disable wandb sync (enabled/disabled)"})
+    wandb_mode: str = field(default="run", metadata={"help": "can enable/disable wandb online sync (run/dryrun)"})
     debug_mode: bool = field(default=False, metadata={"help": "truncate dataset for faster debugging"})
 
     def __post_init__(self):

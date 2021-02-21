@@ -5,7 +5,7 @@
   "tagging": "bio",
   "do_train": true,
   "resume": null,
-  "wandb_mode": "disabled",
+  "wandb_mode": "dryrun",
   "debug_mode": true,
   "num_train_epochs": 300,
   "data_root": "../data",
