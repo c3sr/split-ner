@@ -45,8 +45,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
 | BioBERT-HeadToken*                       | **86.175**                  | 73.649         |  **91.487**                |           |                      |
-| BioBERT-POS-Tag*                         | 85.900                      |                |                            |           |                      |
-| BioBERT-DEP-Tag*                         | 85.799                      |                |                            |           |                      |
+| BioBERT-POS-Tag                          | 85.900                      |                |                            |           |                      |
+| BioBERT-DEP-Tag                          | 85.799                      |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
 | BioBERT-CRF                              | 85.685                      |                |                            |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
@@ -54,25 +54,25 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN5-Pattern0LSTM            | 85.915                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM-SubText*   |**86.025**                   |                |                            |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
 | BioBERT-Pattern1LSTM                     | 85.385                      |                |                            |           |                      |
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
-| BioBERT-PunctuationExtended*             | **86.037**                  |                |  90.657                    |           |                      |
+| BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
 | BioBERT-Punctuation-HeadToken*           | **86.357**                  |                |  **91.681**                |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
-| BioBERT-Punctuation-CRF*                 | **86.049**                  |                |  90.993                    |           |                      |
-| BioBERT-Punctuation-And*                 | **86.133**                  |                |                            |           |                      |
-| BioBERT-Punctuation-CE-PunctLoss*        | 85.725                      |                |                            |           |                      |
+| BioBERT-Punctuation-CRF                  | **86.049**                  |                |  90.993                    |           |                      |
+| BioBERT-Punctuation-And                  | **86.133**                  |                |                            |           |                      |
+| BioBERT-Punctuation-CE-PunctLoss         | 85.725                      |                |                            |           |                      |
 | BioBERT-WordType                         | **86.166**                  |                |  90.772                    |           |                      |
-| BioBERT-WordType-SubText*                | **86.211**                  |                |  91.009                    |           |                      |
+| BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
-| BioBERT-QA4-WordType*                    | 85.848                      |                |                            |           |                      |
+| BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
 | BioBERT-QA4-Dice                         | 75.323**                    | 73.232**       |                            |           |                      |
 | BioBERT-QA4-CRF                          | 84.950                      |                |                            |           |                      |
 | BioBERT-QA4-EndCNN                       | -                           |                |                            |           |                      |
@@ -117,3 +117,6 @@ Precision, Recall distribution for some good performing models to understand whe
 6. In normal training, WordType and CharCNN+Pattern, increased both precision and recall.
 7. In QA, Punctuation reduced precision (and increased recall).
 8. WordType gave the highest recall in the normal case till now.
+
+### Class-Wise Analysis
+
