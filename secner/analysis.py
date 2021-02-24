@@ -57,7 +57,7 @@ def calc_micro_f1(data):
 
     for tag in tp.keys():
         tag_tp, tag_fp, tag_fn = len(tp[tag]), len(fp[tag]), len(fn[tag])
-        tag_cnt = tag_fn
+        tag_cnt = tag_tp + tag_fn
         tag_p = tag_tp * 1.0 / (tag_tp + tag_fp + 1e-7)
         tag_r = tag_tp * 1.0 / (tag_tp + tag_fn + 1e-7)
         tag_f1 = 2.0 * tag_p * tag_r / (tag_p + tag_r + 1e-7)

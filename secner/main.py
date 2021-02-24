@@ -88,7 +88,7 @@ class NerExecutor:
             data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
             if self.additional_args.use_head_mask:
                 for j in range(len(sentence.tokens)):
-                    data[i][j][2] = dataset.tag_vocab[prediction[j]]
+                    data[i][j][2] = dataset.tag_vocab[prediction[j + 1]]
             else:
                 offsets = [tok.token.offset for tok in sentence.bert_tokens]
                 ptr = 0
