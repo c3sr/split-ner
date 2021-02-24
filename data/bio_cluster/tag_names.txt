@@ -4,7 +4,10 @@ Cancer	cancer
 Cell	cell
 Cellular_component	cellular component
 Developing_anatomical_structure	developing anatomical structure
-Gene_or_gene_product	gene or gene product
+Gene_or_gene_product0	type 0 gene or gene product
+Gene_or_gene_product1	type 1 gene or gene product
+Gene_or_gene_product2	type 2 gene or gene product
+Gene_or_gene_product3	type 3 gene or gene product
 Immaterial_anatomical_entity	immaterial anatomical entity
 Multi-tissue_structure	multi-tissue structure
 Organ	organ
