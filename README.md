@@ -121,6 +121,7 @@ Precision, Recall distribution for some good performing models to understand whe
 ### Class-Wise Analysis
 
 | Model | Count | Precision | Recall | Micro F1 |
+|-------|-------|-----------|--------|----------|
 | Overall | - | 87.6171 | 85.6562 | 86.6255 |
 | Cancer | 924 | 91.4989 | 88.5281 | 89.9890 |
 | Simple_chemical | 727 | 86.6154 | 77.4415 | 81.7720 |
