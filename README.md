@@ -120,3 +120,39 @@ Precision, Recall distribution for some good performing models to understand whe
 
 ### Class-Wise Analysis
 
+| Model | Count | Precision | Recall | Micro F1 |
+| Overall | - | 87.6171 | 85.6562 | 86.6255 |
+| Cancer | 924 | 91.4989 | 88.5281 | 89.9890 |
+| Simple_chemical | 727 | 86.6154 | 77.4415 | 81.7720 |
+| Gene_or_gene_product | 2520 | 90.7022 | 91.7460 | 91.2211 |
+| Organ | 156 | 75.3247 | 74.3590 | 74.8387 |
+| Organism | 518 | 90.1381 | 88.2239 | 89.1707 |
+| Multi-tissue_structure | 303 | 78.8194 | 74.9175 | 76.8189 |
+| Cell | 1013 | 90.0901 | 88.8450 | 89.4632 |
+| Cellular_component | 180 | 85.5556 | 85.5556 | 85.5556 |
+| Organism_substance | 102 | 94.1860 | 79.4118 | 86.1702 |
+| Tissue | 184 | 63.0631 | 76.0870 | 68.9655 |
+| Amino_acid | 62 | 89.2857 | 40.3226 | 55.5556 |
+| Immaterial_anatomical_entity | 31 | 61.7647 | 67.7419 | 64.6154 |
+| Organism_subdivision | 39 | 63.1579 | 61.5385 | 62.3377 |
+| Pathological_formation | 88 | 60.2564 | 53.4091 | 56.6265 |
+| Developing_anatomical_structure | 17 | 44.4444 | 47.0588 | 45.7143 |
+| Anatomical_system | 17 | 50.0000 | 5.8824 | 10.5263 |
+
+### Pre-Clustering
+
+Experimented with clustering mentions for high-resource entities to handle diversity issues. Accouringly, divided **Gene_or_gene_product** into 4 sub-classes and trained a model. Finally in the test set, the resultant labels in the 4 sub-classes were remaped to the parent class and precision/recall were measured. For training, we used the QA setup and worked with only 3 output classes (Gene_or_gene_product, Simple_chemical, Cancer). However, this approach is not found to give improvements over the original setup.
+
+| BioNLP13CG (QA model) Without Clustering | Precision              | Recall                 | F1                     |
+|------------------------------------------|------------------------|------------------------|------------------------|
+| Overall                                  | 88.6535                | 87.2932                | 87.9681                |
+| Gene_or_gene_product                     | 88.4540                | 91.5079                | 89.9591                |
+| Simple_chemical                          | 87.8489                | 73.5903                | 80.0898                |
+| Cancer                                   | 89.7868                | 86.5801                | 88.1543                |
+
+| BioNLP13CG (QA model) With Clustering    | Precision              | Recall                 | Micro F1               |
+|------------------------------------------|------------------------|------------------------|------------------------|
+| Overall                                  | 88.4203                | 84.9640                | 86.6577                |
+| Gene_or_gene_product                     | **88.6556**            | 87.1775                | 87.9103                |
+| Simple_chemical                          | 86.1538                | **77.0289**            | **81.3362**            |
+| Cancer                                   | 89.4318                | 85.1732                | 87.2505                |
