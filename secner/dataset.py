@@ -149,6 +149,8 @@ class NerDataset(Dataset):
             return NerDataset.make_pattern_type0(text)
         if pattern_type == "1":
             return NerDataset.make_pattern_type1(text)
+        if pattern_type == "2":
+            return NerDataset.make_pattern_type2(text)
         return NotImplementedError
 
     @staticmethod
