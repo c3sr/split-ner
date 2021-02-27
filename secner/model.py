@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
-from transformers import BertConfig
-from transformers.models.bert import BertModel, BertPreTrainedModel
-
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
 from secner.dataset import NerDataset
+from secner.flair_cnn import FlairCNN
 from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
+from transformers import BertConfig
+from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModel(BertPreTrainedModel):
@@ -43,7 +43,11 @@ class NerModel(BertPreTrainedModel):
             self.char_cnn = CharCNN(additional_args, "char")
             classifier_inp_dim += self.char_cnn.char_out_dim
 
-        if self.additional_args.use_char_cnn in ["pattern", "both"]:
+        if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
+            self.flair_cnn = FlairCNN(additional_args)
+            classifier_inp_dim += self.flair_cnn.out_dim
+
+        if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
             dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
             self.pattern_cnn = CharCNN(additional_args, "pattern")
             self.pattern_lstm = nn.LSTM(input_size=self.pattern_cnn.char_out_dim,
@@ -82,6 +86,9 @@ class NerModel(BertPreTrainedModel):
             head_mask=None,
             char_ids=None,
             pattern_ids=None,
+            flair_ids=None,
+            flair_attention_mask=None,
+            flair_boundary=None,
             punctuation_vec=None,
             word_type_ids=None,
             pos_tag=None,
@@ -125,7 +132,11 @@ class NerModel(BertPreTrainedModel):
             char_vec = self.char_cnn(char_ids)
             sequence_output = torch.cat([sequence_output, char_vec], dim=2)
 
-        if self.additional_args.use_char_cnn in ["pattern", "both"]:
+        if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
+            flair_vec = self.flair_cnn(flair_ids, flair_attention_mask, flair_boundary)
+            sequence_output = torch.cat([sequence_output, flair_vec], dim=2)
+
+        if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
             pattern_vec = self.pattern_cnn(pattern_ids)
             lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
             packed_inp = nn.utils.rnn.pack_padded_sequence(input=pattern_vec,

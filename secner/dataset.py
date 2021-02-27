@@ -181,6 +181,20 @@ class NerDataset(Dataset):
         return NerDataset.make_pattern_type0(text)
 
     @staticmethod
+    def make_pattern_type2(text):
+        pattern_text = ""
+        for c in text:
+            if "a" <= c <= "z":
+                pattern_text += "l"
+            elif "A" <= c <= "Z":
+                pattern_text += "u"
+            elif "0" <= c <= "9":
+                pattern_text += "d"
+            else:
+                pattern_text += c
+        return pattern_text
+
+    @staticmethod
     def get_word_type(text):
         if text == "[CLS]":
             return "C"
@@ -330,6 +344,12 @@ class NerDataset(Dataset):
         return vocab
 
     @staticmethod
+    def get_flair_vocab():
+        vocab = NerDataset.get_char_vocab()
+        vocab.append(" ")
+        return vocab
+
+    @staticmethod
     def get_pattern_vocab(pattern_type):
         vocab = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
         if pattern_type == "0":
@@ -339,6 +359,9 @@ class NerDataset(Dataset):
         if pattern_type == "1":
             vocab += list("ulCSLUFM")
             vocab += list("0123456789")
+            return vocab
+        if pattern_type == "2":
+            vocab += list("uld")
             return vocab
         return NotImplementedError
 
@@ -389,11 +412,45 @@ class NerDataCollator:
             batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len, char_vocab)
 
         # pattern_ids
-        if self.args.use_char_cnn in ["pattern", "both"]:
+        if self.args.use_char_cnn in ["pattern", "both", "both-flair"]:
             batch_pattern = [[NerDataset.make_pattern(word, self.args.pattern_type)
                               for word in entry[self.args.token_type]] for entry in features]
             pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
+
+        # flair_ids
+        if self.args.use_char_cnn in ["flair", "both-flair"]:
+            flair_vocab = NerDataset.get_flair_vocab()
+            start_index, end_index, pad_index = len(flair_vocab), len(flair_vocab) + 1, len(flair_vocab) + 2
+            entry_list = []
+            entry_boundary = []
+            flair_max_len = 0
+            for f in features:
+                sent_text = f[self.args.token_type]
+                sent_ids = [start_index]
+                boundary = []
+                for word_text in sent_text[:-1]:
+                    boundary.append(len(sent_ids) - 1)
+                    sent_ids += [flair_vocab.index(c) for c in word_text if c in flair_vocab]
+                    sent_ids.append(flair_vocab.index(" "))
+                boundary.append(len(sent_ids) - 1)
+                sent_ids += [flair_vocab.index(c) for c in sent_text[-1] if c in flair_vocab]
+                sent_ids.append(end_index)
+                boundary.append(len(sent_ids) - 1)
+                pad_len = max_len + 1 - len(boundary)  # count(boundaries) = count(elements) + 1
+                entry_boundary.append(torch.tensor(boundary + [-1] * pad_len))
+                entry_list.append(sent_ids)
+                flair_max_len = max(flair_max_len, len(sent_ids))
+            batch["flair_boundary"] = torch.stack(entry_boundary)
+
+            entry = []
+            entry_mask = []
+            for i in range(len(features)):
+                pad_len = flair_max_len - len(entry_list[i])
+                entry.append(torch.tensor(entry_list[i] + pad_len * [pad_index]))
+                entry_mask.append(torch.tensor([1] * len(entry_list[i]) + [0] * pad_len, dtype=torch.int64))
+            batch["flair_ids"] = torch.stack(entry)
+            batch["flair_attention_mask"] = torch.stack(entry_mask)
 
         if self.args.punctuation_handling != "none":
             entry = []

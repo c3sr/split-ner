@@ -36,7 +36,8 @@ class AdditionalArguments:
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char)"})
     loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|ce_punct|dice)"})
-    use_char_cnn: str = field(default="none", metadata={"help": "use char CNN (none|char|pattern|both)"})
+    use_char_cnn: str = field(default="none", metadata={"help": "use char CNN "
+                                                                "(none|char|pattern|flair|both|both-flair)"})
     token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
     pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1)"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
