@@ -51,7 +51,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CRF                              | 85.685                      |                |                            |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |                            |           |                      |
-| BioBERT-CharCNN5-Pattern0LSTM            | 85.915                      |                |                            |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
@@ -59,6 +59,9 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
+| BioBERT-FlairLSTM                        | 85.626                      |                |                            |           |                      |
+| BioBERT-FlairLSTM-Pattern1LSTM           | 85.570                      |                |                            |           |                      |
+| BioBERT-FlairLSTM-Pattern2LSTM           | 85.323                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
 | BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
