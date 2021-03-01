@@ -1,4 +1,5 @@
 out/
+data/cyber
 **/wandb/
 *.egg-info/
 **/__pycache__/
