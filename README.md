@@ -161,3 +161,9 @@ Experimented with clustering mentions for high-resource entities to handle diver
 | Gene_or_gene_product                     | **88.6556**            | 87.1775                | 87.9103                |
 | Simple_chemical                          | 86.1538                | **77.0289**            | **81.3362**            |
 | Cancer                                   | 89.4318                | 85.1732                | 87.2505                |
+
+### New Considerations
+
+1. BioNLP13CG dataset has nested entities (around 1%) which should be considered.
+2. BioNLP13CG dataset has paragraphical texts. Considering this might give more information to the model and facilitate NER.
+3. Paragrapical structure can help identify key phrases which can help in boundary detection issues.
