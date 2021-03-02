@@ -19,8 +19,10 @@ class NerModelWithCrf(BertPreTrainedModel):
         self.num_labels = config.num_labels
         self.num_word_types = len(NerDataset.get_word_type_vocab())
         none_tag = self.additional_args.none_tag
-        self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag))
-        self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag))
+        self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag,
+                                                               self.additional_args.use_pos_tag))
+        self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
+                                                               self.additional_args.use_dep_tag))
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
 
         self.bert = BertModel(config)

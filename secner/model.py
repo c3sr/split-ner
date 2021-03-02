@@ -1,12 +1,13 @@
 import torch
 import torch.nn as nn
+from transformers import BertConfig
+from transformers.models.bert import BertModel, BertPreTrainedModel
+
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
 from secner.dataset import NerDataset
 from secner.flair_cnn import FlairCNN
 from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
-from transformers import BertConfig
-from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModel(BertPreTrainedModel):
@@ -17,8 +18,10 @@ class NerModel(BertPreTrainedModel):
         self.num_labels = config.num_labels
         self.num_word_types = len(NerDataset.get_word_type_vocab())
         none_tag = self.additional_args.none_tag
-        self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag))
-        self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag))
+        self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag,
+                                                               self.additional_args.use_pos_tag))
+        self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
+                                                               self.additional_args.use_dep_tag))
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
 
         self.bert = BertModel(config)
