@@ -44,7 +44,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
-| BioBERT-HeadToken*                       | **86.175**                  | 73.649         |  **91.487**                |           |                      |
+| BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487**                |           |                      |
 | BioBERT-POS-Tag                          | 85.900                      |                |                            |           |                      |
 | BioBERT-DEP-Tag                          | 85.799                      |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
@@ -52,6 +52,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
+| BioBERT-CharCNN5-Pattern2LSTM*           | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
@@ -59,13 +60,13 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
-| BioBERT-FlairLSTM                        | 85.626                      |                |                            |           |                      |
-| BioBERT-FlairLSTM-Pattern1LSTM           | 85.570                      |                |                            |           |                      |
-| BioBERT-FlairLSTM-Pattern2LSTM           | 85.323                      |                |                            |           |                      |
+| BioBERT-FlairLSTM*                       | 85.626                      |                |                            |           |                      |
+| BioBERT-FlairLSTM-Pattern1LSTM*          | 85.570                      |                |                            |           |                      |
+| BioBERT-FlairLSTM-Pattern2LSTM*          | 85.323                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
 | BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
-| BioBERT-Punctuation-HeadToken*           | **86.357**                  |                |  **91.681**                |           |                      |
+| BioBERT-Punctuation-HeadToken            | **86.357**                  |                |  **91.681**                |           |                      |
 | BioBERT-Punctuation-WordType             | 85.648                      |                |                            |           |                      |
 | BioBERT-Punctuation-CRF                  | **86.049**                  |                |  90.993                    |           |                      |
 | BioBERT-Punctuation-And                  | **86.133**                  |                |                            |           |                      |
