@@ -2,12 +2,13 @@ import argparse
 import re
 
 import spacy
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
 from spacy.tokens.doc import Doc
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+from secner.additional_args import AdditionalArguments
+from secner.dataset import NerDataset
+from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
 
 
 class NerQADataset(Dataset):
@@ -17,8 +18,10 @@ class NerQADataset(Dataset):
         self.args = args
         self.corpus_type = corpus_type
         self.corpus_path = self.set_corpus_path()
-        self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag)
-        self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag)
+        self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag,
+                                                            self.args.use_pos_tag)
+        self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
+                                                            self.args.use_dep_tag)
 
         self.tag_to_text_mapping = self.parse_tag_names()
 
@@ -97,8 +100,10 @@ class NerQADataset(Dataset):
         bert_head_mask = [tok.is_head for tok in context.bert_tokens]
         bert_token_text = [tok.token.text for tok in context.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in context.bert_tokens]
-        bert_token_pos = [self.pos_tag_vocab.index(tok.token.pos_tag) for tok in context.bert_tokens]
-        bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in context.bert_tokens]
+        bert_token_pos = [self.pos_tag_vocab.index(tok.token.pos_tag) for tok in
+                          context.bert_tokens] if self.args.use_pos_tag else []
+        bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in
+                          context.bert_tokens] if self.args.use_dep_tag else []
         bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tag, self.args.none_tag) for tok in context.bert_tokens]
 
         return {"input_ids": bert_token_ids,

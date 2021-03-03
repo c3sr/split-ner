@@ -4,10 +4,11 @@ from collections import defaultdict
 
 import torch
 from dataclasses import dataclass
-from secner.additional_args import AdditionalArguments
-from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+from secner.additional_args import AdditionalArguments
+from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 
 
 class NerDataset(Dataset):
@@ -20,8 +21,10 @@ class NerDataset(Dataset):
 
         self.tag_vocab = []
         self.parse_tag_vocab()
-        self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag)
-        self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag)
+        self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag,
+                                                            self.args.use_pos_tag)
+        self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
+                                                            self.args.use_dep_tag)
 
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
         self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
@@ -48,7 +51,9 @@ class NerDataset(Dataset):
                     self.tag_vocab.append(line)
 
     @staticmethod
-    def parse_aux_tag_vocab(vocab_path, none_tag):
+    def parse_aux_tag_vocab(vocab_path, none_tag, do_task=True):
+        if not do_task:
+            return []
         vocab = [none_tag]
         with open(vocab_path, "r", encoding="utf-8") as f:
             for line in f:
@@ -228,8 +233,10 @@ class NerDataset(Dataset):
         bert_head_mask = [tok.is_head for tok in sentence.bert_tokens]
         bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in sentence.bert_tokens]
-        bert_token_pos = [self.pos_tag_vocab.index(tok.token.pos_tag) for tok in sentence.bert_tokens]
-        bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in sentence.bert_tokens]
+        bert_token_pos = [self.pos_tag_vocab.index(tok.token.pos_tag) for tok in
+                          sentence.bert_tokens] if self.args.use_pos_tag else []
+        bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in
+                          sentence.bert_tokens] if self.args.use_dep_tag else []
         bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
 
         return {"input_ids": bert_token_ids,
