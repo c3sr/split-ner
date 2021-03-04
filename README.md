@@ -64,6 +64,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-FlairLSTM-Pattern1LSTM*          | 85.570                      |                |                            |           |                      |
 | BioBERT-FlairLSTM-Pattern2LSTM*          | 85.323                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
+| BioBERT-Punctuation-LongContext300       | 85.532                      |                |                            |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
 | BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
 | BioBERT-Punctuation-HeadToken            | **86.357**                  |                |  **91.681**                |           |                      |
