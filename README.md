@@ -44,7 +44,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
-| BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487**                |           |                      |
+| BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487** ( -MISC: 92.930 PER: 96.898)               |           |    
+|  BioBERT-HeadToken                        |                 |        |                  |           | |
 | BioBERT-POS-Tag                          | 85.900                      |                |                            |           |                      |
 | BioBERT-DEP-Tag                          | 85.799                      |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
@@ -64,6 +65,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-FlairLSTM-Pattern1LSTM*          | 85.570                      |                |                            |           |                      |
 | BioBERT-FlairLSTM-Pattern2LSTM*          | 85.323                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
+| BioBERT-Punctuation-LongContext300       | 85.532                      |                |                            |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
 | BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
 | BioBERT-Punctuation-HeadToken            | **86.357**                  |                |  **91.681**                |           |                      |
