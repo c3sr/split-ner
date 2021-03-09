@@ -25,9 +25,10 @@ class NerQADataset(Dataset):
 
         self.tag_to_text_mapping = self.parse_tag_names()
 
-        self.nlp = spacy.load("en_core_web_sm")
-        self.tokenizer_map = dict()
-        self.nlp.tokenizer = lambda x: Doc(self.nlp.vocab, self.tokenizer_map[x])
+        if self.args.use_pos_tag or self.args.use_dep_tag:
+            self.nlp = spacy.load("en_core_web_sm")
+            self.tokenizer_map = dict()
+            self.nlp.tokenizer = lambda x: Doc(self.nlp.vocab, self.tokenizer_map[x])
 
         self.contexts = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
@@ -70,8 +71,13 @@ class NerQADataset(Dataset):
 
         for sent in self.sentences:
             for tok in sent.tokens:
-                if tok.tag[2:] not in permissible_tags:
-                    tok.tag = self.args.none_tag
+                new_tags = tok.tags
+                for tag in tok.tags:
+                    if tag[2:] not in permissible_tags:
+                        new_tags.remove(tag)
+                if len(new_tags) == 0:
+                    new_tags.append(self.args.none_tag)
+                tok.tags = new_tags
 
     def split_tags(self):
         if not self.args.split_tags:
@@ -83,8 +89,11 @@ class NerQADataset(Dataset):
                 for sp in spans["Simple_chemical"]:
                     mention = " ".join([sent.tokens[i].text for i in range(sp.start, sp.end + 1)])
                     if re.search(r"[^A-Za-z0-9]|\d", mention):
-                        for index in range(sp.start, sp.end + 1):
-                            sent.tokens[index].tag = sent.tokens[index].tag[:2] + "Symbolic_simple_chemical"
+                        k = sent.tokens[sp.start].tags.index("B-Simple_chemical")
+                        sent.tokens[sp.start].tags[k] = "B-Symbolic_simple_chemical"
+                        for index in range(sp.start + 1, sp.end + 1):
+                            k = sent.tokens[index].tags.index("I-Simple_chemical")
+                            sent.tokens[index].tags[k] = "I-Symbolic_simple_chemical"
 
     def parse_dataset(self):
         for sentence in self.sentences:
@@ -104,7 +113,8 @@ class NerQADataset(Dataset):
                           context.bert_tokens] if self.args.use_pos_tag else []
         bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in
                           context.bert_tokens] if self.args.use_dep_tag else []
-        bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tag, self.args.none_tag) for tok in context.bert_tokens]
+        bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tags[0], self.args.none_tag) for tok in
+                        context.bert_tokens]
 
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
@@ -144,14 +154,16 @@ class NerQADataset(Dataset):
         # query
         bert_query_tokens = []
         query_tokens = tag_text.split()
-        self.tokenizer_map[tag_text] = query_tokens
-        doc = self.nlp(tag_text)
+        doc = None
+        if self.args.use_pos_tag or self.args.use_dep_tag:
+            self.tokenizer_map[tag_text] = query_tokens
+            doc = self.nlp(tag_text)
         for index, word in enumerate(query_tokens):
             out = self.tokenize_with_cache(word)
-            pos_tag = doc[index].tag_
-            dep_tag = doc[index].dep_
+            pos_tag = doc[index].tag_ if self.args.use_pos_tag else None
+            dep_tag = doc[index].dep_ if self.args.use_dep_tag else None
             for i in range(len(out["input_ids"])):
-                bert_token = Token(word, self.args.none_tag, offset=index, pos_tag=pos_tag, dep_tag=dep_tag)
+                bert_token = Token(word, [self.args.none_tag], offset=index, pos_tag=pos_tag, dep_tag=dep_tag)
                 tup = out["offset_mapping"][i]
                 sub_text = word[tup[0]:tup[1]]
                 bert_query_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=0,
@@ -162,15 +174,16 @@ class NerQADataset(Dataset):
         if self.args.add_qa_helper_sentence:
             q = len(query_tokens)
             for tok in sentence.tokens:
-                if self.corpus_type != "train" or tok.tag[2:] == tag or tok.tag == self.args.none_tag:
+                token_tags = [t[2:] for t in tok.tags]
+                if self.corpus_type != "train" or tag in token_tags or self.args.none_tag in token_tags:
                     helper_text = tok.text
-                elif tok.tag.startswith("B-"):
-                    helper_text = self.tag_to_text_mapping[tok.tag[2:]]
+                elif "B-{0}".format(tag) in tok.tags:
+                    helper_text = self.tag_to_text_mapping[tag]
                 else:
                     continue
                 out = self.tokenize_with_cache(helper_text)
                 for i in range(len(out["input_ids"])):
-                    bert_token = Token(helper_text, self.args.none_tag, q + tok.offset, tok.pos_tag, tok.dep_tag,
+                    bert_token = Token(helper_text, [self.args.none_tag], q + tok.offset, tok.pos_tag, tok.dep_tag,
                                        tok.guidance_tag)
                     tup = out["offset_mapping"][i]
                     sub_text = helper_text[tup[0]:tup[1]]
@@ -180,11 +193,15 @@ class NerQADataset(Dataset):
         # sentence
         bert_sent_tokens = []
         for tok in sentence.tokens:
-            new_tag = tok.tag[0] if tok.tag[2:] == tag else self.args.none_tag
+            token_tags = [t[2:] for t in tok.tags]
+            if tag in token_tags:
+                new_tag = tok.tags[token_tags.index(tag)][0]
+            else:
+                new_tag = self.args.none_tag
             out = self.tokenize_with_cache(tok.text)
             for i in range(len(out["input_ids"])):
                 bert_tag = new_tag if i == 0 or new_tag != "B" else "I"
-                bert_token = Token(tok.text, bert_tag, tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
+                bert_token = Token(tok.text, [bert_tag], tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
                 tup = out["offset_mapping"][i]
                 sub_text = tok.text[tup[0]:tup[1]]
                 bert_sent_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=1,
@@ -193,16 +210,16 @@ class NerQADataset(Dataset):
         if self.args.num_labels == 2:
             # BO tagging scheme
             for i in range(len(bert_sent_tokens)):
-                if bert_sent_tokens[i].token.tag == "I":
-                    bert_sent_tokens[i].token.tag = "B"
+                if bert_sent_tokens[i].token.tags[0] == "I":
+                    bert_sent_tokens[i].token.tags[0] = "B"
 
         elif self.args.num_labels == 4:
             # BIOE tagging scheme
             is_end_token = False
             for i in range(len(bert_sent_tokens) - 1, 0, -1):
-                if bert_sent_tokens[i].token.tag == "I":
+                if bert_sent_tokens[i].token.tags[0] == "I":
                     if is_end_token:
-                        bert_sent_tokens[i].token.tag = "E"
+                        bert_sent_tokens[i].token.tags[0] = "E"
                         is_end_token = False
                 else:
                     is_end_token = True

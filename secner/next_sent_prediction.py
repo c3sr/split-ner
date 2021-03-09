@@ -20,7 +20,7 @@ class PreviousSentenceSelector:
         self.output_dataset_path = os.path.join("..", "data", args.output_dataset, args.file)
         training_sentences = NerDataset.read_dataset(self.train_path, self.args)
         self.candidates = [Sentence([Token(text=token.text,
-                                           tag=args.none_tag,
+                                           tags=[args.none_tag],
                                            pos_tag=token.pos_tag,
                                            dep_tag=token.dep_tag,
                                            guidance_tag=token.guidance_tag)

@@ -73,8 +73,11 @@ class NerDataset(Dataset):
                 for sp in spans["Simple_chemical"]:
                     mention = " ".join([sent.tokens[i].text for i in range(sp.start, sp.end + 1)])
                     if re.search(r"[^A-Za-z0-9]|\d", mention):
-                        for index in range(sp.start, sp.end + 1):
-                            sent.tokens[index].tag = sent.tokens[index].tag[:2] + "Symbolic_simple_chemical"
+                        k = sent.tokens[sp.start].tags.index("B-Simple_chemical")
+                        sent.tokens[sp.start].tags[k] = "B-Symbolic_simple_chemical"
+                        for index in range(sp.start + 1, sp.end + 1):
+                            k = sent.tokens[index].tags.index("I-Simple_chemical")
+                            sent.tokens[index].tags[k] = "I-Symbolic_simple_chemical"
 
     def filter_tags(self):
         if self.args.filter_tags is None:
@@ -90,17 +93,23 @@ class NerDataset(Dataset):
 
         for sent in self.sentences:
             for tok in sent.tokens:
-                if tok.tag[2:] not in permissible_tags:
-                    tok.tag = self.args.none_tag
+                new_tags = tok.tags
+                for tag in tok.tags:
+                    if tag[2:] not in permissible_tags:
+                        new_tags.remove(tag)
+                if len(new_tags) == 0:
+                    new_tags.append(self.args.none_tag)
+                tok.tags = new_tags
 
     @staticmethod
     def get_spans(sentence):
         spans = defaultdict(list)
         for index, tok in enumerate(sentence.tokens):
-            if tok.tag.startswith("B-"):
-                spans[tok.tag[2:]].append(PairSpan(index, index))
-            elif tok.tag.startswith("I-"):
-                spans[tok.tag[2:]][-1].end = index
+            for tag in tok.tags:
+                if tag.startswith("B-"):
+                    spans[tag[2:]].append(PairSpan(index, index))
+                elif tag.startswith("I-"):
+                    spans[tag[2:]][-1].end = index
         return spans
 
     def parse_dataset(self):
@@ -118,7 +127,7 @@ class NerDataset(Dataset):
                 if line:
                     row = line.split("\t")
                     for rt in NerDataset.get_row_tokens(row, args):
-                        tokens.append(Token(text=rt.text, pos_tag=rt.pos_tag, dep_tag=rt.dep_tag, tag=rt.tag,
+                        tokens.append(Token(text=rt.text, pos_tag=rt.pos_tag, dep_tag=rt.dep_tag, tags=rt.tags,
                                             offset=offset))
                         offset += 1
                 else:
@@ -132,21 +141,21 @@ class NerDataset(Dataset):
     @staticmethod
     def get_row_tokens(row, args: AdditionalArguments):
         text = row[0]
-        tag = row[-1]
-        pos_tag = row[1] if len(row) >= 3 else None
-        dep_tag = row[2] if len(row) >= 4 else None
-        if tag == args.none_tag or args.use_pattern == "none":
-            return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag)]
+        pos_tag = row[1] if args.data_pos_dep else None
+        dep_tag = row[2] if args.data_pos_dep else None
+        tags = row[3:] if args.data_pos_dep else row[1:]
+        if tags == [args.none_tag] or args.use_pattern == "none":
+            return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tags=tags)]
         pattern_text = NerDataset.make_pattern_type0(text)
         if args.use_pattern == "only":
-            return [Token(text=pattern_text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag)]
+            return [Token(text=pattern_text, pos_tag=pos_tag, dep_tag=dep_tag, tags=tags)]
         if args.use_pattern == "both":
             # E.g.: ABC, a uuu, is investing ...
-            return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tag=tag),
-                    Token(text=",", pos_tag=",", dep_tag="punct", tag=args.none_tag),
-                    Token(text="a", pos_tag="DT", dep_tag="det", tag=args.none_tag),
-                    Token(text=pattern_text, pos_tag="NN", dep_tag="appos", tag=args.none_tag),
-                    Token(text=",", pos_tag=",", dep_tag="punct", tag=args.none_tag)]
+            return [Token(text=text, pos_tag=pos_tag, dep_tag=dep_tag, tags=tags),
+                    Token(text=",", pos_tag=",", dep_tag="punct", tags=[args.none_tag]),
+                    Token(text="a", pos_tag="DT", dep_tag="det", tags=[args.none_tag]),
+                    Token(text=pattern_text, pos_tag="NN", dep_tag="appos", tags=[args.none_tag]),
+                    Token(text=",", pos_tag=",", dep_tag="punct", tags=[args.none_tag])]
 
     @staticmethod
     def make_pattern(text, pattern_type):
@@ -237,7 +246,8 @@ class NerDataset(Dataset):
                           sentence.bert_tokens] if self.args.use_pos_tag else []
         bert_token_dep = [self.dep_tag_vocab.index(tok.token.dep_tag) for tok in
                           sentence.bert_tokens] if self.args.use_dep_tag else []
-        bert_tag_ids = [self.get_tag_index(tok.token.tag) for tok in sentence.bert_tokens]
+        # For seq-tagging framework, we use only the first gold tag for each token (not considering nested NER)
+        bert_tag_ids = [self.get_tag_index(tok.token.tags[0]) for tok in sentence.bert_tokens]
 
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
@@ -260,17 +270,17 @@ class NerDataset(Dataset):
         start_token = BertToken(bert_id=start_id,
                                 sub_text=start_text,
                                 token_type=0,
-                                token=Token(start_text, none_tag, offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                                token=Token(start_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                                 is_head=True)
         mid_sep_token = BertToken(bert_id=end_id,
                                   sub_text=end_text,
                                   token_type=0,
-                                  token=Token(end_text, none_tag, offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                                  token=Token(end_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                                   is_head=True)
         end_token = BertToken(bert_id=end_id,
                               sub_text=end_text,
                               token_type=1,
-                              token=Token(end_text, none_tag, offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                              token=Token(end_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                               is_head=True)
         return start_token, mid_sep_token, end_token
 
@@ -279,17 +289,18 @@ class NerDataset(Dataset):
         sentence.bert_tokens = [self.bert_start_token]
         for token in sentence.tokens:
             out = self.tokenizer(token.text, add_special_tokens=False, return_offsets_mapping=True)
+            token_tag = token.tags[0]
             for i in range(len(out["input_ids"])):
-                if i == 0 or not token.tag.startswith("B-"):
-                    tag = token.tag
+                if i == 0 or not token_tag.startswith("B-"):
+                    tag = token_tag
                 else:
-                    tag = "I-" + token.tag[2:]
+                    tag = "I-" + token_tag[2:]
 
                 # Handle 'BO' tagging scheme
                 if self.args.tagging == "bo" and tag[:2] == "I-":
                     tag = "B-" + tag[2:]
 
-                bert_token = Token(token.text, tag, token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
+                bert_token = Token(token.text, [tag], token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
                 tup = out["offset_mapping"][i]
                 sub_text = token.text[tup[0]:tup[1]]
                 sentence.bert_tokens.append(BertToken(out["input_ids"][i], sub_text, 0, bert_token, is_head=(i == 0)))

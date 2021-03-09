@@ -3,6 +3,10 @@ import logging
 import os
 
 import numpy as np
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import TrainingArguments
+
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset, NerDataCollator
 from secner.dataset_char import NerCharDataset, NerCharDataCollator
@@ -13,9 +17,6 @@ from secner.model_char import NerModelChar
 from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
-from transformers import AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import TrainingArguments
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,8 @@ class NerExecutor:
         for i in range(len(dataset)):
             sentence = dataset.sentences[i]
             prediction = model_predictions[i]
-            data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
+            # considering only the first gold tag associated with the token
+            data.append([[tok.text, tok.tags[0], pad_tag] for tok in sentence.tokens])
             if self.additional_args.use_head_mask:
                 for j in range(len(sentence.tokens)):
                     data[i][j][2] = dataset.tag_vocab[prediction[j + 1]]
@@ -109,7 +111,8 @@ class NerExecutor:
         for i in range(len(dataset)):
             sentence = dataset.sentences[i]
             prediction = model_predictions[i]
-            data.append([[tok.text, tok.tag, pad_tag] for tok in sentence.tokens])
+            # considering only the first gold tag associated with the token
+            data.append([[tok.text, tok.tags[0], pad_tag] for tok in sentence.tokens])
             offsets = [tok.token.offset for tok in sentence.bert_tokens]
             ptr = -1
             r = min(prediction.shape[0], len(offsets))

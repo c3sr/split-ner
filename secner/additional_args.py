@@ -52,6 +52,7 @@ class AdditionalArguments:
     end_cnn_channels: int = field(default=8, metadata={"help": "end CNN output channels"})
     cnn_dropout_rate: float = field(default=0.3, metadata={"help": "char CNN dropout rate"})
     use_head_mask: bool = field(default=False, metadata={"help": "use only head sub-token's output from BERT"})
+    data_pos_dep: bool = field(default=True, metadata={"help": "dataset has labeled POS/DEP tags"})
     use_pos_tag: bool = field(default=False, metadata={"help": "use 1-hot POS tag vectors for tokens"})
     use_dep_tag: bool = field(default=False, metadata={"help": "use 1-hot DEP-parse tag vectors for tokens"})
     filter_tags: object = field(default=None, metadata={"help": "consider only given output tags"})

@@ -3,6 +3,10 @@ import logging
 import os
 
 import numpy as np
+from transformers import AutoConfig, AutoTokenizer
+from transformers import HfArgumentParser
+from transformers.trainer import TrainingArguments
+
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
@@ -12,9 +16,6 @@ from secner.model_bidaf import NerModelBiDAF
 from secner.model_crf import NerModelWithCrf
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
-from transformers import AutoConfig, AutoTokenizer
-from transformers import HfArgumentParser
-from transformers.trainer import TrainingArguments
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +89,8 @@ class NerQAExecutor:
             text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
             prediction = model_predictions[i]
             if text_sentence not in data_dict:
-                data_dict[text_sentence] = [[tok.text, tok.tag, pad_tag] for tok in context.sentence.tokens]
+                # considering only the first gold tag associated with the token
+                data_dict[text_sentence] = [[tok.text, tok.tags[0], pad_tag] for tok in context.sentence.tokens]
             ptr = 0
             r = min(prediction.shape[0], len(context.bert_tokens))
             for j in range(r):
@@ -134,7 +136,8 @@ class NerQAExecutor:
             text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
             prediction = model_predictions[i]
             if text_sentence not in data_dict:
-                data_dict[text_sentence] = [[tok.text, tok.tag, pad_tag] for tok in context.sentence.tokens]
+                # considering only the first gold tag associated with the token
+                data_dict[text_sentence] = [[tok.text, tok.tags[0], pad_tag] for tok in context.sentence.tokens]
             ptr = -1
             r = min(prediction.shape[0], len(context.bert_tokens))
             for j in range(1, r - 1):

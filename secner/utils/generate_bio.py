@@ -5,6 +5,14 @@ import re
 from secner.utils.general import Token, Sentence
 
 
+# import spacy
+# from spacy.tokens.doc import Doc
+
+# nlp = spacy.load("en_core_web_sm")
+# tokenizer_map = dict()
+# nlp.tokenizer = lambda x: Doc(nlp.vocab, tokenizer_map[x])
+
+
 def read_text(filename):
     return "".join([line for line in open(filename, "r", encoding="utf-8")])
 
@@ -31,7 +39,7 @@ def make_entry(text, tags, doc_id):
         end = start + len(tok)
         tok = tok.strip()
         if tok:
-            token_with_pos.append((Token(tok, "O"), (start, end)))
+            token_with_pos.append((Token(tok, ["O"]), (start, end)))
     error_cnt = 0
     non_overlap_tags = []
     start = 0
@@ -47,10 +55,10 @@ def make_entry(text, tags, doc_id):
         found_start, found_end = False, False
         for tok in token_with_pos:
             if tok[1][0] == tag[1]:
-                tok[0].tag = "B-{0}".format(tag[0])
+                tok[0].tags = "B-{0}".format(tag[0])
                 found_start = True
             elif found_start and tok[1][0] > tag[1] and tok[1][1] <= tag[2]:
-                tok[0].tag = "I-{0}".format(tag[0])
+                tok[0].tags = "I-{0}".format(tag[0])
             if tok[1][1] == tag[2]:
                 found_end = True
                 break
@@ -77,6 +85,54 @@ def make_entry(text, tags, doc_id):
     return sentences, error_cnt
 
 
+def make_entry_nested(text, tags, doc_id):
+    tokens = re.split("([,;.!?:'\"/|_@#$%^&*~`+\-=<>()\[\]{}]|\s+)", text)
+    token_with_pos = []
+    end = 0
+    for tok in tokens:
+        start = end
+        end = start + len(tok)
+        tok = tok.strip()
+        if tok:
+            token_with_pos.append((Token(tok, ["O"]), (start, end)))
+
+    error_cnt = 0
+    for tag in tags:
+        found_start, found_end = False, False
+        for tok in token_with_pos:
+            if tok[1][0] == tag[1]:
+                tok[0].tags.append("B-{0}".format(tag[0]))
+                found_start = True
+            elif found_start and tok[1][0] > tag[1] and tok[1][1] <= tag[2]:
+                tok[0].tags.append("I-{0}".format(tag[0]))
+            if tok[1][1] == tag[2]:
+                found_end = True
+                break
+
+        if not (found_start and found_end):
+            print("error boundary: ", doc_id, tag)
+            error_cnt += 1
+
+    final_tokens = [tup[0] for tup in token_with_pos]
+
+    for tok in final_tokens:
+        if len(tok.tags) > 1 and "O" in tok.tags:
+            tok.tags.remove("O")
+
+    sentences = []
+    start = 0
+    # tokenizer_map[text] = [tok.text for tok in final_tokens]
+    # doc = nlp(text)
+    for i in range(len(final_tokens)):
+        if final_tokens[i].text == ".":
+            sentences.append(Sentence(final_tokens[start: i + 1]))
+            start = i + 1
+    if start < len(final_tokens):
+        sentences.append(Sentence(final_tokens[start:]))
+
+    return sentences, error_cnt
+
+
 def read_data(path, corpus_type):
     dir_path = os.path.join(path, "raw", "BioNLP-ST_2013_CG_{0}_data".format(corpus_type))
     data = []
@@ -89,7 +145,7 @@ def read_data(path, corpus_type):
             text = read_text(os.path.join(dir_path, f))
             tags = read_annotations(os.path.join(dir_path, "PMID-{0}.a1".format(doc_id)))
             all_tags_cnt += len(tags)
-            sentences, overlap_cnt = make_entry(text, tags, doc_id)
+            sentences, overlap_cnt = make_entry_nested(text, tags, doc_id)
             all_overlap_cnt += overlap_cnt
             data.extend(sentences)
     print("# annotations: {0}".format(all_tags_cnt))
@@ -101,7 +157,7 @@ def out_data(data, path):
     with open(path, "w", encoding="utf-8") as f:
         for sent in data:
             for tok in sent.tokens:
-                f.write("{0}\t{1}\n".format(tok.text, tok.tag))
+                f.write("{0}\t{1}\n".format(tok.text, "\t".join(tok.tags)))
             f.write("\n")
 
 
@@ -117,6 +173,6 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="BioNLP13CG corpus parser")
-    ap.add_argument("--path", type=str, default="../../data/bio_context", help="raw data path")
+    ap.add_argument("--path", type=str, default="../../data/bio_nested", help="raw data path")
     ap = ap.parse_args()
     main(ap)

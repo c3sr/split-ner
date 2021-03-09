@@ -15,23 +15,23 @@ from transformers.training_args import default_logdir
 
 
 class Token:
-    def __init__(self, text, tag, offset=None, pos_tag=None, dep_tag=None, guidance_tag=None):
+    def __init__(self, text, tags, offset=None, pos_tag=None, dep_tag=None, guidance_tag=None):
         self.offset = offset
         self.text = text
-        self.tag = tag
+        self.tags = tags
         self.pos_tag = pos_tag
         self.dep_tag = dep_tag
         self.guidance_tag = guidance_tag
 
     def __str__(self):
-        return "({0}, {1}, {2}, {3}, {4}, {5})".format(self.text, self.tag, self.offset, self.pos_tag, self.dep_tag,
+        return "({0}, {1}, {2}, {3}, {4}, {5})".format(self.text, self.tags, self.offset, self.pos_tag, self.dep_tag,
                                                        self.guidance_tag)
 
     def __repr__(self):
         return self.__str__()
 
     def to_tsv_form(self):
-        return "\t".join([self.text, self.pos_tag, self.dep_tag, self.tag])
+        return "\t".join([self.text, self.pos_tag, self.dep_tag] + self.tags)
 
 
 class BertToken:

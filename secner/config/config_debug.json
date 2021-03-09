@@ -8,6 +8,7 @@
   "wandb_mode": "dryrun",
   "debug_mode": true,
   "num_train_epochs": 300,
+  "data_pos_dep": true,
   "data_root": "../data",
   "out_root": "../out",
   "train_path": "train.tsv",
