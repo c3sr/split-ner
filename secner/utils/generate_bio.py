@@ -2,15 +2,14 @@ import argparse
 import os
 import re
 
+import spacy
+from spacy.tokens import Doc
+
 from secner.utils.general import Token, Sentence
 
-
-# import spacy
-# from spacy.tokens.doc import Doc
-
-# nlp = spacy.load("en_core_web_sm")
-# tokenizer_map = dict()
-# nlp.tokenizer = lambda x: Doc(nlp.vocab, tokenizer_map[x])
+nlp = spacy.load("en_core_sci_sm")
+tokenizer_map = dict()
+nlp.tokenizer = lambda x: Doc(nlp.vocab, tokenizer_map[x])
 
 
 def read_text(filename):
@@ -30,7 +29,7 @@ def read_annotations(filename):
     return tags
 
 
-def make_entry(text, tags, doc_id):
+def make_entry_context(text, tags, doc_id):
     tokens = re.split("([,;.!?:'\"/|_@#$%^&*~`+-=<>()\[\]{}]|\s+)", text)
     token_with_pos = []
     end = 0
@@ -119,21 +118,14 @@ def make_entry_nested(text, tags, doc_id):
         if len(tok.tags) > 1 and "O" in tok.tags:
             tok.tags.remove("O")
 
-    sentences = []
-    start = 0
-    # tokenizer_map[text] = [tok.text for tok in final_tokens]
-    # doc = nlp(text)
-    for i in range(len(final_tokens)):
-        if final_tokens[i].text == ".":
-            sentences.append(Sentence(final_tokens[start: i + 1]))
-            start = i + 1
-    if start < len(final_tokens):
-        sentences.append(Sentence(final_tokens[start:]))
+    tokenizer_map[text] = [tok.text for tok in final_tokens]
+    doc = nlp(text)
+    sentences = [Sentence(final_tokens[sent.start: sent.end]) for sent in doc.sents]
 
     return sentences, error_cnt
 
 
-def read_data(path, corpus_type):
+def read_data(path, corpus_type, output_data_type):
     dir_path = os.path.join(path, "raw", "BioNLP-ST_2013_CG_{0}_data".format(corpus_type))
     data = []
     all_tags_cnt = 0
@@ -145,7 +137,10 @@ def read_data(path, corpus_type):
             text = read_text(os.path.join(dir_path, f))
             tags = read_annotations(os.path.join(dir_path, "PMID-{0}.a1".format(doc_id)))
             all_tags_cnt += len(tags)
-            sentences, overlap_cnt = make_entry_nested(text, tags, doc_id)
+            if output_data_type == "nested":
+                sentences, overlap_cnt = make_entry_nested(text, tags, doc_id)
+            else:  # "context"
+                sentences, overlap_cnt = make_entry_context(text, tags, doc_id)
             all_overlap_cnt += overlap_cnt
             data.extend(sentences)
     print("# annotations: {0}".format(all_tags_cnt))
@@ -162,9 +157,9 @@ def out_data(data, path):
 
 
 def main(args):
-    train_data = read_data(args.path, "training")
-    dev_data = read_data(args.path, "development")
-    test_data = read_data(args.path, "test")
+    train_data = read_data(args.path, "training", args.type)
+    dev_data = read_data(args.path, "development", args.type)
+    test_data = read_data(args.path, "test", args.type)
 
     out_data(train_data, os.path.join(args.path, "train.tsv"))
     out_data(dev_data, os.path.join(args.path, "dev.tsv"))
@@ -174,5 +169,6 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="BioNLP13CG corpus parser")
     ap.add_argument("--path", type=str, default="../../data/bio_nested", help="raw data path")
+    ap.add_argument("--type", type=str, default="nested", help="Type of data parsing/sample creation (nested|context)")
     ap = ap.parse_args()
     main(ap)

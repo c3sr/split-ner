@@ -2,7 +2,7 @@ import logging
 
 import spacy
 from datasets import load_dataset
-from spacy.tokens.doc import Doc
+from spacy.tokens import Doc
 from tqdm import tqdm
 
 from secner.utils.general import setup_logging, generate_aux_tag_vocab_from_data
