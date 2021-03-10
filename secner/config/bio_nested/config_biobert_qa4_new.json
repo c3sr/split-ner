@@ -3,7 +3,7 @@
   "dataset_dir": "bio_nested",
   "num_labels": 4,
   "do_train": true,
-  "resume": null,
+  "resume": "40400",
   "num_train_epochs": 300,
   "data_pos_dep": false,
   "data_root": "../data",
