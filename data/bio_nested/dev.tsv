@@ -1062,7 +1062,6 @@ P	O
 =	O
 0	O
 .	O
-
 3	O
 )	O
 in	O
@@ -1116,7 +1115,6 @@ P	O
 =	O
 0	O
 .	O
-
 12	O
 )	O
 or	O
@@ -1128,7 +1126,6 @@ P	O
 =	O
 0	O
 .	O
-
 09	O
 )	O
 .	O
@@ -1156,7 +1153,6 @@ P	O
 =	O
 0	O
 .	O
-
 006	O
 )	O
 and	O
@@ -1187,7 +1183,6 @@ P	O
 =	O
 0	O
 .	O
-
 23	O
 )	O
 .	O
@@ -1207,7 +1202,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 ,	O
@@ -1217,7 +1211,6 @@ P	O
 =	O
 0	O
 .	O
-
 02	O
 )	O
 ,	O
@@ -1230,7 +1223,6 @@ P	O
 =	O
 0	O
 .	O
-
 01	O
 )	O
 but	O
@@ -1243,7 +1235,6 @@ P	O
 =	O
 0	O
 .	O
-
 82	O
 )	O
 or	O
@@ -1311,7 +1302,6 @@ greater	O
 than	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -1402,7 +1392,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 ,	O
@@ -1419,7 +1408,6 @@ less	O
 than	O
 0	O
 .	O
-
 002	O
 )	O
 .	O
@@ -2584,7 +2572,6 @@ less	O
 than	O
 0	O
 .	O
-
 0001	O
 )	O
 .	O
@@ -2621,7 +2608,6 @@ P	O
 =	O
 0	O
 .	O
-
 002	O
 )	O
 .	O
@@ -3012,10 +2998,8 @@ tumors	I-Cancer
 %	O
 vs	O
 .	O
-
 1	O
 .	O
-
 5	O
 %	O
 in	O
@@ -3025,7 +3009,6 @@ P	O
 =	O
 0	O
 .	O
-
 001	O
 )	O
 .	O
@@ -3067,7 +3050,6 @@ P	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -3498,14 +3480,12 @@ group	O
 ,	O
 1	O
 .	O
-
 61	O
 +	O
 /	O
 -	O
 0	O
 .	O
-
 21	O
 g	O
 /	O
@@ -3524,7 +3504,6 @@ group	O
 -	O
 0	O
 .	O
-
 35	O
 g	O
 /	O
@@ -4237,6 +4216,7 @@ congestive	O
 heart	B-Organ
 failure	O
 ?	O
+
 Angiogenic	O
 factors	O
 ,	O
@@ -4589,7 +4569,6 @@ PI	O
 -	O
 2	O
 .	O
-
 778	O
 )	O
 than	O
@@ -4610,14 +4589,12 @@ PI	O
 -	O
 2	O
 .	O
-
 674	O
 ,	O
 P	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -4645,7 +4622,6 @@ P	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -6979,15 +6955,12 @@ analyses	O
 (	O
 32	O
 .	O
-
 6	O
 %	O
 vs	O
 .	O
-
 45	O
 .	O
-
 8	O
 %	O
 ;	O
@@ -6995,7 +6968,6 @@ P	O
 =	O
 0	O
 .	O
-
 057	O
 )	O
 and	O
@@ -7005,7 +6977,6 @@ P	O
 =	O
 0	O
 .	O
-
 06	O
 )	O
 .	O
@@ -8771,7 +8742,6 @@ delayed	O
 Hox	B-Gene_or_gene_product
 1	I-Gene_or_gene_product
 .	I-Gene_or_gene_product
-
 4	I-Gene_or_gene_product
 and	O
 Hox	B-Gene_or_gene_product
@@ -9052,16 +9022,13 @@ cyclophosphamide	B-Simple_chemical
 mg	O
 p	O
 .	O
-
 o	O
 .	O
 
 o	O
 .	O
-
 d	O
 .	O
-
 )	O
 and	O
 high	O
@@ -9073,7 +9040,6 @@ celecoxib	B-Simple_chemical
 mg	O
 p	O
 .	O
-
 o	O
 .	O
 
@@ -9082,10 +9048,8 @@ b	O
 
 i	O
 .	O
-
 d	O
 .	O
-
 )	O
 in	O
 adult	O
@@ -9237,7 +9201,6 @@ survivals	O
 are	O
 14	O
 .	O
-
 4	O
 and	O
 4	O
@@ -9256,7 +9219,6 @@ duration	O
 was	O
 8	O
 .	O
-
 2	O
 months	O
 .	O
@@ -9649,7 +9611,6 @@ P	O
 =	O
 0	O
 .	O
-
 006	O
 )	O
 better	O
@@ -9701,7 +9662,6 @@ P	O
 =	O
 0	O
 .	O
-
 014	O
 )	O
 than	O
@@ -11692,7 +11652,6 @@ spironolactone	B-Simple_chemical
 -	O
 2	O
 .	O
-
 0	O
 days	O
 )	O
@@ -11712,7 +11671,6 @@ treated	O
 -	O
 1	O
 .	O
-
 2	O
 days	O
 ,	O
@@ -11729,14 +11687,12 @@ controls	O
 (	O
 13	O
 .	O
-
 0	O
 +	O
 /	O
 -	O
 1	O
 .	O
-
 0	O
 days	O
 ,	O
@@ -11744,7 +11700,6 @@ p	O
 =	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -11975,7 +11930,6 @@ OR	O
 =	O
 4	O
 .	O
-
 16	O
 ,	O
 95	O
@@ -11988,7 +11942,6 @@ CI	O
 =	O
 1	O
 .	O
-
 10	O
 to	O
 15	O
@@ -12000,7 +11953,6 @@ P	O
 =	O
 0	O
 .	O
-
 036	O
 ]	O
 .	O
@@ -12049,14 +12001,12 @@ CI	O
 -	O
 14	O
 .	O
-
 00	O
 ,	O
 P	O
 =	O
 0	O
 .	O
-
 059	O
 )	O
 .	O
@@ -12306,7 +12256,6 @@ H	B-Simple_chemical
 
 E	I-Simple_chemical
 .	I-Simple_chemical
-
 )	O
 stained	O
 sections	B-Tissue
@@ -12345,7 +12294,6 @@ P	O
 <	O
 0	O
 .	O
-
 001	O
 )	O
 of	O
@@ -12359,7 +12307,6 @@ H	B-Simple_chemical
 
 E	I-Simple_chemical
 .	I-Simple_chemical
-
 -	O
 staining	O
 in	O
@@ -12545,7 +12492,6 @@ of	O
 and	O
 1	O
 .	O
-
 953	O
 and	O
 P	O
@@ -12555,14 +12501,12 @@ P	O
 =	O
 0	O
 .	O
-
 0003	O
 and	O
 P	O
 =	O
 0	O
 .	O
-
 0352	O
 .	O
 
@@ -12590,7 +12534,6 @@ H	B-Simple_chemical
 
 E	I-Simple_chemical
 .	I-Simple_chemical
-
 -	O
 staining	O
 in	O
@@ -14281,7 +14224,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 and	O
@@ -14293,7 +14235,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 were	O
@@ -14350,7 +14291,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -17718,7 +17658,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -17760,7 +17699,6 @@ group	O
 -	O
 77	O
 .	O
-
 02	O
 ,	O
 group	O
@@ -17772,7 +17710,6 @@ group	O
 -	O
 81	O
 .	O
-
 85	O
 /	O
 mm2	O
@@ -17781,7 +17718,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -17803,7 +17739,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -18486,7 +18421,6 @@ malignancies	I-Cancer
 Cancer	O
 2010	O
 .	O
-
 (	O
 c	O
 )	O
@@ -19278,10 +19212,8 @@ vegetables	B-Organism_subdivision
 ,	O
 i	O
 .	O
-
 e	O
 .	O
-
 gallic	B-Simple_chemical
 acid	I-Simple_chemical
 (	O
@@ -20846,7 +20778,6 @@ i	O
 
 p	O
 .	O
-
 )	O
 ,	O
 with	O
@@ -21759,7 +21690,6 @@ p	O
 =	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -23019,7 +22949,6 @@ i	B-Immaterial_anatomical_entity
 
 v	I-Immaterial_anatomical_entity
 .	I-Immaterial_anatomical_entity
-
 ,	O
 median	O
 colony	B-Cell
@@ -23043,7 +22972,6 @@ less	O
 than	O
 0	O
 .	O
-
 005	O
 )	O
 .	O
@@ -23397,7 +23325,6 @@ Namba	O
 et	O
 al	O
 .	O
-
 ,	O
 1985	O
 ;	O
@@ -27109,6 +27036,7 @@ tumor	B-Cancer
 host	O
 interaction	O
 ?	O
+
 Somatostatin	B-Gene_or_gene_product
 receptors	I-Gene_or_gene_product
 were	O
@@ -28366,7 +28294,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 ,	O
@@ -28380,7 +28307,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 ,	O
@@ -28392,7 +28318,6 @@ p	O
 <	O
 0	O
 .	O
-
 01	O
 )	O
 and	O
@@ -28405,7 +28330,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 in	O
@@ -28443,7 +28367,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 in	O

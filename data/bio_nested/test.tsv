@@ -124,6 +124,7 @@ for	O
 thyroid	B-Organ
 tumourigenesis	O
 ?	O
+
 Human	B-Organism
 thyroid	B-Cancer
 tumours	I-Cancer
@@ -512,12 +513,10 @@ reduced	O
 in	O
 50	O
 .	O
-
 5	O
 and	O
 64	O
 .	O
-
 4	O
 %	O
 ,	O
@@ -987,7 +986,6 @@ P	O
 <	O
 0	O
 .	O
-
 008	O
 )	O
 in	O
@@ -1648,7 +1646,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 and	O
 P	O
@@ -1686,7 +1683,6 @@ P	O
 =	O
 0	O
 .	O
-
 0001	O
 )	O
 .	O
@@ -2981,7 +2977,6 @@ in	O
 (	O
 43	O
 .	O
-
 4	O
 %	O
 )	O
@@ -2996,7 +2991,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 )	O
 and	O
@@ -3008,7 +3002,6 @@ less	O
 than	O
 0	O
 .	O
-
 05	O
 )	O
 were	O
@@ -3059,7 +3052,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 and	O
 p	O
@@ -3067,7 +3059,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 ,	O
@@ -3083,7 +3074,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 in	O
@@ -3336,7 +3326,6 @@ P	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 ,	O
@@ -3364,7 +3353,6 @@ P	O
 >	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -3732,7 +3720,6 @@ Moses	O
 et	O
 al	O
 .	O
-
 (	O
 1999	O
 ,	O
@@ -3747,7 +3734,6 @@ Acad	O
 
 Sci	O
 .	O
-
 USA	O
 2645	O
 -	O
@@ -5873,6 +5859,7 @@ on	I-Gene_or_gene_product
 chromosome	I-Gene_or_gene_product
 10	I-Gene_or_gene_product
 )	O
+
 was	O
 identified	O
 as	O
@@ -6187,7 +6174,6 @@ of	O
 :	O
 0	O
 .	O
-
 4	O
 :	O
 1	O
@@ -6393,7 +6379,6 @@ ml	O
 to	O
 8	O
 .	O
-
 1	O
 ng	O
 /	O
@@ -7785,7 +7770,6 @@ IC50	O
 =	O
 9	O
 .	O
-
 5	O
 microM	O
 )	O
@@ -7952,7 +7936,6 @@ paclitaxel	B-Simple_chemical
 by	O
 1	O
 .	O
-
 7	O
 -	O
 fold	O
@@ -8071,7 +8054,6 @@ produced	O
 a	O
 1	O
 .	O
-
 8	O
 -	O
 fold	O
@@ -9585,7 +9567,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 )	O
 by	O
@@ -10005,7 +9986,6 @@ albicans	I-Organism
 (	O
 2	O
 .	O
-
 5	O
 x	O
 10	O
@@ -11161,7 +11141,6 @@ P	O
 =	O
 0	O
 .	O
-
 05	O
 (	O
 t	O
@@ -11692,7 +11671,6 @@ p	O
 <	O
 0	O
 .	O
-
 005	O
 )	O
 .	O
@@ -11732,7 +11710,6 @@ p	O
 <	O
 0	O
 .	O
-
 003	O
 )	O
 .	O
@@ -11765,7 +11742,6 @@ p	O
 <	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -11973,24 +11949,20 @@ Bell	O
 ,	O
 L	O
 .	O
-
 ,	O
 and	O
 J	O
 .	O
-
 A	O
 .	O
 
 Madri	O
 .	O
-
 1990	O
 .	O
 
 Am	O
 .	O
-
 J	O
 .	O
 
@@ -13242,12 +13214,10 @@ p	O
 =	O
 0	O
 .	O
-
 0477	O
 ,	O
 0	O
 .	O
-
 0316	O
 and	O
 0	O
@@ -13287,7 +13257,6 @@ p	O
 =	O
 0	O
 .	O
-
 0014	O
 )	O
 .	O
@@ -13321,7 +13290,6 @@ p	O
 =	O
 0	O
 .	O
-
 0430	O
 and	O
 0	O
@@ -16214,7 +16182,6 @@ less	O
 than	O
 0	O
 .	O
-
 0005	O
 )	O
 ,	O
@@ -16236,7 +16203,6 @@ p	O
 =	O
 0	O
 .	O
-
 0002	O
 )	O
 .	O
@@ -16499,21 +16465,17 @@ Group	O
 -	O
 1	O
 .	O
-
 07	O
 vs	O
 .	O
-
 1	O
 .	O
-
 76	O
 +	O
 /	O
 -	O
 0	O
 .	O
-
 76	O
 ,	O
 respectively	O
@@ -16554,7 +16516,6 @@ PDR	O
 64	O
 vs	O
 .	O
-
 36	O
 %	O
 ,	O
@@ -16564,7 +16525,6 @@ p	O
 =	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -16606,7 +16566,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 ;	O
@@ -18483,6 +18442,7 @@ anti	O
 angiogenesis	O
 intervention	O
 ?	O
+
 A	O
 receptor	O
 for	O
@@ -18512,7 +18472,6 @@ Moser	O
 et	O
 al	O
 .	O
-
 ,	O
 1999	O
 )	O
@@ -18529,7 +18488,6 @@ Acad	O
 
 Sci	O
 .	O
-
 U	O
 .	O
 
@@ -18620,7 +18578,6 @@ Moser	O
 et	O
 al	O
 .	O
-
 ,	O
 2001	O
 )	O
@@ -18641,7 +18598,6 @@ Wahl	O
 et	O
 al	O
 .	O
-
 ,	O
 2002	O
 )	O
@@ -19639,7 +19595,6 @@ was	O
 -	O
 0	O
 .	O
-
 01	O
 nmol	O
 /	O
@@ -19655,7 +19610,6 @@ heparin	B-Simple_chemical
 was	O
 95	O
 .	O
-
 8	O
 pmol	O
 /	O
@@ -19866,7 +19820,6 @@ function	O
 (	O
 e	O
 .	O
-
 g	O
 .	O
 
@@ -20149,7 +20102,6 @@ p	O
 <	O
 0	O
 .	O
-
 0001	O
 ,	O
 for	O
@@ -20976,14 +20928,12 @@ was	O
 (	O
 21	O
 .	O
-
 50	O
 +	O
 /	O
 -	O
 8	O
 .	O
-
 87	O
 )	O
 ,	O
@@ -20994,7 +20944,6 @@ AI	O
 was	O
 1	O
 .	O
-
 15	O
 %	O
 .	O
@@ -21013,28 +20962,24 @@ was	O
 (	O
 26	O
 .	O
-
 33	O
 +	O
 /	O
 -	O
 9	O
 .	O
-
 70	O
 )	O
 and	O
 (	O
 17	O
 .	O
-
 68	O
 +	O
 /	O
 -	O
 6	O
 .	O
-
 06	O
 )	O
 respectively	O
@@ -21065,7 +21010,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -21085,7 +21029,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 )	O
 ,	O
@@ -21132,7 +21075,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -21154,7 +21096,6 @@ r	O
 -	O
 0	O
 .	O
-
 53	O
 ,	O
 P	O
@@ -21162,7 +21103,6 @@ less	O
 than	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -21304,10 +21244,8 @@ factories	O
 ,	O
 i	O
 .	O
-
 e	O
 .	O
-
 ,	O
 "	O
 power	O
@@ -21330,10 +21268,8 @@ plants	O
 ,	O
 i	O
 .	O
-
 e	O
 .	O
-
 ,	O
 systems	O
 that	O
@@ -21367,7 +21303,6 @@ the	O
 "	O
 mitochondria	B-Cellular_component
 .	O
-
 "	O
 In	O
 contrast	O
@@ -21515,12 +21450,10 @@ Ko	O
 et	O
 al	O
 .	O
-
 ,	O
 Cancer	O
 Letts	O
 .	O
-
 ,	O
 173	O
 ,	O
@@ -21554,7 +21487,6 @@ Ko	O
 et	O
 al	O
 .	O
-
 ,	O
 Biochem	O
 .	O
@@ -21567,7 +21499,6 @@ Res	O
 
 Commun	O
 .	O
-
 ,	O
 324	O
 ,	O
@@ -21595,7 +21526,6 @@ apoptotic	O
 cell	B-Cell
 death	O
 .	O
-
 "	O
 Here	O
 ,	O
@@ -21608,10 +21538,8 @@ factors	O
 (	O
 e	O
 .	O
-
 g	O
 .	O
-
 ,	O
 cytochrome	B-Gene_or_gene_product
 c	I-Gene_or_gene_product
@@ -21912,14 +21840,12 @@ drug	O
 (	O
 0	O
 .	O
-
 0043317	O
 +	O
 /	O
 -	O
 0	O
 .	O
-
 0040418	O
 ml	O
 /	O
@@ -21945,14 +21871,12 @@ animals	O
 (	O
 0	O
 .	O
-
 0090460	O
 +	O
 /	O
 -	O
 0	O
 .	O
-
 0043680	O
 ml	O
 /	O
@@ -21991,7 +21915,6 @@ albumin	I-Simple_chemical
 -	O
 13	O
 .	O
-
 94	O
 ml	O
 /	O
@@ -22019,7 +21942,6 @@ and	O
 -	O
 11	O
 .	O
-
 92	O
 ml	O
 /	O
@@ -22058,26 +21980,22 @@ by	O
 from	O
 5	O
 .	O
-
 2	O
 +	O
 /	O
 -	O
 1	O
 .	O
-
 1	O
 to	O
 2	O
 .	O
-
 5	O
 +	O
 /	O
 -	O
 0	O
 .	O
-
 8	O
 ml	O
 /	O
@@ -22091,26 +22009,22 @@ and	O
 from	O
 0	O
 .	O
-
 00165	O
 +	O
 /	O
 -	O
 5	O
 .	O
-
 1	O
 to	O
 0	O
 .	O
-
 0067	O
 +	O
 /	O
 -	O
 4	O
 .	O
-
 8	O
 ml	O
 /	O
@@ -22692,7 +22606,6 @@ P	O
 =	O
 0	O
 .	O
-
 049	O
 )	O
 ,	O
@@ -22749,7 +22662,6 @@ P	O
 =	O
 0	O
 .	O
-
 002	O
 )	O
 than	O
@@ -24087,7 +23999,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 ,	O
@@ -24102,7 +24013,6 @@ P	O
 =	O
 0	O
 .	O
-
 004	O
 )	O
 ,	O
@@ -25697,7 +25607,6 @@ P	O
 =	O
 0	O
 .	O
-
 072	O
 and	O
 0	O
@@ -25720,12 +25629,10 @@ P	O
 =	O
 0	O
 .	O
-
 19	O
 and	O
 0	O
 .	O
-
 18	O
 ,	O
 respectively	O
@@ -27118,12 +27025,10 @@ mL	O
 and	O
 0	O
 .	O
-
 0	O
 -	O
 28	O
 .	O
-
 4	O
 pg	O
 /	O
@@ -27153,28 +27058,23 @@ controls	O
 (	O
 48	O
 .	O
-
 9	O
 +	O
 /	O
 -	O
 194	O
 .	O
-
 4	O
 vs	O
 .	O
-
 5	O
 .	O
-
 2	O
 +	O
 /	O
 -	O
 13	O
 .	O
-
 8	O
 pg	O
 /	O
@@ -27186,7 +27086,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 .	O
@@ -27212,28 +27111,23 @@ controls	O
 (	O
 159	O
 .	O
-
 2	O
 +	O
 /	O
 -	O
 40	O
 .	O
-
 4	O
 vs	O
 .	O
-
 99	O
 .	O
-
 6	O
 +	O
 /	O
 -	O
 107	O
 .	O
-
 1	O
 pg	O
 /	O
@@ -27258,7 +27152,6 @@ analysis	O
 gave	O
 0	O
 .	O
-
 83	O
 and	O
 0	O
@@ -27332,7 +27225,6 @@ P	O
 =	O
 0	O
 .	O
-
 07	O
 )	O
 .	O
@@ -28636,7 +28528,6 @@ less	O
 than	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -28720,26 +28611,22 @@ decreased	O
 from	O
 42	O
 .	O
-
 4	O
 +	O
 /	O
 -	O
 4	O
 .	O
-
 8	O
 to	O
 10	O
 .	O
-
 5	O
 +	O
 /	O
 -	O
 3	O
 .	O
-
 2	O
 per	O
 x	O
@@ -28761,19 +28648,16 @@ from	O
 -	O
 4	O
 .	O
-
 5	O
 to	O
 37	O
 .	O
-
 5	O
 +	O
 /	O
 -	O
 4	O
 .	O
-
 6	O
 by	O
 CD31	B-Gene_or_gene_product
@@ -28786,7 +28670,6 @@ less	O
 than	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -32197,7 +32080,6 @@ P	O
 =	O
 0	O
 .	O
-
 047	O
 )	O
 ,	O
@@ -32218,15 +32100,12 @@ rate	O
 (	O
 42	O
 .	O
-
 6	O
 %	O
 vs	O
 .	O
-
 53	O
 .	O
-
 9	O
 %	O
 ;	O
@@ -34498,6 +34377,7 @@ cerebral	B-Cell
 endothelial	I-Cell
 cells	I-Cell
 ?	O
+
 Exposure	O
 of	O
 wild	O
@@ -36839,14 +36719,12 @@ r	O
 -	O
 0	O
 .	O
-
 400	O
 ,	O
 p	O
 =	O
 0	O
 .	O
-
 011	O
 )	O
 .	O
@@ -36869,7 +36747,6 @@ p	O
 =	O
 0	O
 .	O
-
 042	O
 )	O
 .	O
@@ -39186,7 +39063,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -39218,7 +39094,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -39251,7 +39126,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 and	O
@@ -39270,7 +39144,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -39322,14 +39195,11 @@ expression	O
 (	O
 20	O
 .	O
-
 9	O
 vs	O
 .	O
-
 2	O
 .	O
-
 4	O
 %	O
 ,	O
@@ -39337,7 +39207,6 @@ p	O
 <	O
 0	O
 .	O
-
 01	O
 )	O
 .	O
@@ -39370,10 +39239,8 @@ expression	O
 19	O
 vs	O
 .	O
-
 4	O
 .	O
-
 7	O
 %	O
 ,	O
@@ -39381,7 +39248,6 @@ p	O
 <	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -40996,7 +40862,6 @@ tumors	I-Cancer
 (	O
 83	O
 .	O
-
 1	O
 %	O
 ,	O
@@ -41053,7 +40918,6 @@ P	O
 =	O
 0	O
 .	O
-
 037	O
 )	O
 .	O
@@ -41073,7 +40937,6 @@ P	O
 <	O
 0	O
 .	O
-
 0005	O
 )	O
 .	O
@@ -41099,7 +40962,6 @@ P	O
 =	O
 0	O
 .	O
-
 019	O
 )	O
 was	O
@@ -41333,7 +41195,6 @@ ILD	O
 p	O
 <	O
 .	O
-
 001	O
 )	O
 .	O
@@ -41346,7 +41207,6 @@ PLD	O
 >	O
 8	O
 .	O
-
 0	O
 )	O
 showed	O
@@ -41363,19 +41223,16 @@ PLD	O
 =	O
 8	O
 .	O
-
 0	O
 )	O
 (	O
 74	O
 .	O
-
 0	O
 %	O
 vs	O
 46	O
 .	O
-
 8	O
 %	O
 ,	O
@@ -42027,7 +41884,6 @@ glioma	B-Cancer
 RG1	B-Cancer
 2	I-Cancer
 .	I-Cancer
-
 2	I-Cancer
 )	O
 of	O
@@ -42040,7 +41896,6 @@ experimental	O
 RG1	B-Cancer
 2	I-Cancer
 .	I-Cancer
-
 2	I-Cancer
 glioma	I-Cancer
 of	O
@@ -42107,7 +41962,6 @@ of	O
 -	O
 0	O
 .	O
-
 1	O
 ml	O
 /	O
@@ -42131,7 +41985,6 @@ of	O
 -	O
 7	O
 .	O
-
 1	O
 ml	O
 /	O
@@ -42174,7 +42027,6 @@ of	O
 -	O
 8	O
 .	O
-
 3	O
 mumol	O
 /	O
@@ -42197,7 +42049,6 @@ of	O
 -	O
 0	O
 .	O
-
 2	O
 mumol	O
 /	O
@@ -42222,7 +42073,6 @@ and	O
 -	O
 4	O
 .	O
-
 7	O
 mumol	O
 /	O
@@ -43307,7 +43157,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 at	O
@@ -43360,7 +43209,6 @@ P	O
 =	O
 0	O
 .	O
-
 011	O
 )	O
 .	O
@@ -43376,7 +43224,6 @@ less	O
 than	O
 0	O
 .	O
-
 001	O
 )	O
 at	O
@@ -43439,7 +43286,6 @@ P	O
 =	O
 0	O
 .	O
-
 021	O
 )	O
 .	O
@@ -47760,8 +47606,8 @@ at	O
 pH	O
 4	O
 .	O
-
 8	O
+
 at	O
 37	O
 degrees	O
@@ -48157,7 +48003,6 @@ deficient	O
 (	O
 K	B-Cell
 .	I-Cell
-
 Se	I-Cell
 (	I-Cell
 -	I-Cell
@@ -48170,7 +48015,6 @@ satisfied	O
 (	O
 K	B-Cell
 .	I-Cell
-
 Se	I-Cell
 (	I-Cell
 +	I-Cell
@@ -48265,7 +48109,6 @@ e	O
 
 g	O
 .	O
-
 ,	O
 glucose	B-Simple_chemical
 -	O
@@ -49081,7 +48924,6 @@ Zarbl	O
 et	O
 al	O
 .	O
-
 ,	O
 1987	O
 )	O
@@ -49797,7 +49639,6 @@ efficiency	O
 (	O
 0	O
 .	O
-
 2	O
 -	O
 0	O
@@ -51309,7 +51150,6 @@ less	O
 than	O
 0	O
 .	O
-
 0001	O
 )	O
 .	O
@@ -51382,7 +51222,6 @@ less	O
 than	O
 0	O
 .	O
-
 0001	O
 )	O
 .	O
@@ -51407,7 +51246,6 @@ P	O
 =	O
 0	O
 .	O
-
 0004	O
 )	O
 ,	O
@@ -51474,7 +51312,6 @@ P	O
 =	O
 0	O
 .	O
-
 007	O
 )	O
 .	O
@@ -52519,7 +52356,6 @@ IL	B-Gene_or_gene_product
 6	O
 vs	O
 .	O
-
 control	O
 75	O
 +	O
@@ -52933,7 +52769,6 @@ recovered	O
 a	O
 0	O
 .	O
-
 2	O
 -	O
 kb	O
@@ -53864,7 +53699,6 @@ p	O
 =	O
 0	O
 .	O
-
 002	O
 )	O
 ,	O
@@ -53891,7 +53725,6 @@ less	O
 than	O
 0	O
 .	O
-
 05	O
 )	O
 .	O
@@ -54832,10 +54665,8 @@ processing	O
 (	O
 i	O
 .	O
-
 e	O
 .	O
-
 ,	O
 tunicamycin	B-Simple_chemical
 ,	O
