@@ -44,8 +44,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |                            |           |                      |
-| BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487** ( -MISC: 92.930 PER: 96.898)               |           |    
-|  BioBERT-HeadToken                        |                 |        |                  |           | |
+| BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487** (-MISC: 92.930 PER: 96.898)|         |            |
 | BioBERT-POS-Tag                          | 85.900                      |                |                            |           |                      |
 | BioBERT-DEP-Tag                          | 85.799                      |                |                            |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
@@ -55,7 +54,6 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM*           | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
 | BioBERT-Pattern1LSTM                     | 85.385                      |                |                            |           |                      |
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
