@@ -523,9 +523,14 @@ class NerDataCollator:
             entry.append(torch.tensor(labels_mod + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)
 
-        if self.args.gold_span_inp:
+        if self.args.gold_span_inp == "simple":
             none_index = NerDataset.parse_tag_vocab(self.args.tag_vocab_path).index(self.args.none_tag)
             batch["gold_span_inp"] = ((batch["labels"] != none_index) & (batch["labels"] != -100)).float()
+
+        elif self.args.gold_span_inp == "label":
+            none_index = NerDataset.parse_tag_vocab(self.args.tag_vocab_path).index(self.args.none_tag)
+            batch["gold_span_inp"] = torch.where(batch["labels"] != -100, batch["labels"],
+                                                 torch.full(batch["labels"].shape, none_index, dtype=torch.int64))
 
         return batch
 

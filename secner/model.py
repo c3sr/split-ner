@@ -41,8 +41,10 @@ class NerModel(BertPreTrainedModel):
                 self.additional_args.punctuation_handling)
             classifier_inp_dim += self.punctuation_vocab_size
 
-        if self.additional_args.gold_span_inp:
+        if self.additional_args.gold_span_inp == "simple":
             classifier_inp_dim += 1
+        elif self.additional_args.gold_span_inp == "label":
+            classifier_inp_dim += self.num_labels
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             self.char_cnn = CharCNN(additional_args, "char")
@@ -134,8 +136,12 @@ class NerModel(BertPreTrainedModel):
             dep_tag_vec = torch.eye(self.num_dep_tags)[dep_tag].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, dep_tag_vec], dim=2)
 
-        if self.additional_args.gold_span_inp:
+        if self.additional_args.gold_span_inp == "simple":
             sequence_output = torch.cat([sequence_output, gold_span_inp.unsqueeze(-1)], dim=2)
+
+        elif self.additional_args.gold_span_inp == "label":
+            span_vec = torch.eye(self.num_labels)[gold_span_inp].to(sequence_output.device)
+            sequence_output = torch.cat([sequence_output, span_vec], dim=2)
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             char_vec = self.char_cnn(char_ids)
