@@ -4,11 +4,10 @@ from collections import defaultdict
 
 import torch
 from dataclasses import dataclass
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser, AutoTokenizer
-
 from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser, AutoTokenizer
 
 
 class NerDataset(Dataset):
@@ -19,8 +18,7 @@ class NerDataset(Dataset):
         self.corpus_type = corpus_type
         self.corpus_path = self.set_corpus_path()
 
-        self.tag_vocab = []
-        self.parse_tag_vocab()
+        self.tag_vocab = NerDataset.parse_tag_vocab(self.args.tag_vocab_path)
         self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag,
                                                             self.args.use_pos_tag)
         self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
@@ -43,12 +41,15 @@ class NerDataset(Dataset):
             return self.args.test_path
         return None
 
-    def parse_tag_vocab(self):
-        with open(self.args.tag_vocab_path, "r") as f:
+    @staticmethod
+    def parse_tag_vocab(vocab_path):
+        tag_vocab = []
+        with open(vocab_path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
-                    self.tag_vocab.append(line)
+                    tag_vocab.append(line)
+        return tag_vocab
 
     @staticmethod
     def parse_aux_tag_vocab(vocab_path, none_tag, do_task=True):
@@ -521,6 +522,10 @@ class NerDataCollator:
             pad_len = max_len - len(labels_mod)
             entry.append(torch.tensor(labels_mod + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)
+
+        if self.args.gold_span_inp:
+            none_index = NerDataset.parse_tag_vocab(self.args.tag_vocab_path).index(self.args.none_tag)
+            batch["gold_span_inp"] = ((batch["labels"] != none_index) & (batch["labels"] != -100)).float()
 
         return batch
 

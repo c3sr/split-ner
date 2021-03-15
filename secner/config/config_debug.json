@@ -42,6 +42,7 @@
   "use_head_mask": false,
   "use_pos_tag": false,
   "use_dep_tag": false,
+  "gold_span_inp": true,
   "filter_tags": null,
   "split_tags": false,
   "query_type": "question",

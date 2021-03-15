@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
-from transformers import BertConfig
-from transformers.models.bert import BertModel, BertPreTrainedModel
-
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
 from secner.dataset import NerDataset
 from secner.flair_cnn import FlairCNN
 from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
+from transformers import BertConfig
+from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModel(BertPreTrainedModel):
@@ -41,6 +40,9 @@ class NerModel(BertPreTrainedModel):
             self.punctuation_vocab_size = NerDataset.get_punctuation_vocab_size(
                 self.additional_args.punctuation_handling)
             classifier_inp_dim += self.punctuation_vocab_size
+
+        if self.additional_args.gold_span_inp:
+            classifier_inp_dim += 1
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             self.char_cnn = CharCNN(additional_args, "char")
@@ -93,6 +95,7 @@ class NerModel(BertPreTrainedModel):
             flair_attention_mask=None,
             flair_boundary=None,
             punctuation_vec=None,
+            gold_span_inp=None,
             word_type_ids=None,
             pos_tag=None,
             dep_tag=None,
@@ -130,6 +133,9 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.use_dep_tag:
             dep_tag_vec = torch.eye(self.num_dep_tags)[dep_tag].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, dep_tag_vec], dim=2)
+
+        if self.additional_args.gold_span_inp:
+            sequence_output = torch.cat([sequence_output, gold_span_inp.unsqueeze(-1)], dim=2)
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
             char_vec = self.char_cnn(char_ids)
