@@ -39,6 +39,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
+| BioBERT-WithKnownSpans*                  | 85.387                      |                |                            |           |                      |
+| BioBERT-WithKnownSpansAndLabels*         | 85.960                      |                |                            |           |                      |
 | SciBERT                                  | **86.092**                  | 74.68          |                            |           |                      |
 | SciBERT-PairedSentence                   | 85.606**                    |                |                            |           |                      |
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
