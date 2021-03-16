@@ -45,6 +45,7 @@
   "gold_span_inp": "none",
   "filter_tags": null,
   "split_tags": false,
+  "use_main_lstm": false,
   "query_type": "question",
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",

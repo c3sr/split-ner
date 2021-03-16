@@ -22,6 +22,7 @@ class NerModel(BertPreTrainedModel):
         self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
                                                                self.additional_args.use_dep_tag))
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
+        dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
@@ -55,7 +56,6 @@ class NerModel(BertPreTrainedModel):
             classifier_inp_dim += self.flair_cnn.out_dim
 
         if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
-            dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
             self.pattern_cnn = CharCNN(additional_args, "pattern")
             self.pattern_lstm = nn.LSTM(input_size=self.pattern_cnn.char_out_dim,
                                         hidden_size=self.additional_args.lstm_hidden_dim,
@@ -73,6 +73,15 @@ class NerModel(BertPreTrainedModel):
                                      padding=2,
                                      padding_mode="circular")
             classifier_inp_dim *= self.additional_args.end_cnn_channels // 2
+
+        if self.additional_args.use_main_lstm:
+            self.main_lstm = nn.LSTM(input_size=classifier_inp_dim,
+                                     hidden_size=self.additional_args.lstm_hidden_dim,
+                                     bidirectional=True,
+                                     batch_first=True,
+                                     num_layers=self.additional_args.lstm_num_layers,
+                                     dropout=dropout_prob)
+            classifier_inp_dim = 2 * self.additional_args.lstm_hidden_dim
 
         self.classifier = nn.Linear(classifier_inp_dim, self.num_labels)
 
@@ -169,6 +178,18 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.use_end_cnn:
             sequence_output = self.end_cnn(sequence_output.unsqueeze(1))
             sequence_output = sequence_output.permute(0, 2, 1, 3).reshape(batch_size, seq_len, -1)
+
+        if self.additional_args.use_main_lstm:
+            lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
+            packed_inp = nn.utils.rnn.pack_padded_sequence(input=sequence_output,
+                                                           lengths=lengths,
+                                                           batch_first=True,
+                                                           enforce_sorted=False)
+            self.main_lstm.flatten_parameters()
+            packed_out, _ = self.main_lstm(packed_inp)
+            sequence_output, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out,
+                                                                  batch_first=True,
+                                                                  total_length=seq_len)
 
         sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
