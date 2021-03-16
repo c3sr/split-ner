@@ -39,6 +39,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
+| BioBERT-WithKnownSpans*                  | 85.387                      |                |                            |           |                      |
+| BioBERT-WithKnownSpansAndLabels*         | 85.960                      |                |                            |           |                      |
 | SciBERT                                  | **86.092**                  | 74.68          |                            |           |                      |
 | SciBERT-PairedSentence                   | 85.606**                    |                |                            |           |                      |
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
@@ -110,6 +112,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
+| BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
 | BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
 | BioBERT-QA4-CharCNN1-Highway             | 88.2282                | 84.7406                | 86.4492                |
