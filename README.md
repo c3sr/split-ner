@@ -150,7 +150,7 @@ Precision, Recall distribution for some good performing models to understand whe
 
 ### Pre-Clustering
 
-Experimented with clustering mentions for high-resource entities to handle diversity issues. Accouringly, divided **Gene_or_gene_product** into 4 sub-classes and trained a model. Finally in the test set, the resultant labels in the 4 sub-classes were remaped to the parent class and precision/recall were measured. For training, we used the QA setup and worked with only 3 output classes (Gene_or_gene_product, Simple_chemical, Cancer). However, this approach is not found to give improvements over the original setup.
+Experimented with clustering mentions for high-resource entities to handle diversity issues. Accordingly, divided **Gene_or_gene_product** into 4 sub-classes and trained a model. Finally in the test set, the resultant labels in the 4 sub-classes were remaped to the parent class and precision/recall were measured. For training, we used the QA setup and worked with only 3 output classes (Gene_or_gene_product, Simple_chemical, Cancer). However, this approach is not found to give improvements over the original setup.
 
 | BioNLP13CG (QA model) Without Clustering | Precision              | Recall                 | F1                     |
 |------------------------------------------|------------------------|------------------------|------------------------|
@@ -168,6 +168,36 @@ Experimented with clustering mentions for high-resource entities to handle diver
 
 ### New Considerations
 
-1. BioNLP13CG dataset has nested entities (around 1%) which should be considered.
-2. BioNLP13CG dataset has paragraphical texts. Considering this might give more information to the model and facilitate NER.
-3. Paragrapical structure can help identify key phrases which can help in boundary detection issues.
+1. BioNLP13CG dataset has nested entities (around 1%) which should be considered. (**update:** our QA model gets almost equal performance)
+2. BioNLP13CG dataset has paragraphical texts. Considering this might give more information to the model and facilitate NER. (**update:** naive implementation did not help. Can implement setup described in [this paper](https://arxiv.org/pdf/2006.01563v2.pdf).
+3. Paragrapical structure can help identify key phrases which can help in boundary detection issues. (**update:** in next section)
+
+### Span Guidance Analysis (Basically, any concatenated guidance analysis)
+
+| Model                                    | Precision (Test)       | Recall (Test)          | Micro F1 (Test)        | Micro F1 (BERT subtext level)                       |
+|------------------------------------------|------------------------|------------------------|------------------------|-----------------------------------------------------|
+| BioBERT-Freeze          (LR:0.005)       | 75.5802                | 75.2507                | 75.4151                | (Train: 84.412, Dev: 71.059, Test: 70.921) (140 ep) |
+| BioBERT-Freeze-GoldSpan (LR:0.005)       | 79.1092                | 79.2472                | 79.1782                | (Train: 87.207, Dev: 76.710, Test: 75.686) (20 ep)  |
+| BioBERT-GoldSpan        (LR:1e-5)        | 86.2155                | 85.3510                | 85.7811                | (Train: 99.958, Dev: 85.647, Test: 85.387) (300 ep) |
+
+**Important Note:**
+Ideally speaking, there is 4% (absolute) improvement with GoldSpan info. It should have shown in some form (to some slight extent at least) when trained with BioBERT, but it did not. Infact as seen below, even full gold-label info given in the input is not utilized properly when trained with BioBERT using contatenation with one-hot gold vectors.
+
+#### Training Concerns
+
+We hypothesise that very low learning rate (1e-5) is not optimal for non-BERT params. So, overall, the BERT params get fine-tuned but the additional information given is not being learnt and utilized to its full potential.
+
+**Experiment**: On giving actual true labels as one-hot embeddings to the model
+
+| Model                                                     | Micro F1                    |
+|-----------------------------------------------------------|-----------------------------|
+| BioBERT-WithKnownSpansAndLabels (LR:1e-5)                 | 85.960 (Test)(**Striking!**)|
+| BioBERT-Freeze-WithKnownSpansAndLabels (LR:1e-5)          | 54.502 (Dev)  (after 150 ep)|
+| BioBERT-Freeze-WithKnownSpansAndLabels (LR:0.005)         | 100.000 (Test)              |
+
+Also tried **fragmented training**, by training for first 15 epochs with BERT params frozen (LR: 0.005) and then fine-tuning complete thing (LR: 1e-5). But the second step gave 0.00 score consecutively for several epochs upon initiation of step 2, hence stopped.
+
+Also tried high LR (0.01 and 0.001) training with BioBERT-GoldSpan (results for LR: 1e-5 in tables above), but for high LR it consistently gave 0.00 F1 for several epochs and hence, stopped.
+
+**Question:**
+Transformer training seems to be very sensitive to learning rate! We can't select a high LR, and low LR may not be able to train the remaining supporting parameters to train well. So, how to we strike a balance? Or, how else can we feed in additional guidance input to BERT-based transformer models?
