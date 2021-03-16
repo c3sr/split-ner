@@ -40,7 +40,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
 | BioBERT-Freeze* (LR:0.005)               | 70.921 (ep:140)             |                |                            |           |                      |
-| BioBERT-Freeze-MainLSTM* (LR:0.001)      | running                     |                |                            |           |                      |
+| BioBERT-Freeze-MainLSTM* (LR:0.001)      | 81.435                      |                |                            |           |                      |
 | BioBERT-WithKnownSpans*                  | 85.387                      |                |                            |           |                      |
 | BioBERT-WithKnownSpansAndLabels*         | 85.960                      |                |                            |           |                      |
 | SciBERT                                  | **86.092**                  | 74.68          |                            |           |                      |
@@ -67,7 +67,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-FlairLSTM-Pattern1LSTM           | 85.570                      |                |                            |           |                      |
 | BioBERT-FlairLSTM-Pattern2LSTM           | 85.323                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
-| BioBERT-Freeze-Punctuation* (LR:0.001)   | running                     |                |                            |           |                      |
+| BioBERT-Freeze-Punctuation* (LR:0.001)   | 81.698                      |                |                            |           |                      |
 | BioBERT-Punctuation-LongContext300       | 85.532                      |                |                            |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
 | BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
