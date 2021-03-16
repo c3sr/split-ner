@@ -183,7 +183,7 @@ Experimented with clustering mentions for high-resource entities to handle diver
 **Important Note:**
 Ideally speaking, there is 4% (absolute) improvement with GoldSpan info. It should have shown in some form (to some slight extent at least) when trained with BioBERT, but it did not. Infact as seen below, even full gold-label info given in the input is not utilized properly when trained with BioBERT using contatenation with one-hot gold vectors.
 
-#### Training Concerns
+### Training Concerns
 
 We hypothesise that very low learning rate (1e-5) is not optimal for non-BERT params. So, overall, the BERT params get fine-tuned but the additional information given is not being learnt and utilized to its full potential.
 
