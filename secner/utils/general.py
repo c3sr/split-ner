@@ -58,6 +58,12 @@ class Sentence:
     def to_tsv_form(self):
         return "\n".join([token.to_tsv_form() for token in self.tokens])
 
+    def __str__(self):
+        return self.tokens.__str__()
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class PairSpan:
     def __init__(self, start, end):
