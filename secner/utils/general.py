@@ -169,3 +169,30 @@ def _parse_data_and_add_to_vocab(dataset_name, corpus_type, dep_vocab, pos_vocab
                 s = line.split("\t")
                 pos_vocab.add(s[1])
                 dep_vocab.add(s[2])
+
+
+def remove_punct_rows_from_dataset(data_path):
+    # read
+    data = []
+    with open(data_path, "r", encoding="utf-8") as f:
+        sent = []
+        for line in f:
+            line = line.strip()
+            if line:
+                sent.append(line.split("\t"))
+            else:
+                data.append(sent)
+                sent = []
+        if len(sent) > 0:
+            data.append(sent)
+
+    # filter
+    for sent in data:
+        sent[:] = [line for line in sent if line[0] not in list("-()/")]
+
+    # write
+    with open(data_path, "w", encoding="utf-8") as f:
+        for sent in data:
+            for line in sent:
+                f.write("\t".join(line) + "\n")
+            f.write("\n")
