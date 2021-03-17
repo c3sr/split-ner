@@ -80,7 +80,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
-| BioBERT-Freeze-QA4-MainLSTM* (LR:0.001)  | running                     |                |                            |           |                      |
+| BioBERT-Freeze-QA4-MainLSTM* (LR:0.001)  | 80.290                      |                |                            |           |                      |
 | BioBERT-QA4-Nested*                      | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
 | BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
@@ -206,4 +206,5 @@ Also tried high LR (0.01 and 0.001) training with BioBERT-GoldSpan (results for 
 **Question:**
 Transformer training seems to be very sensitive to learning rate! We can't select a high LR, and low LR may not be able to train the remaining supporting parameters to train well. So, how to we strike a balance? Or, how else can we feed in additional guidance input to BERT-based transformer models?
 
-**Current**: Running QA/Normal models with BiLSTM as the main LM (with frozen BioBERT embeddings) (+Punctuation guidance) to see how well it performs and whether additional guidance vectors are utilized well. Also it seems, from training time perspective LSTM is **almost similar** to BERT (but has 2M params vs 102M in BERT).
+#### Notes
+1. Running QA/Normal models with BiLSTM as the main LM (with frozen BioBERT embeddings) (+Punctuation guidance) to see how well it performs and whether additional guidance vectors are utilized well. Also it seems, from training time perspective LSTM is **almost similar** to BERT (but has 2M params vs 102M in BERT).
