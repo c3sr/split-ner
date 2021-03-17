@@ -1,9 +1,9 @@
 {
-  "model_name": "ner-biobert-freeze-mainlstm",
+  "model_name": "ner-biobert-freeze-mainlstm-punct",
   "dataset_dir": "bio",
   "num_labels": 33,
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "20010",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
