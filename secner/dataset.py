@@ -118,7 +118,13 @@ class NerDataset(Dataset):
 
     def parse_dataset(self):
         for index in range(len(self.sentences)):
-            self.process_sentence(index)
+            try:
+                self.process_sentence(index)
+            except Exception as e:
+                logger.error("exception: {0}".format(e))
+                logger.error("error index: {0}".format(index))
+                logger.error("error sent:\n{0}".format("\n".join([str(tok) for tok in self.sentences[index].tokens])))
+                raise e
 
     @staticmethod
     def read_dataset(file_path, args: AdditionalArguments):
