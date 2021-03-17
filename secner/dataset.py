@@ -1,4 +1,5 @@
 import argparse
+import logging
 import re
 from collections import defaultdict
 
@@ -8,6 +9,8 @@ from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+logger = logging.getLogger(__name__)
 
 
 class NerDataset(Dataset):
@@ -135,6 +138,8 @@ class NerDataset(Dataset):
                     sentences.append(Sentence(tokens))
                     tokens = []
                     offset = 0
+        if len(tokens) > 0:
+            sentences.append(Sentence(tokens))
         if args.debug_mode:
             sentences = sentences[:10]
         return sentences
@@ -166,7 +171,7 @@ class NerDataset(Dataset):
             return NerDataset.make_pattern_type1(text)
         if pattern_type == "2":
             return NerDataset.make_pattern_type2(text)
-        return NotImplementedError
+        raise NotImplementedError
 
     @staticmethod
     def make_pattern_type0(text):
@@ -352,7 +357,7 @@ class NerDataset(Dataset):
                 # catch all other punctuations (P)
                 return len(punctuation_vocab)
             return 0  # non-punctuation (O)
-        return NotImplementedError
+        raise NotImplementedError
 
     @staticmethod
     def get_char_vocab():
@@ -384,7 +389,7 @@ class NerDataset(Dataset):
         if pattern_type == "2":
             vocab += list("uld")
             return vocab
-        return NotImplementedError
+        raise NotImplementedError
 
     @staticmethod
     def get_word_type_vocab():
