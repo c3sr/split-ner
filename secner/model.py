@@ -83,6 +83,10 @@ class NerModel(BertPreTrainedModel):
                                      dropout=dropout_prob)
             classifier_inp_dim = 2 * self.additional_args.lstm_hidden_dim
 
+        if self.additional_args.second_classifier_hidden_sz > 0:
+            self.hidden_classifier = nn.Linear(classifier_inp_dim, self.additional_args.second_classifier_hidden_sz)
+            classifier_inp_dim = self.additional_args.second_classifier_hidden_sz
+
         self.classifier = nn.Linear(classifier_inp_dim, self.num_labels)
 
         self.init_weights()
@@ -192,6 +196,11 @@ class NerModel(BertPreTrainedModel):
                                                                   total_length=seq_len)
 
         sequence_output = self.dropout(sequence_output)
+
+        if self.additional_args.second_classifier_hidden_sz > 0:
+            sequence_output = self.hidden_classifier(sequence_output)
+            sequence_output = self.dropout(sequence_output)
+
         logits = self.classifier(sequence_output)
 
         predictions = torch.argmax(logits, dim=2)

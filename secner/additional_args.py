@@ -29,15 +29,15 @@ class AdditionalArguments:
     none_tag: str = field(default="O", metadata={"help": "symbol for NONE tag"})
 
     max_seq_len: int = field(default=128, metadata={"help": "maximum sequence length"})
-    punctuation_handling: str = field(default="none", metadata={"help": "add one-hot entry to represent if token is "
-                                                                        "punct (none|type1|type2|type1-and)"})
+    punctuation_handling: str = field(default="none", metadata=
+    {"help": "add one-hot entry to represent if token is punct (none|type1|type2|type1-and)"})
     word_type_handling: str = field(default="none", metadata={"help": "add word type (token lower/digit)(none|1hot)"})
     base_model: str = field(default="bert-base-uncased", metadata={"help": "base pretrained model for training"})
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char)"})
     loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|ce_punct|dice)"})
-    use_char_cnn: str = field(default="none", metadata={"help": "use char CNN "
-                                                                "(none|char|pattern|flair|both|both-flair)"})
+    use_char_cnn: str = field(default="none", metadata=
+    {"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
     token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
     pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1)"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
@@ -51,6 +51,8 @@ class AdditionalArguments:
     cnn_kernel_size: int = field(default=5, metadata={"help": "char CNN kernel size"})
     end_cnn_channels: int = field(default=8, metadata={"help": "end CNN output channels"})
     cnn_dropout_rate: float = field(default=0.3, metadata={"help": "char CNN dropout rate"})
+    second_classifier_hidden_sz: int = field(default=0, metadata=
+    {"help": "use 2nd classifier layer with supplied hidden size (use 0 for no second layer)"})
     use_head_mask: bool = field(default=False, metadata={"help": "use only head sub-token's output from BERT"})
     data_pos_dep: bool = field(default=True, metadata={"help": "dataset has labeled POS/DEP tags"})
     use_pos_tag: bool = field(default=False, metadata={"help": "use 1-hot POS tag vectors for tokens"})

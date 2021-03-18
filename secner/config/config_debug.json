@@ -39,6 +39,7 @@
   "end_cnn_channels": 8,
   "lstm_hidden_dim": 256,
   "lstm_num_layers": 1,
+  "second_classifier_hidden_sz": 0,
   "use_head_mask": false,
   "use_pos_tag": false,
   "use_dep_tag": false,
