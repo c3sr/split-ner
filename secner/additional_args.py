@@ -43,7 +43,9 @@ class AdditionalArguments:
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})
     use_pattern: str = field(default="none", metadata={"help": "use patterns over actual mentions (none|only|both)"})
-    query_type: str = field(default="question", metadata={"help": "query type for entities fed in QA model"})
+    query_type: str = field(default="question", metadata=
+    {"help": "query type for entities fed in QA model (question|question2)"})
+    detect_spans: bool = field(default=False, metadata={"help": "in QA mode with this set, we detect only spans"})
     char_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_num_layers: int = field(default=1, metadata={"help": "pattern LSTM: no. of layers"})
