@@ -3,9 +3,8 @@ import os
 import re
 
 import spacy
-from spacy.tokens import Doc
-
 from secner.utils.general import Token, Sentence
+from spacy.tokens import Doc
 
 nlp = spacy.load("en_core_sci_sm")
 tokenizer_map = dict()
@@ -168,7 +167,8 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="BioNLP13CG corpus parser")
-    ap.add_argument("--path", type=str, default="../../data/bio_nested", help="raw data path")
+    ap.add_argument("--inp_path", type=str, default="../../data/bio_context", help="raw data path")
+    ap.add_argument("--out_path", type=str, default="../../data/bio_nested", help="raw data path")
     ap.add_argument("--type", type=str, default="nested", help="Type of data parsing/sample creation (nested|context)")
     ap = ap.parse_args()
     main(ap)
