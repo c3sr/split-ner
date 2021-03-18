@@ -3,6 +3,7 @@ import logging
 import os
 import random
 from pathlib import Path
+from shutil import copyfile
 from typing import Tuple
 
 import dataclasses
@@ -172,7 +173,13 @@ def _parse_data_and_add_to_vocab(dataset_name, corpus_type, dep_vocab, pos_vocab
 
 
 def remove_punct_rows_from_dataset(data_path):
-    # read
+    data = read_data(data_path)
+    for sent in data:
+        sent[:] = [line for line in sent if line[0] not in list("-()/")]
+    write_data(data, data_path)
+
+
+def read_data(data_path):
     data = []
     with open(data_path, "r", encoding="utf-8") as f:
         sent = []
@@ -185,14 +192,33 @@ def remove_punct_rows_from_dataset(data_path):
                 sent = []
         if len(sent) > 0:
             data.append(sent)
+    return data
 
-    # filter
-    for sent in data:
-        sent[:] = [line for line in sent if line[0] not in list("-()/")]
 
-    # write
+def write_data(data, data_path):
     with open(data_path, "w", encoding="utf-8") as f:
         for sent in data:
             for line in sent:
                 f.write("\t".join(line) + "\n")
             f.write("\n")
+
+
+def make_shorter_dataset(inp_path, shrink_factor=0.2):
+    out_path = "{0}_{1}".format(inp_path, int(shrink_factor * 100))
+    os.makedirs(out_path, exist_ok=True)
+    make_shorter_dataset_util(os.path.join(inp_path, "train.tsv"), os.path.join(out_path, "train.tsv"), shrink_factor)
+    make_shorter_dataset_util(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"), shrink_factor)
+    make_shorter_dataset_util(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"), shrink_factor)
+    copyfile(os.path.join(inp_path, "tag_vocab.txt"), os.path.join(out_path, "tag_vocab.txt"))
+    copyfile(os.path.join(inp_path, "tag_names.txt"), os.path.join(out_path, "tag_names.txt"))
+    copyfile(os.path.join(inp_path, "pos_tag_vocab.txt"), os.path.join(out_path, "pos_tag_vocab.txt"))
+    copyfile(os.path.join(inp_path, "dep_tag_vocab.txt"), os.path.join(out_path, "dep_tag_vocab.txt"))
+
+
+def make_shorter_dataset_util(inp_data_path, out_data_path, shrink_factor):
+    set_all_seeds(42)
+    data = read_data(inp_data_path)
+    n = len(data)
+    vec = np.random.choice(np.arange(n), int(shrink_factor * n), replace=False)
+    new_data = [data[k] for k in vec]
+    write_data(new_data, out_data_path)
