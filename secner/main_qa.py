@@ -89,8 +89,13 @@ class NerQAExecutor:
             text_sentence = " ".join([tok.text for tok in context.sentence.tokens])
             prediction = model_predictions[i]
             if text_sentence not in data_dict:
-                # considering only the first gold tag associated with the token
-                data_dict[text_sentence] = [[tok.text, tok.tags[0], pad_tag] for tok in context.sentence.tokens]
+                entry = []
+                for tok in context.sentence.tokens:
+                    # considering only the first gold tag associated with the token
+                    # gold_tag = "ENTITY" if self.additional_args.detect_spans else tok.tags[0]
+                    gold_tag = tok.tags[0]
+                    entry.append([tok.text, gold_tag, pad_tag])
+                data_dict[text_sentence] = entry
             ptr = 0
             r = min(prediction.shape[0], len(context.bert_tokens))
             for j in range(r):

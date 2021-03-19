@@ -17,6 +17,8 @@ class AdditionalArguments:
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
+    infer_path: str = field(default=None, metadata=
+    {"help": "set to predictions file of span detector in predict mode, relative to predictions dir"})
     train_path: str = field(default="train.tsv", metadata={"help": "train file path relative to data root"})
     dev_path: str = field(default="dev.tsv", metadata={"help": "dev file path relative to data root"})
     test_path: str = field(default="test.tsv", metadata={"help": "test file path relative to data root"})
@@ -72,6 +74,9 @@ class AdditionalArguments:
             self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
         self.wandb_dir = self.run_root
         self.predictions_dir = os.path.join(self.run_root, "predictions")
+
+        if self.infer_path:
+            self.infer_path = os.path.join(self.predictions_dir, self.infer_path)
 
         self.abs_dataset_dir = os.path.join(self.data_root, self.dataset_dir)
         self.train_path = os.path.join(self.abs_dataset_dir, self.train_path)

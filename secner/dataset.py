@@ -5,10 +5,11 @@ from collections import defaultdict
 
 import torch
 from dataclasses import dataclass
-from secner.additional_args import AdditionalArguments
-from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+from secner.additional_args import AdditionalArguments
+from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 
 logger = logging.getLogger(__name__)
 
@@ -118,13 +119,7 @@ class NerDataset(Dataset):
 
     def parse_dataset(self):
         for index in range(len(self.sentences)):
-            try:
-                self.process_sentence(index)
-            except Exception as e:
-                logger.error("exception: {0}".format(e))
-                logger.error("error index: {0}".format(index))
-                logger.error("error sent:\n{0}".format("\n".join([str(tok) for tok in self.sentences[index].tokens])))
-                raise e
+            self.process_sentence(index)
 
     @staticmethod
     def read_dataset(file_path, args: AdditionalArguments):

@@ -79,11 +79,12 @@ class PairSpan:
 
 
 class Context:
-    def __init__(self, sentence=None, entity=None, entity_text=None, bert_tokens=None):
+    def __init__(self, sentence=None, entity=None, entity_text=None, bert_tokens=None, mention_span: PairSpan = None):
         self.sentence = sentence
         self.entity = entity
         self.entity_text = entity_text
         self.bert_tokens = bert_tokens
+        self.mention_span = mention_span
 
 
 def set_all_seeds(seed=42):
