@@ -2,12 +2,13 @@ import argparse
 import re
 
 import spacy
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
 from spacy.tokens.doc import Doc
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
+
+from secner.additional_args import AdditionalArguments
+from secner.dataset import NerDataset
+from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context
 
 
 class NerQADataset(Dataset):
@@ -31,8 +32,8 @@ class NerQADataset(Dataset):
 
         self.contexts = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
-        self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
-            self.tokenizer, self.args.none_tag)
+        self.bert_start_token, self.bert_first_sep_token, self.bert_second_sep_token = \
+            NerDataset.get_bert_special_tokens(self.tokenizer, self.args.none_tag)
         self.tokenizer_cache = dict()
         self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
         self.filter_tags()
@@ -228,10 +229,10 @@ class NerQADataset(Dataset):
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)
         bert_tokens.extend(bert_helper_sent_tokens)
-        bert_tokens.append(self.bert_mid_sep_token)
+        bert_tokens.append(self.bert_first_sep_token)
         bert_tokens.extend(bert_sent_tokens)
         bert_tokens = bert_tokens[:self.args.max_seq_len - 1]
-        bert_tokens.append(self.bert_end_token)
+        bert_tokens.append(self.bert_second_sep_token)
         return Context(sentence, tag, tag_text, bert_tokens)
 
     def prep_context_span(self, sentence):
@@ -291,10 +292,10 @@ class NerQADataset(Dataset):
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)
-        bert_tokens.append(self.bert_mid_sep_token)
+        bert_tokens.append(self.bert_first_sep_token)
         bert_tokens.extend(bert_sent_tokens)
         bert_tokens = bert_tokens[:self.args.max_seq_len - 1]
-        bert_tokens.append(self.bert_end_token)
+        bert_tokens.append(self.bert_second_sep_token)
         return Context(sentence, "ENTITY", tag_text, bert_tokens)
 
     def process_sentence(self, sentence):

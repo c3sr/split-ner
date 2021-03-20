@@ -29,8 +29,8 @@ class NerDataset(Dataset):
                                                             self.args.use_dep_tag)
 
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
-        self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
-            self.tokenizer, self.args.none_tag)
+        self.bert_start_token, self.bert_first_sep_token, self.bert_second_sep_token = \
+            NerDataset.get_bert_special_tokens(self.tokenizer, self.args.none_tag)
         self.sentences = NerDataset.read_dataset(self.corpus_path, self.args)
         self.filter_tags()
         self.split_tags()
@@ -272,24 +272,24 @@ class NerDataset(Dataset):
 
     @staticmethod
     def get_bert_special_tokens(tokenizer, none_tag):
-        start_id, end_id = tokenizer.encode("")
-        start_text, end_text = tokenizer.decode([start_id, end_id]).split()
+        start_text, start_id = tokenizer.cls_token, tokenizer.cls_token_id
+        sep_text, sep_id = tokenizer.sep_token, tokenizer.sep_token_id
         start_token = BertToken(bert_id=start_id,
                                 sub_text=start_text,
                                 token_type=0,
                                 token=Token(start_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                                 is_head=True)
-        mid_sep_token = BertToken(bert_id=end_id,
-                                  sub_text=end_text,
-                                  token_type=0,
-                                  token=Token(end_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
-                                  is_head=True)
-        end_token = BertToken(bert_id=end_id,
-                              sub_text=end_text,
-                              token_type=1,
-                              token=Token(end_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
-                              is_head=True)
-        return start_token, mid_sep_token, end_token
+        first_sep_token = BertToken(bert_id=sep_id,
+                                    sub_text=sep_text,
+                                    token_type=0,
+                                    token=Token(sep_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                                    is_head=True)
+        second_sep_token = BertToken(bert_id=sep_id,
+                                     sub_text=sep_text,
+                                     token_type=1,
+                                     token=Token(sep_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
+                                     is_head=True)
+        return start_token, first_sep_token, second_sep_token
 
     def process_sentence(self, index):
         sentence = self.sentences[index]
@@ -312,7 +312,7 @@ class NerDataset(Dataset):
                 sub_text = token.text[tup[0]:tup[1]]
                 sentence.bert_tokens.append(BertToken(out["input_ids"][i], sub_text, 0, bert_token, is_head=(i == 0)))
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
-        sentence.bert_tokens.append(self.bert_end_token)
+        sentence.bert_tokens.append(self.bert_first_sep_token)
 
     @staticmethod
     def get_char_ids(batch_text, max_len, vocab):
@@ -402,6 +402,9 @@ class NerDataset(Dataset):
 class NerDataCollator:
     args: AdditionalArguments
 
+    def __post_init__(self):
+        self.tokenizer = AutoTokenizer.from_pretrained(self.args.base_model, use_fast=True)
+
     def __call__(self, features):
         # post-padding
         max_len = max(len(entry["labels"]) for entry in features)
@@ -413,7 +416,7 @@ class NerDataCollator:
             entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["input_ids"])
-                entry.append(torch.tensor(features[i]["input_ids"] + [0] * pad_len))
+                entry.append(torch.tensor(features[i]["input_ids"] + [self.tokenizer.pad_token_id] * pad_len))
             batch["input_ids"] = torch.stack(entry)
 
         # attention_mask
@@ -429,7 +432,7 @@ class NerDataCollator:
             entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["token_type_ids"])
-                entry.append(torch.tensor(features[i]["token_type_ids"] + [0] * pad_len))
+                entry.append(torch.tensor(features[i]["token_type_ids"] + [self.tokenizer.pad_token_type_id] * pad_len))
             batch["token_type_ids"] = torch.stack(entry)
 
         # char_ids

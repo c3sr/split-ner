@@ -25,8 +25,8 @@ class NerSpanDataset(Dataset):
 
         self.contexts = []
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
-        self.bert_start_token, self.bert_mid_sep_token, self.bert_end_token = NerDataset.get_bert_special_tokens(
-            self.tokenizer, self.args.none_tag)
+        self.bert_start_token, self.bert_first_sep_token, self.bert_second_sep_token = \
+            NerDataset.get_bert_special_tokens(self.tokenizer, self.args.none_tag)
         self.tokenizer_cache = dict()
         self.sentences = []
         self.parse_dataset()
@@ -111,10 +111,10 @@ class NerSpanDataset(Dataset):
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_sent_tokens)
-        bert_tokens.append(self.bert_mid_sep_token)
+        bert_tokens.append(self.bert_first_sep_token)
         bert_tokens = bert_tokens[:self.args.max_seq_len - len(bert_query_tokens) - 1]
         bert_tokens.extend(bert_query_tokens)
-        bert_tokens.append(self.bert_end_token)
+        bert_tokens.append(self.bert_second_sep_token)
         return Context(sentence, None, None, bert_tokens, mention_span)
 
     def process_sentence(self, sentence):

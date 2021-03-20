@@ -15,6 +15,7 @@ from secner.model import NerModel
 from secner.model_bidaf import NerModelBiDAF
 from secner.model_char import NerModelChar
 from secner.model_crf import NerModelWithCrf
+from secner.model_roberta import NerRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -139,6 +140,8 @@ class NerExecutor:
     def get_model_class(self):
         if self.additional_args.model_mode == "std":
             return NerModel
+        if self.additional_args.model_mode == "roberta_std":
+            return NerRobertaModel
         if self.additional_args.model_mode == "crf":
             return NerModelWithCrf
         if self.additional_args.model_mode == "bidaf":
