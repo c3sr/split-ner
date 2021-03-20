@@ -245,7 +245,10 @@ class NerDataset(Dataset):
     def __getitem__(self, index):
         sentence = self.sentences[index]
         bert_token_ids = [tok.bert_id for tok in sentence.bert_tokens]
-        bert_token_type_ids = [tok.token_type for tok in sentence.bert_tokens]
+        if self.args.model_mode == "roberta_std":
+            bert_token_type_ids = [self.tokenizer.pad_token_type_id for _ in sentence.bert_tokens]
+        else:
+            bert_token_type_ids = [tok.token_type for tok in sentence.bert_tokens]
         bert_head_mask = [tok.is_head for tok in sentence.bert_tokens]
         bert_token_text = [tok.token.text for tok in sentence.bert_tokens]
         bert_sub_token_text = [tok.sub_text for tok in sentence.bert_tokens]

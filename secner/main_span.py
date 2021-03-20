@@ -38,7 +38,8 @@ class NerSpanExecutor:
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model
         bert_config = AutoConfig.from_pretrained(model_path, num_labels=self.num_labels)
 
-        self.model = NerSpanModel.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
+        model_class = self.get_model_class()
+        self.model = model_class.from_pretrained(model_path, config=bert_config, additional_args=additional_args)
 
         trainable_params = filter(lambda p: p.requires_grad, self.model.parameters())
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
@@ -95,6 +96,13 @@ class NerSpanExecutor:
                 del data_dict[text_sentence]
 
         return data
+
+    def get_model_class(self):
+        if self.additional_args.model_mode == "std":
+            return NerSpanModel
+        # TODO: Need to create a separate class with RoBERTa base class for spans, if required
+        # if self.additional_args.model_mode == "roberta_std":
+        raise NotImplementedError
 
     def run(self):
         if self.train_args.do_train:

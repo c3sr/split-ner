@@ -62,7 +62,10 @@ class NerSpanDataset(Dataset):
     def __getitem__(self, index):
         context = self.contexts[index]
         bert_token_ids = [tok.bert_id for tok in context.bert_tokens]
-        bert_token_type_ids = [tok.token_type for tok in context.bert_tokens]
+        if self.args.model_mode == "roberta_std":
+            bert_token_type_ids = [self.tokenizer.pad_token_type_id for _ in context.bert_tokens]
+        else:
+            bert_token_type_ids = [tok.token_type for tok in context.bert_tokens]
         # TODO: Needs to be handled if working with nested entities
         tag = context.sentence.tokens[context.mention_span.start].tags[0][2:]
         bert_tag_id = self.tag_vocab.index(tag) if tag in self.tag_vocab else -100
@@ -112,6 +115,8 @@ class NerSpanDataset(Dataset):
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_sent_tokens)
         bert_tokens.append(self.bert_first_sep_token)
+        if self.args.model_mode == "roberta_std":
+            bert_tokens.append(self.bert_first_sep_token)
         bert_tokens = bert_tokens[:self.args.max_seq_len - len(bert_query_tokens) - 1]
         bert_tokens.extend(bert_query_tokens)
         bert_tokens.append(self.bert_second_sep_token)
