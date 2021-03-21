@@ -38,7 +38,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
-| RoBERTa-Base*                            | -                           |                |  running                   |           |                      |
+| RoBERTa-Base*                            | -                           |                |  90.728                    |           |                      |
 | BioBERT*                                 | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier*                | 85.681                      |                |                            |           |                      |
 | BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             |                |                            |           |                      |
