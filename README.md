@@ -128,11 +128,21 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 1. Part 1 QA: What is the entity mentioned in the text ? <Sentence> . Training: Every span converted to B/I/E-Entity span and train 4-class QA model. Training data size does not hence increase at all.
 2. Part 2 QA: <Sentence> . What is <mention span> ? Training: Gold spans are taken and all data is converted to this format. One training sample for each span in gold dataset. **Note**: We don't currently train the span classifier on **imperfect spans** but that can be added as well.
 
+# BioNLP13CG
+
 | Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
 |-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
 | Span Detector   | 89.808                                                  | 90.6365                   | 89.6091                   | 90.1198                    |
 | Span Classifier | 94.056                                                  | 94.0561                   | 94.0561                   | 94.0561                    |
 | Pipeline        | 93.465 (for span class. on gen. output from span det.)  | 86.3296                   | 85.4627                   | 85.8940                    |
+
+#### CoNLL
+
+| Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
+|-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
+| Span Detector   | 94.991                                                  | 95.3300                   | 95.1376                   | 95.2337                    |
+| Span Classifier |                                                         |                           |                           |                            |
+| Pipeline        |                                                         |                           |                           |                            |
 
 #### Motivation
 The core idea is BERT model finetuning with additional external cues concatenated as vectors or parallel CNN/LSTM's are possibly not getting trained well. So, why not use another BERT model itself and fine-tune it on some other desired sub-task to get that additional information learnt well (which we would have otherwise learnt from punctuation vec or CNN/LSTM).
