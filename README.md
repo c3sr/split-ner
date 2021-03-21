@@ -214,6 +214,27 @@ Precision, Recall distribution for some good performing models to understand whe
 | Tag: Developing_anatomical_structure | P: 90.0000 | R: 52.9412 | F1: 66.6667 |
 | Tag: Anatomical_system | P: 50.0000 | R: 5.8824 | F1: 10.5263 |
 
+#### BioBERT-QA4 (Span Pipeline)
+
+| Overall | P: 86.3296 | R: 85.4627 | Micro F1: 85.8940 |
+|---------|------------|------------|-------------------|
+| Tag: Cancer | P: 87.5403 | R: 88.2035 | F1: 87.8706 |
+| Tag: Simple_chemical | P: 87.6006 | R: 75.1381 | F1: 80.8922 |
+| Tag: Gene_or_gene_product | P: 88.8633 | R: 91.8983 | F1: 90.3553 |
+| Tag: Organ | P: 73.5294 | R: 80.1282 | F1: 76.6871 |
+| Tag: Organism | P: 88.8224 | R: 86.2403 | F1: 87.5123 |
+| Tag: Multi-tissue_structure | P: 81.8182 | R: 74.5033 | F1: 77.9896 |
+| Tag: Cell | P: 90.4330 | R: 88.6476 | F1: 89.5314 |
+| Tag: Cellular_component | P: 80.1020 | R: 87.2222 | F1: 83.5106 |
+| Tag: Organism_substance | P: 93.1818 | R: 80.3922 | F1: 86.3158 |
+| Tag: Tissue | P: 56.4706 | R: 78.2609 | F1: 65.6036 |
+| Tag: Anatomical_system | P: 66.6667 | R: 23.5294 | F1: 34.7826 |
+| Tag: Immaterial_anatomical_entity | P: 62.0690 | R: 58.0645 | F1: 60.0000 |
+| Tag: Organism_subdivision | P: 65.7143 | R: 58.9744 | F1: 62.1622 |
+| Tag: Pathological_formation | P: 78.1250 | R: 56.8182 | F1: 65.7895 |
+| Tag: Amino_acid | P: 84.0000 | R: 33.8710 | F1: 48.2759 |
+| Tag: Developing_anatomical_structure | P: 80.0000 | R: 50.0000 | F1: 61.5385 |
+
 ### Pre-Clustering
 
 Experimented with clustering mentions for high-resource entities to handle diversity issues. Accordingly, divided **Gene_or_gene_product** into 4 sub-classes and trained a model. Finally in the test set, the resultant labels in the 4 sub-classes were remaped to the parent class and precision/recall were measured. For training, we used the QA setup and worked with only 3 output classes (Gene_or_gene_product, Simple_chemical, Cancer). However, this approach is not found to give improvements over the original setup.
