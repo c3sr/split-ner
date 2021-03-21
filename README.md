@@ -38,11 +38,11 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
-| BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           |                      |
-| BioBERT-Freeze* (LR:0.005)               | 70.921 (ep:140)             |                |                            |           |                      |
-| BioBERT-Freeze-MainLSTM* (LR:0.001)      | 81.435                      |                |                            |           |                      |
-| BioBERT-WithKnownSpans*                  | 85.387                      |                |                            |           |                      |
-| BioBERT-WithKnownSpansAndLabels*         | 85.960                      |                |                            |           |                      |
+| BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
+| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             |                |                            |           |                      |
+| BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
+| BioBERT-WithKnownSpans                   | 85.387                      |                |                            |           |                      |
+| BioBERT-WithKnownSpansAndLabels          | 85.960                      |                |                            |           |                      |
 | SciBERT                                  | **86.092**                  | 74.68          |                            |           |                      |
 | SciBERT-PairedSentence                   | 85.606**                    |                |                            |           |                      |
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
@@ -101,6 +101,20 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 For CoNLL, OntoNotes: BERT, BioBERT, SciBERT -> all correspond to general English BERT model
 Note: DiceLoss and PunctLoss helped improve a lot on DEV set but did not improve on the TEST set
 ```
+
+## Analysis of Error Cases
+1. Boundary Detection: 
+   a. Puntuation Symbols: Semantics is not well captured by pretrained BERT models, causing undesired breakage in detected entities (tried Punctuation vector to handle)
+   b. Modifier prefix/suffix: adjectives which add to the entity are not detected by the model. Potentially this could be because of lack of similar cases in training set (needs to be checked) (tried adding POS/DEP vecs to handle this but did not help)
+3. Out of Vocabulary Terms (tried pattern/char CNN to handle)
+
+Since, punctuation symbols cause issues, tried removing punctuations from test set and directly testing a model (trained with punctuation symbols) and also separated trained a new model on non-punctuation data. Both the models did not perform as well as the original setting (with punctuations)
+
+| Model Scenario                             | Test Micro-F1       |
+|--------------------------------------------|---------------------|
+| BioBERT-PunctDataTrained-PunctDataEval     | 86.0055             | 
+| BioBERT-PunctDataTrained-NoPunctDataEval   | 80.0209             |
+| BioBERT-NoPunctDataTrained-NoPunctDataEval | 80.6674             |
 
 ## Precision / Recall Analysis
 Precision, Recall distribution for some good performing models to understand where we can still improve upon. The values are calculated from predictions file created for the test set. Becase of the different between BERT-based tokenization and actual sentence tokenization, the results for models are not same as in the table above, but they correspond to the same model.
