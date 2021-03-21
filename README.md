@@ -110,7 +110,7 @@ Note: DiceLoss and PunctLoss helped improve a lot on DEV set but did not improve
 1. Boundary Detection: 
    a. Puntuation Symbols: Semantics is not well captured by pretrained BERT models, causing undesired breakage in detected entities (tried Punctuation vector to handle)
    b. Modifier prefix/suffix: adjectives which add to the entity are not detected by the model. Potentially this could be because of lack of similar cases in training set (needs to be checked) (tried adding POS/DEP vecs to handle this but did not help)
-3. Out of Vocabulary Terms (tried pattern/char CNN to handle)
+2. Out of Vocabulary Terms (tried pattern/char CNN to handle)
 
 Since, punctuation symbols cause issues, tried removing punctuations from test set and directly testing a model (trained with punctuation symbols) and also separated trained a new model on non-punctuation data. Both the models did not perform as well as the original setting (with punctuations)
 
@@ -121,6 +121,23 @@ Since, punctuation symbols cause issues, tried removing punctuations from test s
 | BioBERT-NoPunctDataTrained-NoPunctDataEval | 80.6674             |
 
 ** There has been a recent small bug fix in ```token_type_id``` setting which may have made the results slightly better than previous reported value of ```85.9910```.
+
+## Span Detection and Classification Perspective
+Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pipelined approach in which we (1) first detect spans using QA model then, (2) classify identified spans into ```K``` output classes (tags) again using QA model. Every detected span is classified into some tag (without ```B/I``` and no ```NONE``` tag).
+
+1. Part 1 QA: What is the entity mentioned in the text ? <Sentence> . Training: Every span converted to B/I/E-Entity span and train 4-class QA model. Training data size does not hence increase at all.
+2. Part 2 QA: <Sentence> . What is <mention span> ? Training: Gold spans are taken and all data is converted to this format. One training sample for each span in gold dataset. **Note**: We don't currently train the span classifier on **imperfect spans** but that can be added as well.
+
+| Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
+|-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
+| Span Detector   | 89.808                                                  | 90.6365                   | 89.6091                   | 90.1198                    |
+| Span Classifier | 94.056                                                  | 94.0561                   | 94.0561                   | 94.0561                    |
+| Pipeline        | 93.465 (for span class. on gen. output from span det.)  | 86.3296                   | 85.4627                   | 85.8940                    |
+
+#### Motivation
+The core idea is BERT model finetuning with additional external cues concatenated as vectors or parallel CNN/LSTM's are possibly not getting trained well. So, why not use another BERT model itself and fine-tune it on some other desired sub-task to get that additional information learnt well (which we would have otherwise learnt from punctuation vec or CNN/LSTM).
+
+The easiest way to break the problem into sub-problems is this span pipeline. Also note that in QA model, a single BERT model is rich enough to not just detect spans but classify them with high precision. Lower recall could be due to model's representative limitations. So, make the task easier. Train the model for only span detection task. The diversity of spans will be more now but the model should potentially be able to learn well. Then train another separate model for span classification. So, overall advantage is, we have more parameters and tweeking power for the overall NER task but downside is that approach is pipelined. So, error propagates across the stages of the pipeline.
 
 ## Precision / Recall Analysis
 Precision, Recall distribution for some good performing models to understand where we can still improve upon. The values are calculated from predictions file created for the test set. Becase of the different between BERT-based tokenization and actual sentence tokenization, the results for models are not same as in the table above, but they correspond to the same model.
@@ -154,6 +171,8 @@ Precision, Recall distribution for some good performing models to understand whe
 
 ### Class-Wise Analysis
 
+#### BioBERT-Punctuation model (Best Sequence Tagging Model)
+
 | Model | Count | Precision | Recall | Micro F1 |
 |-------|-------|-----------|--------|----------|
 | Overall | - | 87.6171 | 85.6562 | 86.6255 |
@@ -173,6 +192,27 @@ Precision, Recall distribution for some good performing models to understand whe
 | Pathological_formation | 88 | 60.2564 | 53.4091 | 56.6265 |
 | Developing_anatomical_structure | 17 | 44.4444 | 47.0588 | 45.7143 |
 | Anatomical_system | 17 | 50.0000 | 5.8824 | 10.5263 |
+
+#### BioBERT-QA4-QuestionType2(Where) model (Best QA Model)
+
+| Overall | P: 89.2091 | R: 84.5807 | Micro F1: 86.8333 |
+| --------|------------|------------|-------------------|
+| Tag: Cancer | P: 91.9101 | R: 88.5281 | F1: 90.1874 |
+| Tag: Simple_chemical | P: 87.6190 | R: 75.9285 | F1: 81.3559 |
+| Tag: Gene_or_gene_product | P: 89.7887 | R: 91.0714 | F1: 90.4255 |
+| Tag: Organ | P: 82.4818 | R: 72.4359 | F1: 77.1331 |
+| Tag: Organism | P: 90.9836 | R: 85.7143 | F1: 88.2704 |
+| Tag: Multi-tissue_structure | P: 85.0980 | R: 71.6172 | F1: 77.7778 |
+| Tag: Cell | P: 93.3679 | R: 88.9437 | F1: 91.1021 |
+| Tag: Cellular_component | P: 90.8537 | R: 82.7778 | F1: 86.6279 |
+| Tag: Organism_substance | P: 97.4026 | R: 73.5294 | F1: 83.7989 |
+| Tag: Tissue | P: 67.4757 | R: 75.5435 | F1: 71.2820 |
+| Tag: Amino_acid | P: 82.1429 | R: 37.0968 | F1: 51.1111 |
+| Tag: Immaterial_anatomical_entity | P: 72.4138 | R: 67.7419 | F1: 70.0000 |
+| Tag: Organism_subdivision | P: 69.2308 | R: 46.1538 | F1: 55.3846 |
+| Tag: Pathological_formation | P: 73.7705 | R: 51.1364 | F1: 60.4027 |
+| Tag: Developing_anatomical_structure | P: 90.0000 | R: 52.9412 | F1: 66.6667 |
+| Tag: Anatomical_system | P: 50.0000 | R: 5.8824 | F1: 10.5263 |
 
 ### Pre-Clustering
 
@@ -205,6 +245,7 @@ Experimented with clustering mentions for high-resource entities to handle diver
 | BioBERT-Freeze          (LR:0.005)       | 75.5802                | 75.2507                | 75.4151                | (Train: 84.412, Dev: 71.059, Test: 70.921) (140 ep) |
 | BioBERT-Freeze-GoldSpan (LR:0.005)       | 79.1092                | 79.2472                | 79.1782                | (Train: 87.207, Dev: 76.710, Test: 75.686) (20 ep)  |
 | BioBERT-GoldSpan        (LR:1e-5)        | 86.2155                | 85.3510                | 85.7811                | (Train: 99.958, Dev: 85.647, Test: 85.387) (300 ep) |
+| BioBERT-GoldSpan (LR:0.001 and 0.01)     | 0.0                    | 0.0                    | 0.0                    | -                                                   |
 
 **Important Note:**
 Ideally speaking, there is 4% (absolute) improvement with GoldSpan info. It should have shown in some form (to some slight extent at least) when trained with BioBERT, but it did not. Infact as seen below, even full gold-label info given in the input is not utilized properly when trained with BioBERT using contatenation with one-hot gold vectors.
@@ -224,6 +265,8 @@ We hypothesise that very low learning rate (1e-5) is not optimal for non-BERT pa
 Also tried **fragmented training**, by training for first 15 epochs with BERT params frozen (LR: 0.005) and then fine-tuning complete thing (LR: 1e-5). But the second step gave 0.00 score consecutively for several epochs upon initiation of step 2, hence stopped.
 
 Also tried high LR (0.01 and 0.001) training with BioBERT-GoldSpan (results for LR: 1e-5 in tables above), but for high LR it consistently gave 0.00 F1 for several epochs and hence, stopped.
+
+**Interpretation of ```0.0``` in evaluation F1**: Typical case is that every token in the dataset is being tagged with the same tag (generally, something like ```I-Pathological_formation```. So, the span detector never detects any span and all gold spans are marked as unidentified. So, precision and recall are both calculated as ```0.0```.
 
 **Question:**
 Transformer training seems to be very sensitive to learning rate! We can't select a high LR, and low LR may not be able to train the remaining supporting parameters to train well. So, how to we strike a balance? Or, how else can we feed in additional guidance input to BERT-based transformer models?
