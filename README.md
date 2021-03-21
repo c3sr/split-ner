@@ -38,9 +38,13 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
-| BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
+| RoBERTa-Base*                            | -                           |                |  running                   |           |                      |
+| BioBERT*                                 | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
+| BioBERT-2LayerClassifier*                | 85.681                      |                |                            |           |                      |
 | BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             |                |                            |           |                      |
 | BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
+| BioBERT-Freeze-Punctuation (LR:0.001)    | 81.698                      |                |                            |           |                      |
+| BioBERT-Freeze-QA4-MainLSTM (LR:0.001)   | 80.290                      |                |                            |           |                      |
 | BioBERT-WithKnownSpans                   | 85.387                      |                |                            |           |                      |
 | BioBERT-WithKnownSpansAndLabels          | 85.960                      |                |                            |           |                      |
 | SciBERT                                  | **86.092**                  | 74.68          |                            |           |                      |
@@ -63,11 +67,10 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CharCNN7-Pattern0LSTM            | 85.773                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM2           | 85.777                      |                |                            |           |                      |
 | BioBERT-CharCNN9-Pattern0LSTM            | 85.857                      |                |                            |           |                      |
-| BioBERT-FlairLSTM*                       | 85.626                      |                |                            |           |                      |
+| BioBERT-FlairLSTM                        | 85.626                      |                |                            |           |                      |
 | BioBERT-FlairLSTM-Pattern1LSTM           | 85.570                      |                |                            |           |                      |
 | BioBERT-FlairLSTM-Pattern2LSTM           | 85.323                      |                |                            |           |                      |
 | BioBERT-Punctuation                      | **86.348**                  | 73.844         |  91.263                    |           |                      |
-| BioBERT-Freeze-Punctuation* (LR:0.001)   | 81.698                      |                |                            |           |                      |
 | BioBERT-Punctuation-LongContext300       | 85.532                      |                |                            |           |                      |
 | BioBERT-Punctuation-Warmup               | 85.839                      |                |                            |           |                      |
 | BioBERT-PunctuationExtended              | **86.037**                  |                |  90.657                    |           |                      |
@@ -80,8 +83,9 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
-| BioBERT-Freeze-QA4-MainLSTM* (LR:0.001)  | 80.290                      |                |                            |           |                      |
-| BioBERT-QA4-Nested*                      | 85.855                      |                |                            |           |                      |
+| BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  |                |                            |           |                      |
+| RoBERTa-QA4                              | -                           |                |  running                   |           |                      |
+| BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
 | BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
 | BioBERT-QA4-Dice                         | 75.323**                    | 73.232**       |                            |           |                      |
@@ -112,9 +116,11 @@ Since, punctuation symbols cause issues, tried removing punctuations from test s
 
 | Model Scenario                             | Test Micro-F1       |
 |--------------------------------------------|---------------------|
-| BioBERT-PunctDataTrained-PunctDataEval     | 86.0055             | 
+| BioBERT-PunctDataTrained-PunctDataEval     | 86.0055**           | 
 | BioBERT-PunctDataTrained-NoPunctDataEval   | 80.0209             |
 | BioBERT-NoPunctDataTrained-NoPunctDataEval | 80.6674             |
+
+** There has been a recent small bug fix in ```token_type_id``` setting which may have made the results slightly better than previous reported value of ```85.9910```.
 
 ## Precision / Recall Analysis
 Precision, Recall distribution for some good performing models to understand where we can still improve upon. The values are calculated from predictions file created for the test set. Becase of the different between BERT-based tokenization and actual sentence tokenization, the results for models are not same as in the table above, but they correspond to the same model.
@@ -125,11 +131,12 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 86.1666                | 85.8160                | 85.9910                |
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
-| BioBERT-PunctuationExtended              | 86.1328                | 86.7461                | 86.4383                |
+| BioBERT-PunctuationExtended              | 86.1328                | **86.7461**            | 86.4383                |
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
+| BioBERT-QA4-QuestionType2(Where)         | **89.2091**            | 84.5807                | **86.8333**            |
 | BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
 | BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
@@ -143,6 +150,7 @@ Precision, Recall distribution for some good performing models to understand whe
 6. In normal training, WordType and CharCNN+Pattern, increased both precision and recall.
 7. In QA, Punctuation reduced precision (and increased recall).
 8. WordType gave the highest recall in the normal case till now.
+9. Simply changing the question from ```What``` to ```Where``` is the ```protein``` located in the text leads to performance improvement!
 
 ### Class-Wise Analysis
 
