@@ -84,7 +84,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  |                |                            |           |                      |
-| RoBERTa-QA4                              | -                           |                |  running                   |           |                      |
+| RoBERTa-QA4                              | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
 | BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
