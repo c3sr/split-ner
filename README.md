@@ -83,7 +83,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
-| BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  | running        |  91.358                    |           |                      |
+| BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  | 74.083(running)|  91.358                    |           |                      |
 | RoBERTa-QA4*                             | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
@@ -148,9 +148,9 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 
 | Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
 |-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
-| Span Detector   | running                                                 |                           |                           |                            |
+| Span Detector   | 77.753                                                  | 74.7685                   | 82.2835                   | 78.3462                    |
 | Span Classifier | next                                                    |                           |                           |                            |
-| Pipeline        |         (for span class. on gen. output from span det.) |                           |                           |                            |
+| Pipeline        | next    (for span class. on gen. output from span det.) |                           |                           |                            |
 
 #### Motivation
 The core idea is BERT model finetuning with additional external cues concatenated as vectors or parallel CNN/LSTM's are possibly not getting trained well. So, why not use another BERT model itself and fine-tune it on some other desired sub-task to get that additional information learnt well (which we would have otherwise learnt from punctuation vec or CNN/LSTM).
