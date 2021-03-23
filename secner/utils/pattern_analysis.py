@@ -18,7 +18,7 @@ def mine_patterns(data_spans, tag):
 
 def intrinsic_patterns(args):
     default_additional_args = AdditionalArguments()
-    data = NerDataset.read_dataset("../data/{0}/{1}.tsv".format(args.corpus, args.file), default_additional_args)
+    data = NerDataset.read_dataset("../../data/{0}/{1}.tsv".format(args.corpus, args.file), default_additional_args)
     term_dict = dict()
     for sent in data:
         for tok in sent.tokens:
@@ -42,7 +42,7 @@ def intrinsic_patterns(args):
 
 def extrinsic_patterns(args):
     default_additional_args = AdditionalArguments()
-    data = NerDataset.read_dataset("../data/{0}/{1}.tsv".format(args.corpus, args.file), default_additional_args)
+    data = NerDataset.read_dataset("../../data/{0}/{1}.tsv".format(args.corpus, args.file), default_additional_args)
     new_data = []
     for sent in data:
         new_tokens = []

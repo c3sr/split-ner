@@ -10,12 +10,13 @@ import torch
 from numpy.random import default_rng
 from pyclustering.cluster.kmedoids import kmedoids
 from scipy.spatial import distance
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import setup_logging, parse_config, set_all_seeds, PairSpan
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from transformers import HfArgumentParser, AutoModel
+
+from secner.additional_args import AdditionalArguments
+from secner.dataset import NerDataset
+from secner.utils.general import setup_logging, parse_config, set_all_seeds, PairSpan
 
 rng = default_rng(seed=42)
 
@@ -58,7 +59,7 @@ def remap(args, dataset, tag, corpus_type, vecs):
                 curr = sent.tokens[sent.bert_tokens[i].token.offset]
                 curr.tag = curr.tag[:2] + tag + str(k)
 
-    with open("../data/bio_cluster/{0}.tsv".format(corpus_type), "w") as f:
+    with open("../../data/bio_cluster/{0}.tsv".format(corpus_type), "w") as f:
         for sent in dataset.sentences:
             for tok in sent.tokens:
                 f.write("{0}\t{1}\t{2}\t{3}\n".format(tok.text, tok.pos_tag, tok.dep_tag, tok.tag))
@@ -79,8 +80,8 @@ def tsne_plot(args, mentions, tag, corpus_type):
     tsne_output = TSNE(n_components=2).fit_transform(pca_output)
     plot_data = {"pca": pca_output, "x": tsne_output[:, 0], "y": tsne_output[:, 1], "group": labels, "vec": vec}
 
-    os.makedirs("../out/cluster", exist_ok=True)
-    with open("../out/cluster/{0}_{1}_{2}".format(args.dataset_dir, tag, corpus_type), "wb") as handle:
+    os.makedirs("../../out/cluster", exist_ok=True)
+    with open("../../out/cluster/{0}_{1}_{2}".format(args.dataset_dir, tag, corpus_type), "wb") as handle:
         pickle.dump(plot_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     print("saved")
 
@@ -96,7 +97,7 @@ def plot_scatter(plot_data, args, tag, corpus_type):
                     ax=ax)
     for i in range(plot_data["x"].shape[0]):
         plt.text(plot_data["x"][i], plot_data["y"][i], plot_data["group"][i], fontsize=9, alpha=0.8)
-    plt.savefig("../out/cluster/{0}_{1}_{2}.png".format(args.dataset_dir, tag, corpus_type), dpi=500)
+    plt.savefig("../../out/cluster/{0}_{1}_{2}.png".format(args.dataset_dir, tag, corpus_type), dpi=500)
     plt.show()
 
 
@@ -111,7 +112,7 @@ def get_spans(sentence):
 
 
 def cluster(args, tag, corpus_type, approach):
-    with open("../out/cluster/{0}_{1}_{2}".format(args.dataset_dir, tag, corpus_type), "rb") as handle:
+    with open("../../out/cluster/{0}_{1}_{2}".format(args.dataset_dir, tag, corpus_type), "rb") as handle:
         plot_data = pickle.load(handle)
 
     K = len(plot_data["group"])
@@ -182,6 +183,6 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Mention Embedding Runner")
-    ap.add_argument("--config", default="config/config_debug.json", help="config json file")
+    ap.add_argument("--config", default="../config/config_debug.json", help="config json file")
     ap = ap.parse_args()
     main(ap)

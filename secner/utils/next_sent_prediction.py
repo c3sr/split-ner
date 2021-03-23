@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 class PreviousSentenceSelector:
     def __init__(self, args):
         self.args = args
-        self.train_path = os.path.join("..", "data", args.input_dataset, "train.tsv")
-        self.dataset_path = os.path.join("..", "data", args.input_dataset, args.file)
-        self.output_dataset_path = os.path.join("..", "data", args.output_dataset, args.file)
+        self.train_path = os.path.join("..", "..", "data", args.input_dataset, "train.tsv")
+        self.dataset_path = os.path.join("..", "..", "data", args.input_dataset, args.file)
+        self.output_dataset_path = os.path.join("..", "..", "data", args.output_dataset, args.file)
         training_sentences = NerDataset.read_dataset(self.train_path, self.args)
         self.candidates = [Sentence([Token(text=token.text,
                                            tags=[args.none_tag],
