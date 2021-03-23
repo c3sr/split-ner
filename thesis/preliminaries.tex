@@ -1,0 +1,65 @@
+\section{Nature of Entities}
+Language dynamics and style of writing vary across domains and so does the nature of informing entities in corresponding sentences. Some characteristics of entities include:
+
+\begin{itemize}
+    \item \textbf{Multi-word vs single-word}. Common approach to handle such cases is using \texttt{BIO}, \texttt{BIOE} tagging schemes to learn entity boundaries.
+    
+    \item \textbf{Alpha-numeric vs alphabetic words vs abbreviations}. Some entities like \textit{passport number}, \textit{telephone number} etc. have semantics captured through intrinsic alpha-numeric patterns. \textit{Locations}, \textit{person name} etc. and abbreviation have some common terms or external gazetteers or surrounding words capturing their semantics.
+    
+    \item \textbf{Broad vs narrow spectrum}. Some entity classes may be broad with many diverse examples and intricacies, while others may be specific and have a narrow spectrum which is simpler to capture.
+    
+    \item \textbf{Nested entities}. Related to diversity, it may be possible that some specific entities are a sub-class of a more general entity. In other words, there may be a hierarchy/taxonomy of entities to consider. For example, \textit{U.S. Embassy in India} is a \texttt{Facility} where \textit{U.S.} and \textit{India} are \texttt{Locations}. Such examples can be found in biomedical domain in GENIA corpus\cite{} and news article domain in ACE-2004\cite{} and ACE-2005\cite{} corpora. \cite{finkel2009nested} align sentences into a tree-structure with entities for handling this and \cite{li2019unified} extract each entity separately by querying a sentence multiple times in a question-answering framework.
+    
+    \item \textbf{High vs low-resource}. Depending on importance to the underlying use-case and domain, not all labeled entities may have an equable representation in the data. Some may have more examples (\textit{high-resource entities}) while others may have only a few (\textit{low-resource entities}). 
+    
+\end{itemize}
+
+Based on the above factors, our goal is to develop an approach for named entity recognition that is domain-agnostic and which does not develop biases towards commonly seen entities and learns a meaningful representation for low-resource entities as well. Hence, we conduct our experiments on multiple datasets as detailed below. 
+
+\section{Datasets}
+
+Table \ref{tab:datasets_summary} gives a summary of the datasets and nature of entities they posses. For each dataset we work with standard \texttt{Train}/\texttt{Dev}/\texttt{Test} splits as used by previous studies.
+
+\begin{table}[h!]
+	\begin{tabular}{|c|c|c|p{5em}|p{6em}|c|}\hline
+	\textbf{Dataset} & \textbf{Source} & \textbf{\#Entities} & \textbf{Alpha-numerics} & \textbf{High/Low Resource} & \textbf{Structure}\\\hline
+	\texttt{CoNLL 2003} & News & 4 & No & High & Flat\\\hline
+	\texttt{OntoNotes 5.0} & News & 18 & Yes & High \& Low & Flat\\\hline
+	\texttt{BIONLP13CG} & Biomedical & 16 & Yes & High \& Low & Nested\\\hline
+	\texttt{JNLPBA} & Biomedical & 4 & Yes & High & Flat\\\hline
+	\end{tabular}
+	\caption{Datasets Summary}
+	\label{tab:datasets_summary}
+\end{table}
+
+\subsection{CoNLL 2003 Dataset}
+
+The \texttt{CoNLL 2003}\cite{sang2003introduction} corpus is a collection of news wire articles from the Reuters corpus and has been manually annotated with 4 classes, \texttt{PER} (Person), \texttt{ORG} (Organization), \texttt{LOC} (Location) and \texttt{MISC} (Miscellaneous) entities which do not belong to the other 3 classes. We obtain the dataset from \texttt{datasets}\footnote{https://huggingface.co/datasets/conll2003} package. The \texttt{MISC} class can be considered more diverse than the other 3 classes. Alphanumeric entity tokens only constitute \texttt{0.054\%} of all entity tokens and hence all named entities are predominantly non-alphanumeric. The entities are flatly labelled i.e do not have overlaps or nesting structure. As per Table \ref{tab:conll_entity_distribution}, none of the entities are low-resource. Average sentence length is \texttt{14.53} tokens. Table \ref{tab:conll_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} split. 
+
+\begin{table}[h!]
+\begin{subtable}[t]{.48\linewidth}
+\centering
+\begin{tabular}{|c|c|}\hline
+	\textbf{Entity} & \textbf{Count}\\\hline
+	\texttt{PER} & 10059\\\hline
+	\texttt{ORG} & 9323\\\hline
+	\texttt{LOC} & 10645\\\hline
+	\texttt{MISC} & 5062\\\hline
+	\end{tabular}
+	\caption{Entity Distribution}
+	\label{tab:conll_entity_distribution}
+% }
+\end{subtable}
+\begin{subtable}[t]{.48\linewidth}
+\centering
+\begin{tabular}{|c|c|}\hline
+	\textbf{Split} & \textbf{\# Sentences}\\\hline
+	\texttt{Train} & 14041\\\hline
+	\texttt{Dev} & 3250\\\hline
+	\texttt{Test} & 3453\\\hline
+	\end{tabular}
+	\caption{Data Split}
+	\label{tab:conll_dataset_split}
+\end{subtable}
+\caption{CoNLL 2003 Dataset Stats}
+\end{table}
