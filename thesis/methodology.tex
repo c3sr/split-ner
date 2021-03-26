@@ -1,0 +1,26 @@
+Concretely, in named entity recognition (NER), we are given an unlabeled raw text and the goal is to identify certain entities (sequence of tokens) of interest. In this study, we approach this task using machine learning in supervised learning setting. The idea is, we are given a set of labeled sentences with the required entities marked. We feed those samples to a machine learning system to learn from it. The system is then evaluated on a manually labeled test set and relevant evaluation metrics are reported. In this chapter, we will look at various ways of approaching NER along with detailed ablation studies and variants. Simultaneously, we compare our results with existing published state-of-the-art approaches on multiple datasets.
+
+\section{Sequence Labeling}
+Traditionally, the most intuitive way of approaching named entity recognition is as a sequence labeling task. An input sentence can be considered as a sequence of \texttt{n} tokens, fed to a neural network model. For each token, the model classifies it into an output class as per \texttt{BIO} tagging scheme. As the model backbone, we use \texttt{CNN-LSTM-CRF} and \texttt{BERT} architectures as described below.
+
+\begin{itemize}
+    \item \texttt{CNN-LSTM-CRF}: As proposed in \cite{ma2016end}, this is a popular NER model. The character-level CNN helps capture the intrinsic patterns and word-level semantics of individual tokens. These character-level embeddings are concatenated with word embeddings and fed to bidirectional LSTM\cite{} which helps capture the sentence grammar and token inter-dependencies. Finally, the CRF models the output tag sequence and makes sure that abrupt and unexpected tag transitions do not take place. 
+    
+    \item \texttt{BERT}: Proposed in \cite{devlin2018bert}, BERT is a bidirectional encoder implemented using the \texttt{transformer} architecture \cite{}. The input is a sentence, which is broken down into sub-words/sub-tokens. Multi-head attention and several layers of encoders are able to capture long-term relationships among tokens and semantics well. Finally, the model outputs contextualized embeddings for each sub-token in the sentence. Then we have a simple fully-connected layer followed by Softmax to classify each token into an output class. The model is optimized using cross-entropy loss.
+\end{itemize}
+
+\subsection{Experiment Details}
+As our BERT model for English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert#download} model which is specifially pretrained on biomedical data.
+
+
+For \texttt{CNN-LSTM-CRF} framework, as word embeddings we use the contextual embeddings from BERT/BioBERT model but freeze the BERT architecture for training. So, the trainable model still remains a core \texttt{CNN-LSTM-CRF}. We take the mean of sub-token embeddings from BERT to get the embedding for the token.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|}\hline
+	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
+	\texttt{CNN-LSTM-CRF} & 85\% & 74\%, 95.0\% \\\hine
+	\end{tabular}
+	\label{tab:res_seq_tagging}
+    \caption{Sequence Labeling Results}
+\end{table}
