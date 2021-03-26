@@ -83,7 +83,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |                            |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
-| BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  | running        |  91.358                    |           |                      |
+| BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  | 74.330         |  91.358                    |           |                      |
 | RoBERTa-QA4*                             | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
@@ -128,7 +128,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 1. Part 1 QA: What is the entity mentioned in the text ? <Sentence> . Training: Every span converted to B/I/E-Entity span and train 4-class QA model. Training data size does not hence increase at all.
 2. Part 2 QA: <Sentence> . What is <mention span> ? Training: Gold spans are taken and all data is converted to this format. One training sample for each span in gold dataset. **Note**: We don't currently train the span classifier on **imperfect spans** but that can be added as well.
 
-# BioNLP13CG
+#### BioNLP13CG
 
 | Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
 |-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
@@ -148,9 +148,9 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 
 | Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
 |-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
-| Span Detector   | running                                                 |                           |                           |                            |
+| Span Detector   | 77.753                                                  | 74.7685                   | 82.2835                   | 78.3462                    |
 | Span Classifier | next                                                    |                           |                           |                            |
-| Pipeline        |         (for span class. on gen. output from span det.) |                           |                           |                            |
+| Pipeline        | next    (for span class. on gen. output from span det.) |                           |                           |                            |
 
 #### Motivation
 The core idea is BERT model finetuning with additional external cues concatenated as vectors or parallel CNN/LSTM's are possibly not getting trained well. So, why not use another BERT model itself and fine-tune it on some other desired sub-task to get that additional information learnt well (which we would have otherwise learnt from punctuation vec or CNN/LSTM).
@@ -160,7 +160,7 @@ The easiest way to break the problem into sub-problems is this span pipeline. Al
 ## Precision / Recall Analysis
 Precision, Recall distribution for some good performing models to understand where we can still improve upon. The values are calculated from predictions file created for the test set. Becase of the different between BERT-based tokenization and actual sentence tokenization, the results for models are not same as in the table above, but they correspond to the same model.
 
-### BioNLP13CG Corpus
+#### BioNLP13CG Corpus
 
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
@@ -176,6 +176,29 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
 | BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
 | BioBERT-QA4-CharCNN1-Highway             | 88.2282                | 84.7406                | 86.4492                |
+
+#### CoNLL 2003 Corpus
+
+| Model                                    | Precision              | Recall                 | Micro F1               |
+|------------------------------------------|------------------------|------------------------|------------------------|
+| BERT                                     | 91.2352                | 91.4777                | 91.3563                |
+| BERT-Head                                | 91.6741                | 91.3005                | 91.4869                |
+| BERT-Punctuation                         | 91.7480                | 91.6017                | 91.6748                |
+| BERT-Punctuation-Head                    | 91.6888                | 91.6726                | 91.6807                |
+| BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
+| BERT-QA4                                 | 91.5402                | 90.8006                | 91.1689                |
+| BERT-QA4-QuestionType2(Where)            | **92.4651**            | 91.1927                | **91.8245**            |
+
+#### JNLPBA Corpus
+
+| Model                                    | Precision              | Recall                 | Micro F1               |
+|------------------------------------------|------------------------|------------------------|------------------------|
+| BioBERT                                  | 70.9698                | 78.0651                | 74.3485                |
+| BioBERT-Punctuation                      | 70.4206                | 78.4692                | 74.2274                |
+| BioBERT-Dice                             | 72.0468                | 78.2267                | 75.0097                |
+| BioBERT-QA                               | 72.0803                | 77.7559                | 74.8106                |
+| BioBERT-QA4                              | -                      | -                      | - (todo: update here)  |
+| BioBERT-QA4-QuestionType2(Where)         | 71.4543                | 78.1149                | 74.6363                |
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
