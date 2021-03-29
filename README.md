@@ -149,8 +149,8 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
 |-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
 | Span Detector   | 77.753                                                  | 74.7685                   | 82.2835                   | 78.3462                    |
-| Span Classifier | next                                                    |                           |                           |                            |
-| Pipeline        | next    (for span class. on gen. output from span det.) |                           |                           |                            |
+| Span Classifier | 94.528                                                  | 94.4682                   | 94.5229                   | 94.4956                    |
+| Pipeline        | 94.009 (for span class. on gen. output from span det.)  | 71.1385                   | 79.3358                   | **75.0139**                |
 
 #### Motivation
 The core idea is BERT model finetuning with additional external cues concatenated as vectors or parallel CNN/LSTM's are possibly not getting trained well. So, why not use another BERT model itself and fine-tune it on some other desired sub-task to get that additional information learnt well (which we would have otherwise learnt from punctuation vec or CNN/LSTM).
@@ -170,6 +170,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
+| BioBERT-QA                               | todo                   | todo                   | todo                   |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-QuestionType2(Where)         | **89.2091**            | 84.5807                | **86.8333**            |
 | BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
@@ -199,6 +200,12 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-QA                               | 72.0803                | 77.7559                | 74.8106                |
 | BioBERT-QA4                              | -                      | -                      | - (todo: update here)  |
 | BioBERT-QA4-QuestionType2(Where)         | 71.4543                | 78.1149                | 74.6363                |
+
+#### OntoNotes Corpus
+
+| Model                                    | Precision              | Recall                 | Micro F1               |
+|------------------------------------------|------------------------|------------------------|------------------------|
+| BioBERT                                  | 82.2538                | 84.5543                | 83.3882                |
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
