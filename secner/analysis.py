@@ -22,7 +22,7 @@ def parse_file(file_path):
 
 
 def make_gold_file(path, outfile, data):
-    with open(os.path.join(path, outfile), "w") as f:
+    with open(os.path.join(path, outfile), "w", encoding="utf-8") as f:
         for sent in data:
             for tok in sent:
                 f.write("{0}\t{1}\t{2}\n".format(tok[0], tok[1], tok[1]))

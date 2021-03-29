@@ -2,11 +2,12 @@ import argparse
 
 import torch
 from dataclasses import dataclass
+from torch.utils.data import Dataset
+from transformers import HfArgumentParser
+
 from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataset
 from secner.utils.general import set_all_seeds, parse_config, setup_logging
-from torch.utils.data import Dataset
-from transformers import HfArgumentParser
 
 
 class NerCharDataset(Dataset):
@@ -32,7 +33,7 @@ class NerCharDataset(Dataset):
         return None
 
     def parse_tag_vocab(self):
-        with open(self.args.tag_vocab_path, "r") as f:
+        with open(self.args.tag_vocab_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:

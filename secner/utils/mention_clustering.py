@@ -59,7 +59,7 @@ def remap(args, dataset, tag, corpus_type, vecs):
                 curr = sent.tokens[sent.bert_tokens[i].token.offset]
                 curr.tag = curr.tag[:2] + tag + str(k)
 
-    with open("../../data/bio_cluster/{0}.tsv".format(corpus_type), "w") as f:
+    with open("../../data/bio_cluster/{0}.tsv".format(corpus_type), "w", encoding="utf-8") as f:
         for sent in dataset.sentences:
             for tok in sent.tokens:
                 f.write("{0}\t{1}\t{2}\t{3}\n".format(tok.text, tok.pos_tag, tok.dep_tag, tok.tag))

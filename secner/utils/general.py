@@ -131,7 +131,7 @@ def parse_config(parser: HfArgumentParser, json_file: str) -> Tuple[DataClass, .
 def generate_tag_names_for_underscore_separated_tags(dataset_name):
     tags = set()
     prefix = "../../data/{0}".format(dataset_name)
-    with open("{0}/tag_vocab.txt".format(prefix), "r") as f:
+    with open("{0}/tag_vocab.txt".format(prefix), "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line[2:]:

@@ -48,7 +48,7 @@ class NerDataset(Dataset):
     @staticmethod
     def parse_tag_vocab(vocab_path):
         tag_vocab = []
-        with open(vocab_path, "r") as f:
+        with open(vocab_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:
