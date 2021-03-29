@@ -6,21 +6,144 @@ Traditionally, the most intuitive way of approaching named entity recognition is
 \begin{itemize}
     \item \texttt{CNN-LSTM-CRF}: As proposed in \cite{ma2016end}, this is a popular NER model. The character-level CNN helps capture the intrinsic patterns and word-level semantics of individual tokens. These character-level embeddings are concatenated with word embeddings and fed to bidirectional LSTM\cite{} which helps capture the sentence grammar and token inter-dependencies. Finally, the CRF models the output tag sequence and makes sure that abrupt and unexpected tag transitions do not take place. 
     
-    \item \texttt{BERT}: Proposed in \cite{devlin2018bert}, BERT is a bidirectional encoder implemented using the \texttt{transformer} architecture \cite{}. The input is a sentence, which is broken down into sub-words/sub-tokens. Multi-head attention and several layers of encoders are able to capture long-term relationships among tokens and semantics well. Finally, the model outputs contextualized embeddings for each sub-token in the sentence. Then we have a simple fully-connected layer followed by Softmax to classify each token into an output class. The model is optimized using cross-entropy loss.
+    \item \texttt{BERT}: Proposed in \cite{devlin2018bert}, BERT is a bidirectional encoder implemented using the transformer architecture \cite{}. The input is a sentence, which is broken down into sub-words/sub-tokens. Multi-head attention and several layers of encoders are able to capture long-term relationships among tokens and semantics well. Finally, the model outputs contextualized embeddings for each sub-token in the sentence. Then we have a simple fully-connected layer followed by Softmax to classify each token into an output class. The model is optimized using cross-entropy loss.
 \end{itemize}
 
 \subsection{Experiment Details}
-As our BERT model for English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert#download} model which is specifially pretrained on biomedical data.
+For English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert#download} model which is specifically pretrained on biomedical data. For \texttt{CNN-LSTM-CRF} framework, as word embeddings we use the contextual embeddings from BERT/BioBERT model but freeze the BERT architecture for training. So, the trainable model architecture still remains a core \texttt{CNN-LSTM-CRF}. We take the mean of sub-token embeddings from BERT to get the embedding for the token.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}\hline
+	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003} & \textbf{OntoNotes 5.0}\\\hline
+	\texttt{BERT-Freeze} & 75.42 & todo & todo & todo \\\hline
+	\texttt{CNN-LSTM-CRF (BERT-Freeze)} & 84.1 & 76.2 & 91.6 & 86.4 \\\hline
+	\texttt{BERT} & 85.99 & 74.35 & 91.36 & 83.39 \\\hline
+	\end{tabular}
+    \caption{Results: Sequence Labeling (Test set Micro-F1 in \%)}
+    \label{tab:res_seq_labeling}
+\end{table}
+
+\subsection{Observations}
+Based on results summarized in Table \ref{tab:res_seq_labeling}:
+\begin{itemize}
+    \item Pretrained BERT embeddings themselves capture linguistic semantics well as can be seen from \texttt{BERT-Freeze}.
+    \item Fine-tuning the BERT model or using BERT embeddings with CNN-LSTM-CRF both work well and give almost comprable enhancements over the \texttt{BERT-Freeze} setup.
+\end{itemize}
+
+\section{Question Answering}
+
+% QA3, QA4, Where
+The NER task can also be modelled as a question answering problem where, we give a question to the model asking it to extract the entity of interest from the supplied text. 
+
+\cite{li2019unified} and \cite{li2019dice} show the effectiveness of this setup using a simple BERT model architecture on multiple general English and Chinese news datasets. They make the model output candidate spans (start and end indices) where the entity in question is present. This setup has advantages over the naive sequence labeling setup since using this framework we can extract even nested or overlapping entities while sequence labeling can capture only flat non-overlapping entities. Since they output spans, so their classification layer does a $\mathcal{O}(n^2)$ computation where $n$ is the number of tokens in the input sentence. \cite{banerjee2019knowledge} use a similar setup and output simple \texttt{B}, \texttt{I} and \texttt{O} tags for each token to mark the presence of the entity in question. Hence, their problem complexity becomes $\mathcal{O}(n)$. On top of this setup, we study the variations described below.
+
+\begin{itemize}
+    \item \textbf{Tagging Scheme}: Classify each token into 3 output classes (\texttt{B}, \texttt{I} and \texttt{O}) [\texttt{BERT-QA(BIO)} model] or 4 classes explicitly modeling the end boundary using \texttt{E} output class [\texttt{BERT-QA(BIOE)} model]. In both these models, we ask questions of the form, \textit{What is the person mentioned in the text?}.
+    
+    \item \textbf{Question Formulation}: \cite{banerjee2019knowledge} show that their trained model gives a high importance to the question word. Hence we probe the model and change the question slightly to observe its impact. Instead of asking \textit{What} [\texttt{BERT-QA(What)} model], we ask \textit{What is the person mentioned in the text?} [\texttt{BERT-QA(Where)} model]. In both these models, we follow the \texttt{BIOE} output tagging scheme.
+\end{itemize}
+
+\subsection{Experiment Details}
 
 
-For \texttt{CNN-LSTM-CRF} framework, as word embeddings we use the contextual embeddings from BERT/BioBERT model but freeze the BERT architecture for training. So, the trainable model still remains a core \texttt{CNN-LSTM-CRF}. We take the mean of sub-token embeddings from BERT to get the embedding for the token.
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}\hline
+	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
+	\texttt{BERT-QA(BIO)} & todo & 74.81 & todo\\\hline
+	\texttt{BERT-QA(BIOE)} & 86.45 & todo & 91.17\\\hline
+	\end{tabular}
+    \caption{Results: Question Answering (Tagging Scheme) (Test set Micro-F1 in \%)}
+    \label{tab:res_qa_tagging}
+\end{table}
 
-\begin{table}
+\begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
-	\texttt{CNN-LSTM-CRF} & 85\% & 74\%, 95.0\% \\\hine
+	\texttt{BERT-QA(What)} & 86.45 & todo & 91.17\\\hline
+	\texttt{BERT-QA(Where)} & \textbf{86.83} & 74.64 & \textbf{91.82}\\\hline
 	\end{tabular}
-	\label{tab:res_seq_tagging}
-    \caption{Sequence Labeling Results}
+    \caption{Results: Question Answering (Question Formulation) (Test set Micro-F1 in \%)}
+    \label{tab:res_qa_question}
 \end{table}
+
+\subsection{Observations}
+\begin{itemize}
+    \item From Table \ref{tab:res_qa_tagging}, \texttt{BIOE} tagging is able to better capture the entity boundaries as compared to \texttt{BIO} tagging scheme.
+    
+    \item From Table \ref{tab:res_qa_question}, we observe that the model is sensitive to slight changes in question semantics. Asking a \textit{where} to the model helps it learn and identify entities better than asking \textit{what}. 
+\end{itemize}
+
+\section{Span Detection and Classification Pipeline}
+Another way of approaching NER is to break it down into a two-step pipelined procedure. In the first step, given a sentence, we detect all entity spans (Span Detector). In the next step, these spans are classified into an output entity class by another model (Span Classifier).
+
+\subsection{Experiment Details}
+
+\begin{itemize}
+    \item \textbf{Span Detection}: We treat this sub-problem as a question answering task. Every sample sentence of the form, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted into the form, \textit{What is the entity mentioned in the text? Emily lives in United States}. This is fed to BERT (\texttt{bert-base-uncased}) model and the outputs are passed through a single fully connected layer followed by softmax. The model is expected to output \texttt{B}, \texttt{I} and \texttt{O} tags for each token and in this case, detect two spans, \textit{Emily} and \textit{United States}. 
+    
+    \item \textbf{Span Classification}: Again, we treat this sub-problem as a question answering task as well. For every gold labeled entity mention in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample, \textit{Emily lives in United States. What is Emily?} The sentence is passed to BERT (\texttt{bert-base-uncased}) and the final pooled output for the sentence is fed to a fully connected layer followed by softmax to classify the sentence into one of the entity types, in this case, \texttt{PERSON}.
+    
+    \item \textbf{Pipeline}: During evaluation, every unlabeled sentence is passed through Span Detector and for each output span, we convert to an input sample for Span Classifier.
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}\hline
+	\textbf{} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
+	\texttt{Span Detection} & 90.12 & 78.35 & 95.23\\\hline
+	\texttt{Span Classification} & 94.06 & 95.08 & 94.50\\\hline
+	\texttt{Pipeline} & 85.89 & 75.01 & 91.64\\\hline
+	\texttt{BERT-QA} & 86.45 & todo & 91.17\\\hline
+	\end{tabular}
+    \caption{Results: Span Pipeline (Test set Micro-F1 in \%)}
+    \label{tab:res_span}
+\end{table}
+
+\subsection{Observations}
+Table \ref{tab:res_span} reports the results of the pipelined span detection and classification procedure and also presents comparison with simple BERT question answering setup for NER. We present this comparison since question answering model serves as the primary backbone of our current span-based extraction procedure. Note that for one-to-one comparison all results here correspond to \texttt{B}, \texttt{I}, \texttt{O} output tagging and \textit{What} as question word in question formulation.
+
+\begin{itemize}
+    \item \textbf{Span Detection}: Detecting all entity spans together without classification is a simpler problem for the model than full NER and hence we get better performance compared to \texttt{BERT-QA} model.
+    
+    \item \textbf{Span Classification}: Given that spans are detected correctly, this second step of the pipeline is relatively simple for the BERT model. On all datasets, we see above 90\% Micro-F1 on test set.
+    
+    \item \textbf{Pipeline}: The pipelined procedure gives comparable results to standard question answering based NER model. The main bottleneck lies in the span detection part. Since this procedure is pipelined, errors in first step propagate to the next step leading to an overall reduced performance.
+\end{itemize}
+
+\section{Learning Objective Variations}
+An ML algorithm learns by optimizing its learning objective. For named entity recognition in supervised learning setup, we get a corpus labeled with gold entity mentions. As highlighted in section \ref{sec:nature_of_entities}, there may be an inherent labeling bias in the dataset. Some entities have more representation, more labeled mentions (\textit{high-resource}) while others are rare entities (\textit{low-resource}). With fewer samples, it becomes difficult for the model to learn good differentiating rules for extracting the low-resource entities. To handle this bias in dataset, it is common to give more importance/weight to low-resource entity samples in calculating the learning objective and optimizing on it. In this direction, we experiment with the variants detailed below.
+
+\begin{itemize}
+    \item \textbf{Cross-Entropy (CE) Loss}: This is the standard objective function in which we calculate the cross entropy between the predicted and gold labels for each token in the sentence.
+    
+    \item \textbf{Weighted Cross-Entropy Loss}: Here, based on the gold-labeled tag for a token we assign a weight to its contribution. All tokens which belong to a valid entity span contribute equally to the loss and all other tokens contribute with a reduced weight of 0.5. This helps because a large part of the corpus consists of tokens which belong to the \texttt{O} tag category. For instance, the \texttt{BioNLP13CG} corpus has 76.5\% tokens with \texttt{O} tag.
+    
+    \item \textbf{Punctuation Weighted CE Loss}: From qualitative analysis of misclassified samples in standard CE loss setup we noticed that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, slash etc. Hence, we force the model to learn these symbols well by penalizing the model twice if the misclassified token is a punctuation/special symbol.
+    
+    \item \textbf{Dice Loss}: As proposed by \cite{li2019dice}, we address the above mentioned data imbalance issue between entity and non-entity tokens using dice loss, based on S{\o}rensen-Dice coefficient\cite{} or Tversky index\cite{}. This helps because standard CE loss in accuracy-oriented while during evaluation we calculate F1-measure. The dice loss gives equal importance to false-positives and false-negatives at training time and hence reduces the discrepancy among these training and test time metrics.
+    
+    \item \textbf{CRF}: Apart from the cross-entropy objective, we also experiment by adding a CRF layer on the fully connected layer output in standard BERT-based model. CRF layer is found to work well with bidirectional LSTM\cite{ma2016end} in modeling output tag transitions and emissions.
+    
+\end{itemize}
+
+\subsection{Experiment Details}
+For CRF implementation, we use \texttt{torchcrf} python package.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}\hline
+	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003}\\\hline
+	\texttt{CE Loss} & 85.99 & 91.36\\\hline
+	\texttt{Weighted CE Loss} & calc & todo\\\hline
+	\texttt{Punctuation CE Loss} & calc & todo\\\hline
+	\texttt{Dice Loss} & 86.35 & calc\\\hline
+	\texttt{CRF} & calc & todo\\\hline
+	\end{tabular}
+    \caption{Results: Learning Objectives (Test set Micro-F1 in \%)}
+    \label{tab:res_loss}
+\end{table}
+
+\subsection{Observations}
