@@ -137,13 +137,146 @@ For CRF implementation, we use \texttt{torchcrf} python package.
 \begin{tabular}{|c|c|c|c|c|}\hline
 	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003}\\\hline
 	\texttt{CE Loss} & 85.99 & 91.36\\\hline
-	\texttt{Weighted CE Loss} & calc & todo\\\hline
-	\texttt{Punctuation CE Loss} & calc & todo\\\hline
-	\texttt{Dice Loss} & 86.35 & calc\\\hline
-	\texttt{CRF} & calc & todo\\\hline
+	\texttt{Weighted CE Loss} & 85.93 & todo\\\hline
+	\texttt{Punctuation CE Loss} & 86.12 & todo\\\hline
+	\texttt{Dice Loss} & 86.35 & 90.76\\\hline
+	\texttt{CRF} & 86.20 & todo\\\hline
 	\end{tabular}
     \caption{Results: Learning Objectives (Test set Micro-F1 in \%)}
     \label{tab:res_loss}
 \end{table}
 
 \subsection{Observations}
+\begin{itemize}
+    \item \texttt{Weighted CE Loss} is found to perform comparable to \texttt{CE Loss} and both do not perform as well as the other variants.
+    
+    \item In \texttt{BioNLP13CG} corpus, \texttt{Dice Loss} performs well as this corpus as several high and low resource entities (data imbalance). \texttt{Dice Loss} is not able to give its advantages with \texttt{CoNLL 2003} corpus since here all 4 entity types have a comparable and high representation.
+    
+    \item \texttt{Punctuation CE Loss} is able to make the model learn slightly better semantics of special symbols and hence performs better than the standard \texttt{CE Loss} counterpart.
+    
+    \item \texttt{CRF} is able to capture the output tag transitions better and hence performs better than standard \texttt{CE Loss} setting.
+\end{itemize}
+
+\section{Capturing Additional Token Semantics}
+\label{sec:additional_token_semantics}
+
+Both in \texttt{CNN-LSTM-CRF} and transformer-based architectures, we rely on on a pretrained BERT model. For biomedical datasets we use BioBERT which is trained on scientific and biomedical literatures while for English news datasets, we work with \texttt{bert-base-uncased} model which is trained on Wikipedia and books. BERT models rely on Word-Piece tokenizer\cite{} which considers breaking words into sub-words for representation. Even then from qualitative analysis we find that there are several terms whose semantics are not captured well by the existing BERT model. This causes errors which can be categorized as:
+
+\begin{itemize}
+    \item \textbf{Out of Vocabulary Tokens}: News articles and scientific texts both sometimes make use of abbreviations or localized entities which may be specific to that news article, event time or research paper, but are rare otherwise. Additionally biomedical texts also consist of chemical names in scientific form which includes numerals etc. which need to be extracted. Semantics of such terms is not captured well by generically pretrained models. Table \ref{tab:oov_issue} shows some examples from \texttt{BioNLP13CG} corpus.
+    
+    \begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|}\hline
+    	\textbf{Entity} & \textbf{Misclassification Examples}\\\hline
+    	\texttt{Gene\_or\_Gene\_Product} & DPD, Xhol, mutCK1delta, FAS\\\hline
+    	\texttt{Simple\_Chemical} & MnCl2, AglRhz, NO\\\hline
+    	\texttt{Cell} & LoVo, DeltaG45, BMSVTs\\\hline
+    	\texttt{Amino\_Acid} & phosphoS727, Y705F\\\hline
+    	\end{tabular}
+        \caption{Out-of-Vocabulary tokens in \texttt{BioNLP13CG} corpus}
+        \label{tab:oov_issue}
+    \end{table}
+    
+    \item \textbf{Special Symbols}: Several entities to be extracted have hyphens, periods, parenthesis within them which are not captured well by pretrained BERT model leading to partial entity detection. Table \ref{tab:boundary_issue} gives some examples from \texttt{BioNLP13CG} corpus.
+    
+    \item \textbf{Modifier Suffix/Prefix}: Apart from the root entity required to be extracted the gold labels sometimes expect a modifier term as well which occurs as a prefix/suffix. Missing these again leads to boundary detection issues. Table \ref{tab:boundary_issue} gives some examples from \texttt{BioNLP13CG} corpus.
+    
+    \begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|}\hline
+    	\textbf{Misclassification Category} & \textbf{Gold} & \textbf{Predicted}\\\hline
+    	\texttt{Special Symbols} & L . Se ( + ) cells & L . Se\\\hline
+    	\texttt{Special Symbols} & Gs - IB ( 4 - ) ion & Gs - IB ( 4\\\hline
+    	\texttt{Modifier Suffix/Prefix} & epicardial coronary artery & coronary artery\\\hline
+    	\texttt{Modifier Suffix/Prefix} & T140 analogs & T140\\\hline
+    	\end{tabular}
+        \caption{Boundary detection issues in \texttt{BioNLP13CG} corpus}
+        \label{tab:boundary_issue}
+    \end{table}
+\end{itemize}
+
+\subsection{Experiment Details}
+
+To address the above mentioned issues, we provide additional inputs and infrastructure to the model to learn the underlying semantics better.
+
+\begin{itemize}
+    \item \textbf{Special Symbol Features}: Before feeding the output of BERT model to final fully-connected classification layer, we add an extra one-hot dimension which is set if the current input token is a pure special symbol. This means we assign \texttt{1} for \textit{hyphen}(\texttt{-}), \textit{parenthesis}(\texttt{(} and \texttt{)}), \textit{comma}(\texttt{,}) etc. while assign \texttt{0} for tokens like \texttt{carbon}, \texttt{123}, or mixed format tokens like \texttt{Ca(2+)}, \texttt{AB-3} etc.
+    
+    \item \textbf{Word Type Features}: As an extension of the above special symbol features, here we associate each token with a word type as shown in Table \ref{tab:word_type_encoding} which is converted into a one-hot vector concatenated with BERT output embeddings before sending to final classifier layer.
+    
+    \item \textbf{Character and Pattern Features}: Chemical formulas and scientific names generally follow a nomenclature convention or pattern. Similarly, out-of-vocabulary tokens also may have some intrinsic character level information which is not well captured by the BERT model which considers sub-words. Infact this issue with BERT is studied well in \cite{boukkouri2020characterbert} which propose to use a character CNN instead of word-piece tokenizer at the stating stage. Motivated by \texttt{CNN-LSTM-CRF} setup and this study, we do the following:
+    
+    \textbf{Modeling characters}. Each word is passed to BERT and in parallel, to five 1-dimensional CNNs with kernel sizes of 1 to 5, each having 16 input and 16 output channels. Input character is indexed and embedded into 16-dimensions through an embedding layer. The CNN outputs are concatenated and passed through a linear layer to get overall 768-dimensional output vector for each token.
+    
+    \textbf{Modeling patterns}. Each word is converted to a pattern (like regular expression, a denser space than simply all characters) converting all uppercase letters to \texttt{U}, lowecase to \texttt{L}, digits to \texttt{D} etc. and then sent to a separate character CNN (like the one described above) and then to a bidirectional LSTM to get contextual token embeddings.
+    
+    Finally, these character and pattern embeddings are concatenated with BERT outputs and fed to final classifier layer for tag classification.
+    
+    \item \textbf{Part-of-Speech and Dependency Parse Features}: Concatenate BERT embeddings with the one-hot POS and one-hot dependency parse features before feeding to final classifier layer.
+    
+    \item \textbf{Head Tokens}: BERT uses word-piece tokenizer and hence can break a given single token into multiple sub-words. Instead of doing a token classification on each of these sub-words and making sure everything is correct, it is simpler to take the embedding output for the first sub-word (\textit{head}) for each token. This technique is also used in the original BERT paper \cite{devlin2018bert} for their NER experiments. 
+    
+    \item \textbf{Highway Network}: Instead of using a simple concatenation of character features with BERT as done in previous experiment, here we create a highway network\cite{}, similar to the one used in BiDAF\cite{} architecture in which we train a gated network to learn when to use BERT vectors and when to use the additional character-level information.
+\end{itemize}
+
+\subsection{Observations}
+
+
+\section{Training Effectiveness Study}
+In the previous section \ref{sec:additional_token_semantics}, we mostly try to give additional information to a BERT architecture by concatenating BERT outputs with some additional feature vectors before final classification. Giving additional information to a model is one thing but whether the model is actually able to pick cues from the additional information or not, is another. In this section, we study the training effectiveness on \texttt{BioNLP13CG} dataset in \texttt{Sequence Labeling} setting using \texttt{BioBERT-Base} model.
+
+\subsection{Feeding Answer as Input}
+
+To study the training effectiveness, we give the model the best ideal-case information, i.e. for each token, we feed its gold label as a one-hot vector. This is concatenated with BERT output before feeding to final classifier. We study the following variants:
+
+\begin{itemize}
+    \item \texttt{BERT(Freeze) + Answer}: We freeze the BERT model parameters and concatenate the answer vectors. This effectively reduces the no. of trainable parameters to a few thousand. We try this in two settings, low learning rate of $10^{-5}$ (recommended BioBERT learning rate\footnote{https://github.com/dmis-lab/biobert#named-entity-recognition-ner} and high learning rate of $0.005$.
+    
+    \item \texttt{BERT + Answer}: This mimics the real-world scenario where the BERT model is fine-tuned with given additional information at a low learning rate of $10^{-5}$.
+\end{itemize}
+
+From the results summarized in Table \ref{}, we observe that with a very low learning rate of $10^{-5}$, the model is not able to learn from the additional answer information provided (both with frozen BERT and otherwise). At a higher learning rate of $0.005$, the model catches the provided cue well.
+
+\subsection{What happens at high learning rate?}
+
+From the previous section, we see that we need a relatively higher learning rate to learn from additional information fed to the model. But with BERT fine-tuning, it is recommended to use a very low learning rate in the order of $10^{-5}$. To study this, we pass answer spans as input to the model. Basically, for each token, we add a one-hot dimension which is set if the token belongs to a valid entity else it is set to $0$. This means the model is actually being fed the gold spans and all it has to do is span classification. This should be relatively easy and give good results as seen previously in Section \ref{}. We experiment with the following variants:
+
+\begin{itemize}
+    \item \texttt{BERT (Freeze)}: Freezing BERT model and passing through a single trainable classifier layer. This model has only around $26,000$ trainable parameters. 
+    
+    \item \texttt{BERT (Freeze) + Gold Span}: Same as the above but with gold spans given as additional input. So, this model is expected to perform better than \texttt{BERT (Freeze)}.
+    
+    \item \texttt{BERT + Gold Span}: Same as the above model but with trainable BERT model. We try training this in two different settings, with low learning rate of $10^{-5}$ and high learning rate of $0.005$.
+    
+    \item \texttt{BERT}: This is the standard BERT model with final classification layer and no additional feature inputs fine-tuned at learning rate of $10^{-5}$.
+\end{itemize}
+
+From Table \ref{}, we make the following observations:
+
+\begin{itemize}
+    \item From \texttt{BERT (Freeze)} and \texttt{BERT (Freeze) + Gold Span}, we observe that indeed giving gold span information helps the model.
+    
+    \item From \texttt{BERT(Freeze) + Gold Span} and \texttt{BERT + Gold Span (LR: $10^{-5}$)}, we observe that indeed fine-tuning is able to learn the semantics of entities much better than when using the BERT embeddings right out-of-the-box.
+    
+    \item However, from \texttt{BERT} and \texttt{BERT + Gold Span (LR: $10^{-5}$)}, we observe that with a low learning rate, the model is not able to focus on and effectively utilize the gold span information.
+    
+    \item Finally, from \texttt{BERT + Gold Span (LR: $10^{-5}$)} and \texttt{BERT + Gold Span (LR: $0.005$)}, we observe that increasing the learning rate has a deteriorating effect on the pretrained BERT parameters and the rigorous push from high learning rate pushes the model to an unsatisfactory local optima.
+\end{itemize}
+
+\section{Tagging Scheme Variation}
+As described in Section \ref{sec:tagging_scheme}, in this section, we study how much impact do different output tagging schemes have on boundary detection and learning of the model. We test the \texttt{2-Tag}, \texttt{BIO} and \texttt{BIOE} tagging schemes in question answering setup on \texttt{BIONLP13CG} corpus.
+
+We omit the experiments with sequence labeling setup since for \texttt{K} output tags, \texttt{2-Tag} scheme gives \texttt{K + 1} output tags (\texttt{+1} for \texttt{O} tag). With \texttt{BIO} scheme, we have \texttt{2K + 1} output tags and with \texttt{BIOE} scheme, we have \texttt{3K + 1} tags. For \texttt{BIONLP13CG} corpus which already has \texttt{K = 16}, the \texttt{BIOE} scheme makes number of output tags as \texttt{49}, which is too large to train well since we don't have enough training data. However, for the question answering setup, the number of output tags remains \texttt{3} for \texttt{2-Tag}, \texttt{4} for \texttt{BIO} and \texttt{5} for \texttt{BIOE} scheme which is manageable.
+
+From results in Table \ref{}, we observe that as expected, explicitly modeling the begin and end boundaries performs the best while not modeling start and end at all, in \texttt{2-Tag} scheme performs the least among them. However this will have lesser number of parameters to train and more representative samples for each case.
+
+\section{Pretrained Model Variation}
+
+
+\section{Clustering and Segregation of Diverse Entities}
+In this section, we focus on a dataset with known data imbalance issues (presence of high and low-resource entities) like \texttt{BIONLP13CG} dataset.
+
+\section{Nested Entities and Supplying Additional Context}
+
+\section{Comparative Precision/Recall Analysis}
