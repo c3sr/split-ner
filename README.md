@@ -170,6 +170,9 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
+| BioBERT-CE-Wt                            | 85.9218                | 85.9468                | 85.9343                |
+| BioBERT-CE-PunctWt                       | 86.2094                | 86.0340                | 86.1216                |
+| BioBERT-CRF                              | 86.1728                | 86.2229                | 86.1979                |
 | BioBERT-QA                               | todo                   | todo                   | todo                   |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-QuestionType2(Where)         | **89.2091**            | 84.5807                | **86.8333**            |
