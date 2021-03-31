@@ -10,7 +10,7 @@ Traditionally, the most intuitive way of approaching named entity recognition is
 \end{itemize}
 
 \subsection{Experiment Details}
-For English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert#download} model which is specifically pretrained on biomedical data. For \texttt{CNN-LSTM-CRF} framework, as word embeddings we use the contextual embeddings from BERT/BioBERT model but freeze the BERT architecture for training. So, the trainable model architecture still remains a core \texttt{CNN-LSTM-CRF}. We take the mean of sub-token embeddings from BERT to get the embedding for the token.
+For English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert\#download} model which is specifically pretrained on biomedical data. For \texttt{CNN-LSTM-CRF} framework, as word embeddings we use the contextual embeddings from BERT/BioBERT model but freeze the BERT architecture for training. So, the trainable model architecture still remains a core \texttt{CNN-LSTM-CRF}. We take the mean of sub-token embeddings from BERT to get the embedding for the token.
 
 \begin{table}[h!]
 \centering
@@ -42,6 +42,8 @@ The NER task can also be modelled as a question answering problem where, we give
     \item \textbf{Tagging Scheme}: Classify each token into 3 output classes (\texttt{B}, \texttt{I} and \texttt{O}) [\texttt{BERT-QA(BIO)} model] or 4 classes explicitly modeling the end boundary using \texttt{E} output class [\texttt{BERT-QA(BIOE)} model]. In both these models, we ask questions of the form, \textit{What is the person mentioned in the text?}.
     
     \item \textbf{Question Formulation}: \cite{banerjee2019knowledge} show that their trained model gives a high importance to the question word. Hence we probe the model and change the question slightly to observe its impact. Instead of asking \textit{What} [\texttt{BERT-QA(What)} model], we ask \textit{What is the person mentioned in the text?} [\texttt{BERT-QA(Where)} model]. In both these models, we follow the \texttt{BIOE} output tagging scheme.
+    
+    \item \textbf{Entity Scrambling}: In the question formation, \textit{What is the} \texttt{entity} \textit{mentioned in the text?}, we study the effect of how much the word representing the entity affects the model performance. Hence, we replace the \texttt{entity} keyword with scrambled English letters, for example, \texttt{Person} becomes \texttt{xyz12qqr}. So, even though we give the right person mentions in sentences to the model, the question becomes, \textit{What is the} \texttt{xyz12qqr} \textit{mentioned in the text?} Since our task at hand is to probe the model and develop an understanding of what it focuses on, so we conduct this experiment only on one dataset, \texttt{BIONLP13CG}. Table \ref{tab:entity_scramble_bio} shows some example scrambled entity keywords used for this experiment.
 \end{itemize}
 
 \subsection{Experiment Details}
@@ -74,6 +76,8 @@ The NER task can also be modelled as a question answering problem where, we give
     \item From Table \ref{tab:res_qa_tagging}, \texttt{BIOE} tagging is able to better capture the entity boundaries as compared to \texttt{BIO} tagging scheme.
     
     \item From Table \ref{tab:res_qa_question}, we observe that the model is sensitive to slight changes in question semantics. Asking a \textit{where} to the model helps it learn and identify entities better than asking \textit{what}. 
+    
+    \item From Table \ref{tab:res_qa_scrable}, we observe that the model learning is agnostic to the keyword used for representing the entity. Even with scrambled entity names, we get almost equal performance to what meaningful keywords give.
 \end{itemize}
 
 \section{Span Detection and Classification Pipeline}
@@ -231,7 +235,7 @@ In the previous section \ref{sec:additional_token_semantics}, we mostly try to g
 To study the training effectiveness, we give the model the best ideal-case information, i.e. for each token, we feed its gold label as a one-hot vector. This is concatenated with BERT output before feeding to final classifier. We study the following variants:
 
 \begin{itemize}
-    \item \texttt{BERT(Freeze) + Answer}: We freeze the BERT model parameters and concatenate the answer vectors. This effectively reduces the no. of trainable parameters to a few thousand. We try this in two settings, low learning rate of $10^{-5}$ (recommended BioBERT learning rate\footnote{https://github.com/dmis-lab/biobert#named-entity-recognition-ner} and high learning rate of $0.005$.
+    \item \texttt{BERT(Freeze) + Answer}: We freeze the BERT model parameters and concatenate the answer vectors. This effectively reduces the no. of trainable parameters to a few thousand. We try this in two settings, low learning rate of $10^{-5}$ (recommended BioBERT learning rate\footnote{https://github.com/dmis-lab/biobert\#named-entity-recognition-ner} and high learning rate of $0.005$.
     
     \item \texttt{BERT + Answer}: This mimics the real-world scenario where the BERT model is fine-tuned with given additional information at a low learning rate of $10^{-5}$.
 \end{itemize}
@@ -272,11 +276,70 @@ We omit the experiments with sequence labeling setup since for \texttt{K} output
 From results in Table \ref{}, we observe that as expected, explicitly modeling the begin and end boundaries performs the best while not modeling start and end at all, in \texttt{2-Tag} scheme performs the least among them. However this will have lesser number of parameters to train and more representative samples for each case.
 
 \section{Pretrained Model Variation}
+In almost all of our model variations discussed we use a pretrained BERT model and either fine-tune it or freeze its parameters and use it out-of-the-box. Even though the underlying model architecture remains that of a transformer encoder, based on which dataset the pretrained model is trained on and what objective function is used, there are several variants. We study the effect of this pretraining for NER through the following variants. Note that in all our experiments we work with the BERT-Base architecture which consists of around 110M parameters.
 
+\begin{itemize}
+    \item \texttt{BERT-Base-Uncased}: Proposed by \cite{devlin2018bert}, this model is trained on English text from Wikipedia and BookCorpus\cite{moviebook} which totals around 16GB of uncompressed text. The model is uncased. It is trained on masked language modeling (MLM) and next sentence prediction objective. We use \texttt{bert-base-uncased} model provided by HuggingFace\footnote{https://huggingface.co/bert-base-uncased} for our \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora.
+    
+    \item \texttt{RoBERTa-Base}: Proposed by \cite{}, this model is trained on English text from 5 different datasets totalling around 160 GB of uncompressed text. The model is cased and trained on only the masked language modeling (MLM) objective. We use \texttt{roberta-base} model provided by HuggingFace\footnote{https://huggingface.co/roberta-base} for our \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora.
+    
+    \item \texttt{BioBERT-Base}: Proposed by \cite{}, this model is trained on English biomedical literature including PubMed abstracts and PMC full text articles. The model is cased and trained on same MLM and next sentence prediction objectives proposed in standard BERT model. We use \texttt{BioBERT-Base v1.1} model provided on GitHub\footnote{https://github.com/dmis-lab/biobert\#download} and import it in HuggingFace as \texttt{dmis-lab/biobert-base-cased-v1.1}. We use this model on our biomedical corpora like \texttt{BIONLP13CG} and \texttt{JNLPBA}, since models pretrained on biomedical and scientific texts are found to capture semantics more effectively than those trained on general English text.
+    
+    \item \texttt{SciBERT-Base-Uncased}: Proposed by \cite{}, this model is trained on full texts of papers on Semantic Scholar\footnote{https://www.semanticscholar.org/}. The model is uncased and trained using the MLM and next sentence prediction objectives originally proposed by the BERT paper. However, they are trained using SciVocab, a specially created WordPiece vocabulary for scientific texts. Just like BioBERT, we use this for \texttt{BIONLP13CG} and \texttt{JNLPBA} datasets.
+    
+\end{itemize}
+
+In Tables \ref{} and \ref{}, we present our results. We observe that:
+
+\begin{itemize}
+    \item Performance of \texttt{BERT-Base-Uncased} model and \texttt{RoBERTa-Base} models on \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora is almost comparable with \texttt{BERT-Base-Uncased} having a slight edge.
+    
+    \item On biomedical corpora, \texttt{SciBERT-Base-Uncased} is found to perform better than \texttt{BioBERT-Base v1.1} model. As expected, both of these are better than using \texttt{BERT-Base-Uncased} in the biomedical setting. Hence, we omit the \texttt{BERT-Base-Uncased} experiment with \texttt{JNLPBA}.
+\end{itemize}
 
 \section{Clustering and Segregation of Diverse Entities}
-In this section, we focus on a dataset with known data imbalance issues (presence of high and low-resource entities) like \texttt{BIONLP13CG} dataset.
+Here, we focus on \texttt{BIONLP13CG} dataset. Looking at the entity distribution in Table \ref{tab:bio_entity_distribution}, we see that the dataset has lots of samples of \texttt{Gene\_or\_gene\_product} along with \texttt{Cancer} and \texttt{Simple\_chemical}. In the question answering setup as we studied in Section \ref{sec:scrambling}, the entity name semantics is not too essential and the model still learns to differentiate their mentions accurately. 
 
-\section{Nested Entities and Supplying Additional Context}
+Here, we develop on that idea and try to break a diverse entity group \texttt{Gene\_or\_gene\_product} into sub-groups (or, sub-entities) and train a model to learn each of those sub-entities and differentiate them from each other. The idea is that dividing a diverse group into sub-entities will help reduce the diversity of a big entity group and make it simpler for the model to differentiate cases/variations. At inference time, the sub-entities are remapped to the parent entity and F1-score is calculated.
+
+\subsection{Experiment Details}
+We work with question answering setup with only 3 entities, \texttt{Gene\_or\_gene\_product}, \texttt{Cancer} and \texttt{Simple\_chemical}. All other entities are ignored for the experiment. The procedure is described below:
+
+\begin{itemize}
+    \item Collect all entity mentions of \texttt{Gene\_of\_gene\_product}. Pass their corresponding sentences to \texttt{BioBERT-Base-Uncased} model and concatenate the output embeddings of first and last sub-word labeled as \texttt{Gene\_of\_gene\_product}. This is the embedding of that mention.
+    
+    \item If there are multiple instances of same mention, then take mean of their mention embeddings across sentences.
+    
+    \item Reduce mention embeddings to 100-dimensional vectors using principal component analysis (PCA). Next take their tSNE\cite{} projections to convert each mention to a 2-dimensional vector representation.
+    
+    \item \textbf{Clustering}: Fix number of clusters to 4 (hyper-parameter). Randomly select 4 mention instances as centers and apply K-Medoids clustering with euclidean distance among tSNE representations as the distance metric. Note that we worked with cosine distance and KL-Divergence as well on tSNE representations as well as on 100-dimensional PCA representation. However this presented setup is found to work the best.
+    
+    \item After clustering, we relabel the corpus tagging each mention to its cluster. Each cluster is considered a sub-entity of \texttt{Gene\_of\_gene\_product}. The entities are named from \texttt{Gene\_of\_gene\_product0} to \texttt{Gene\_of\_gene\_product3}.
+    
+    \item Next we train a simple question answering NER model with this new labeled dataset. 
+    
+    \item During inference time, the model outputs each mention into its sub-entity. We post-process the labels and map each sub-entity output to \texttt{Gene\_of\_gene\_product} and then calculate Micro-F1.
+\end{itemize}
+
+\subsection{Observations}
+From results in Table \ref{}, we observe that this sub-entity extraction technique gives comparable performance to the original setup but is not able to give any improvements. This can be attributed to the fact that our clustering has been on the basis of semantics captured by out-of-the-box pretrained BioBERT-Base model which in the first place may not be able to capture the semantics of many entities well. In addition, the criteria for clustering is semantic similarity captured by the embeddings and not word-pattern similarity. In the current clusters, there is still lots of diversity which the model has to capture. Hence, we conclude that the potential of this technique is only limited by the quality of clustering we are able to achieve. With better word-pattern oriented clusters, this technique is bound to get much better results.
+
+\section{Handling Nested Entities}
+As described in \ref{sec:nature_of_entities}, not always are entities of interest completely disjoint of each other in a sentence. There may be nested and overlapping cases. In biomedical and scientific texts, it is a common trend to find chemical names and genes in a nested structure, for example, \textit{tyrosine} is a \texttt{Simple\_chemical} while \textit{tyrosine kinase} is a \texttt{Gene\_or\_gene\_product}. \cite{wang2018penner} work on nested entity extraction by automatically constructing meta-patterns. Similarly, in general English text, \texttt{Goldman Sachs, Bangalore} is an \texttt{Organization} while \textit{Bangalore} is a \texttt{Location}. 
+
+\subsection{Experiment Details and Observations}
+
+In \texttt{BIONLP13CG} corpus, there are around 1\% nested entity structures. It is not a very significant proportion but still helps us understand how well our model can handle such nested cases. The sequence tagging setup just outputs tags for each token sequentially and hence cannot output multiple tags for the same token. However, in the question answering setup, for each sentence, we ask multiple separate questions enquiring for different entities. Hence, this setup can handle nested entities. For the example mentioned above, we can once ask for \texttt{Organization} in text and get \textit{Goldman Sachs, Bangalore} and then ask for \texttt{Location} and get \textit{Bangalore}. From the results in Table \ref{}, we observe that our model is able to perform comparably well on flat as well as nested entity extraction.
+
+\section{Multi-Sentence Context}
+In most datasets we use like \texttt{BIONLP13CG} and \texttt{CoNLL 2003}, we get individual input sentences at training/test time. However, in real-world scenarios, in information extraction domain, we generally have a paragraph or long text from which we have to extract entities. So, connected sentences can be expected. In the individual sentences of the benchmark datasets, we may expect to find some co-reference resolution problems or unknown terms which were probably defined in a previous sentence that the model currently does not know of. This could lead to sub-optimal performance. 
+
+Even in the benchmark datasets like \texttt{BIONLP13CG} and \texttt{CoNLL 2003}, the context sentences are present but not being used. \texttt{BIONLP13CG} dataset consists of abstracts from biomedical research papers. On each of these abstracts individual sentences have been segmented out to create the train/dev/test sets. In \texttt{CoNLL 2003} dataset, there is a special \texttt{--DOCSTART--} tag which signifies the end of a full news article and the start of another. Hence, again by looking at the previous and next sentences we can get the context for current training/text sample. \cite{luoma2020exploring} explore this concept of additional context and develop a majority voting scheme to understand context sentence weightage to achieve better performance on \texttt{CoNLL 2003} NER dataset. We explore the effect of context in the biomedical domain.
+
+\subsection{Experiment Details}
+To study the effect of additional context provided to the model, we parse the \texttt{BIONLP13CG} dataset again and create training samples consists of around 300 tokens. When broken down using WordPieceTokenizer by BERT, this fits the maximum BERT window size of 512 sub-words. In these 300 token samples, we easily get around 3-4 sentences on an average. Hence, in terms of context, this dataset is much richer but yet 3-4 times shorter. For the last chunk which may have much lesser than 300 tokens, we retain it as it is, as a separate training sample.
+
+\subsection{Observations}
+From the stats reported in Tables \ref{tab:context_bio_dataset} and \ref{tab:res_context_bio}, we observe that forming longer and more content rich training samples causes our overall dataset size to be significantly reduced. This is a cause of concern and hence additional context is not able to give performance boost to the existing standard training setup.
 
 \section{Comparative Precision/Recall Analysis}
