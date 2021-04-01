@@ -168,8 +168,13 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
 | BioBERT-PunctuationExtended              | 86.1328                | **86.7461**            | 86.4383                |
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
+| BioBERT-HeadToken                        | 86.1878                | 86.1503                | 86.1690                |
+| BioBERT-Punctuation-HeadToken            | 86.8460                | 85.8741                | 86.3573                |
+| BioBERT-PosTag                           | 86.3849                | 85.8451                | 86.1141                |
+| BioBERT-DepTag                           | 86.0954                | 86.2956                | 86.1954                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
+| BioBERT-WordType-SubText                 | 86.3222                | 86.6734                | 86.4975                |
 | BioBERT-CE-Wt                            | 85.9218                | 85.9468                | 85.9343                |
 | BioBERT-CE-PunctWt                       | 86.2094                | 86.0340                | 86.1216                |
 | BioBERT-CRF                              | 86.1728                | 86.2229                | 86.1979                |
@@ -186,9 +191,11 @@ Precision, Recall distribution for some good performing models to understand whe
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BERT                                     | 91.2352                | 91.4777                | 91.3563                |
-| BERT-Head                                | 91.6741                | 91.3005                | 91.4869                |
+| BERT-HeadToken                           | 91.6741                | 91.3005                | 91.4869                |
 | BERT-Punctuation                         | 91.7480                | 91.6017                | 91.6748                |
-| BERT-Punctuation-Head                    | 91.6888                | 91.6726                | 91.6807                |
+| BERT-Punctuation-HeadToken               | 91.6888                | 91.6726                | 91.6807                |
+| BERT-WordType-SubText                    | 91.4442                | 91.6549                | 91.5494                |
+| BERT-CharCNN5-Pattern1LSTM               | 91.1901                | 90.9639                | 91.0768                |
 | BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
 | BERT-QA4                                 | 91.5402                | 90.8006                | 91.1689                |
 | BERT-QA4-QuestionType2(Where)            | **92.4651**            | 91.1927                | **91.8245**            |
