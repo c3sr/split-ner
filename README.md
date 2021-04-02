@@ -197,6 +197,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BERT-PosTag                              | 91.2890                | 91.6608                | 91.4745                |
 | BERT-DepTag                              | running                | running                | running                |
 | BERT-CE-Wt                               | running                | running                | running                |
+| BERT-CRF                                 | todo                   | todo                   | todo                   |
 | BERT-Punctuation                         | 91.7480                | 91.6017                | 91.6748                |
 | BERT-Punctuation-HeadToken               | 91.6888                | 91.6726                | 91.6807                |
 | BERT-WordType-SubText                    | 91.4442                | 91.6549                | 91.5494                |
@@ -215,7 +216,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-Punctuation                      | 70.4206                | 78.4692                | 74.2274                |
 | BioBERT-Dice                             | 72.0468                | 78.2267                | 75.0097                |
 | BioBERT-QA                               | 72.0803                | 77.7559                | 74.8106                |
-| BioBERT-QA4                              | -                      | -                      | - (todo: update here)  |
+| BioBERT-QA4                              | 71.9727                | 78.1149                | 74.9181                |
 | BioBERT-QA4-QuestionType2(Where)         | 71.4543                | 78.1149                | 74.6363                |
 
 #### OntoNotes Corpus
