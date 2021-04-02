@@ -165,6 +165,7 @@ Precision, Recall distribution for some good performing models to understand whe
 
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
+| BERT                                     | 83.0885                | 82.1828                | 82.6332                |
 | BioBERT                                  | 86.1666                | 85.8160                | 85.9910                |
 | SciBERT                                  | 85.5397                | 86.4845                | 86.0095                |
 | BioBERT-Freeze                           | 75.5802                | 75.2507                | 75.4151                |
