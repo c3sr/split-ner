@@ -1,5 +1,5 @@
 {
-  "model_name": "ner-bert-postag",
+  "model_name": "ner-bert-deptag",
   "dataset_dir": "conll",
   "num_labels": 9,
   "do_train": true,
