@@ -169,6 +169,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT                                  | 86.1666                | 85.8160                | 85.9910                |
 | SciBERT                                  | 85.5397                | 86.4845                | 86.0095                |
 | BioBERT-Freeze                           | 75.5802                | 75.2507                | 75.4151                |
+| BioBERT-GoldSpan                         | 86.2155                | 85.3510                | 85.7811                |
 | BioBERT-GoldLabelSpan                    | 86.7429                | 85.9613                | 86.3504                |
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
 | BioBERT-PunctuationExtended              | 86.1328                | **86.7461**            | 86.4383                |
@@ -351,11 +352,11 @@ We hypothesise that very low learning rate (1e-5) is not optimal for non-BERT pa
 
 **Experiment**: On giving actual true labels as one-hot embeddings to the model
 
-| Model                                                     | Micro F1                    |
-|-----------------------------------------------------------|-----------------------------|
-| BioBERT-WithKnownSpansAndLabels (LR:1e-5)                 | 86.3504(Test)(**Striking!**)|
-| BioBERT-Freeze-WithKnownSpansAndLabels (LR:1e-5)          | 54.502 (Dev)  (after 150 ep)|
-| BioBERT-Freeze-WithKnownSpansAndLabels (LR:0.005)         | 100.000 (Test)              |
+| Model (Test Set Stats)                                    | Precision              | Recall                 | Micro F1               |
+|-----------------------------------------------------------|------------------------|------------------------|------------------------|
+| BioBERT-WithKnownSpansAndLabels (LR:1e-5)                 | 86.7429                | 85.9613                | 86.3504(**Striking!**) |
+| BioBERT-Freeze-WithKnownSpansAndLabels (LR:1e-5)          | 73.2344                | 56.6633                | 63.8918                |
+| BioBERT-Freeze-WithKnownSpansAndLabels (LR:0.005)         | 100.0                  | 100.0                  | 100.0                  |
 
 Also tried **fragmented training**, by training for first 15 epochs with BERT params frozen (LR: 0.005) and then fine-tuning complete thing (LR: 1e-5). But the second step gave 0.00 score consecutively for several epochs upon initiation of step 2, hence stopped.
 
