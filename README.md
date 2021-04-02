@@ -83,6 +83,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |  running                   |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
+| BioBERT-QA4-Scrambled                    | 85.506(can be trained more) |                |                            |           |                      |
 | BioBERT-QA4-QuestionType2(Where)         | **86.642**                  | 74.330         |  91.358                    |           |                      |
 | RoBERTa-QA4                              | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
@@ -165,6 +166,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 86.1666                | 85.8160                | 85.9910                |
+| SciBERT                                  | 85.5397                | 86.4845                | 86.0095                |
 | BioBERT-Freeze                           | 75.5802                | 75.2507                | 75.4151                |
 | BioBERT-GoldLabelSpan                    | 86.7429                | 85.9613                | 86.3504                |
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
@@ -183,6 +185,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-QA2                              | todo                   | todo                   | todo                   |
 | BioBERT-QA3                              | 88.7144                | 83.7378                | 86.1543                |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
+| BioBERT-QA4-Scrambled                    | 88.1084                | 83.6652                | 85.8293                |
 | BioBERT-QA4-QuestionType2(Where)         | **89.2091**            | 84.5807                | **86.8333**            |
 | BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
@@ -194,6 +197,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BERT                                     | 91.2352                | 91.4777                | 91.3563                |
+| RoBERTa                                  | 90.9780                | 91.4129                | 91.1949                |
 | BERT-Freeze                              | running                | running                | running                |
 | BERT-HeadToken                           | 91.6741                | 91.3005                | 91.4869                |
 | BERT-PosTag                              | 91.2890                | 91.6608                | 91.4745                |
