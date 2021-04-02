@@ -42,6 +42,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
 | BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | running        |  running                   |           | running              |
+| BioBERT-Freeze-GoldLabelSpan (LR:1e-5)   | 59.193                      |                |                            |           |                      |
 | BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
 | BioBERT-Freeze-Punctuation (LR:0.001)    | 81.698                      |                |                            |           |                      |
 | BioBERT-Freeze-QA4-MainLSTM (LR:0.001)   | 80.290                      |                |                            |           |                      |
