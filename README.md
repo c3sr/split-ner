@@ -38,9 +38,9 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
-| RoBERTa-Base*                            | -                           |                |  90.728                    |           |                      |
-| BioBERT*                                 | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
-| BioBERT-2LayerClassifier*                | 85.681                      |                |                            |           |                      |
+| RoBERTa-Base                             | -                           |                |  90.728                    |           |                      |
+| BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
+| BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
 | BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | running        |  running                   |           | running              |
 | BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
 | BioBERT-Freeze-Punctuation (LR:0.001)    | 81.698                      |                |                            |           |                      |
@@ -83,8 +83,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
 | BioBERT-QA3                              | **86.023**                  | 74.52          |  running                   |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
-| BioBERT-QA4-QuestionType2(Where)*        | **86.642**                  | 74.330         |  91.358                    |           |                      |
-| RoBERTa-QA4*                             | -                           |                |  91.338                    |           |                      |
+| BioBERT-QA4-QuestionType2(Where)         | **86.642**                  | 74.330         |  91.358                    |           |                      |
+| RoBERTa-QA4                              | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
 | BioBERT-QA4-WordType                     | 85.848                      |                |                            |           |                      |
@@ -166,6 +166,7 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 86.1666                | 85.8160                | 85.9910                |
 | BioBERT-Freeze                           | 75.5802                | 75.2507                | 75.4151                |
+| BioBERT-GoldLabelSpan                    | 86.7429                | 85.9613                | 86.3504                |
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
 | BioBERT-PunctuationExtended              | 86.1328                | **86.7461**            | 86.4383                |
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
@@ -179,6 +180,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-CE-Wt                            | 85.9218                | 85.9468                | 85.9343                |
 | BioBERT-CE-PunctWt                       | 86.2094                | 86.0340                | 86.1216                |
 | BioBERT-CRF                              | 86.1728                | 86.2229                | 86.1979                |
+| BioBERT-QA2                              | todo                   | todo                   | todo                   |
 | BioBERT-QA3                              | 88.7144                | 83.7378                | 86.1543                |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-QuestionType2(Where)         | **89.2091**            | 84.5807                | **86.8333**            |
@@ -346,7 +348,7 @@ We hypothesise that very low learning rate (1e-5) is not optimal for non-BERT pa
 
 | Model                                                     | Micro F1                    |
 |-----------------------------------------------------------|-----------------------------|
-| BioBERT-WithKnownSpansAndLabels (LR:1e-5)                 | 85.960 (Test)(**Striking!**)|
+| BioBERT-WithKnownSpansAndLabels (LR:1e-5)                 | 86.3504(Test)(**Striking!**)|
 | BioBERT-Freeze-WithKnownSpansAndLabels (LR:1e-5)          | 54.502 (Dev)  (after 150 ep)|
 | BioBERT-Freeze-WithKnownSpansAndLabels (LR:0.005)         | 100.000 (Test)              |
 
