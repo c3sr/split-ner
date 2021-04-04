@@ -60,10 +60,10 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
 | BioBERT-CRF                              | 85.685                      |                |  90.822                    |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
-| BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |                            |           |                      |
+| BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  running                   |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-Highway    | todo                        |                |  todo                      |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  todo                      |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM            | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
@@ -217,7 +217,8 @@ Precision, Recall distribution for some good performing models to understand whe
 | BERT-Punctuation                         | 91.7480                | 91.6017                | 91.6748                |
 | BERT-Punctuation-HeadToken               | 91.6888                | 91.6726                | 91.6807                |
 | BERT-WordType-SubText                    | 91.4442                | 91.6549                | 91.5494                |
-| BERT-CharCNN5-Pattern1LSTM               | 91.1901                | 90.9639                | 91.0768                |
+| BERT-CharCNN5-Pattern0LSTM               | 91.1901                | 90.9639                | 91.0768                |
+| BERT-CharCNN5-Pattern1LSTM               | todo                   | todo                   | todo                   |
 | BERT-CharCNN5-Pattern0LSTM-Highway       | running                | running                | running                |
 | BERT-CharCNN5-Pattern1LSTM-Highway       | todo                   | todo                   | todo                   |
 | BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
