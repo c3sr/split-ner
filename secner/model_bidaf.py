@@ -5,6 +5,7 @@ from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
 from secner.additional_args import AdditionalArguments
+from secner.cnn import CharCNN
 from secner.dataset import NerDataset
 from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
 from secner.model import NerModel
@@ -18,6 +19,7 @@ class NerModelBiDAF(BertPreTrainedModel):
         self.num_labels = config.num_labels
         self.num_word_types = len(NerDataset.get_word_type_vocab())
         none_tag = self.additional_args.none_tag
+        dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
         self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag,
                                                                self.additional_args.use_pos_tag))
         self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
@@ -42,22 +44,39 @@ class NerModelBiDAF(BertPreTrainedModel):
                 self.additional_args.punctuation_handling)
             classifier_inp_dim += self.punctuation_vocab_size
 
-        # Character Embedding Layer
-        num_embeddings = len(NerDataset.get_char_vocab()) + 1  # +1 (for the special [PAD] char)
-        self.char_emb = nn.Embedding(num_embeddings=num_embeddings,
-                                     embedding_dim=self.additional_args.char_emb_dim,
-                                     padding_idx=0)
-        # nn.init.uniform_(self.char_emb.weight, -0.001, 0.001)
+        char_vec_dim = 0
+        if self.additional_args.use_bidaf_orig_cnn:
+            # Character Embedding Layer
+            num_embeddings = len(NerDataset.get_char_vocab()) + 1  # +1 (for the special [PAD] char)
+            self.char_emb = nn.Embedding(num_embeddings=num_embeddings,
+                                         embedding_dim=self.additional_args.char_emb_dim,
+                                         padding_idx=0)
+            # nn.init.uniform_(self.char_emb.weight, -0.001, 0.001)
 
-        self.char_conv = nn.Sequential(
-            nn.Conv2d(in_channels=1,
-                      out_channels=self.additional_args.cnn_num_filters,
-                      kernel_size=(self.additional_args.char_emb_dim, self.additional_args.cnn_kernel_size)),
-            nn.ReLU()
-        )
+            self.char_conv = nn.Sequential(
+                nn.Conv2d(in_channels=1,
+                          out_channels=self.additional_args.cnn_num_filters,
+                          kernel_size=(self.additional_args.char_emb_dim, self.additional_args.cnn_kernel_size)),
+                nn.ReLU()
+            )
+            char_vec_dim += self.additional_args.cnn_num_filters
+        else:
+            if self.additional_args.use_char_cnn in ["char", "both"]:
+                self.char_cnn = CharCNN(additional_args, "char")
+                char_vec_dim += self.char_cnn.char_out_dim
+
+            if self.additional_args.use_char_cnn in ["pattern", "both"]:
+                self.pattern_cnn = CharCNN(additional_args, "pattern")
+                self.pattern_lstm = nn.LSTM(input_size=self.pattern_cnn.char_out_dim,
+                                            hidden_size=self.additional_args.lstm_hidden_dim,
+                                            bidirectional=True,
+                                            batch_first=True,
+                                            num_layers=self.additional_args.lstm_num_layers,
+                                            dropout=dropout_prob)
+                char_vec_dim += 2 * self.additional_args.lstm_hidden_dim
 
         # highway network
-        self.hidden_size = self.additional_args.cnn_num_filters + config.hidden_size
+        self.hidden_size = char_vec_dim + config.hidden_size
         for i in range(2):
             setattr(self, 'highway_linear{}'.format(i),
                     nn.Sequential(nn.Linear(self.hidden_size, self.hidden_size),
@@ -122,6 +141,7 @@ class NerModelBiDAF(BertPreTrainedModel):
             attention_mask=None,
             token_type_ids=None,
             char_ids=None,
+            pattern_ids=None,
             punctuation_vec=None,
             word_type_ids=None,
             pos_tag=None,
@@ -129,6 +149,7 @@ class NerModelBiDAF(BertPreTrainedModel):
             labels=None,
             **kwargs):
 
+        batch_size, seq_len = input_ids.shape
         outputs = self.bert(
             input_ids,
             attention_mask=attention_mask,
@@ -136,8 +157,30 @@ class NerModelBiDAF(BertPreTrainedModel):
         )
         sequence_output = outputs[0]
 
-        char_vec = self.char_emb_layer(char_ids)
-        sequence_output = self.highway_network(sequence_output, char_vec)
+        if self.additional_args.use_bidaf_orig_cnn:
+            char_vec = self.char_emb_layer(char_ids)
+            sequence_output = self.highway_network(sequence_output, char_vec)
+        else:
+            additional_vec = torch.empty(batch_size, seq_len, 0, device=input_ids.device)
+            if self.additional_args.use_char_cnn in ["char", "both"]:
+                char_vec = self.char_cnn(char_ids)
+                additional_vec = torch.cat([additional_vec, char_vec], dim=2)
+
+            if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
+                pattern_vec = self.pattern_cnn(pattern_ids)
+                lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
+                packed_inp = nn.utils.rnn.pack_padded_sequence(input=pattern_vec,
+                                                               lengths=lengths,
+                                                               batch_first=True,
+                                                               enforce_sorted=False)
+                self.pattern_lstm.flatten_parameters()
+                packed_out, _ = self.pattern_lstm(packed_inp)
+                pattern_vec, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out,
+                                                                  batch_first=True,
+                                                                  total_length=seq_len)
+                pattern_vec = self.dropout(pattern_vec)
+                additional_vec = torch.cat([additional_vec, pattern_vec], dim=2)
+            sequence_output = torch.cat([sequence_output, additional_vec], dim=2)
 
         if self.additional_args.punctuation_handling == "type1":
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)

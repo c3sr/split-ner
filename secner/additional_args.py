@@ -62,6 +62,7 @@ class AdditionalArguments:
     use_pos_tag: bool = field(default=False, metadata={"help": "use 1-hot POS tag vectors for tokens"})
     use_dep_tag: bool = field(default=False, metadata={"help": "use 1-hot DEP-parse tag vectors for tokens"})
     use_main_lstm: bool = field(default=False, metadata={"help": "use bi-LSTM as the main LM"})
+    use_bidaf_orig_cnn: bool = field(default=False, metadata={"help": "use orig. CNN used in BiDAF for backward comp."})
     filter_tags: object = field(default=None, metadata={"help": "consider only given output tags"})
     split_tags: bool = field(default=False, metadata={"help": "split big categories into smaller ones"})
     gold_span_inp: str = field(default="none", metadata={"help": "provide gold span as input (none|simple|label)"})

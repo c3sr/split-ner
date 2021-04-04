@@ -234,7 +234,7 @@ class NerQADataset(Dataset):
         bert_tokens.extend(bert_helper_sent_tokens)
         bert_tokens.append(self.bert_first_sep_token)
         if self.args.model_mode == "roberta_std":
-            bert_tokens.append(self.bert_first_sep_token)
+            bert_tokens.append(self.bert_first_sep_token)  # check
         bert_tokens.extend(bert_sent_tokens)
         bert_tokens = bert_tokens[:self.args.max_seq_len - 1]
         bert_tokens.append(self.bert_second_sep_token)

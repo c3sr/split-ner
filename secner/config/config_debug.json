@@ -28,6 +28,7 @@
   "punctuation_handling": "none",
   "word_type_handling": "none",
   "add_qa_helper_sentence": false,
+  "use_bidaf_orig_cnn": false,
   "use_char_cnn": "none",
   "token_type": "text",
   "pattern_type": "0",
