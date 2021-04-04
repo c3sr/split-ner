@@ -485,7 +485,7 @@ class NerDataCollator:
             batch["flair_ids"] = torch.stack(entry)
             batch["flair_attention_mask"] = torch.stack(entry_mask)
 
-        if self.args.punctuation_handling != "none":
+        if self.args.punctuation_handling != "none" or self.args.loss_type == "ce_punct":
             entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i][self.args.token_type])
