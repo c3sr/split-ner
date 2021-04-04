@@ -7,7 +7,9 @@ from sklearn.metrics import confusion_matrix
 
 def parse_file(file_path):
     data = []
-    with open(file_path, "r") as f:
+    if not os.path.exists(file_path):
+        return data
+    with open(file_path, "r", encoding="utf-8") as f:
         sent = []
         for line in f:
             line = line.strip()
@@ -345,26 +347,26 @@ def main(args):
     train_path = os.path.join(args.path, "train.tsv")
     dev_path = os.path.join(args.path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
     test_path = os.path.join(args.path, "test.tsv")
+    infer_path = os.path.join(args.path, "infer.tsv")
 
-    train_data = parse_file(train_path)
-    dev_data = parse_file(dev_path)
-    test_data = parse_file(test_path)
+    data = dict()
+    data["train"] = parse_file(train_path)
+    data["dev"] = parse_file(dev_path)
+    data["test"] = parse_file(test_path)
+    data["infer"] = parse_file(infer_path)
 
-    # make_gold_file(args.path, "train_gold.tsv", train_data)
-    # make_gold_file(args.path, "dev_gold.tsv", dev_data)
-    # make_gold_file(args.path, "test_gold.tsv", test_data)
-
-    analyse_errors(test_data)
-    analyse_error_overlaps(os.path.join(args.path, "analysis"), test_data, dump_errors=True)
-    analyse_oov_errors(train_data, test_data)
+    if args.only_f1:
+        calc_micro_f1(data[args.file])
+    else:
+        analyse_errors(data[args.file])
+        analyse_error_overlaps(os.path.join(args.path, "analysis"), data[args.file], dump_errors=True)
+        analyse_oov_errors(data["train"], data[args.file])
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-punct/predictions")
-    # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-char-pattern-large/predictions")
-    # ap.add_argument("--path", type=str, default="../out/bio/ner-biobert-qa4/predictions")
-    # ap.add_argument("--path", type=str, default="../out/jnlpba/ner-biobert-punct/predictions")
-    # ap.add_argument("--path", type=str, default="../out/conll/ner-bert-punct/predictions")
+    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert/predictions")
+    ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
+    ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
     ap = ap.parse_args()
     main(ap)
