@@ -344,10 +344,11 @@ def analyse_oov_errors(train_data, test_data):
 
 
 def main(args):
-    train_path = os.path.join(args.path, "train.tsv")
-    dev_path = os.path.join(args.path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
-    test_path = os.path.join(args.path, "test.tsv")
-    infer_path = os.path.join(args.path, "infer.tsv")
+    root_path = os.path.join("..", "out", args.dataset, args.model, "predictions")
+    train_path = os.path.join(root_path, "train.tsv")
+    dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
+    test_path = os.path.join(root_path, "test.tsv")
+    infer_path = os.path.join(root_path, "infer.tsv")
 
     data = dict()
     data["train"] = parse_file(train_path)
@@ -359,13 +360,14 @@ def main(args):
         calc_micro_f1(data[args.file])
     else:
         analyse_errors(data[args.file])
-        analyse_error_overlaps(os.path.join(args.path, "analysis"), data[args.file], dump_errors=True)
+        analyse_error_overlaps(os.path.join(root_path, "analysis"), data[args.file], dump_errors=True)
         analyse_oov_errors(data["train"], data[args.file])
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--path", type=str, default="../out/bio/ner-biobert/predictions")
+    ap.add_argument("--dataset", type=str, default="bio")
+    ap.add_argument("--model", type=str, default="ner-biobert")
     ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
     ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
     ap = ap.parse_args()
