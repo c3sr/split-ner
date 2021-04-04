@@ -41,7 +41,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | RoBERTa-Base                             | -                           |                |  90.728                    |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
-| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | running        |  running                   |           | running              |
+| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | 49.328         |  78.422                    |           | running              |
 | BioBERT-Freeze-GoldLabelSpan (LR:1e-5)   | 59.193                      |                |                            |           |                      |
 | BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
 | BioBERT-Freeze-Punctuation (LR:0.001)    | 81.698                      |                |                            |           |                      |
@@ -52,14 +52,17 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | SciBERT-PairedSentence                   | 85.606**                    |                |                            |           |                      |
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
-| BioBERT-CE_Weighted                      | 85.575                      |                |  running                   |           |                      |
+| BioBERT-CE_Weighted                      | 85.575                      |                |  90.782                    |           |                      |
+| BioBERT-CE_PunctLoss                     | todo                        |                |  todo                      |           |                      |
 | BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487** (-MISC: 92.930 PER: 96.898)|         |            |
 | BioBERT-POS-Tag                          | 85.900                      |                |  91.126                    |           |                      |
-| BioBERT-DEP-Tag                          | 85.799                      |                |  running                   |           |                      |
+| BioBERT-DEP-Tag                          | 85.799                      |                |  90.932                    |           |                      |
 | BioBERT-Dice                             | 85.966                      | 74.829         |  90.504                    |           |                      |
-| BioBERT-CRF                              | 85.685                      |                |                            |           |                      |
+| BioBERT-CRF                              | 85.685                      |                |  90.822                    |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |                            |           |                      |
+| BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  running                   |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM-Highway    | todo                        |                |  todo                      |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   | 73.516         |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM            | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
@@ -82,7 +85,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-Punctuation-CE-PunctLoss         | 85.725                      |                |                            |           |                      |
 | BioBERT-WordType                         | **86.166**                  |                |  90.772                    |           |                      |
 | BioBERT-WordType-SubText                 | **86.211**                  |                |  91.009                    |           |                      |
-| BioBERT-QA3                              | **86.023**                  | 74.52          |  running                   |           |                      |
+| BioBERT-QA3                              | **86.023**                  | 74.52          |  90.654                    |           |                      |
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Scrambled                    | 85.506(can be trained more) |                |                            |           |                      |
 | BioBERT-QA4-QuestionType2(Where)         | **86.642**                  | 74.330         |  91.358                    |           |                      |
@@ -174,16 +177,19 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-GoldLabelSpan                    | 86.7429                | 85.9613                | 86.3504                |
 | BioBERT-Punctuation                      | 87.6171                | 85.6562                | 86.6255                |
 | BioBERT-PunctuationExtended              | 86.1328                | **86.7461**            | 86.4383                |
+| BioBERT-Punctuation-CE-PunctWt           | 86.2094                | 86.0340                | 86.1216                |
 | BioBERT-Dice                             | 86.6764                | 86.0340                | 86.3540                |
 | BioBERT-HeadToken                        | 86.1878                | 86.1503                | 86.1690                |
 | BioBERT-Punctuation-HeadToken            | 86.8460                | 85.8741                | 86.3573                |
 | BioBERT-PosTag                           | 86.3849                | 85.8451                | 86.1141                |
 | BioBERT-DepTag                           | 86.0954                | 86.2956                | 86.1954                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
+| BioBERT-CharCNN5-Pattern1LSTM-Highway    | todo                   | todo                   | todo                   |
+| BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.4895                | 86.0485                | 85.7681                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
 | BioBERT-WordType-SubText                 | 86.3222                | 86.6734                | 86.4975                |
 | BioBERT-CE-Wt                            | 85.9218                | 85.9468                | 85.9343                |
-| BioBERT-CE-PunctWt                       | 86.2094                | 86.0340                | 86.1216                |
+| BioBERT-CE-PunctWt                       | todo                   | todo                   | todo                   |
 | BioBERT-CRF                              | 86.1728                | 86.2229                | 86.1979                |
 | BioBERT-QA2                              | todo                   | todo                   | todo                   |
 | BioBERT-QA3                              | 88.7144                | 83.7378                | 86.1543                |
@@ -201,18 +207,21 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BERT                                     | 91.2352                | 91.4777                | 91.3563                |
 | RoBERTa                                  | 90.9780                | 91.4129                | 91.1949                |
-| BERT-Freeze                              | running                | running                | running                |
+| BERT-Freeze                              | 83.1429                | 82.4363                | 82.7880                |
 | BERT-HeadToken                           | 91.6741                | 91.3005                | 91.4869                |
 | BERT-PosTag                              | 91.2890                | 91.6608                | 91.4745                |
-| BERT-DepTag                              | running                | running                | running                |
-| BERT-CE-Wt                               | running                | running                | running                |
-| BERT-CRF                                 | todo                   | todo                   | todo                   |
+| BERT-DepTag                              | 91.2352                | 91.4129                | 91.3240                |
+| BERT-CE-Wt                               | 91.3738                | 91.1473                | 91.2604                |
+| BERT-CE-PunctWt                          | todo                   | todo                   | todo                   |
+| BERT-CRF                                 | 91.2797                | 91.1827                | 91.2312                |
 | BERT-Punctuation                         | 91.7480                | 91.6017                | 91.6748                |
 | BERT-Punctuation-HeadToken               | 91.6888                | 91.6726                | 91.6807                |
 | BERT-WordType-SubText                    | 91.4442                | 91.6549                | 91.5494                |
 | BERT-CharCNN5-Pattern1LSTM               | 91.1901                | 90.9639                | 91.0768                |
+| BERT-CharCNN5-Pattern0LSTM-Highway       | running                | running                | running                |
+| BERT-CharCNN5-Pattern1LSTM-Highway       | todo                   | todo                   | todo                   |
 | BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
-| BERT-QA3                                 | running                | running                | running                |
+| BERT-QA3                                 | 91.6218                | 90.4954                | 91.0551                |
 | BERT-QA4                                 | 91.5402                | 90.8006                | 91.1689                |
 | BERT-QA4-QuestionType2(Where)            | **92.4651**            | 91.1927                | **91.8245**            |
 
@@ -221,7 +230,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 70.9698                | 78.0651                | 74.3485                |
-| BioBERT-Freeze                           | running                | running                | running                |
+| BioBERT-Freeze                           | 53.5119                | 58.5777                | 55.9303                |
 | BioBERT-Punctuation                      | 70.4206                | 78.4692                | 74.2274                |
 | BioBERT-Dice                             | 72.0468                | 78.2267                | 75.0097                |
 | BioBERT-QA                               | 72.0803                | 77.7559                | 74.8106                |
