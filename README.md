@@ -53,7 +53,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |  90.782                    |           |                      |
-| BioBERT-CE_PunctLoss                     | todo                        |                |  todo                      |           |                      |
+| BioBERT-CE_PunctLoss                     | 85.348                      |                |  todo                      |           |                      |
 | BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487** (-MISC: 92.930 PER: 96.898)|         |            |
 | BioBERT-POS-Tag                          | 85.900                      |                |  91.126                    |           |                      |
 | BioBERT-DEP-Tag                          | 85.799                      |                |  90.932                    |           |                      |
@@ -189,7 +189,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
 | BioBERT-WordType-SubText                 | 86.3222                | 86.6734                | 86.4975                |
 | BioBERT-CE-Wt                            | 85.9218                | 85.9468                | 85.9343                |
-| BioBERT-CE-PunctWt                       | todo                   | todo                   | todo                   |
+| BioBERT-CE-PunctWt                       | 85.4401                | 86.0485                | 85.7432                |
 | BioBERT-CRF                              | 86.1728                | 86.2229                | 86.1979                |
 | BioBERT-QA2                              | todo                   | todo                   | todo                   |
 | BioBERT-QA3                              | 88.7144                | 83.7378                | 86.1543                |

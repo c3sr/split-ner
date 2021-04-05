@@ -3,7 +3,7 @@
   "dataset_dir": "onto",
   "num_labels": 37,
   "do_train": true,
-  "resume": null,
+  "resume": "104000",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
