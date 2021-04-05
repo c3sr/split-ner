@@ -1,21 +1,27 @@
+\section{Task Formulation}
+\label{sec:task_formulation}
+\textbf{Formal Definition}. Consider $\mathcal{T}$ as a set of entity types that the user is interested in extracting. Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, named entity recognition (NER) is defined as the task of extracting a list of tuples $\langle s, r, t \rangle$ such that $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index and $t \in \mathcal{T}$ is the \textit{entity type}. Corresponding to each such tuple, the n-gram, $w_{s\,..\,e}$ is called a \textit{mention} of entity type $t$.
+
+\textbf{Example}. Let $\mathcal{T} = \{$\texttt{Person}, \texttt{Location}$\}$. Consider a tokenized input sentence $\mathcal{S} = \langle$\textit{Emily}, \textit{lives}, \textit{in}, \textit{United}, \textit{States}$\rangle$. NER task is to output tuples $\langle 1, 1,$ \texttt{Person}$\rangle$ and $\langle 4, 5,$ \texttt{Location}$\rangle$. Here, \textit{Emily} is a mention of entity \texttt{Person} and \textit{United States} is a mention of entity \texttt{Location}.
+
 \section{Nature of Entities}
 \label{sec:nature_of_entities}
-Language dynamics and style of writing vary across domains and so does the nature of informing entities in corresponding sentences. Some characteristics of entities include:
+Language dynamics and style of writing varies from domain-to-domain and so does the nature of informing entities in corresponding sentences. This affects the approaches one should use for extracting entities and the expected performance. Some differentiating characteristics of entities are:
 
 \begin{itemize}
-    \item \textbf{Multi-word vs single-word}. Common approach to handle such cases is using \texttt{BIO}, \texttt{BIOE} tagging schemes to learn entity boundaries.
+    \item \textbf{N-gram length}. Scientific literature include \texttt{chemicals}, \texttt{diseases}, \texttt{phenomena} etc. which are generally long and wordy while news articles include \texttt{person}, \texttt{location} etc. which are comparatively smaller. 
     
-    \item \textbf{Alpha-numeric vs alphabetic words vs abbreviations}. Some entities like \textit{passport number}, \textit{telephone number} etc. have semantics captured through intrinsic alpha-numeric patterns. \textit{Locations}, \textit{person name} etc. and abbreviation have some common terms or external gazetteers or surrounding words capturing their semantics.
+    \item \textbf{Intrinsic properties}. Common entities in news articles like \texttt{person}, \texttt{location} are wordy and alphabetic. Frequently occurring ones can be learnt or else can be inferred from surrounding context. However entities like \texttt{driving license}, \texttt{telephone number} etc. have semantics encoded in the form of alphanumeric patterns (like, state or area code within a \texttt{telephone number}). Similarly, in biomedical domain, there are \texttt{chemical} and \texttt{gene} abbreviations/formulas like \textit{MgCl2}, \textit{mutCK1delta gene} etc. Their semantics lies in the intrinsic language of chemistry where \textit{Mg} is \textit{Magnesium} and \textit{Cl} is \textit{Chlorine}.
     
-    \item \textbf{Broad vs narrow spectrum}. Some entity classes may be broad with many diverse examples and intricacies, while others may be specific and have a narrow spectrum which is simpler to capture.
+    \item \textbf{Diversity}. Some entities are \textit{broad spectrum} with lots of diverse variety of mentions. For example, \texttt{chemicals} are sometimes written in words like \textit{potassium permanganate} or as formula \textit{KMnO4}, sometimes with intricate special symbols like, \textit{Ca(2+)}. Other entities may be \textit{narrow spectrum} following some distinct patterns, like \texttt{phone numbers}. 
     
-    \item \textbf{Nested entities}. Related to diversity, it may be possible that some specific entities are a sub-class of a more general entity. In other words, there may be a hierarchy/taxonomy of entities to consider. For example, \textit{U.S. Embassy in India} is a \texttt{Facility} where \textit{U.S.} and \textit{India} are \texttt{Locations}. Such examples can be found in biomedical domain in GENIA corpus\cite{} and news article domain in ACE-2004\cite{} and ACE-2005\cite{} corpora. \cite{finkel2009nested} align sentences into a tree-structure with entities for handling this and \cite{li2019unified} extract each entity separately by querying a sentence multiple times in a question-answering framework.
+    \item \textbf{Hierarchy}. Depending on the use-case, not all entities to be extracted may be at the same level when organized in a concept taxonomy. For example, in computer science literature, we may be interested in extracting mentions related to \texttt{cybersecurity}, \texttt{RNN}, \texttt{CNN}, \texttt{transformers}. Here, \texttt{RNN}, \texttt{CNN}, \texttt{transformers} are all niche entity classes which come under the broad umbrella of machine learning and are at a lower level in hierarchy than \texttt{cybersecurity}.
     
-    \item \textbf{High vs low-resource}. Depending on importance to the underlying use-case and domain, not all labeled entities may have an equable representation in the data. Some may have more examples (\textit{high-resource entities}) while others may have only a few (\textit{low-resource entities}). 
+    \item \textbf{Nesting}. Some entity mentions may be embedded within bigger mentions thus developing a nested structure. For example, \textit{Goldman Sachs London} is an \texttt{Organization} while \textit{London} is a \texttt{Location}. Several such examples can be found in the biomedical domain in \texttt{GENIA} corpus\cite{kim2003genia} and news article domain in \texttt{ACE 2004}\cite{mitchell2005ace} and \texttt{ACE 2005}\cite{walker2006ace} corpora.
+    
+    \item \textbf{Mention density}. This characteristic may have some influence of the \textit{diversity} and \textit{hierarchy} concepts described above. Depending on the domain, not all labeled entities may have an equable representation in the data. Some may have lots of examples. We call such entities as \textbf{high-resource entities} while others may have only a few and are called \textbf{low-resource entities}.
     
 \end{itemize}
-
-Based on the above factors, our goal is to develop an approach for named entity recognition that is domain-agnostic and which does not develop biases towards commonly seen entities and learns a meaningful representation for low-resource entities as well. Hence, we conduct our experiments on multiple datasets as detailed below. 
 
 \section{Evaluation Metrics}
 % arorja: TODO
