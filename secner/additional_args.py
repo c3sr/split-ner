@@ -41,7 +41,7 @@ class AdditionalArguments:
     use_char_cnn: str = field(default="none", metadata=
     {"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
     token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
-    pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1)"})
+    pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1|2)(1 works best)"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})
     use_pattern: str = field(default="none", metadata={"help": "use patterns over actual mentions (none|only|both)"})
