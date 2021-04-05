@@ -486,10 +486,14 @@ class NerDataCollator:
             batch["flair_attention_mask"] = torch.stack(entry_mask)
 
         if self.args.punctuation_handling != "none" or self.args.loss_type == "ce_punct":
+            punct_type = self.args.punctuation_handling
+            if self.args.loss_type == "ce_punct":
+                # TODO: ce_punct currently does not work with multi-dimensional punctuation_vec (expects 'type1' format)
+                punct_type = "type1"
             entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i][self.args.token_type])
-                entry.append(torch.tensor([NerDataset.handle_punctuation(w, self.args.punctuation_handling)
+                entry.append(torch.tensor([NerDataset.handle_punctuation(w, punct_type)
                                            for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["punctuation_vec"] = torch.stack(entry)
 

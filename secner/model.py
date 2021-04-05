@@ -1,12 +1,13 @@
 import torch
 import torch.nn as nn
+from transformers import BertConfig
+from transformers.models.bert import BertModel, BertPreTrainedModel
+
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
 from secner.dataset import NerDataset
 from secner.flair_cnn import FlairCNN
 from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
-from transformers import BertConfig
-from transformers.models.bert import BertModel, BertPreTrainedModel
 
 
 class NerModel(BertPreTrainedModel):
@@ -223,6 +224,7 @@ class NerModel(BertPreTrainedModel):
             elif self.additional_args.loss_type == "ce_wt":
                 loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(active_logits.device))(active_logits, active_labels)
             elif self.additional_args.loss_type == "ce_punct":
+                # TODO: ce_punct currently does not work with multi-dimensional punctuation_vec (expects 'type1' format)
                 loss = CrossEntropyPunctuationLoss()(active_logits, active_labels, attention_mask.view(-1),
                                                      punctuation_vec.view(-1))
             else:
