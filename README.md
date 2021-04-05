@@ -53,7 +53,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-BO-Tagging                       | 85.218                      |                |                            |           |                      |
 | BioBERT-BO-Tagging-CE_Weighted           | 85.502                      |                |                            |           |                      |
 | BioBERT-CE_Weighted                      | 85.575                      |                |  90.782                    |           |                      |
-| BioBERT-CE_PunctLoss                     | 85.348                      |                |  todo                      |           |                      |
+| BioBERT-CE_PunctLoss                     | 85.348                      |                |  91.103                    |           |                      |
 | BioBERT-HeadToken                        | **86.175**                  | 73.649         |  **91.487** (-MISC: 92.930 PER: 96.898)|         |            |
 | BioBERT-POS-Tag                          | 85.900                      |                |  91.126                    |           |                      |
 | BioBERT-DEP-Tag                          | 85.799                      |                |  90.932                    |           |                      |
@@ -61,7 +61,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-CRF                              | 85.685                      |                |  90.822                    |           |                      |
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |  90.571                    |           |                      |
-| BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  running                   |           |                      |
+| BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  91.134                    |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-Highway    | todo                        |                |  todo                      |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  todo                      |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM            | 85.588                      |                |                            |           |                      |
@@ -212,14 +212,14 @@ Precision, Recall distribution for some good performing models to understand whe
 | BERT-PosTag                              | 91.2890                | 91.6608                | 91.4745                |
 | BERT-DepTag                              | 91.2352                | 91.4129                | 91.3240                |
 | BERT-CE-Wt                               | 91.3738                | 91.1473                | 91.2604                |
-| BERT-CE-PunctWt                          | todo                   | todo                   | todo                   |
+| BERT-CE-PunctWt                          | 91.4649                | 91.6431                | 91.5539                |
 | BERT-CRF                                 | 91.2797                | 91.1827                | 91.2312                |
 | BERT-Punctuation                         | 91.7480                | 91.6017                | 91.6748                |
 | BERT-Punctuation-HeadToken               | 91.6888                | 91.6726                | 91.6807                |
 | BERT-WordType-SubText                    | 91.4442                | 91.6549                | 91.5494                |
 | BERT-CharCNN5-Pattern0LSTM               | 91.1901                | 90.9639                | 91.0768                |
 | BERT-CharCNN5-Pattern1LSTM               | todo                   | todo                   | todo                   |
-| BERT-CharCNN5-Pattern0LSTM-Highway       | running                | running                | running                |
+| BERT-CharCNN5-Pattern0LSTM-Highway       | 91.4604                | 91.5899                | 91.5251                |
 | BERT-CharCNN5-Pattern1LSTM-Highway       | todo                   | todo                   | todo                   |
 | BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
 | BERT-QA3                                 | 91.6218                | 90.4954                | 91.0551                |
