@@ -41,7 +41,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | RoBERTa-Base                             | -                           |                |  90.728                    |           |                      |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
-| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | 49.328         |  78.422                    |           | running              |
+| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | 49.328         |  78.422                    |           | 92.949               |
 | BioBERT-Freeze-GoldLabelSpan (LR:1e-5)   | 59.193                      |                |                            |           |                      |
 | BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
 | BioBERT-Freeze-Punctuation (LR:0.001)    | 81.698                      |                |                            |           |                      |
@@ -62,7 +62,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  91.134                    |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM-Highway    | todo                        |                |  todo                      |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM-Highway    | 85.313                      |                |  todo                      |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  todo                      |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM            | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
@@ -184,7 +184,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-PosTag                           | 86.3849                | 85.8451                | 86.1141                |
 | BioBERT-DepTag                           | 86.0954                | 86.2956                | 86.1954                |
 | BioBERT-CharCNN5-Pattern1LSTM            | 86.8093                | 86.0776                | 86.4419                |
-| BioBERT-CharCNN5-Pattern1LSTM-Highway    | todo                   | todo                   | todo                   |
+| BioBERT-CharCNN5-Pattern1LSTM-Highway    | 85.7372                | 85.6126                | 85.6748                |
 | BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.4895                | 86.0485                | 85.7681                |
 | BioBERT-WordType                         | 86.3524                | 86.5281                | 86.4402                |
 | BioBERT-WordType-SubText                 | 86.3222                | 86.6734                | 86.4975                |
@@ -230,7 +230,9 @@ Precision, Recall distribution for some good performing models to understand whe
 
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
+| BERT                                     | todo                   | todo                   | todo                   |
 | BioBERT                                  | 70.9698                | 78.0651                | 74.3485                |
+| SciBERT                                  | todo                   | todo                   | todo                   |
 | BioBERT-Freeze                           | 53.5119                | 58.5777                | 55.9303                |
 | BioBERT-Punctuation                      | 70.4206                | 78.4692                | 74.2274                |
 | BioBERT-Dice                             | 72.0468                | 78.2267                | 75.0097                |
@@ -243,7 +245,8 @@ Precision, Recall distribution for some good performing models to understand whe
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 82.2538                | 84.5543                | 83.3882                |
-| BioBERT-Freeze                           | running                | running                | running                |
+| BioBERT-Freeze                           | 67.4176                | 67.2891                | 67.3533                |
+| RoBERTa                                  | todo                   | todo                   | todo                   |
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
