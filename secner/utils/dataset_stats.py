@@ -17,11 +17,14 @@ def main(args):
     corpus_data = train_data + dev_data + test_data
     print("Avg. sentence length: {0:.3f}".format(sum(len(sent) for sent in corpus_data) * 1.0 / len(corpus_data)))
 
-    all_mention_tokens = [(tok[0], tok[-1]) for sent in corpus_data for tok in sent]
-    all_none_tokens = [tup for tup in all_mention_tokens if tup[1] == "O"]
-    print("ratio of O-labeled tokens: {0:.4f}%".format(len(all_none_tokens) * 100.0 / len(all_mention_tokens)))
+    all_tokens = [(tok[0], tok[-1]) for sent in corpus_data for tok in sent]
+    all_mention_tokens = [tup for tup in all_tokens if tup[1] != "O"]
+    all_none_tokens = [tup for tup in all_tokens if tup[1] == "O"]
+    print("ratio of O-labeled tokens: {0:.4f}%".format(len(all_none_tokens) * 100.0 / len(all_tokens)))
     alpha_num_tokens = [tup for tup in all_mention_tokens if (tup[1] != "O" and bool(re.search(r"(\d)", tup[0])))]
     print("Alphanumeric entities: {0:.3f}%".format(len(alpha_num_tokens) * 100.0 / len(all_mention_tokens)))
+    non_alpha_tokens = [tup for tup in all_mention_tokens if (tup[1] != "O" and bool(re.search(r"[^A-Za-z]", tup[0])))]
+    print("Non-alphabetic(^A-Za-z) entities: {0:.3f}%".format(len(non_alpha_tokens) * 100.0 / len(all_mention_tokens)))
 
     tag_counts = defaultdict(int)
     for tup in all_mention_tokens:
