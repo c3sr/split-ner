@@ -191,11 +191,11 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-CE-Wt                            | 85.9218                | 85.9468                | 85.9343                |
 | BioBERT-CE-PunctWt                       | 85.4401                | 86.0485                | 85.7432                |
 | BioBERT-CRF                              | 86.1728                | 86.2229                | 86.1979                |
-| BioBERT-QA2                              | todo                   | todo                   | todo                   |
 | BioBERT-QA3                              | 88.7144                | 83.7378                | 86.1543                |
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-Scrambled                    | 88.1084                | 83.6652                | 85.8293                |
-| BioBERT-QA4-QuestionType2(Where)         | **89.2091**            | 84.5807                | **86.8333**            |
+| BioBERT-QA4-QType2(Where)                | **89.2091**            | 84.5807                | **86.8333**            |
+| BioBERT-QA4-QType2(Where)-WordType-SubText| todo                  | todo                   | todo                   |
 | BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
 | BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
@@ -232,7 +232,7 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BERT                                     | todo                   | todo                   | todo                   |
 | BioBERT                                  | 70.9698                | 78.0651                | 74.3485                |
-| SciBERT                                  | todo                   | todo                   | todo                   |
+| SciBERT                                  | 71.0077                | 78.7462                | 74.6770                |
 | BioBERT-Freeze                           | 53.5119                | 58.5777                | 55.9303                |
 | BioBERT-Punctuation                      | 70.4206                | 78.4692                | 74.2274                |
 | BioBERT-Dice                             | 72.0468                | 78.2267                | 75.0097                |
