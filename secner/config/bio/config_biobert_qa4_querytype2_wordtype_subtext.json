@@ -21,7 +21,7 @@
   "query_type": "question2",
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",
-  "logging_steps": 50,
+  "logging_steps": 850,
   "save_total_limit": 2,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
