@@ -1,6 +1,6 @@
 \section{Task Formulation}
 \label{sec:task_formulation}
-\textbf{Formal Definition}. Consider $\mathcal{T}$ as a set of entity types that the user is interested in extracting. Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, named entity recognition (NER) is defined as the task of extracting a list of tuples $\langle s, r, t \rangle$ such that $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index and $t \in \mathcal{T}$ is the \textit{entity type}. Corresponding to each such tuple, the n-gram, $w_{s\,..\,e}$ is called a \textit{mention} of entity type $t$.
+\textbf{Formal Definition}. Consider $\mathcal{T}$ as a set of entity types that the user is interested in extracting. Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, named entity recognition (NER) is defined as the task of extracting a list of tuples $\langle s, e, t \rangle$ such that $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index and $t \in \mathcal{T}$ is the \textit{entity type}. Corresponding to each such tuple, the n-gram, $w_{s\,..\,e}$ is called a \textit{mention} of entity type $t$.
 
 \textbf{Example}. Let $\mathcal{T} = \{$\texttt{Person}, \texttt{Location}$\}$. Consider a tokenized input sentence $\mathcal{S} = \langle$\textit{Emily}, \textit{lives}, \textit{in}, \textit{United}, \textit{States}$\rangle$. NER task is to output tuples $\langle 1, 1,$ \texttt{Person}$\rangle$ and $\langle 4, 5,$ \texttt{Location}$\rangle$. Here, \textit{Emily} is a mention of entity \texttt{Person} and \textit{United States} is a mention of entity \texttt{Location}.
 
@@ -11,7 +11,7 @@ Language dynamics and style of writing varies from domain-to-domain and so does 
 \begin{itemize}
     \item \textbf{N-gram length}. Scientific literature include \texttt{chemicals}, \texttt{diseases}, \texttt{phenomena} etc. which are generally long and wordy while news articles include \texttt{person}, \texttt{location} etc. which are comparatively smaller. 
     
-    \item \textbf{Intrinsic properties}. Common entities in news articles like \texttt{person}, \texttt{location} are wordy and alphabetic. Frequently occurring ones can be learnt or else can be inferred from surrounding context. However entities like \texttt{driving license}, \texttt{telephone number} etc. have semantics encoded in the form of alphanumeric patterns (like, state or area code within a \texttt{telephone number}). Similarly, in biomedical domain, there are \texttt{chemical} and \texttt{gene} abbreviations/formulas like \textit{MgCl2}, \textit{mutCK1delta gene} etc. Their semantics lies in the intrinsic language of chemistry where \textit{Mg} is \textit{Magnesium} and \textit{Cl} is \textit{Chlorine}.
+    \item \textbf{Intrinsic properties}. Common entities in news articles like \texttt{person}, \texttt{location} are wordy and alphabetic. They are called \textbf{word-based entities}. Frequently occurring ones can be learnt or else can be inferred from surrounding context. However there are entities like \texttt{driving license}, \texttt{telephone number} etc. that have semantics encoded in the form of alphanumeric and special symbol patterns (like \texttt{telephone number} has form \texttt{xxx-xxx-xxxx} with a area code in the beginning). Similarly, in biomedical domain, there are \texttt{chemical} and \texttt{gene} abbreviations/formulas like \textit{MgCl2}, \textit{mutCK1delta gene} etc. Their semantics lies in the intrinsic language of chemistry where \textit{Mg} is \textit{Magnesium} and \textit{Cl} is \textit{Chlorine}. We call these \textbf{non-word entities}.
     
     \item \textbf{Diversity}. Some entities are \textit{broad spectrum} with lots of diverse variety of mentions. For example, \texttt{chemicals} are sometimes written in words like \textit{potassium permanganate} or as formula \textit{KMnO4}, sometimes with intricate special symbols like, \textit{Ca(2+)}. Other entities may be \textit{narrow spectrum} following some distinct patterns, like \texttt{phone numbers}. 
     
@@ -24,32 +24,56 @@ Language dynamics and style of writing varies from domain-to-domain and so does 
 \end{itemize}
 
 \section{Evaluation Metrics}
-% arorja: TODO
+\label{sec:evaluation_metrics}
+All the results reported in this work are calculated on predefined test set data unless otherwise specified. We report \textit{micro-averaged F1} score using \textit{exact-match} evaluation over \textit{entity spans}. 
+
+\begin{definition}
+\label{def:mention_correctness}
+An entity mention tuple $\langle s, e, t \rangle$ extracted by NER system on a given sentence is considered correct iff both the boundary positions, $s$ and $e$, along with the entity type $t$ are correct as per ground truth.
+\end{definition} 
+
+Based on Definition \ref{def:mention_correctness}, we count:
+
+\begin{itemize}
+    \item True Positives ($TP$): Count of mention tuples returned by NER system which also appear in ground truth.
+    
+    \item False Positives ($FP$): Count of mention tuples returned by NER system which do \textit{not} appear in ground truth.
+    
+    \item False Negatives ($FN$): Count of mention tuples which appear in ground truth but are not extracted by the NER system.
+\end{itemize}
+
+Precision refers to percentage of retrieved NER results which are correct. Recall refers to the percentage of ground truth entities correctly retrieved by our system. F$_1$ score is the harmonic mean of precision and recall. Note that here we are counting mention tuples as a whole and not separately for each entity type. So the values calculated are known as \textit{micro-averaged} values over all entity types.
+\begin{align*}
+    \text{Micro-Precision} &= \frac{TP}{TP + FP} & \text{Micro-Recall} &= \frac{TP}{TP + FN}
+\end{align*}
+\begin{align*}
+    \text{Micro-F}_1 &= 2 \times \frac{\text{Micro-Precision} \times \text{Micro-Recall}}{\text{Micro-Precision} + \text{Micro-Recall}}
+\end{align*}
 
 \section{Tagging Scheme}
 \label{sec:tagging_scheme}
-In order to capture the boundaries of entity mentions correctly, it is a standard practice to label each token as per a tagging scheme like \texttt{SingleTag}, \texttt{BIO}, \texttt{BIOE}, \texttt{BIOES} as detailed below.
+In order to capture the boundaries of entity mentions correctly, it is a standard practice to assign a label to each token as per a tagging scheme. Some tagging schemes popular in NER literature are:
 
 \begin{itemize}
-    \item \texttt{SingleTag}: Tag each token of a sentence with class label like \texttt{PERSON}, \texttt{ORG} etc. if it is a part of a known entity or \texttt{O} (or \texttt{NONE}) tag if it does not belong to any required entity.
+    \item \texttt{SingleTag}: Every token of an entity mention $\langle s, e, \texttt{Tag} \rangle$ is assigned label \texttt{Tag}. All other tokens are assigned a special label \texttt{O}.
     
-    \item \texttt{BIO}: This tries to capture the boundaries of entities more explicitly than \texttt{SingleTag}. Use \texttt{B-Tag} (read \textit{Begin Tag}) for first token in the entity marked with \texttt{Tag} and all continuing tokens are marked with \texttt{I-Tag} (read \textit{Intermediate Tag}). If a token does not belong to any entity, it is classified as \texttt{O}.
+    \item \texttt{BIO}: For every entity mention of the form $\langle s, e, \texttt{Tag} \rangle$, token at position $s$ is assigned label \texttt{B-Tag} (\texttt{B} stands for \textit{begin}). All other tokens in the mention are assigned \texttt{I-Tag} (\texttt{I} stands for \textit{intermediate}). Remaining tokens, not part of any mention, are assigned \texttt{O} label. 
     
-    \item \texttt{BIOE}: Apart from the \texttt{BIO} tags, here the ending token of an entity is tagged with \texttt{E-Tag} (read \textit{End Tag}). Unigram entities are tagged with \texttt{B-Tag}.
+    \item \texttt{BIOE}: Apart from the \texttt{B}, \texttt{I} and \texttt{O} labels in \texttt{BIO} scheme, here the token at position $e$ is assigned \texttt{E-Tag} (\texttt{E} stands for \textit{end}). Unigram mentions are labeled with \texttt{B-Tag}.
     
-    \item \texttt{BIOES}: Additionally over \texttt{BIOE} scheme, unigram entities are tagged with special \texttt{S-Tag} (read \textit{Single Tag}).
+    \item \texttt{BIOES}: Additionally over \texttt{BIOE} scheme, unigram mentions are labeled \texttt{S-Tag} (\texttt{S} stands for \textit{singleton}).
 \end{itemize}
 
 \section{Datasets}
-
-Table \ref{tab:datasets_summary} gives a summary of the datasets and nature of entities they posses. For each dataset we work with standard \texttt{Train}/\texttt{Dev}/\texttt{Test} splits as used by previous studies. Our datasets are persisted in files in tab-separated (\texttt{TSV}) format. Each token in a sentence corresponds to a row with 4 tab-separated entries (token, part-of-speech tag, dependency-parse tag, output entity tag). Two sentences are separated by an empty line in the file. We follow the \texttt{BIO} tagging scheme in the persisted data files.
+\label{sec:datasets}
+In this study we work with multiple English language datasets belonging to news and biomedical domains. Table \ref{tab:datasets_summary} gives a summary of the datasets and nature of entities they posses. We define non-word entities, high/low resource, nesting in Section \ref{sec:nature_of_entities}.
 
 \begin{table}[h!]
-	\begin{tabular}{|c|c|c|p{5em}|p{6em}|c|}\hline
-	\textbf{Dataset} & \textbf{Source} & \textbf{\#Entities} & \textbf{Alpha-numerics} & \textbf{High/Low Resource} & \textbf{Structure}\\\hline
+	\begin{tabular}{|c|c|c|c|p{6em}|c|}\hline
+	\textbf{Dataset} & \textbf{Domain} & \textbf{\#Entities} & \textbf{Non-Word} & \textbf{High/Low Resource} & \textbf{Nesting}\\\hline
 	\texttt{CoNLL 2003} & News & 4 & No & High & Flat\\\hline
-	\texttt{OntoNotes 5.0} & News & 18 & No & High \& Low & Flat\\\hline
-	\texttt{BIONLP13CG} & Biomedical & 16 & Yes & High \& Low & Nested\\\hline
+	\texttt{OntoNotes 5.0} & News & 18 & Yes & High + Low & Flat\\\hline
+	\texttt{BIONLP13CG} & Biomedical & 16 & Yes & High + Low & Nested\\\hline
 	\texttt{JNLPBA} & Biomedical & 4 & Yes & High & Flat\\\hline
 	\end{tabular}
 	\caption{Datasets Summary}
@@ -58,16 +82,16 @@ Table \ref{tab:datasets_summary} gives a summary of the datasets and nature of e
 
 \subsection{CoNLL 2003 Dataset}
 
-The \texttt{CoNLL 2003}\cite{sang2003introduction} corpus is a collection of news wire articles from the Reuters corpus and has been manually annotated with 4 classes, \texttt{PER} (Person), \texttt{ORG} (Organization), \texttt{LOC} (Location) and \texttt{MISC} (Miscellaneous) entities which do not belong to the other 3 classes. We obtain the dataset from \texttt{datasets}\footnote{https://huggingface.co/datasets/conll2003} package. The \texttt{MISC} class can be considered more diverse than the other 3 classes. Alphanumeric entity tokens only constitute \texttt{0.05\%} of all entity tokens and hence all named entities are predominantly non-alphanumeric. The entities are flatly labelled i.e do not have overlaps or nesting structure. As per Table \ref{tab:conll_entity_distribution}, none of the entities are low-resource. Average sentence length is \texttt{14.53} tokens. Table \ref{tab:conll_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} split. 
+The \texttt{CoNLL 2003}\cite{sang2003introduction} corpus is a collection of news wire articles from the Reuters corpus manually annotated with 4 entity types: \texttt{PER} (Person), \texttt{ORG} (Organization), \texttt{LOC} (Location) and \texttt{MISC} (Miscellaneous). We obtain the dataset from \texttt{datasets}\footnote{https://huggingface.co/datasets/conll2003} package. From diversity perspective, the \texttt{MISC} class is more diverse than the other 3 classes. Only $4.6\%$ tokens belonging to entity mentions are non-word. Hence all named entities are predominantly word-based. The corpus has no nesting and as per the distribution of entities shown in Table \ref{tab:conll_entity_distribution}, none of the entities are low-resource. Average sentence length is $14.5$ tokens. Table \ref{tab:conll_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
 
 \begin{table}[h!]
 \begin{subtable}[t]{.48\linewidth}
 \centering
 \begin{tabular}{|c|c|}\hline
 	\textbf{Entity} & \textbf{Count}\\\hline
+	\texttt{LOC} & 10645\\\hline
 	\texttt{PER} & 10059\\\hline
 	\texttt{ORG} & 9323\\\hline
-	\texttt{LOC} & 10645\\\hline
 	\texttt{MISC} & 5062\\\hline
 	\end{tabular}
 	\caption{Entity Distribution}
@@ -90,31 +114,33 @@ The \texttt{CoNLL 2003}\cite{sang2003introduction} corpus is a collection of new
 
 \subsection{OntoNotes 5.0 Dataset}
 
-\texttt{OntoNotes 5.0}\cite{} is a large corpus consisting of text from news reports, weblogs, broadcasts etc. labelled with structural syntactic and linguistic information like ontology, coreference etc. We focus on named entity tags from English language corpus. The dataset consists of 18 entity classes including \texttt{PERSON}, \texttt{FACILITY}, \texttt{PRODUCT} etc. along with entities with numerical semantics like \texttt{DATE}, \texttt{MONEY} etc. More details on what each entity means can be found in release docs\footnote{Section 2.6 of https://catalog.ldc.upenn.edu/docs/LDC2013T19/OntoNotes-Release-5.0.pdf}. We obtain the dataset available on GitHub\footnote{https://github.com/yuchenlin/OntoNotes-5.0-NER-BIO}. Entities like \texttt{GPE} (Geo-Political Entity) and \texttt{LOCATION} have very subtle differences. There are some similarities among other entities as well. Alphanumeric entity tokens constitute \texttt{1.04\%} of all entity tokens. The entities are flatly labelled (no nesting). As per Table \ref{tab:onto_entity_distribution}, entities like \texttt{PERSON}, \texttt{DATE} are high-resource where as \texttt{LANGUAGE}, \texttt{LAW} are low-resource. Average sentence length is \texttt{19.04} tokens. Table \ref{tab:onto_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} split. 
+\texttt{OntoNotes 5.0}\cite{weischedel2013ontonotes} is a large corpus consisting of text from various genres (news, weblogs, talk shows, broadcast, conversational
+telephone speech etc.) labeled with structural information (syntax) and shallow semantics (word sense linked to an ontology, coreference etc.). There are
+5 versions, from Release 1.0 to Release 5.0. We work with Release 5.0 and focus on named entity labels on English data. There are 18 entity types including common ones like \texttt{PERSON}, \texttt{ORG} and entities having numerical semantics like \texttt{DATE}, \texttt{MONEY} etc. We obtain the dataset from GitHub\footnote{https://github.com/yuchenlin/OntoNotes-5.0-NER-BIO}. There are some entities like \texttt{GPE} (geo-political entity) and \texttt{LOCATION} which have very subtle difference in their semantics making them challenging to disambiguate. Corpus is flat-labeled and around $19.3\%$  entity-mention tokens are non-word. As per Table \ref{tab:onto_entity_distribution}, entities like \texttt{PERSON}, \texttt{DATE} are high-resource while \texttt{LANGUAGE}, \texttt{LAW} are low-resource. Average sentence length is $19.0$ tokens. Table \ref{tab:onto_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
 
 \begin{table}[h!]
 \begin{subtable}[t]{.48\linewidth}
 \centering
 \begin{tabular}{|c|c|}\hline
 	\textbf{Entity} & \textbf{Count}\\\hline
-	\texttt{DATE} & 23786\\\hline
-    \texttt{MONEY} & 6425\\\hline
-    \texttt{WORK\_OF\_ART} & 1650\\\hline
-    \texttt{CARDINAL} & 13626\\\hline
-    \texttt{ORG} & 29963\\\hline
-    \texttt{PERSON} & 27332\\\hline
+	\texttt{ORG} & 29963\\\hline
     \texttt{GPE} & 28133\\\hline
+    \texttt{PERSON} & 27332\\\hline
+    \texttt{DATE} & 23786\\\hline
+    \texttt{CARDINAL} & 13626\\\hline
     \texttt{NORP} & 11608\\\hline
+    \texttt{MONEY} & 6425\\\hline
     \texttt{PERCENT} & 4866\\\hline
     \texttt{ORDINAL} & 2737\\\hline
-    \texttt{TIME} & 2289\\\hline
     \texttt{LOC} & 2691\\\hline
-    \texttt{PRODUCT} & 1296\\\hline
-    \texttt{FAC} & 1440\\\hline
-    \texttt{EVENT} & 1273\\\hline
+    \texttt{TIME} & 2289\\\hline
+    \texttt{WORK\_OF\_ART} & 1650\\\hline
     \texttt{QUANTITY} & 1583\\\hline
-    \texttt{LANGUAGE} & 412\\\hline
+    \texttt{FAC} & 1440\\\hline
+    \texttt{PRODUCT} & 1296\\\hline
+    \texttt{EVENT} & 1273\\\hline
     \texttt{LAW} & 568\\\hline
+    \texttt{LANGUAGE} & 412\\\hline
 	\end{tabular}
 	\caption{Entity Distribution}
 	\label{tab:onto_entity_distribution}
@@ -136,7 +162,7 @@ The \texttt{CoNLL 2003}\cite{sang2003introduction} corpus is a collection of new
 
 \subsection{JNLPBA Dataset}
 
-The \texttt{JNLPBA}\cite{} dataset comes from GENIA version 3.2 corpus\cite{} which consists of abstracts taken from MEDLINE database. GENIA dataset consists of 36 entity classes. For preparing JNLPBA, some of these classes are combined to a higher-level entity class and some are ignored. In all, JNLPBA has 5 entity classes: \texttt{protein}, \texttt{DNA}, \texttt{RNA}, \texttt{cell\_line}, \texttt{cell\_type}. We obtain the dataset available on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/tree/master/data/JNLPBA}. Alphanumeric entity tokens constitute \texttt{3.73\%} of all entity tokens. The entities are flatly labelled (no nesting). As per Table \ref{tab:jnlpba_entity_distribution}, mostly the entities can be considered high-resource although representation of \texttt{RNA} is comparatively very less. Average sentence length is \texttt{26.50} tokens. Table \ref{tab:jnlpba_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} split. 
+The \texttt{JNLPBA}\cite{kim2004introduction} dataset comes from GENIA\cite{kim2003genia} corpus (version 3.2) and contains abstracts of papers taken from MEDLINE database. The GENIA corpus consists of 36 fine-grained nested named entity types. For preparing JNLPBA, some of these entity classes are combined to a higher-level entity class and others are ignored. In all, JNLPBA has 5 flat-labeled entity types: \texttt{protein}, \texttt{DNA}, \texttt{RNA}, \texttt{cell\_line}, \texttt{cell\_type}. We obtain the dataset available from GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/tree/master/data/JNLPBA}. Around $31.1\%$ of entity mention tokens are non-word. As per Table \ref{tab:jnlpba_entity_distribution}, most entities are high resource although representation of \texttt{RNA} is comparatively less. Average sentence length is $26.5$ tokens. Table \ref{tab:jnlpba_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
 
 \begin{table}[h!]
 \begin{subtable}[t]{.48\linewidth}
@@ -169,7 +195,7 @@ The \texttt{JNLPBA}\cite{} dataset comes from GENIA version 3.2 corpus\cite{} wh
 
 \subsection{BIONLP13CG Dataset}
 
-The \texttt{BIONLP13CG}\cite{} (Cancer Genetics) dataset comes from BioNLP Shared Task 2013. The text belongs to the theme of biological processes relating to the development and progression of cancer. It consists of 16 entity types with a mix of high-resource and low-resource ones. We obtain the dataset available on the shared task website\footnote{http://2013.bionlp-st.org/tasks/cancer-genetics} and process it into \texttt{tsv} format. For most part of NER study when using this dataset we focus on flat-annotated entity mentions and ignore the small percentage of nested entities both from training and evaluation. The flat-annotated corpus is consistent with the one avaiable on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/tree/master/data/BioNLP13CG-IOB}. Alphanumeric entity tokens constitute \texttt{3.08\%} of all entity tokens. There are some entity overlaps and around 1\% of entities are nested. Table \ref{tab:bio_entity_distribution} shows the representation of entity mentions in the complete dataset. Average sentence length is \texttt{27.57} tokens. Table \ref{tab:bio_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} split. 
+The \texttt{BIONLP13CG}\cite{pyysalo2015overview} (Cancer Genetics) dataset comes from BioNLP Shared Task 2013. The text belongs to the theme of biological processes relating to the development and progression of cancer. It consists of 16 entity types with a mix of high-resource and low-resource ones. We obtain the dataset available on the shared task website\footnote{http://2013.bionlp-st.org/tasks/cancer-genetics} and process it into \texttt{tsv} format. For most part of NER study when using this dataset we focus on flat-annotated entity mentions and ignore the small percentage (around $1\%$) of nested entities both from training and evaluation. The flat-annotated corpus is consistent with the one available on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/tree/master/data/BioNLP13CG-IOB}. Around $24.9\%$ of entity mention tokens are non-word. Average sentence length is $27.6$ tokens. Table \ref{tab:bio_entity_distribution} shows the distribution of entities and Table \ref{tab:bio_dataset_split} gives the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
 
 \begin{table}[h!]
 \begin{subtable}[t]{.48\linewidth}
@@ -177,19 +203,19 @@ The \texttt{BIONLP13CG}\cite{} (Cancer Genetics) dataset comes from BioNLP Share
 \begin{tabular}{|c|c|}\hline
 	\textbf{Entity} & \textbf{Count}\\\hline
 	\texttt{Gene\_or\_gene\_product} & 7908\\\hline
-    \texttt{Cancer} & 2582\\\hline
     \texttt{Cell} & 3492\\\hline
-    \texttt{Organism} & 1715\\\hline
+    \texttt{Cancer} & 2582\\\hline
     \texttt{Simple\_chemical} & 2270\\\hline
+    \texttt{Organism} & 1715\\\hline
     \texttt{Multi-tissue\_structure} & 857\\\hline
-    \texttt{Organ} & 421\\\hline
-    \texttt{Organism\_subdivision} & 98\\\hline
     \texttt{Tissue} & 587\\\hline
-    \texttt{Immaterial\_anatomical\_entity} & 102\\\hline
-    \texttt{Organism\_substance} & 283\\\hline
     \texttt{Cellular\_component} & 569\\\hline
+    \texttt{Organ} & 421\\\hline
+    \texttt{Organism\_substance} & 283\\\hline
     \texttt{Pathological\_formation} & 228\\\hline
     \texttt{Amino\_acid} & 135\\\hline
+    \texttt{Immaterial\_anatomical\_entity} & 102\\\hline
+    \texttt{Organism\_subdivision} & 98\\\hline
     \texttt{Anatomical\_system} & 41\\\hline
     \texttt{Developing\_anatomical\_structure} & 35\\\hline
 	\end{tabular}
@@ -212,4 +238,4 @@ The \texttt{BIONLP13CG}\cite{} (Cancer Genetics) dataset comes from BioNLP Share
 \end{table}
 
 \section{Experimental Setup}
-% TODO: arorja
+We report all our results on the test sets after taking the model checkpoint corresponding to the best micro-averaged F1-score on dev set. The dev set evaluation takes place at steps of 0.5 training epochs. We train the models for $300$ epochs at learning rate $10^{-5}$ unless otherwise specified. We use \texttt{transformers}\footnote{https://github.com/huggingface/transformers} python library by HuggingFace and \texttt{pytorch} for implementation and fix random seed to $42$ for replication. Our experiments are conducted on \texttt{Nvidia GeForce GTX 1080} and \texttt{Nvidia Tesla V100} gpus. We use cross entropy loss during training unless otherwise specified. The training data is randomly shuffled and a batch size of $16$ is used with post-padding. For BERT-based models, we fix maximum sequence length to $256$ for \texttt{BIONLP13CG}, \texttt{CoNLL 2003}, \texttt{JNLPBA} datasets and $512$ for \texttt{OntoNotes 5.0} data. Unless otherwise specified, the BERT-based models output entity labels to each sub-token (as per WordPiece tokenization) of an existing token in the dataset. As a heuristic, we take the label of first sub-token as the label for the corresponding token during our evaluations.
