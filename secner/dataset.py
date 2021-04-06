@@ -425,7 +425,7 @@ class NerDataCollator:
         # attention_mask
         entry = []
         for i in range(len(features)):
-            good_len = len(features[i]["labels"])
+            good_len = len(features[i]["input_ids"])
             pad_len = max_len - good_len
             entry.append(torch.tensor([1] * good_len + [0] * pad_len))
         batch["attention_mask"] = torch.stack(entry)
@@ -502,7 +502,8 @@ class NerDataCollator:
             word_type_vocab = NerDataset.get_word_type_vocab()
             for i in range(len(features)):
                 pad_len = max_len - len(features[i][self.args.token_type])
-                entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w))
+                # padding tokens get word_type 0, all others get valid word_type indices (1 onwards)
+                entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w)) + 1
                                            for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["word_type_ids"] = torch.stack(entry)
 

@@ -16,7 +16,8 @@ class NerModel(BertPreTrainedModel):
         super(NerModel, self).__init__(config)
         self.additional_args = additional_args
         self.num_labels = config.num_labels
-        self.num_word_types = len(NerDataset.get_word_type_vocab())
+        # added (+1) to give special importance to <PAD> token (breaks backward compatibility with prev. trained models)
+        self.num_word_types = len(NerDataset.get_word_type_vocab()) + 1
         none_tag = self.additional_args.none_tag
         self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag,
                                                                self.additional_args.use_pos_tag))
