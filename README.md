@@ -62,8 +62,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  91.134                    |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM-Highway    | 85.313                      |                |  todo                      |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  todo                      |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM-Highway    | 85.313                      |                |  91.085                    |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  90.903            |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM            | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
@@ -89,6 +89,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Scrambled                    | 85.506(can be trained more) |                |                            |           |                      |
 | BioBERT-QA4-QuestionType2(Where)         | **86.642**                  | 74.330         |  91.358                    |           |                      |
+| BioBERT-QA4-QType2-WordType-SubText      | 85.811(running)             |                |                            |           |                      |
 | RoBERTa-QA4                              | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
@@ -195,7 +196,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-Scrambled                    | 88.1084                | 83.6652                | 85.8293                |
 | BioBERT-QA4-QType2(Where)                | **89.2091**            | 84.5807                | **86.8333**            |
-| BioBERT-QA4-QType2(Where)-WordType-SubText| todo                  | todo                   | todo                   |
+| BioBERT-QA4-QType2-WordType-SubText(running)| 87.5847             | 84.5807                | 86.0565                |
 | BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
 | BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
@@ -218,9 +219,9 @@ Precision, Recall distribution for some good performing models to understand whe
 | BERT-Punctuation-HeadToken               | 91.6888                | 91.6726                | 91.6807                |
 | BERT-WordType-SubText                    | 91.4442                | 91.6549                | 91.5494                |
 | BERT-CharCNN5-Pattern0LSTM               | 91.1901                | 90.9639                | 91.0768                |
-| BERT-CharCNN5-Pattern1LSTM               | todo                   | todo                   | todo                   |
+| BERT-CharCNN5-Pattern1LSTM               | 91.1029                | 91.5545                | 91.3281                |
 | BERT-CharCNN5-Pattern0LSTM-Highway       | 91.4604                | 91.5899                | 91.5251                |
-| BERT-CharCNN5-Pattern1LSTM-Highway       | todo                   | todo                   | todo                   |
+| BERT-CharCNN5-Pattern1LSTM-Highway       | 91.7037                | 91.3952                | 91.5492                |
 | BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
 | BERT-QA3                                 | 91.6218                | 90.4954                | 91.0551                |
 | BERT-QA4                                 | 91.5402                | 90.8006                | 91.1689                |
