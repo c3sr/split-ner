@@ -1,12 +1,17 @@
-Concretely, in named entity recognition (NER), we are given an unlabeled raw text and the goal is to identify certain entities (sequence of tokens) of interest. In this study, we approach this task using machine learning in supervised learning setting. The idea is, we are given a set of labeled sentences with the required entities marked. We feed those samples to a machine learning system to learn from it. The system is then evaluated on a manually labeled test set and relevant evaluation metrics are reported. In this chapter, we will look at various ways of approaching NER along with detailed ablation studies and variants. Simultaneously, we compare our results with existing published state-of-the-art approaches on multiple datasets.
+We approach the named entity recognition problem from different perspectives, as a sequence labeling task, a question answering task and a span detection and classification task. In this chapter, we look at all these in detail and compare and contract them with one-another. Primarily, we develop on top of pretrained BERT model. We look at the effect of loss function, tagging schemes, providing additional semantic information etc. on the overall task. We also study how much guidance the model derives from any additional information fed with the input. Experiments are conducted on multiple datasets and we simultaneously compare our models with previously published state-of-the-art results as well. 
 
 \section{Sequence Labeling}
-Traditionally, the most intuitive way of approaching named entity recognition is as a sequence labeling task. An input sentence can be considered as a sequence of \texttt{n} tokens, fed to a neural network model. For each token, the model classifies it into an output class as per \texttt{BIO} tagging scheme. As the model backbone, we use \texttt{CNN-LSTM-CRF} and \texttt{BERT} architectures as described below.
+\begin{definition}
+\label{def:seq_labeling}
+    Given sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, sequence labeling is the task of forming output sequence $\mathcal{L} = \langle l_1, l_2 \ldots l_N \rangle$ where $l_i$ is the label assigned to token $w_i$. 
+\end{definition}
+
+For NER, we extract entity mentions by making output labels follow a tagging scheme (Section \ref{sec:tagging_scheme}). For example, with \texttt{BIO} scheme, each output label is of the form \texttt{B-Tag}, \texttt{I-Tag} or \texttt{O} with $\texttt{Tag} \in \mathcal{T}$ where $\mathcal{T}$ is the set of all possible entity types. For this task, we use two deep neural architectures:
 
 \begin{itemize}
-    \item \texttt{CNN-LSTM-CRF}: As proposed in \cite{ma2016end}, this is a popular NER model. The character-level CNN helps capture the intrinsic patterns and word-level semantics of individual tokens. These character-level embeddings are concatenated with word embeddings and fed to bidirectional LSTM\cite{} which helps capture the sentence grammar and token inter-dependencies. Finally, the CRF models the output tag sequence and makes sure that abrupt and unexpected tag transitions do not take place. 
+    \item \texttt{CNN-LSTM-CRF}: Proposed by \cite{ma2016end}, this model has three components. A CNN layer helps capture intrinsic character-level semantics and patterns. These features are then concatenated with word embeddings and fed to a bidirectional LSTM\cite{hochreiter1997long} which captures sentence grammar and token inter-dependencies. Finally, a CRF\cite{lafferty2001conditional} layer on top helps model tag transitions to make sure output label sequence does not contain abrupt and unexpected transitions. 
     
-    \item \texttt{BERT}: Proposed in \cite{devlin2018bert}, BERT is a bidirectional encoder implemented using the transformer architecture \cite{}. The input is a sentence, which is broken down into sub-words/sub-tokens. Multi-head attention and several layers of encoders are able to capture long-term relationships among tokens and semantics well. Finally, the model outputs contextualized embeddings for each sub-token in the sentence. Then we have a simple fully-connected layer followed by Softmax to classify each token into an output class. The model is optimized using cross-entropy loss.
+    \item \texttt{BERT}: Proposed by \cite{devlin2018bert}, BERT is a bidirectional encoder transformer\cite{vaswani2017attention}. It applies WordPiece\cite{wu2016google} tokenization on input sentence which is then passed through several encoder layers with multiple attention heads capturing sentence semantics and inter-token relationships well. The model outputs contextualized embeddings for each sub-token in the sentence. We take the last hidden layer outputs from BERT model and pass it to a fully connected layer. The outputs are converted to a probability distribution over labels space.
 \end{itemize}
 
 \subsection{Experiment Details}
@@ -531,3 +536,35 @@ To study the effect of additional context provided to the model, we parse the \t
 From the stats reported in Tables \ref{tab:context_bio_dataset} and \ref{tab:res_context_bio}, we observe that forming longer and more content rich training samples causes our overall dataset size to be significantly reduced. This is a cause of concern and hence additional context is not able to give performance boost to the existing standard training setup.
 
 \section{Comparative Precision/Recall Analysis}
+\label{sec:precision_recall_analysis}
+Next, we do a quantitative comparison among the several variations studied in the previous sections and look at their micro-averaged precision, recall and F1-scores over multiple datasets.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+     & \multicolumn{3}{c|}{\textbf{BIONLP13CG}} & \multicolumn{3}{c|}{\textbf{CoNLL 2003}} & \multicolumn{3}{c|}{\textbf{JNLPBA}}\\\hline
+	 & P & R & F1 & P & R & F1 & P & R & F1\\\hline
+	\texttt{BERT} & 86.17 & 85.82 & 85.99 & 91.24 & 91.48 & 91.36 & 70.97 & 78.07 & 74.35\\\hline
+	\texttt{Dice Loss} & 86.68 & \textbf{86.03} & 86.35 & 91.05 & 90.47 & 90.76 & \textbf{72.05} & 78.23 & \textbf{75.01}\\\hline
+	\texttt{Span-Based} & 86.33 & 85.47 & 85.89 & 91.46 & \textbf{91.82} & 91.64 & 71.14 & \textbf{79.34} & \textbf{75.01}\\\hline
+	\texttt{QA} & 88.62 & 84.39 & 86.45 & 91.54 & 90.80 & 91.17 & 71.97 & 78.11 & 74.92\\\hline
+	\texttt{QA(Where)} & \textbf{89.21} & 84.58 & \textbf{86.83} & \textbf{92.47} & 91.19 & \textbf{91.82} & 71.45 & 78.11 & 74.64\\\hline
+	\texttt{Punctuation} & 87.62 & 85.66 & 86.63 & 91.75 & 91.60 & 91.67 & 70.42 & 78.47 & 74.23\\\hline
+	\end{tabular}
+    \caption{Results: Precision/Recall Comparison}
+    \label{tab:res_precision_recall}
+\end{table}
+
+\section{State-of-the-art Comparison}
+\label{sec:sota_comparison}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}\hline
+	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003} & \textbf{JNLPBA}\\\hline
+	\texttt{Span-Based} & 86.83 & 91.82 & 75.01\\\hline
+	\texttt{SOTA} & 85.56* & 94.3* & 81.29*\\\hline
+	\end{tabular}
+    \caption{Results: Comparison with SOTA (Test set Micro-F1 in \%)}
+    \label{tab:context_bio_dataset}
+\end{table}

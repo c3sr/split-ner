@@ -25,10 +25,12 @@ NER has been a popular research area for long and has seen transitions in parall
 %     \item Different entities have different semantics which may require explicit modeling. Entities like \texttt{Person}, \texttt{Location} are wordy, while others like \texttt{Date}, \texttt{SSN}, \texttt{Telephone} can be numeric codes having patterns within them. (We handle this by parallel Char-CNN+Patterns)
 % \end{itemize}
 
-In this work, we use the popular \texttt{CNN-LSTM-CRF} and BERT models as baselines and develop on top of them. We present a thorough study and compare and contrast the NER task from three different perspectives, as a sequence labeling problem, a question answering-based approach and span detection and classification task. The contributions of our work are three-fold:
+In this work, we use the popular \texttt{CNN-LSTM-CRF} and BERT models as baselines and develop on top of them. We present a thorough study and compare and contrast the NER task from three different perspectives, as a sequence labeling problem, a question answering-based approach and span detection and classification task. The contributions of our work are:
 
 \begin{itemize}
     \item We introduce a novel pattern modeling approach which converts sparse character space to dense pattern space for more effective training of alphanumeric entities even with minimal training samples.
+    
+    \item We propose a novel question answering based setup for span detection and classification which gives competitive performance and performs particularly well for low-resource entities.
     
     \item Our system achieves new state-of-the-art on \texttt{BIONLP13CG} dataset which consists of 16 fine-grained alphanumeric named entity types and achieves competitive results in both biomedical as well as general English news domains.
     
