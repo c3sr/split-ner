@@ -89,6 +89,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Scrambled                    | 85.506(can be trained more) |                |                            |           |                      |
 | BioBERT-QA4-QuestionType2(Where)         | **86.642**                  | 74.330         |  91.358                    |           |                      |
+| BioBERT-QA4-QType2-WordType-SubText      | 85.811(running)             |                |                            |           |                      |
 | RoBERTa-QA4                              | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
@@ -195,7 +196,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BioBERT-QA4                              | 88.6159                | 84.3918                | 86.4523                |
 | BioBERT-QA4-Scrambled                    | 88.1084                | 83.6652                | 85.8293                |
 | BioBERT-QA4-QType2(Where)                | **89.2091**            | 84.5807                | **86.8333**            |
-| BioBERT-QA4-QType2(Where)-WordType-SubText| todo                  | todo                   | todo                   |
+| BioBERT-QA4-QType2-WordType-SubText(running)| 87.5847             | 84.5807                | 86.0565                |
 | BioBERT-QA4 (Nested)                     | 87.4147                | 84.4318                | 85.8973                |
 | BioBERT-QA4-Punctuation                  | 88.0719                | 84.7697                | 86.3892                |
 | BioBERT-QA4-WordType                     | 88.4910                | 84.0285                | 86.2020                |
