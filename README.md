@@ -62,8 +62,8 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | CharCNN1                                 | 50.283                      |                |                            |           |                      |
 | BioBERT-CharCNN1-Pattern0LSTM            | 85.048                      |                |  90.571                    |           |                      |
 | BioBERT-CharCNN5-Pattern0LSTM-Highway    | 85.294                      |                |  91.134                    |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM-Highway    | 85.313                      |                |  todo                      |           |                      |
-| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  todo                      |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM-Highway    | 85.313                      |                |  91.085                    |           |                      |
+| BioBERT-CharCNN5-Pattern1LSTM            |**86.064**                   |73.516(check pat:0 or 1)|  todo              |           |                      |
 | BioBERT-CharCNN5-Pattern2LSTM            | 85.588                      |                |                            |           |                      |
 | BioBERT-CharCNN5                         | 85.836                      |                |                            |           |                      |
 | BioBERT-CharCNN5-Pattern1LSTM-SubText    |**86.025**                   |                |                            |           |                      |
@@ -220,7 +220,7 @@ Precision, Recall distribution for some good performing models to understand whe
 | BERT-CharCNN5-Pattern0LSTM               | 91.1901                | 90.9639                | 91.0768                |
 | BERT-CharCNN5-Pattern1LSTM               | todo                   | todo                   | todo                   |
 | BERT-CharCNN5-Pattern0LSTM-Highway       | 91.4604                | 91.5899                | 91.5251                |
-| BERT-CharCNN5-Pattern1LSTM-Highway       | todo                   | todo                   | todo                   |
+| BERT-CharCNN5-Pattern1LSTM-Highway       | 91.7037                | 91.3952                | 91.5492                |
 | BERT-Dice                                | 91.0485                | 90.4678                | 90.7572                |
 | BERT-QA3                                 | 91.6218                | 90.4954                | 91.0551                |
 | BERT-QA4                                 | 91.5402                | 90.8006                | 91.1689                |
