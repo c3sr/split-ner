@@ -17,7 +17,7 @@
   "max_seq_len": 256,
   "freeze_bert": false,
   "detect_spans": true,
-  "query_type": "question",
+  "query_type": "question2",
   "base_model": "allenai/scibert_scivocab_uncased",
   "evaluation_strategy": "steps",
   "logging_steps": 50,
