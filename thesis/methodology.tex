@@ -113,16 +113,37 @@ However, for learning spans (start and end indices), the classification layer ha
 \section{Span Detection and Classification Pipeline}
 \label{sec:span_pipeline}
 
-Another way of approaching NER is to break it down into a two-step pipelined procedure. In the first step, given a sentence, we detect all entity spans (Span Detector). In the next step, these spans are classified into an output entity class by another model (Span Classifier).
+Previous approaches like sequence labeling and question answering (QA) treat the NER problem as a whole. One single model must take a sentence as input and return mention tuples with correct boundaries and correct entity type. Another possibility is to have a division of labor. We break down the NER problem into a two-step pipelined process. In the first step (\textbf{Span Detector}), we detect all mention spans in a given sentence. In the next step (\textbf{Span Classifier}), we classify these spans into their corresponding entity type. Now, we can train two separate models independently which specialize in their own sub-tasks and together solve the NER problem. We borrow the basic intuitions of QA model to solve both our sub-tasks.
 
-\subsection{Experiment Details}
+\subsection{Span Detection}
+Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, the goal of this module is to output a list of spans (mention tuples) $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. Note that here the mention tuples are not associated with an entity type. 
+
+We formulate this as a question answering task asking the model to identify all entity spans in a given sentence. For example, the sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted to the input, \textit{What is the \texttt{entity} mentioned in the text? Emily lives in United States}. This is fed to BERT model which outputs labels for each token following the \texttt{BIOE} scheme. In this example, we expect two spans, \textit{Emily} and \textit{United States}. 
+
+\subsection{Span Classification}
+Here, we are given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$ and a span $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. The goal is to output a label $t$ for the span such that $t \in \mathcal{T}$, where $\mathcal{T}$ is the set of all entity types.
+
+This is modeled as the reverse of QA model for NER described in Section \ref{sec:question_answering}. For every gold entity mention (Eg. \textit{Emily}) in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample input, \textit{Emily lives in United States. What is Emily?} The sentence is fed to a BERT model where we do sequence classification. The pooled sequence embedding returned by BERT is fed to a fully connected layer and converted to a probability distribution over possible entity types. In this example, the model is expected to assign maximum probability to \texttt{PERSON}.
+
+\subsection{Pipeline}
+Both the models can be trained independently. The pipeline structure comes during the inference time. Here, every unlabeled sentence is first passed through Span Detector and for each output span, we convert to an input sample for Span Classifier.
+
+\subsection{Salient Features}
 
 \begin{itemize}
-    \item \textbf{Span Detection}: We treat this sub-problem as a question answering task. Every sample sentence of the form, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted into the form, \textit{What is the entity mentioned in the text? Emily lives in United States}. This is fed to BERT (\texttt{bert-base-uncased}) model and the outputs are passed through a single fully connected layer followed by softmax. The model is expected to output \texttt{B}, \texttt{I} and \texttt{O} tags for each token and in this case, detect two spans, \textit{Emily} and \textit{United States}. 
+    \item Compared to sequence labeling and question answering approach, this span-based approach has more representative power. This is because here we have two BERT models each working on their own sub-tasks and contributing towards better NER while the other approaches just have a single model.
     
-    \item \textbf{Span Classification}: Again, we treat this sub-problem as a question answering task as well. For every gold labeled entity mention in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample, \textit{Emily lives in United States. What is Emily?} The sentence is passed to BERT (\texttt{bert-base-uncased}) and the final pooled output for the sentence is fed to a fully connected layer followed by softmax to classify the sentence into one of the entity types, in this case, \texttt{PERSON}.
+    \item Even though we are training two BERT models, they can be trained independently, in parallel. Only at inference time, we need to maintain the sequential nature.
     
-    \item \textbf{Pipeline}: During evaluation, every unlabeled sentence is passed through Span Detector and for each output span, we convert to an input sample for Span Classifier.
+    \item If we have $T$ entities of interest, then standard question answering approach creates $T$ samples for each input sentence both at train and inference time. Considering that each sentence on an average has much lesser than $T$ entity mentions, there is a lot of redundancy in this approach. 
+    
+    \item Our span-based approach removes QA model redundancy even though inherently we have a QA-based setup. Span Detector only sees an input sentence once and identifies all mention spans. The span classifier will work on only these identified mention spans and classify them into an entity type.
+    
+    \item Nevertheless, our approach has a pipeline-based structure and hence errors made by span detector propagate to the classifier. Sequence labeling and question answering approaches do not face this concern. 
+    
+    \item Our span-based approach shows the effectiveness of \textit{reverse question answering}. For a sentence, \textit{Emily lives in United States}, rather than asking a question of the form, \textit{"What is the \texttt{Person} mentioned in the text?"}, we ask, \textit{"What is \texttt{Emily}?"}. This opens up prospects for more intuitive forms of approaching NER, taking us closer to human understanding and interpretations.
+    
+    \item Comparable and even improved performance of this span-based approach compared to the general QA NER setup (results in Table \ref{tab:res_span}) shows that boundary detection of mentions has less correlation with the entity type it belongs to.
 \end{itemize}
 
 \begin{table}[h!]
@@ -131,25 +152,31 @@ Another way of approaching NER is to break it down into a two-step pipelined pro
 	\textbf{} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
 	\texttt{Span Detection} & 90.12 & 78.35 & 95.23\\\hline
 	\texttt{Span Classification} & 94.06 & 95.08 & 94.50\\\hline
-	\texttt{Pipeline} & 85.89 & 75.01 & 91.64\\\hline
-	\texttt{BERT-QA} & 86.45 & todo & 91.17\\\hline
+	\texttt{Pipeline} & 85.89 & \textbf{75.01} & \textbf{91.64}\\\hline
+	\texttt{BERT-QA} & \textbf{86.45} & 74.81 & 91.17\\\hline
 	\end{tabular}
     \caption{Results: Span Pipeline (Test set Micro-F1 in \%)}
     \label{tab:res_span}
 \end{table}
 
 \subsection{Observations}
-Table \ref{tab:res_span} reports the results of the pipelined span detection and classification procedure and also presents comparison with simple BERT question answering setup for NER. We present this comparison since question answering model serves as the primary backbone of our current span-based extraction procedure. Note that for one-to-one comparison all results here correspond to \texttt{B}, \texttt{I}, \texttt{O} output tagging and \textit{What} as question word in question formulation.
+Table \ref{tab:res_span} reports the results of the pipelined span detection and classification procedure and compares it with simple BERT QA setup. We present this comparison since QA model serves as the primary backbone of our span-based approach. All models here use \texttt{BIOE} tagging scheme and use \textit{What} as the question word in question formulation.
 
 \begin{itemize}
-    \item \textbf{Span Detection}: Detecting all entity spans together without classification is a simpler problem for the model than full NER and hence we get better performance compared to \texttt{BERT-QA} model.
+    \item \textbf{Span Detection}: Detecting all mention spans together without classification is a simpler problem for the model than full NER and we get better performance on this sub-task compared to complete NER task in QA setup.
     
-    \item \textbf{Span Classification}: Given that spans are detected correctly, this second step of the pipeline is relatively simple for the BERT model. On all datasets, we see above 90\% Micro-F1 on test set.
+    \item \textbf{Span Classification}: Given that spans are pre-identified, classifying them to an entity type is a relatively simple task for the BERT model. On all datasets, we see around $95\%$ Micro-F1 on test set.
     
-    \item \textbf{Pipeline}: The pipelined procedure gives comparable results to standard question answering based NER model. The main bottleneck lies in the span detection part. Since this procedure is pipelined, errors in first step propagate to the next step leading to an overall reduced performance.
+    \item \textbf{Pipeline}: The pipelined procedure gives comparable and even better performance than standard QA NER model on all datasets demonstrating the effectiveness of this division of labor. 
+    
+    \item Since out \texttt{Pipeline} results are comparable to \texttt{BERT-QA} model, we conclude that internally \texttt{BERT-QA} model also tries to logically segregate boundary detection and classification as separate tasks.
+    
+    \item The results of span pipeline are limited by the performance of the span detector part. Since this procedure is pipelined, errors in this first step propagate to the next step. Boundary detection serves as the primary challenge in Span Detector and has a large scope for improvement on biomedical datasets.
+    
+    \item Qualitative analysis, later discussed in Section \ref{sec:qualitative_analysis} reveals that both \texttt{BERT-QA} and \texttt{Span Detector} share very similar boundary detection issues.
 \end{itemize}
 
-\section{Learning Objective Variations}
+\section{Learning Objective Variation}
 An ML algorithm learns by optimizing its learning objective. For named entity recognition in supervised learning setup, we get a corpus labeled with gold entity mentions. As highlighted in section \ref{sec:nature_of_entities}, there may be an inherent labeling bias in the dataset. Some entities have more representation, more labeled mentions (\textit{high-resource}) while others are rare entities (\textit{low-resource}). With fewer samples, it becomes difficult for the model to learn good differentiating rules for extracting the low-resource entities. To handle this bias in dataset, it is common to give more importance/weight to low-resource entity samples in calculating the learning objective and optimizing on it. In this direction, we experiment with the variants detailed below.
 
 \begin{itemize}
@@ -573,3 +600,9 @@ Next, we do a quantitative comparison among the several variations studied in th
     \caption{Results: Comparison with SOTA (Test set Micro-F1 in \%)}
     \label{tab:context_bio_dataset}
 \end{table}
+
+\section{Qualitative Analysis}
+\label{sec:qualitative_analysis}
+From span detection, additional semantics sections, we observe than boundary detection of spans serves as the primary issue of NER task. Once a span has been identified, then classifying it and differentiating it from other entity types is relatively simpler.
+
+Span detection faces similar issues as NER normal.
