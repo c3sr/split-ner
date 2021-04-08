@@ -38,10 +38,10 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
-| RoBERTa-Base                             | -                           |                |  90.728                    |           |                      |
+| RoBERTa-Base                             | -                           |                |  90.728                    |           | 86.114 (running)     |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
-| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | 49.328         |  78.422                    |           | 92.949               |
+| BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | 49.328         |  78.422                    |           | 62.949               |
 | BioBERT-Freeze-GoldLabelSpan (LR:1e-5)   | 59.193                      |                |                            |           |                      |
 | BioBERT-Freeze-MainLSTM (LR:0.001)       | 81.435                      |                |                            |           |                      |
 | BioBERT-Freeze-Punctuation (LR:0.001)    | 81.698                      |                |                            |           |                      |
@@ -136,11 +136,12 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 
 #### BioNLP13CG
 
-| Model           | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
-|-----------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
-| Span Detector   | 89.808                                                  | 90.6365                   | 89.6091                   | 90.1198                    |
-| Span Classifier | 94.056                                                  | 94.0561                   | 94.0561                   | 94.0561                    |
-| Pipeline        | 93.465 (for span class. on gen. output from span det.)  | 86.3296                   | 85.4627                   | **85.8940**                |
+| Model                    | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
+|--------------------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
+| Span Detector            | 89.808                                                  | 90.6365                   | 89.6091                   | 90.1198                    |
+| Span Detector-QType2     | running                                                 | running                   | running                   | running                    |
+| Span Classifier          | 94.056                                                  | 94.0561                   | 94.0561                   | 94.0561                    |
+| Pipeline                 | 93.465 (for span class. on gen. output from span det.)  | 86.3296                   | 85.4627                   | **85.8940**                |
 
 #### CoNLL
 
@@ -247,7 +248,7 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 82.2538                | 84.5543                | 83.3882                |
 | BioBERT-Freeze                           | 67.4176                | 67.2891                | 67.3533                |
-| RoBERTa                                  | todo                   | todo                   | todo                   |
+| RoBERTa (running)                        | 85.0015                | 87.7165                | 86.3377                |
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
