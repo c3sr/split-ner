@@ -343,6 +343,19 @@ def analyse_oov_errors(train_data, test_data):
           .format(unigram_error_ratio, oov_unigram_error_ratio))
 
 
+def convert_to_span_based(data):
+    new_data = []
+    for sent in data:
+        new_sent = []
+        for tup in sent:
+            token, gold, pred = tup
+            if gold != "O":
+                gold = "{0}-ENTITY".format(gold[0])
+            new_sent.append((token, gold, pred))
+        new_data.append(new_sent)
+    return new_data
+
+
 def main(args):
     root_path = os.path.join("..", "out", args.dataset, args.model, "predictions")
     train_path = os.path.join(root_path, "train.tsv")
@@ -356,6 +369,11 @@ def main(args):
     data["test"] = parse_file(test_path)
     data["infer"] = parse_file(infer_path)
 
+    if args.span_based:
+        data["train"] = convert_to_span_based(data["train"])
+        data["dev"] = convert_to_span_based(data["dev"])
+        data["test"] = convert_to_span_based(data["test"])
+
     if args.only_f1:
         calc_micro_f1(data[args.file])
     else:
@@ -367,8 +385,9 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
     ap.add_argument("--dataset", type=str, default="bio")
-    ap.add_argument("--model", type=str, default="ner-biobert")
+    ap.add_argument("--model", type=str, default="ner-biobert-qa4-querytype2-span")
     ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
     ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
+    ap.add_argument("--span_based", dest="span_based", action="store_true", help="set this flag if using span detector")
     ap = ap.parse_args()
     main(ap)
