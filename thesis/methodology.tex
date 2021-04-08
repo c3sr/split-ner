@@ -9,21 +9,24 @@ We approach the named entity recognition problem from different perspectives, as
 For NER, we extract entity mentions by making output labels follow a tagging scheme (Section \ref{sec:tagging_scheme}). For example, with \texttt{BIO} scheme, each output label is of the form \texttt{B-Tag}, \texttt{I-Tag} or \texttt{O} with $\texttt{Tag} \in \mathcal{T}$ where $\mathcal{T}$ is the set of all possible entity types. For this task, we use two deep neural architectures:
 
 \begin{itemize}
-    \item \texttt{CNN-LSTM-CRF}: Proposed by \cite{ma2016end}, this model has three components. A CNN layer helps capture intrinsic character-level semantics and patterns. These features are then concatenated with word embeddings and fed to a bidirectional LSTM\cite{hochreiter1997long} which captures sentence grammar and token inter-dependencies. Finally, a CRF\cite{lafferty2001conditional} layer on top helps model tag transitions to make sure output label sequence does not contain abrupt and unexpected transitions. 
+
+    \item \texttt{BERT}: Proposed by \cite{devlin2018bert}, BERT is a bidirectional encoder transformer\cite{vaswani2017attention}. It applies WordPiece\cite{wu2016google} tokenization on input sentence which is then passed through several encoder layers with multiple attention heads capturing sentence semantics and inter-token relationships well. The model outputs contextualized embeddings for each sub-token in the sentence. We take the last hidden layer outputs from BERT model and pass it to a fully connected layer. The outputs are converted to a probability distribution over labels space. Model parameters are initialized from a pretrained model and fine-tuned on our NER task.
     
-    \item \texttt{BERT}: Proposed by \cite{devlin2018bert}, BERT is a bidirectional encoder transformer\cite{vaswani2017attention}. It applies WordPiece\cite{wu2016google} tokenization on input sentence which is then passed through several encoder layers with multiple attention heads capturing sentence semantics and inter-token relationships well. The model outputs contextualized embeddings for each sub-token in the sentence. We take the last hidden layer outputs from BERT model and pass it to a fully connected layer. The outputs are converted to a probability distribution over labels space.
+    \item \texttt{CNN-LSTM-CRF (BERT-Freeze)}: Proposed by \cite{ma2016end}, this model has three components. A CNN layer helps capture intrinsic character-level semantics and patterns. These features are then concatenated with word embeddings and fed to a bidirectional LSTM\cite{hochreiter1997long} which captures sentence grammar and token inter-dependencies. Finally, a CRF\cite{lafferty2001conditional} layer on top helps make sure that output label sequence does not contain abrupt and unexpected transitions. We use the contextual word embeddings from pretrained BERT model as word embeddings fed to LSTM but freeze BERT parameters during training. This makes sure that ultimate model being trained remains CNN-LSTM-CRF.
+    
+    \item \texttt{BERT-Freeze}: To understand how much semantic information is already captured in a pretrained BERT model, we use the exact same architecture as \texttt{BERT} model above but freeze the BERT model parameters. So, the only trainable parameters remain from the fully connected layer.
 \end{itemize}
 
 \subsection{Experiment Details}
-For English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert\#download} model which is specifically pretrained on biomedical data. For \texttt{CNN-LSTM-CRF} framework, as word embeddings we use the contextual embeddings from BERT/BioBERT model but freeze the BERT architecture for training. So, the trainable model architecture still remains a core \texttt{CNN-LSTM-CRF}. We take the mean of sub-token embeddings from BERT to get the embedding for the token.
+For general English corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use pretrained \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert\#download} model. For \texttt{CNN-LSTM-CRF (BERT-Freeze)} setup, we take the mean of sub-token embeddings from BERT to get the embedding for each input token. We make use of \texttt{BIO} tagging scheme in all our sequence labeling experiments. Models with frozen BERT parameters used learning rate $0.005$. CNN input channels is set to character vocabulary size and each character is fed as a one-hot vector. CNN has $128$ output channels, kernel size of $5$ and does a max pooling to get word-level representation from character-level outputs. LSTM hidden dimensions is set to $256$.
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003} & \textbf{OntoNotes 5.0}\\\hline
-	\texttt{BERT-Freeze} & 75.42 & todo & todo & todo \\\hline
+	\texttt{BERT-Freeze} & 75.42 & 55.93 & 82.79 & 67.35 \\\hline
 	\texttt{CNN-LSTM-CRF (BERT-Freeze)} & 84.1 & 76.2 & 91.6 & 86.4 \\\hline
-	\texttt{BERT} & 85.99 & 74.35 & 91.36 & 83.39 \\\hline
+	\texttt{BERT} & \textbf{85.99} & 74.35 & 91.36 & 83.39 \\\hline
 	\end{tabular}
     \caption{Results: Sequence Labeling (Test set Micro-F1 in \%)}
     \label{tab:res_seq_labeling}
@@ -32,24 +35,24 @@ For English news corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we
 \subsection{Observations}
 Based on results summarized in Table \ref{tab:res_seq_labeling}:
 \begin{itemize}
-    \item Pretrained BERT embeddings themselves capture linguistic semantics well as can be seen from \texttt{BERT-Freeze}.
-    \item Fine-tuning the BERT model or using BERT embeddings with CNN-LSTM-CRF both work well and give almost comprable enhancements over the \texttt{BERT-Freeze} setup.
+    \item \texttt{BERT-Freeze} serves as a naive baseline for the other two language models to improve upon.
+    \item Both CNN-LSTM-CRF and transformer-based BERT architecture perform comparably on NER task on these relatively small-sized datasets as can be seen from \texttt{BERT} and \texttt{CNN-LSTM-CRF (BERT-Freeze)} results.
 \end{itemize}
 
 \section{Question Answering}
 \label{sec:question_answering}
+In recent years there has been a trend of formulating NER problems as question answering(QA) tasks. \cite{li2019entity, levy2017zero} model relation extraction as QA tasks and \cite{mccann2018natural} propose a QA-based multi-task learning setup. 
 
-% QA3, QA4, Where
-The NER task can also be modelled as a question answering problem where, we give a question to the model asking it to extract the entity of interest from the supplied text. 
+For NER using a QA setup, we feed a question to the model asking it to extract all mentions of a given entity type from the supplied text. Since there can be multiple entities of interest, each combination of entity question and input sentence is fed to the model. \cite{li2019unified, li2019dice} show the effectiveness of such a setup using BERT over multiple general English and Chinese news datasets and output candidate spans (start and end indices) where the entity in question is present. This setup has advantages over sequence labeling since it can handle nested entities as well. 
 
-\cite{li2019unified} and \cite{li2019dice} show the effectiveness of this setup using a simple BERT model architecture on multiple general English and Chinese news datasets. They make the model output candidate spans (start and end indices) where the entity in question is present. This setup has advantages over the naive sequence labeling setup since using this framework we can extract even nested or overlapping entities while sequence labeling can capture only flat non-overlapping entities. Since they output spans, so their classification layer does a $\mathcal{O}(n^2)$ computation where $n$ is the number of tokens in the input sentence. \cite{banerjee2019knowledge} use a similar setup and output simple \texttt{B}, \texttt{I} and \texttt{O} tags for each token to mark the presence of the entity in question. Hence, their problem complexity becomes $\mathcal{O}(n)$. On top of this setup, we study the variations described below.
+However, for learning spans (start and end indices), the classification layer has to do $\mathcal{O}(n^2)$ computations where $n$ is the number of tokens in the input sentence. Such a computation can be expensive for large sentences. To mitigate this, \cite{banerjee2019knowledge} propose an approach in the middle of question answering and sequence labeling. They return \texttt{B}, \texttt{I} and \texttt{O} labels for each token to mark the presence of the entity in question. Hence, their problem complexity becomes $\mathcal{O}(n)$ since they output one label for each token. We implement this framework and study the effect of several factors:
 
 \begin{itemize}
-    \item \textbf{Tagging Scheme}: Classify each token into 3 output classes (\texttt{B}, \texttt{I} and \texttt{O}) [\texttt{BERT-QA(BIO)} model] or 4 classes explicitly modeling the end boundary using \texttt{E} output class [\texttt{BERT-QA(BIOE)} model]. In both these models, we ask questions of the form, \textit{What is the person mentioned in the text?}.
+    \item \textbf{Tagging Scheme}: Classify each token using \texttt{BIO} or \texttt{BIOE} scheme. In both these models, we ask questions of the form, \textit{What is the person mentioned in the text?}.
     
-    \item \textbf{Question Formulation}: \cite{banerjee2019knowledge} show that their trained model gives a high importance to the question word. Hence we probe the model and change the question slightly to observe its impact. Instead of asking \textit{What} [\texttt{BERT-QA(What)} model], we ask \textit{What is the person mentioned in the text?} [\texttt{BERT-QA(Where)} model]. In both these models, we follow the \texttt{BIOE} output tagging scheme.
+    \item \textbf{Question Formulation}: In QA setup, extraction from a sentence is highly dependent on the question semantics. We study the importance of the question word being used (\texttt{What} or \texttt{Where}). Our sample question is of the form, \textit{\texttt{What}$\vert$\texttt{Where} is the person mentioned in the text?} In both these models, we follow the \texttt{BIOE} output tagging scheme.
     
-    \item \textbf{Entity Scrambling}: In the question formation, \textit{What is the} \texttt{entity} \textit{mentioned in the text?}, we study the effect of how much the word representing the entity affects the model performance. Hence, we replace the \texttt{entity} keyword with scrambled English letters, for example, \texttt{Person} becomes \texttt{xyz12qqr}. So, even though we give the right person mentions in sentences to the model, the question becomes, \textit{What is the} \texttt{xyz12qqr} \textit{mentioned in the text?} Since our task at hand is to probe the model and develop an understanding of what it focuses on, so we conduct this experiment only on one dataset, \texttt{BIONLP13CG}. Table \ref{tab:entity_scramble_bio} shows some example scrambled entity keywords used for this experiment. We compare it with the unscrambled model in the same \texttt{BIOE} tagging setting.
+    \item \textbf{Entity Scrambling}: In the question, \textit{What is the \texttt{entity} mentioned in the text?}, we study the effect of the entity keyword used. We replace each entity with some scrambled English letters, for example, \texttt{Person} becomes \texttt{xyz12qqr}. So, during training, we ask questions like \textit{What is the \texttt{xyz12qqr} mentioned in the text?} but give the right \texttt{person} mentions as gold labels to the model. Since our task here is to probe the model and develop an understanding of what it focuses on, so we conduct this experiment on a single dataset, \texttt{BIONLP13CG}. Table \ref{tab:entity_scramble_bio} shows some example scrambled entity keywords. We compare it with the unscrambled model in the same \texttt{BIOE} tagging scheme setting.
     
     \begin{table}[h!]
     \centering
@@ -69,8 +72,8 @@ The NER task can also be modelled as a question answering problem where, we give
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
-	\texttt{BERT-QA(BIO)} & 86.15 & 74.81 & todo\\\hline
-	\texttt{BERT-QA(BIOE)} & 86.45 & 74.92 & 91.17\\\hline
+	\texttt{BERT-QA(BIO)} & 86.15 & 74.81 & 91.06\\\hline
+	\texttt{BERT-QA(BIOE)} & \textbf{86.45} & \textbf{74.92} & \textbf{91.17}\\\hline
 	\end{tabular}
     \caption{Results: Question Answering (Tagging Scheme) (Test set Micro-F1 in \%)}
     \label{tab:res_qa_tagging}
@@ -80,7 +83,7 @@ The NER task can also be modelled as a question answering problem where, we give
 \centering
 \begin{tabular}{|c|c|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
-	\texttt{BERT-QA(What)} & 86.45 & todo & 91.17\\\hline
+	\texttt{BERT-QA(What)} & 86.45 & \textbf{74.81} & 91.17\\\hline
 	\texttt{BERT-QA(Where)} & \textbf{86.83} & 74.64 & \textbf{91.82}\\\hline
 	\end{tabular}
     \caption{Results: Question Answering (Question Formulation) (Test set Micro-F1 in \%)}
@@ -91,7 +94,7 @@ The NER task can also be modelled as a question answering problem where, we give
 \centering
 \begin{tabular}{|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
-	\texttt{Original} & 86.45\\\hline
+	\texttt{Original} & \textbf{86.45}\\\hline
 	\texttt{Scrambled} & 85.83\\\hline
 	\end{tabular}
     \caption{Question Answering (Entity Scrambling) (Test set Micro-F1 in \%)}
@@ -102,13 +105,14 @@ The NER task can also be modelled as a question answering problem where, we give
 \begin{itemize}
     \item From Table \ref{tab:res_qa_tagging}, \texttt{BIOE} tagging is able to better capture the entity boundaries as compared to \texttt{BIO} tagging scheme.
     
-    \item From Table \ref{tab:res_qa_question}, we observe that the model is sensitive to slight changes in question semantics. Asking a \textit{where} to the model helps it learn and identify entities better than asking \textit{what}. 
+    \item From Table \ref{tab:res_qa_question}, we observe that the model is sensitive to slight changes in question semantics. Since the ultimate goal of the model is to identify mention boundaries, asking \texttt{Where} works better than \texttt{What}. 
     
-    \item From Table \ref{tab:res_qa_scrable}, we observe that the model learning is agnostic to the keyword used for representing the entity. Even with scrambled entity names, we get almost equal performance to what meaningful keywords give.
+    \item From Table \ref{tab:res_qa_scrable}, we observe that as expected, \texttt{Original} keyword model works better than \texttt{Scrambled}. However the contribution of entity keyword is very minimal. It is possible to form some logical groups of entity mentions with unknown group name and the model should still be able to distinguish and differentiate the group well. We use this finding in Section \ref{sec:clustering}.
 \end{itemize}
 
 \section{Span Detection and Classification Pipeline}
 \label{sec:span_pipeline}
+
 Another way of approaching NER is to break it down into a two-step pipelined procedure. In the first step, given a sentence, we detect all entity spans (Span Detector). In the next step, these spans are classified into an output entity class by another model (Span Classifier).
 
 \subsection{Experiment Details}
@@ -443,6 +447,7 @@ In Tables \ref{tab:res_pretrained_model_bio} and \ref{tab:res_pretrained_model_g
 \end{itemize}
 
 \section{Clustering and Segregation of Diverse Entities}
+\label{sec:clustering}
 Here, we focus on \texttt{BIONLP13CG} dataset. Looking at the entity distribution in Table \ref{tab:bio_entity_distribution}, we see that the dataset has lots of samples of \texttt{Gene\_or\_gene\_product} along with \texttt{Cancer} and \texttt{Simple\_chemical}. In the question answering setup as we studied in Section \ref{sec:question_answering}, the entity name semantics is not too essential and the model still learns to differentiate their mentions accurately. 
 
 Here, we develop on that idea and try to break a diverse entity group \texttt{Gene\_or\_gene\_product} into sub-groups (or, sub-entities) and train a model to learn each of those sub-entities and differentiate them from each other. The idea is that dividing a diverse group into sub-entities will help reduce the diversity of a big entity group and make it simpler for the model to differentiate cases/variations. At inference time, the sub-entities are remapped to the parent entity and F1-score is calculated.
