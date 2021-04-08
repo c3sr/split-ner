@@ -139,7 +139,8 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Model                    | BERT-level Span Test Micro-F1                           | Dataset-level Span Test P | Dataset-level Span Test R | Dataset-level Span Test F1 |
 |--------------------------|---------------------------------------------------------|---------------------------|---------------------------|----------------------------|
 | Span Detector            | 89.808                                                  | 90.6365                   | 89.6091                   | 90.1198                    |
-| Span Detector-QType2     | running                                                 | running                   | running                   | running                    |
+| Span Detector-QType2     | 90.252                                                  | 90.6150                   | 90.3648                   | 90.4897                    |
+| Span Detector-SciBERT    | running                                                 | running                   | running                   | running                    |
 | Span Classifier          | 94.056                                                  | 94.0561                   | 94.0561                   | 94.0561                    |
 | Pipeline                 | 93.465 (for span class. on gen. output from span det.)  | 86.3296                   | 85.4627                   | **85.8940**                |
 
