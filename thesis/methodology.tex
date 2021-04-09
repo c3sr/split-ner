@@ -177,33 +177,58 @@ Table \ref{tab:res_span} reports the results of the pipelined span detection and
 \end{itemize}
 
 \section{Learning Objective Variation}
-An ML algorithm learns by optimizing its learning objective. For named entity recognition in supervised learning setup, we get a corpus labeled with gold entity mentions. As highlighted in section \ref{sec:nature_of_entities}, there may be an inherent labeling bias in the dataset. Some entities have more representation, more labeled mentions (\textit{high-resource}) while others are rare entities (\textit{low-resource}). With fewer samples, it becomes difficult for the model to learn good differentiating rules for extracting the low-resource entities. To handle this bias in dataset, it is common to give more importance/weight to low-resource entity samples in calculating the learning objective and optimizing on it. In this direction, we experiment with the variants detailed below.
+An ML algorithm learns by optimizing its learning objective (loss function). In this section, we use some standard popular loss functions and also design our new ones and study their effect on model performance. In all our experiments here, we use sequence labeling setup with \texttt{BIO} tagging scheme. Without loss of generality, we use the binary classification setting while illustrating the different loss functions. Let $\mathcal{X}$ be the set of all training samples such that a sample $x_i \in \mathcal{X}$ is associated with ground truth label, $y_i = [y_{i0}, y_{i1}]$ where $y_{i0}, y_{i1} \in \{0, 1\}$. Let $p_i = [p_{i0}, p_{i1}]$ be model prediction probabilities such that $p_{i0}, p_{i1} \in [0, 1]$ and $p_{i0} + p_{i1} = 1$. Let $N$ be the batch size.
 
-\begin{itemize}
-    \item \textbf{Cross-Entropy (CE) Loss}: This is the standard objective function in which we calculate the cross entropy between the predicted and gold labels for each token in the sentence.
-    
-    \item \textbf{Weighted Cross-Entropy Loss}: Here, based on the gold-labeled tag for a token we assign a weight to its contribution. All tokens which belong to a valid entity span contribute equally to the loss and all other tokens contribute with a reduced weight of 0.5. This helps because a large part of the corpus consists of tokens which belong to the \texttt{O} tag category. For instance, the \texttt{BioNLP13CG} corpus has 76.5\% tokens with \texttt{O} tag.
-    
-    \item \textbf{Punctuation Weighted CE Loss}: From qualitative analysis of misclassified samples in standard CE loss setup we noticed that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, slash etc. Hence, we force the model to learn these symbols well by penalizing the model twice if the misclassified token is a punctuation/special symbol.
-    
-    \item \textbf{Dice Loss}: As proposed by \cite{li2019dice}, we address the above mentioned data imbalance issue between entity and non-entity tokens using dice loss, based on S{\o}rensen-Dice coefficient\cite{} or Tversky index\cite{}. This helps because standard CE loss in accuracy-oriented while during evaluation we calculate F1-measure. The dice loss gives equal importance to false-positives and false-negatives at training time and hence reduces the discrepancy among these training and test time metrics.
-    
-    \item \textbf{CRF}: Apart from the cross-entropy objective, we also experiment by adding a CRF layer on the fully connected layer output in standard BERT-based model. CRF layer is found to work well with bidirectional LSTM\cite{ma2016end} in modeling output tag transitions and emissions.
-    
-\end{itemize}
+\subsection{Cross Entropy (CE) Loss}
+As can be seen from Equation \eqref{eq:cross_entropy}, Cross Entropy loss penalizes misclassifications. When the classification is correct, it pushes the model to output the correct result with a probability of 1. Hence, Cross Entropy loss models accuracy. However, during evaluation in NER setting, we calculate F1-Score. This difference between training objective and evaluation metric may lead to sub-optimal performance in some situations.
+\begin{equation}
+\label{eq:cross_entropy}
+    CE &= -\frac{1}{N}\sum_{i}\sum_{j \in \{0, 1\}} y_{ij}\log p_{ij}
+\end{equation}
 
-\subsection{Experiment Details}
-For CRF implementation, we use \texttt{torchcrf} python package.
+\subsection{Weighted CE Loss}
+Not all entity types may have an equable distribution in the labeled dataset. Generally negative samples outweigh positive samples in NER datasets. Only $23.5\%$ tokens in \texttt{BIONLP13CG} dataset belong to some entity, rest are labeled \texttt{O}. This may introduce bias in the model which can be countered by giving different importance/weights to different entity types. In our case, we want to reduce the dominant influence of \texttt{O} labels, hence, any token with a gold label \texttt{O} is given a weight of $0.5$ while all others have a weight of $1$. This can be further extended to give different weights to high and low resource entity types. However, this approach makes the model very sensitive to the assigned weights and it can rather easily develop a bias towards low-resource entities\cite{valverde2017improving}.
+
+\subsection{Punctuation Weighted CE Loss}
+From qualitative analysis of misclassified samples (Section \ref{sec:qualitative_analysis} in standard CE loss setup we notice that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, slash etc. Hence, we emphasize these symbols by penalizing the model twice if the misclassified token is a punctuation/special symbol.
+
+\subsection{Dice Loss}
+As detailed earlier, Cross Entropy is an accuracy-oriented objective while during evaluation, we calculate the F1-Score. This difference can lead to sub-optimal model training. To counteract, \cite{li2019dice} make use of S{\o}rensen-Dice coefficient(DSC)\cite{sorensen1948method, dice1945measures} and Tversky index\cite{tversky1977features} which are F-Score oriented statistics. Given sets $A$ and $B$, DSC is used to gauge similarity among two sets and is defined as,
+\begin{equation}
+\label{eq:dsc_set}
+    DSC(A, B) = \frac{2\ \vert A \cap B \vert}{\vert A \vert + \vert B \vert}
+\end{equation}
+Consider $A$ as set of all positive samples predicted by a model and $B$ as set of all ground truth positives. Then, by definition of true positive ($TP$), false positive ($FP$) and false negative ($FN$) from Section \ref{sec:evaluation_metrics}, we have,
+\begin{align*}
+    TP &= \vert A \cap B \vert &
+    \vert A \vert &= TP + FP &
+    \vert B \vert &= TP + FN &
+\end{align*}
+\begin{align*}
+     DSC(A, B) &= \frac{2TP}{2TP + FP + FN} &= \frac{2\ \frac{TP}{TP + FN}\ \frac{TP}{TP + FP}}{\frac{TP}{TP + FN} + \frac{TP}{TP + FP}} &= \frac{2\ Precision \times Recall}{Precision + Recall} &= F1
+\end{align*}
+
+The dice coefficient gives equal importance to false-positives and false-negatives at training time and is more immune to data-imbalance issues\cite{sudre2017generalised, shen2018influence, kodym2018segmentation}. The above formulation shows its equivalence to F1-score thus removing the discrepancy among training and evaluation metrics. From Equation \eqref{eq:dsc_set}, for an individual sample $x_i$, dice coefficient is defined as,
+\begin{align*}
+    DSC(x_i) = \frac{2p_{i1}y_{i1} + \gamma}{p_{i1} + y_{i1} + \gamma}
+\end{align*}
+where $\gamma$ is the smoothing parameter. Then over all samples, dice loss (DL) is defined as:
+\begin{equation}
+    DL = 1 - \frac{2\sum_i{p_{i1}y_{i1}} + \gamma}{\sum_i{p_{i1}} + \sum_i{y_{i1}} + \gamma}
+\end{equation}
+
+\subsection{Conditional Random Field}
+\cite{ma2016end} show the effectiveness of a conditional random field (CRF) in modeling output label transitions in sequence labeling settings when added over a bidirectional LSTM. In this setup, we apply a similar CRF layer on top of BERT for assigning output labels to each token. For CRF implementation, we use \texttt{torchcrf} python package.
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
 	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003}\\\hline
 	\texttt{CE Loss} & 85.99 & 91.36\\\hline
-	\texttt{Weighted CE Loss} & 85.93 & todo\\\hline
-	\texttt{Punctuation CE Loss} & 86.12 & todo\\\hline
+	\texttt{Weighted CE Loss} & 85.93 & 91.26\\\hline
+	\texttt{Punctuation CE Loss} & 85.74 & 91.55\\\hline
 	\texttt{Dice Loss} & 86.35 & 90.76\\\hline
-	\texttt{CRF} & 86.20 & todo\\\hline
+	\texttt{CRF} & 86.20 & 91.23\\\hline
 	\end{tabular}
     \caption{Results: Learning Objectives (Test set Micro-F1 in \%)}
     \label{tab:res_loss}
@@ -211,22 +236,22 @@ For CRF implementation, we use \texttt{torchcrf} python package.
 
 \subsection{Observations}
 \begin{itemize}
-    \item \texttt{Weighted CE Loss} is found to perform comparable to \texttt{CE Loss} and both do not perform as well as the other variants.
+    \item \texttt{Weighted CE Loss} and \texttt{Punctuation CE Loss} give mixed results. Their performance varies with the weights set for different misclassification cases. The same set of weights do not generalize across both datasets.
     
-    \item In \texttt{BioNLP13CG} corpus, \texttt{Dice Loss} performs well as this corpus as several high and low resource entities (data imbalance). \texttt{Dice Loss} is not able to give its advantages with \texttt{CoNLL 2003} corpus since here all 4 entity types have a comparable and high representation.
+    \item In \texttt{BIONLP13CG} corpus, \texttt{Dice Loss} performs well as this corpus as several high and low resource entities (data imbalance). \texttt{Dice Loss} is not able to give its advantages with \texttt{CoNLL 2003} corpus since here all 4 entity types have a comparable and high representation.
     
-    \item \texttt{Punctuation CE Loss} is able to make the model learn slightly better semantics of special symbols and hence performs better than the standard \texttt{CE Loss} counterpart.
-    
-    \item \texttt{CRF} is able to capture the output tag transitions better and hence performs better than standard \texttt{CE Loss} setting.
+    \item From a sequence labeling perspective with \texttt{BIO} tagging scheme, we get $2K + 1$ output entity classes for $K$ entity types. This means \texttt{BioNLP13CG} corpus with $16$ entity types requires $33$ output classes and \texttt{CONLL 2003} with $4$ entities requires $9$ output classes. A \texttt{CRF} primarily captures tag transitions and is found to be helpful when number of output labels is more, i.e. on \texttt{BioNLP13CG} corpus. On \texttt{CONLL 2003} data, it gives comparable performance to the base model.
 \end{itemize}
 
 \section{Capturing Additional Token Semantics}
 \label{sec:additional_token_semantics}
+After having run through the three major approaches for NER namely, sequence labeling, question answering and span detection and classification, in this section we present a qualitative error analysis. Next, we address the identified issues by either architectural modification or additional input features.
 
-Both in \texttt{CNN-LSTM-CRF} and transformer-based architectures, we rely on on a pretrained BERT model. For biomedical datasets we use BioBERT which is trained on scientific and biomedical literatures while for English news datasets, we work with \texttt{bert-base-uncased} model which is trained on Wikipedia and books. BERT models rely on Word-Piece tokenizer\cite{} which considers breaking words into sub-words for representation. Even then from qualitative analysis we find that there are several terms whose semantics are not captured well by the existing BERT model. This causes errors which can be categorized as:
+\subsection{Qualitative Error Analysis}
+Different approaches have their own strengths and weaknesses highlighted later in Section \ref{sec:precision_recall_analysis}. However there are several common errors which can be segregated into three major categories:
 
 \begin{itemize}
-    \item \textbf{Out of Vocabulary Tokens}: News articles and scientific texts both sometimes make use of abbreviations or localized entities which may be specific to that news article, event time or research paper, but are rare otherwise. Additionally biomedical texts also consist of chemical names in scientific form which includes numerals etc. which need to be extracted. Semantics of such terms is not captured well by generically pretrained models. Table \ref{tab:oov_issue} shows some examples from \texttt{BioNLP13CG} corpus.
+    \item \textbf{Out of Vocabulary Terms}: Both in news articles and research texts, it is common to coin new terms and abbreviations to describe latest events or new concepts. Such terms are pretty much localized to that article and rare otherwise. Additionally scientific texts also have chemical formulas etc. which have numerals etc. encoded within. Semantics of many such terms may not be captured well by generically pretrained BERT models. Although BERT uses sub-word semantics using WordPiece tokenizer but such sub-word combinations may still be rare. Hence we call these \textit{out-of-vocabulary} terms. Table \ref{tab:oov_issue} shows some errors made by our models on \texttt{BioNLP13CG} corpus which fall in this category.
     
     \begin{table}[h!]
     \centering
@@ -237,13 +262,13 @@ Both in \texttt{CNN-LSTM-CRF} and transformer-based architectures, we rely on on
     	\texttt{Cell} & LoVo, DeltaG45, BMSVTs\\\hline
     	\texttt{Amino\_Acid} & phosphoS727, Y705F\\\hline
     	\end{tabular}
-        \caption{Out-of-Vocabulary tokens in \texttt{BioNLP13CG} corpus}
+        \caption{Out-of-Vocabulary terms in \texttt{BioNLP13CG} corpus}
         \label{tab:oov_issue}
     \end{table}
     
-    \item \textbf{Special Symbols}: Several entities to be extracted have hyphens, periods, parenthesis within them which are not captured well by pretrained BERT model leading to partial entity detection. Table \ref{tab:boundary_issue} gives some examples from \texttt{BioNLP13CG} corpus.
+    \item \textbf{Special Symbols}: Several entity mentions have hyphens, periods, parenthesis within them. Pretrained embeddings to not capture their semantics well leading to boundary detection issues. Table \ref{tab:boundary_issue} shows some errors of this type from \texttt{BioNLP13CG} dataset.
     
-    \item \textbf{Modifier Suffix/Prefix}: Apart from the root entity required to be extracted the gold labels sometimes expect a modifier term as well which occurs as a prefix/suffix. Missing these again leads to boundary detection issues. Table \ref{tab:boundary_issue} gives some examples from \texttt{BioNLP13CG} corpus.
+    \item \textbf{Modifier Suffix/Prefix}: Apart from the root entity required to be extracted the gold labels sometimes expect a modifier term as well which occurs as a prefix/suffix. Missing these leads to boundary detection issues. Table \ref{tab:boundary_issue} lists some error cases of this type from \texttt{BioNLP13CG} corpus.
     
     \begin{table}[h!]
     \centering
@@ -261,12 +286,12 @@ Both in \texttt{CNN-LSTM-CRF} and transformer-based architectures, we rely on on
 
 \subsection{Experiment Details}
 
-To address the above mentioned issues, we provide additional inputs and infrastructure to the model to learn the underlying semantics better. In all these cases, we develop on top of the sequence labeling setup for NER.
+To address the above mentioned issues, we provide additional inputs and infrastructure to the model to learn the underlying semantics better. In these experiments, we develop on top of the sequence labeling setup with \texttt{BIO} tagging scheme.
 
 \begin{itemize}
-    \item \textbf{Special Symbol Features}: Before feeding the output of BERT model to final fully-connected classification layer, we add an extra one-hot dimension which is set if the current input token is a pure special symbol. This means we assign \texttt{1} for \textit{hyphen}(\texttt{-}), \textit{parenthesis}(\texttt{(} and \texttt{)}), \textit{comma}(\texttt{,}) etc. while assign \texttt{0} for tokens like \texttt{carbon}, \texttt{123}, or mixed format tokens like \texttt{Ca(2+)}, \texttt{AB-3} etc.
+    \item \textbf{Special Symbol Features}: Before feeding to final classifier, concatenate BERT hidden layer output with a one-dimensional vector, set if the input token is a pure special symbol. This means we assign $1$ for \textit{hyphen}(\texttt{-}), \textit{parenthesis}(\texttt{(} and \texttt{)}), \textit{comma}(\texttt{,}) etc. and $0$ for \texttt{carbon}, \texttt{123}, \texttt{Ca(2+)}, \texttt{AB-3} etc.
     
-    \item \textbf{Word Type Features}: As an extension of the above special symbol features, here we associate each token with a word type as shown in Table \ref{tab:word_type_encoding} which is converted into a one-hot vector concatenated with BERT output embeddings before sending to final classifier layer.
+    \item \textbf{Word Type Features}: As an extension to special symbol features, here we associate each input token with a word type (shown in Table \ref{tab:word_type_encoding}) which is converted into a one-hot vector concatenated with BERT output embeddings before feeding to the classifier layer.
     
     \begin{table}[h!]
     \centering
@@ -286,19 +311,19 @@ To address the above mentioned issues, we provide additional inputs and infrastr
         \label{tab:word_type_encoding}
     \end{table}
     
-    \item \textbf{Character and Pattern Features}: Chemical formulas and scientific names generally follow a nomenclature convention or pattern. Similarly, out-of-vocabulary tokens also may have some intrinsic character level information which is not well captured by the BERT model which considers sub-words. Infact this issue with BERT is studied well in \cite{boukkouri2020characterbert} which propose to use a character CNN instead of word-piece tokenizer at the stating stage. Motivated by \texttt{CNN-LSTM-CRF} setup and this study, we do the following:
+    \item \textbf{Character and Pattern Features}: Chemical formulas and scientific terms generally follow a nomenclature convention or pattern. Similarly, out-of-vocabulary terms may have some intrinsic character-level information which is not well captured by the sub-words fed to the BERT model. \cite{boukkouri2020characterbert} study this issue and propose a character-CNN instead of WordPiece tokenizer at the input stage to the BERT model. Motivated by the CNN-LSTM-CRF model and this study, we do the following:
     
-    \textbf{Modeling characters}. Each word is passed to BERT and in parallel, to five 1-dimensional CNNs with kernel sizes of 1 to 5, each having 16 input and 16 output channels. Input character is indexed and embedded into 16-dimensions through an embedding layer. The CNN outputs are concatenated and passed through a linear layer to get overall 768-dimensional output vector for each token.
+    \textbf{Modeling characters}. Each word is passed to BERT and simultaneously to five one-dimensional CNNs with kernel sizes of $1$ to $5$, each having $16$ input and $16$ output channels. Input character is indexed and mapped to a $16$-dimensional embedding. Character-level outputs are max-pooled to get word representation. Outputs from multiple CNNs are concatenated and passed through a linear layer to get overall $768$-dimensional output vector for each token.
     
-    \textbf{Modeling patterns}. Each word is converted to a pattern (like regular expression, a denser space than simply all characters) converting all uppercase letters to \texttt{U}, lowecase to \texttt{L}, digits to \texttt{D} etc. and then sent to a separate character CNN (like the one described above) and then to a bidirectional LSTM to get contextual token embeddings.
+    \textbf{Modeling patterns}. Each word is converted to a pattern (a regular expression or a denser space with smaller character set). For example, all uppercase letters are mapped to \texttt{U}, lowercase to \texttt{L}, digits to \texttt{D} etc. These patterns are then fed to a Character-CNN (like the one described above) and then to a bidirectional LSTM to get contextual pattern token embeddings.
     
-    Finally, these character and pattern embeddings are concatenated with BERT outputs and fed to final classifier layer for tag classification.
+    Finally, these character and pattern embeddings are concatenated with BERT outputs and fed to final classifier layer.
     
-    \item \textbf{Part-of-Speech and Dependency Parse Features}: Concatenate BERT embeddings with the one-hot POS and one-hot dependency parse features before feeding to final classifier layer.
+    \item \textbf{Part-of-Speech and Dependency Parse Features}: Concatenate BERT embeddings with the one-hot part-of-speech and dependency parse features before feeding to final classifier layer. The part-of-speech and dependency parse tags are generated using \texttt{scispacy} for \texttt{BIONLP13CG} and \texttt{JNLPBA} datasets, \texttt{spacy} for \texttt{CONLL 2003} and \texttt{OntoNotes 5.0} datasets.
     
-    \item \textbf{Head Tokens}: BERT uses word-piece tokenizer and hence can break a given single token into multiple sub-words. Instead of doing a token classification on each of these sub-words and making sure everything is correct, it is simpler to take the embedding output for the first sub-word (\textit{head}) for each token. This technique is also used in the original BERT paper \cite{devlin2018bert} for their NER experiments. 
+    \item \textbf{Head Tokens}: BERT uses WordPiece tokenizer and may break a single input token into multiple sub-words. Instead of doing token classification on each of these sub-words and making sure everything is correct, it is simpler to take the BERT hidden layer output for the first (\textit{head}) sub-word for each token. This technique is also used in the original BERT paper\cite{devlin2018bert} for NER.
     
-    \item \textbf{Highway Network}: Instead of using a simple concatenation of character features with BERT as done in previous experiment, here we create a highway network\cite{}, similar to the one used in BiDAF\cite{} architecture in which we train a gated network to learn when to use BERT vectors and when to use the additional character-level information.
+    \item \textbf{Highway Network}: Instead of directly concatenating character-based features with BERT, we create a highway network\cite{srivastava2015highway} similar to the one used in BiDAF\cite{seo2016bidirectional} architecture and train a logic gate to control the inflow of information from BERT vectors and additional character-level semantics.
 \end{itemize}
 
 \begin{table}[h!]
@@ -309,11 +334,11 @@ To address the above mentioned issues, we provide additional inputs and infrastr
 	\texttt{Special Symbol} & 86.63 & 91.67\\\hline
 	\texttt{Word Type} & 86.50 & 91.55\\\hline
 	\texttt{Character/Patterns} & 86.44 & 91.08\\\hline
-	\texttt{Part-Of-Speech} & 86.11 & todo\\\hline
-	\texttt{Dependency Parse} & 86.20 & todo\\\hline
+	\texttt{Part-Of-Speech} & 86.11 & 91.47\\\hline
+	\texttt{Dependency Parse} & 86.20 & 91.32\\\hline
 	\texttt{Head Tokens} & 86.17 & 91.49\\\hline
 	\texttt{Special Symbol + Head Tokens} & 86.36 & 91.68\\\hline
-	\texttt{Highway Net} & todo & todo\\\hline
+	\texttt{Highway Net} & 85.77 & 91.53\\\hline
 	\end{tabular}
     \caption{Results: Token Semantics (Test set Micro-F1 in \%)}
     \label{tab:res_token_semantics}
@@ -323,19 +348,19 @@ To address the above mentioned issues, we provide additional inputs and infrastr
 Our results are summarized in Table \ref{tab:res_token_semantics}. We also experimented with combinations of the above described features together but omit the results from this report if not found to be significant. We make the following observations:
 
 \begin{itemize}
-    \item All the proposed additional features are found to improve upon the \texttt{Vanilla BERT} model on \texttt{BIONLP13CG} dataset. On \texttt{CoNLL 2003} dataset, some features are found to be more effective than others.
+    \item Almost all of the proposed additional features are found to improve upon the \texttt{Vanilla BERT} model on both \texttt{BioNLP13CG} and \texttt{CoNLL 2003} datasets.
     
     \item Handling special symbols is a primary issue of \texttt{Vanilla BERT}. Explicitly handling it is found to be most helpful among all the other features across both datasets and on both models \texttt{Special Symbol} and \texttt{Special Symbol + Head Tokens}.
     
-    \item Extending the special symbol features to word types may be giving slightly mixed signals to the model. It hence gives the second best improvements over the vanilla version on both datasets.
+    \item Extending the special symbol features to word types gives mixed signals to the model. \texttt{Word Type} model hence gives the second best performance on both datasets.
     
-    \item \texttt{Character/Pattern} modeling helps in the biomedical text setting since it helps understand semantics of some chemical names etc. However, giving importance to intrinsic patterns seems to send slightly conflicting signals on general English text and hence gives lower performance on \texttt{CoNLL 2003} data.
+    \item \texttt{Character/Patterns} modeling helps in the biomedical text setting since it helps understand semantics of chemical names etc. However, giving importance to intrinsic patterns gives conflicting signals for general English entities and hence gives lower performance on \texttt{CoNLL 2003} data.
     
-    \item Part of Speech and Dependency Parse features do give some additional insights to the model over vanilla BERT and hence give better performance. Dependency parse features capture entity inter-dependencies which helps more than just the part-of-speech of tokens.
+    \item \texttt{Part-of-Speech} and \texttt{Dependency Parse} features give some additional insights to the model over \texttt{Vanilla BERT} and hence give comparable or even better performance. 
     
-    \item Considering only head tokens again helps over vanilla modeling on both datasets. When combined with special symbol features it helps give the highest result on \texttt{CoNLL 2003} data. On \texttt{BIONLP13CG}, the effect is reduced as compared to \texttt{Special Symbol}. We suspect that this is because of some loss of intrinsic sub-word details when considering only the head tokens, which can be crucial for biomedical and scientific texts since they have lots of out-of-vocabulary chemical/gene names etc.
+    \item Considering only \texttt{Head Tokens} helps over \texttt{Vanilla BERT} on both datasets. \texttt{Special Symbol + Head Tokens} gives the best performance on \texttt{CoNLL 2003} data. On \texttt{BioNLP13CG}, the improvement is reduced compared to \texttt{Special Symbol}. We suspect this is because of the loss of intrinsic sub-word details which can be crucial for biomedical text since they have lots of out-of-vocabulary chemical/gene names etc.
     
-    \item Highway network is found to be more effective than plain concatenation of features with BERT outputs on both datasets, since it gives the model more flexibility to prioritize among different sources of information dynamically on a case-by-case basis.
+    \item \texttt{Highway Net} rightly ignores confusing character-level information for \texttt{CoNLL 2003} data and hence gives a performance boost over \texttt{Character/Patterns}. For the \texttt{BioNLP13CG} data, this additional highway layer is unable to give improvements since it adds undesired complexity to the model.
 \end{itemize}
 
 \section{Training Effectiveness Study}
