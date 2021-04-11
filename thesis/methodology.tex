@@ -18,7 +18,7 @@ For NER, we extract entity mentions by making output labels follow a tagging sch
 \end{itemize}
 
 \subsection{Experiment Details}
-For general English corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, we use pretrained \texttt{bert-base-uncased} model from \texttt{transformers}\footnote{https://huggingface.co/transformers} python package in \texttt{PyTorch}. For biomedical datasets, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert\#download} model. For \texttt{CNN-LSTM-CRF (BERT-Freeze)} setup, we take the mean of sub-token embeddings from BERT to get the embedding for each input token. We make use of \texttt{BIO} tagging scheme in all our sequence labeling experiments. Models with frozen BERT parameters used learning rate $0.005$. CNN input channels is set to character vocabulary size and each character is fed as a one-hot vector. CNN has $128$ output channels, kernel size of $5$ and does a max pooling to get word-level representation from character-level outputs. LSTM hidden dimensions is set to $256$.
+For \texttt{CNN-LSTM-CRF (BERT-Freeze)} setup, we take the mean of sub-token embeddings from BERT to get the embedding for each input token. We make use of \texttt{BIO} tagging scheme in all our sequence labeling experiments. Models with frozen BERT parameters used learning rate $0.005$. CNN input channels is set to character vocabulary size and each character is fed as a one-hot vector. CNN has $128$ output channels, kernel size of $5$ and does a max pooling to get word-level representation from character-level outputs. LSTM hidden dimensions is set to $256$.
 
 \begin{table}[h!]
 \centering
@@ -364,59 +364,62 @@ Our results are summarized in Table \ref{tab:res_token_semantics}. We also exper
 \end{itemize}
 
 \section{Training Effectiveness Study}
-In the previous section \ref{sec:additional_token_semantics}, we mostly try to give additional information to a BERT architecture by concatenating BERT outputs with some additional feature vectors before final classification. Giving additional information to a model is one thing but whether the model is actually able to pick cues from the additional information or not, is another. In this section, we study the training effectiveness on \texttt{BioNLP13CG} dataset in \texttt{Sequence Labeling} setting using \texttt{BioBERT-Base} model.
+In section \ref{sec:additional_token_semantics}, we looked at some limitations of the pretrained BERT model in capturing special symbols and rare word semantics. To counteract, we proposed feeding in some additional token semantics. In this section, we study how effectively the model is able to pick cues and learn from the supplied additional features. Our experiments are conducted in sequence labeling setting on \texttt{BioNLP13CG} corpus using \texttt{BIO} tagging scheme.
 
 \subsection{Feeding Answer as Input}
-
-To study the training effectiveness, we give the model the best ideal-case information, i.e. for each token, we feed its gold label as a one-hot vector. This is concatenated with BERT output before feeding to final classifier. We study the following variants:
+To study the training effectiveness, we give the model the best ideal-case information, i.e. for each token, we feed its gold label as a one-hot vector. This is concatenated with BERT outputs before feeding to final classifier. We study the following variants:
 
 \begin{itemize}
-    \item \texttt{BERT(Freeze) + Answer}: We freeze the BERT model parameters and concatenate the answer vectors. This effectively reduces the no. of trainable parameters to a few thousand. We try this in two settings, low learning rate of $10^{-5}$ (recommended BioBERT learning rate\footnote{https://github.com/dmis-lab/biobert\#named-entity-recognition-ner}) and high learning rate of $0.005$.
+    \item \texttt{BERT(Freeze) + Answer}: We concatenate BERT outputs with answer vectors and freeze BERT model parameters during training. This effectively reduces the no. of trainable parameters to around $26,000$. We train this in two settings, low learning rate of $10^{-5}$ (recommended BioBERT learning rate\footnote{https://github.com/dmis-lab/biobert\#named-entity-recognition-ner}) and high learning rate of $0.005$.
     
-    \item \texttt{BERT + Answer}: This mimics the real-world scenario where the BERT model is fine-tuned with given additional information at a low learning rate of $10^{-5}$.
+    \item \texttt{BERT + Answer}: This mimics the standard setting where the BERT model is fine-tuned with given additional information at a low learning rate of $10^{-5}$.
     
-    \item For comparison with the above, we also present the results for simple \texttt{BERT} (fine-tuned) and \texttt{BERT(Freeze)} models as well.
+    \item For comparison with the above variants, we also present the results for simple \texttt{BERT} (fine-tuned) and \texttt{BERT(Freeze)} models as well (without any answer inputs).
 \end{itemize}
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}\hline
 	\textbf{Model} & \textbf{Learning Rate} & \textbf{BIONLP13CG}\\\hline
-	\texttt{BERT} & $10^{-5}$ & 85.99\\\hline
-	\texttt{BERT + Answer} & $10^{-5}$ & 86.35\\\hline
-	\texttt{BERT(Freeze)} & $0.005$ & 75.42\\\hline
-	\texttt{BERT(Freeze) + Answer} & $10^{-5}$ & 63.89\\\hline
-	\texttt{BERT(Freeze) + Answer} & $0.005$ & 100.00\\\hline
+	\texttt{BERT} & $10^{-5}$ & $85.99$\\\hline
+	\texttt{BERT + Answer} & $10^{-5}$ & $86.35$\\\hline
+	\texttt{BERT(Freeze)} & $0.005$ & $75.42$\\\hline
+	\texttt{BERT(Freeze) + Answer} & $0.005$ & $100.00$\\\hline
+	\texttt{BERT(Freeze) + Answer} & $10^{-5}$ & $63.89$\\\hline
 	\end{tabular}
     \caption{Results: Training Effectiveness - Feed Answer as Input (Test set Micro-F1 in \%)}
     \label{tab:res_training_ans_input}
 \end{table}
 
-From the results summarized in Table \ref{tab:res_training_ans_input}, we observe that with a very low learning rate of $10^{-5}$, the model is not able to learn from the additional answer information provided (both with frozen BERT and otherwise). At a higher learning rate of $0.005$, the model catches the provided cues well.
+From results summarized in Table \ref{tab:res_training_ans_input}, we make the following observations:
+\begin{itemize}
+    \item From \texttt{BERT} and \texttt{BERT(Freeze)}, we conclude that fine-tuning the model definitely helps.
+    
+    \item From \texttt{BERT} and \texttt{BERT + Answer}, we observe that feeding the answer with input gives better performance. However at a low learning rate of $10^{-5}$, the gain is very small.
+    
+    \item From \texttt{BERT(Freeze) + Answer} at learning rates $0.005$ and $10^{-5}$, we observe that at low learning rate the model is not able to effectively catch the provided cues. At high learning rate, we get perfect scores as expected.
+\end{itemize}
 
 \subsection{What happens at high learning rate?}
-
-From the previous section, we see that we need a relatively higher learning rate to learn from additional information fed to the model. But with BERT fine-tuning, it is recommended to use a very low learning rate in the order of $10^{-5}$. To study this, we pass answer spans as input to the model. Basically, for each token, we add a one-hot dimension which is set if the token belongs to a valid entity else it is set to $0$. This means the model is actually being fed the gold spans and all it has to do is span classification. This should be relatively easy and give good results as seen previously in Section \ref{sec:span_pipeline}. We experiment with the following variants:
+From the previous section, we see that model needs training at high learning rate for learning from additional input features. But with BERT fine-tuning, it is recommended\footnote{https://github.com/dmis-lab/biobert\#named-entity-recognition-ner} to use a low learning rate in the order of $10^{-5}$. To study this, we pass gold mention spans as input to the model. Basically, for each token we add a one-dimensional vector which is set if the token is a part of some gold entity mention. This means effective the model just has to do span classification which is a relatively easy task as seen previously in Section \ref{sec:span_pipeline}. We experiment with the following variants:
 
 \begin{itemize}
-    \item \texttt{BERT (Freeze)}: Freezing BERT model and passing through a single trainable classifier layer. This model has only around $26,000$ trainable parameters. 
+    \item \texttt{BERT(Freeze) + Gold Span}: Concatenate last hidden layer output from BERT with gold-labeled span vectors. and freeze BERT parameters during training. This model is expected to perform better than \texttt{BERT(Freeze)}.
     
-    \item \texttt{BERT (Freeze) + Gold Span}: Same as the above but with gold spans given as additional input. So, this model is expected to perform better than \texttt{BERT (Freeze)}.
+    \item \texttt{BERT + Gold Span}: Same as the above model but with BERT fine-tuning. We train this in two settings, with low learning rate of $10^{-5}$ and high learning rate of $0.005$.
     
-    \item \texttt{BERT + Gold Span}: Same as the above model but with trainable BERT model. We try training this in two different settings, with low learning rate of $10^{-5}$ and high learning rate of $0.005$.
-    
-    \item \texttt{BERT}: This is the standard BERT model with final classification layer and no additional feature inputs fine-tuned at learning rate of $10^{-5}$.
+    \item For comparison, we also present the results for simple \texttt{BERT} (fine-tuned) and \texttt{BERT(Freeze)} models.
 \end{itemize}
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}\hline
 	\textbf{Model} & \textbf{Learning Rate} & \textbf{BIONLP13CG}\\\hline
-	\texttt{BERT(Freeze)} & $0.005$ & 75.42\\\hline
+	\texttt{BERT(Freeze)} & $0.005$ & $75.42$\\\hline
+	\texttt{BERT(Freeze) + Gold Span} & $0.005$ & $79.18$\\\hline
 	\texttt{BERT} & $10^{-5}$ & 85.99\\\hline
-	\texttt{BERT(Freeze) + Gold Span} & $0.005$ & 79.18\\\hline
-	\texttt{BERT + Gold Span} & $10^{-5}$ & 85.78\\\hline
-	\texttt{BERT + Gold Span} & $0.005$ & 0.0\\\hline
+	\texttt{BERT + Gold Span} & $10^{-5}$ & $85.78$\\\hline
+	\texttt{BERT + Gold Span} & $0.005$ & $0.0$\\\hline
 	\end{tabular}
     \caption{Results: Training Effectiveness - Feed Gold Span as Input (Test set Micro-F1 in \%)}
     \label{tab:res_training_span_input}
@@ -425,13 +428,13 @@ From the previous section, we see that we need a relatively higher learning rate
 From Table \ref{tab:res_training_span_input}, we make the following observations:
 
 \begin{itemize}
-    \item From \texttt{BERT (Freeze)} and \texttt{BERT (Freeze) + Gold Span}, we observe that indeed giving gold span information helps the model.
+    \item From \texttt{BERT(Freeze)} and \texttt{BERT(Freeze) + Gold Span}, we observe that indeed giving gold span information helps the model.
     
-    \item From \texttt{BERT(Freeze) + Gold Span} and \texttt{BERT + Gold Span (LR: $10^{-5}$)}, we observe that indeed fine-tuning is able to learn the semantics of entities much better than when using the BERT embeddings right out-of-the-box.
+    % \item From \texttt{BERT(Freeze) + Gold Span} and \texttt{BERT + Gold Span (LR: $10^{-5}$)}, we observe that indeed fine-tuning is able to learn the semantics of entities much better than when using the BERT embeddings right out-of-the-box.
     
-    \item However, from \texttt{BERT} and \texttt{BERT + Gold Span (LR: $10^{-5}$)}, we observe that with a low learning rate, the model is not able to focus on and effectively utilize the gold span information.
+    \item From \texttt{BERT} and \texttt{BERT + Gold Span} at learning rate $10^{-5}$, we observe that with a low learning rate, the model is not able to focus on and effectively utilize the gold span information (similar to our previous findings with answer inputs).
     
-    \item Finally, from \texttt{BERT + Gold Span (LR: $10^{-5}$)} and \texttt{BERT + Gold Span (LR: $0.005$)}, we observe that increasing the learning rate has a deteriorating effect on the pretrained BERT parameters and the rigorous push from high learning rate pushes the model to an unsatisfactory local optima.
+    \item From \texttt{BERT + Gold Span} at learning rates $10^{-5}$ and $0.005$, we observe that increasing the learning rate has a deteriorating effect on the pretrained BERT parameters and the rigorous push from a high learning rate pushes the model to an unsatisfactory local optima.
 \end{itemize}
 
 % \section{Tagging Scheme Variation}
@@ -454,16 +457,16 @@ From Table \ref{tab:res_training_span_input}, we make the following observations
 % From results in Table \ref{tab:res_tagging_scheme_qa}, we observe that as expected, explicitly modeling the begin and end boundaries performs the best while not modeling start and end at all, in \texttt{2-Tag} scheme performs the least among them. However this will have lesser number of parameters to train and more representative samples for each case.
 
 \section{Pretrained Model Variation}
-In almost all of our model variations discussed we use a pretrained BERT model and either fine-tune it or freeze its parameters and use it out-of-the-box. Even though the underlying model architecture remains that of a transformer encoder, based on which dataset the pretrained model is trained on and what objective function is used, there are several variants. We study the effect of this pretraining for NER in sequence tagging setup through the following variants. Note that in all our experiments we work with the BERT-Base architecture which consists of around 110M parameters.
+In all the experiments done in this work, pretrained BERT model serves as our model backbone. However based on which dataset the pretrained model is trained on and what learning objective is used, there are several variants. We study the effect of this pretraining procedure on NER performance in sequence tagging setup through the following variants: 
 
 \begin{itemize}
     \item \texttt{BERT-Base-Uncased}: Proposed by \cite{devlin2018bert}, this model is trained on English text from Wikipedia and BookCorpus\cite{moviebook} which totals around 16GB of uncompressed text. The model is uncased. It is trained on masked language modeling (MLM) and next sentence prediction objective. We use \texttt{bert-base-uncased} model provided by HuggingFace\footnote{https://huggingface.co/bert-base-uncased} for our \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora.
     
-    \item \texttt{RoBERTa-Base}: Proposed by \cite{}, this model is trained on English text from 5 different datasets totalling around 160 GB of uncompressed text. The model is cased and trained on only the masked language modeling (MLM) objective. We use \texttt{roberta-base} model provided by HuggingFace\footnote{https://huggingface.co/roberta-base} for our \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora.
+    \item \texttt{RoBERTa-Base}: Proposed by \cite{liu2019roberta}, this model is trained on English text from 5 different datasets totalling around 160 GB of uncompressed text. The model is cased and trained on only the masked language modeling (MLM) objective. We use \texttt{roberta-base} model provided by HuggingFace\footnote{https://huggingface.co/roberta-base} for our \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora.
     
-    \item \texttt{BioBERT-Base}: Proposed by \cite{}, this model is trained on English biomedical literature including PubMed abstracts and PMC full text articles. The model is cased and trained on same MLM and next sentence prediction objectives proposed in standard BERT model. We use \texttt{BioBERT-Base v1.1} model provided on GitHub\footnote{https://github.com/dmis-lab/biobert\#download} and import it in HuggingFace as \texttt{dmis-lab/biobert-base-cased-v1.1}. We use this model on our biomedical corpora like \texttt{BIONLP13CG} and \texttt{JNLPBA}, since models pretrained on biomedical and scientific texts are found to capture semantics more effectively than those trained on general English text.
+    \item \texttt{BioBERT-Base}: Proposed by \cite{lee2020biobert}, this model is trained on English biomedical literature including PubMed abstracts and PMC full text articles. The model is cased and trained on same MLM and next sentence prediction objectives proposed in standard BERT model. We use \texttt{BioBERT-Base v1.1} model provided on GitHub\footnote{https://github.com/dmis-lab/biobert\#download} and import it in HuggingFace as \texttt{dmis-lab/biobert-base-cased-v1.1}. We use this for \texttt{BioNLP13CG} and \texttt{JNLPBA} datasets, since models pretrained on biomedical and scientific texts are found to capture similar semantics more effectively than those trained on general English text.
     
-    \item \texttt{SciBERT-Base-Uncased}: Proposed by \cite{}, this model is trained on full texts of papers on Semantic Scholar\footnote{https://www.semanticscholar.org/}. The model is uncased and trained using the MLM and next sentence prediction objectives originally proposed by the BERT paper. However, they are trained using \texttt{SciVocab}, a specially created WordPiece vocabulary for scientific texts. Just like BioBERT, we use this for \texttt{BIONLP13CG} and \texttt{JNLPBA} datasets.
+    \item \texttt{SciBERT-Base-Uncased}: Proposed by \cite{beltagy2019scibert}, this model is trained on full texts of papers on Semantic Scholar\footnote{https://www.semanticscholar.org/}. The model is uncased and trained using the MLM and next sentence prediction objectives originally proposed by the BERT paper. However, this model uses \texttt{SciVocab}, a specially created WordPiece vocabulary for scientific texts. Just like BioBERT, we use this for \texttt{BioNLP13CG} and \texttt{JNLPBA} datasets.
     
 \end{itemize}
 
@@ -471,11 +474,11 @@ In almost all of our model variations discussed we use a pretrained BERT model a
 \centering
 \begin{tabular}{|c|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA}\\\hline
-	\texttt{BERT-Base-Uncased} & 82.63 & -\\\hline
-	\texttt{BioBERT-Base} & 85.99 & 74.35\\\hline
-	\texttt{SciBERT-Base-Uncased} & 86.01 & todo\\\hline
+	\texttt{BERT-Base-Uncased} & $82.63$ & todo\\\hline
+	\texttt{BioBERT-Base} & $85.99$ & $74.35$\\\hline
+	\texttt{SciBERT-Base-Uncased} & $86.01$ & $74.68$\\\hline
 	\end{tabular}
-    \caption{Results: Pretrained Model Variation (Test set Micro-F1 in \%)}
+    \caption{Results: Pretrained (Biomedical) Model Variation (Test set Micro-F1 in \%)}
     \label{tab:res_pretrained_model_bio}
 \end{table}
 
@@ -483,44 +486,42 @@ In almost all of our model variations discussed we use a pretrained BERT model a
 \centering
 \begin{tabular}{|c|c|c|}\hline
 	\textbf{Model} & \textbf{CoNLL 2003} & \textbf{OntoNotes 5.0}\\\hline
-	\texttt{BERT-Base-Uncased} & 91.36 & 74.35\\\hline
-	\texttt{RoBERTa-Base} & 91.19 & todo\\\hline
+	\texttt{BERT-Base-Uncased} & $91.36$ & $83.39$\\\hline
+	\texttt{RoBERTa-Base} & $91.19$ & $86.34$\\\hline
 	\end{tabular}
-    \caption{Results: Pretrained Model Variation (Test set Micro-F1 in \%)}
+    \caption{Results: Pretrained (General) Model Variation (Test set Micro-F1 in \%)}
     \label{tab:res_pretrained_model_general}
 \end{table}
 
 In Tables \ref{tab:res_pretrained_model_bio} and \ref{tab:res_pretrained_model_general}, we present our results. We observe that:
 
 \begin{itemize}
-    \item Performance of \texttt{BERT-Base-Uncased} model and \texttt{RoBERTa-Base} models on \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} corpora is almost comparable with \texttt{BERT-Base-Uncased} having a slight edge.
+    \item On \texttt{OntoNotes 5.0} data, \texttt{RoBERTa-Base} performs better than \texttt{Bert-Base-Uncased}. This gives us an insight that case of tokens plays an important role in general English news data. However, on \texttt{CoNLL 2003}, the performance is similar. On investigating further\footnote{https://github.com/google-research/bert/issues/223\#issuecomment-649619302}, we identify that original \texttt{CoNLL 2003} data has some casing issues which people try to resolve by doing truecasing as a pre-processing step. It is because of this casing issue that \texttt{RoBERTa-Base} model is not able to show its advantages on \texttt{CoNLL 2003} data.
     
-    \item On biomedical corpora, \texttt{SciBERT-Base-Uncased} is found to perform better than \texttt{BioBERT-Base v1.1} model. As expected, both of these are better than using \texttt{BERT-Base-Uncased} in the biomedical setting. Hence, we omit the \texttt{BERT-Base-Uncased} experiment with \texttt{JNLPBA}.
+    \item \texttt{SciBERT-Base-Uncased} performs marginally better than \texttt{BioBERT-Base v1.1} on both biomedical datasets. As expected, both of these domain-specific pretrained models perform much better than \texttt{BERT-Base-Uncased}. 
 \end{itemize}
 
-\section{Clustering and Segregation of Diverse Entities}
+\section{Partitioning Diverse Entities}
 \label{sec:clustering}
-Here, we focus on \texttt{BIONLP13CG} dataset. Looking at the entity distribution in Table \ref{tab:bio_entity_distribution}, we see that the dataset has lots of samples of \texttt{Gene\_or\_gene\_product} along with \texttt{Cancer} and \texttt{Simple\_chemical}. In the question answering setup as we studied in Section \ref{sec:question_answering}, the entity name semantics is not too essential and the model still learns to differentiate their mentions accurately. 
-
-Here, we develop on that idea and try to break a diverse entity group \texttt{Gene\_or\_gene\_product} into sub-groups (or, sub-entities) and train a model to learn each of those sub-entities and differentiate them from each other. The idea is that dividing a diverse group into sub-entities will help reduce the diversity of a big entity group and make it simpler for the model to differentiate cases/variations. At inference time, the sub-entities are remapped to the parent entity and F1-score is calculated.
+From the entity distribution in \texttt{BioNLP13CG} dataset (Table \ref{tab:bio_entity_distribution}), we see that \texttt{Cancer}, \texttt{Gene\_or\_gene\_product} etc. are high-resource entity types. They may have high mention diversity and hence it may be difficult for a model to capture all their mention representations. Instead, it may be easier to break a heterogeneous entity class into relatively homogeneous sub-entity classes and work with them. At inference time, remap the sub-entities to the original entity and report F1-scores.
 
 \subsection{Experiment Details}
-We work with question answering setup with only 3 entities, \texttt{Gene\_or\_gene\_product}, \texttt{Cancer} and \texttt{Simple\_chemical}. All other entities are ignored for the experiment. The procedure is described below:
+We work with \texttt{BioNLP13CG} dataset using question answering setup on only 3 entities, \texttt{Gene\_or\_gene\_product}, \texttt{Cancer} and \texttt{Simple\_chemical}. All other entities are ignored. We partition \texttt{Gene\_or\_gene\_product} (the largest entity class) into $K$ sub-entities ($K$ becomes a hyper-parameter). The procedure is described below:
 
 \begin{itemize}
-    \item Collect all entity mentions of \texttt{Gene\_of\_gene\_product}. Pass their corresponding sentences to \texttt{BioBERT-Base-Uncased} model and concatenate the output embeddings of first and last sub-word labeled as \texttt{Gene\_of\_gene\_product}. This is the embedding of that mention.
+    \item Collect all mentions of \texttt{Gene\_of\_gene\_product}. Pass their corresponding sentences to pretrained \texttt{BioBERT-Base-Uncased} model. Calculate contextualized mention embedding as the concatenation of BERT outputs of first and last sub-words of the mention.
     
-    \item If there are multiple instances of same mention, then take mean of their mention embeddings across sentences.
+    \item For multiple instances of same mention, take the mean of contextual mention embeddings across sentences.
     
-    \item Reduce mention embeddings to 100-dimensional vectors using principal component analysis (PCA). Next take their tSNE\cite{} projections to convert each mention to a 2-dimensional vector representation.
+    \item Reduce mention embeddings to 100-dimensional vectors using principal component analysis (PCA). Then take their tSNE\cite{van2008visualizing} projections to convert each mention to a 2-dimensional vector representation.
     
-    \item \textbf{Clustering}: Fix number of clusters to 4 (hyper-parameter). Randomly select 4 mention instances as centers and apply K-Medoids clustering with euclidean distance among tSNE representations as the distance metric. Note that we worked with cosine distance and KL-Divergence as well on tSNE representations as well as on 100-dimensional PCA representation. However this presented setup is found to work the best.
+    \item \textbf{Clustering}: Fix $K = 4$ (number of clusters). Randomly select $K$ mention instances as cluster centers and apply K-Medoids clustering. Use euclidean distance among tSNE projections as the distance metric\footnote{We evaluated cosine distance and KL-Divergence on tSNE and PCA vectors as distance metrics as well. However the presented setup is found to work the best.}.
     
-    \item After clustering, we relabel the corpus tagging each mention to its cluster. Each cluster is considered a sub-entity of \texttt{Gene\_of\_gene\_product}. The entities are named from \texttt{Gene\_of\_gene\_product0} to \texttt{Gene\_of\_gene\_product3}.
+    \item After clustering, we relabel the corpus tagging each mention to its cluster. Each cluster is considered a sub-entity of \texttt{Gene\_of\_gene\_product}. The sub-entities are named from \texttt{Gene\_of\_gene\_product0} to \texttt{Gene\_of\_gene\_product3}.
     
-    \item Next we train a simple question answering NER model with this new labeled dataset. 
+    \item Next we train a question answering NER model with this new labeled dataset. Note that in Section \ref{sec:question_answering} we saw that the keyword used to represent an entity does not play a crucial role in extraction performance. So, our sub-entity naming convention should not be a problem.
     
-    \item During inference time, the model outputs each mention into its sub-entity. We post-process the labels and map each sub-entity output to \texttt{Gene\_of\_gene\_product} and then calculate Micro-F1.
+    \item During inference time, the model mention with their sub-entity types. We post-process the labels and map each sub-entity output to \texttt{Gene\_of\_gene\_product} and then calculate overall Micro-F1.
 \end{itemize}
 
 \begin{table}[h!]
@@ -528,14 +529,14 @@ We work with question answering setup with only 3 entities, \texttt{Gene\_or\_ge
 \begin{tabular}{|c|c|}\hline
 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
 	\texttt{BERT-QA} & 87.97\\\hline
-	\texttt{BERT-QA (With Clustering)} & 86.66\\\hline
+	\texttt{BERT-QA (With Partitioning)} & 86.66\\\hline
 	\end{tabular}
-    \caption{Results: Clustering/Segregation of Diverse Entities (Test set Micro-F1 in \%)}
+    \caption{Results: Partitioning Diverse Entities (Test set Micro-F1 in \% on 3 high-resource entities)}
     \label{tab:res_clustering}
 \end{table}
 
 \subsection{Observations}
-From results in Table \ref{tab:res_clustering}, we observe that this sub-entity extraction technique gives comparable performance to the original setup but is not able to give any improvements. This can be attributed to the fact that our clustering has been on the basis of semantics captured by out-of-the-box pretrained BioBERT-Base model which in the first place may not be able to capture the semantics of many entities well. In addition, the criteria for clustering is semantic similarity captured by the embeddings and not word-pattern similarity. In the current clusters, there is still lots of diversity which the model has to capture. Hence, we conclude that the potential of this technique is only limited by the quality of clustering we are able to achieve. With better word-pattern oriented clusters, this technique is bound to get much better results.
+From results in Table \ref{tab:res_clustering}, we observe that entity partitioning technique gives slightly reduced performance compared to original setup. This is because our current clustering is on the basis of semantic similarity captured by BERT embeddings and not similarity among word patterns. As an example, among \texttt{Simple\_chemical}, we want formulas like \textit{CaSO4} to be segregated from names like \textit{calcium sulphate}. However, the BERT model clubs them into the same sub-entity since they are semantically same. Hence, our sub-entities still have high heterogeneity and not well separated, making it difficult for the model to train well. However, with better word-pattern oriented clusters, this technique has potential to give better results.
 
 \section{Handling Nested Entities}
 % Such examples can be found in biomedical domain in GENIA corpus\cite{} and news article domain in ACE-2004\cite{} and ACE-2005\cite{} corpora. \cite{finkel2009nested} align sentences into a tree-structure with entities for handling this and \cite{li2019unified} extract each entity separately by querying a sentence multiple times in a question-answering framework. To make data annotation even more complicated, Katiyar and Cardie [122] reported that nested entities are fairly common: 17% of the entities in the GENIA corpus are embedded within another entity; in the ACE corpora, 30% of sentences contain nested entities. Our goal is to develop an approach for named entity recognition that is domain-agnostic and which does not develop biases towards commonly seen entities and learns a meaningful representation for low-resource entities as well. Hence, we conduct our experiments on multiple datasets as detailed below. 
@@ -594,6 +595,9 @@ From the stats reported in Tables \ref{tab:context_bio_dataset} and \ref{tab:res
 
 \section{Comparative Precision/Recall Analysis}
 \label{sec:precision_recall_analysis}
+
+Entity-wise results? Any advantages in span based setup?
+
 Next, we do a quantitative comparison among the several variations studied in the previous sections and look at their micro-averaged precision, recall and F1-scores over multiple datasets.
 
 \begin{table}[h!]
