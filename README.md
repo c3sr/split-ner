@@ -38,7 +38,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
 | BERT-Base                                | 81.940                      |                |                            |           |                      |
-| RoBERTa-Base                             | -                           |                |  90.728                    |           | 86.114 (running)     |
+| RoBERTa-Base                             | -                           |                |  90.728                    |           | 86.780               |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
 | BioBERT-Freeze (LR:0.005)                | 70.921 (ep:140)             | 49.328         |  78.422                    |           | 62.949               |
@@ -251,7 +251,7 @@ Precision, Recall distribution for some good performing models to understand whe
 |------------------------------------------|------------------------|------------------------|------------------------|
 | BioBERT                                  | 82.2538                | 84.5543                | 83.3882                |
 | BioBERT-Freeze                           | 67.4176                | 67.2891                | 67.3533                |
-| RoBERTa (running)                        | 85.0015                | 87.7165                | 86.3377                |
+| RoBERTa                                  | 86.5359                | 87.2716                | 86.9022                |
 
 1. QA models have greater precision than normal models but lower recall.
 2. CharCNN+Pattern helped increase recall.
