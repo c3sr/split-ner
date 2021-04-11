@@ -598,7 +598,21 @@ From the stats reported in Tables \ref{tab:context_bio_dataset} and \ref{tab:res
 
 Entity-wise results? Any advantages in span based setup?
 
-Next, we do a quantitative comparison among the several variations studied in the previous sections and look at their micro-averaged precision, recall and F1-scores over multiple datasets.
+As a summary, in this section, we take some major models described in the previous sections and compare and contrast them quantitatively by comparing their precision, recall and F1-score on multiple datasets.
+
+\begin{itemize}
+    \item \texttt{BERT}: Represents sequence labeling NER setup with \texttt{BIO} tagging scheme.
+    
+    \item \texttt{Dice Loss}: Same as \texttt{BERT} model using dice loss instead of standard cross-entropy loss.
+    
+    \item \texttt{Special Symbol}: Same as \texttt{BERT} model with additional one-hot input feature to capture if the token is a special symbol like \textit{hyphen}, \textit{parenthesis} etc.
+    
+    \item \texttt{BERT-QA}: Represents question answering NER setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word.
+    
+    \item \texttt{BERT-QA(Where)}: Same as \texttt{BERT-QA} with \textit{Where} as the question word.
+    
+    \item \texttt{Span-Based}: Uses the \texttt{BERT-QA} setup for span detection and QA-based sequence classification for span classification.
+\end{itemize}
 
 \begin{table}[h!]
 \centering
@@ -607,14 +621,39 @@ Next, we do a quantitative comparison among the several variations studied in th
 	 & P & R & F1 & P & R & F1 & P & R & F1\\\hline
 	\texttt{BERT} & 86.17 & 85.82 & 85.99 & 91.24 & 91.48 & 91.36 & 70.97 & 78.07 & 74.35\\\hline
 	\texttt{Dice Loss} & 86.68 & \textbf{86.03} & 86.35 & 91.05 & 90.47 & 90.76 & \textbf{72.05} & 78.23 & \textbf{75.01}\\\hline
+	\texttt{Special Symbol} & 87.62 & 85.66 & 86.63 & 91.75 & 91.60 & 91.67 & 70.42 & 78.47 & 74.23\\\hline
+	\texttt{BERT-QA} & 88.62 & 84.39 & 86.45 & 91.54 & 90.80 & 91.17 & 71.97 & 78.11 & 74.92\\\hline
+	\texttt{BERT-QA(Where)} & \textbf{89.21} & 84.58 & \textbf{86.83} & \textbf{92.47} & 91.19 & \textbf{91.82} & 71.45 & 78.11 & 74.64\\\hline
 	\texttt{Span-Based} & 86.33 & 85.47 & 85.89 & 91.46 & \textbf{91.82} & 91.64 & 71.14 & \textbf{79.34} & \textbf{75.01}\\\hline
-	\texttt{QA} & 88.62 & 84.39 & 86.45 & 91.54 & 90.80 & 91.17 & 71.97 & 78.11 & 74.92\\\hline
-	\texttt{QA(Where)} & \textbf{89.21} & 84.58 & \textbf{86.83} & \textbf{92.47} & 91.19 & \textbf{91.82} & 71.45 & 78.11 & 74.64\\\hline
-	\texttt{Punctuation} & 87.62 & 85.66 & 86.63 & 91.75 & 91.60 & 91.67 & 70.42 & 78.47 & 74.23\\\hline
 	\end{tabular}
     \caption{Results: Precision/Recall Comparison}
     \label{tab:res_precision_recall}
 \end{table}
+
+From the results summarized in Table \ref{tab:res_precision_recall}, we make the following observations:
+
+\begin{itemize}
+    \item QA-based models give a much higher precision than sequence labeling or span-based methods. However, they compromise on the recall.
+    
+    \item Sequence labeling and span-based methods have comparable precision / recall while QA setup has a large margin between precision and recall values.
+    
+    \item \texttt{Dice Loss} is found to help improve recall in sequence labeling setup and \texttt{Special Symbol} helps improve precision (mention span boundary detection).
+    
+    \item In QA setup, asking \textit{Where} gives a higher precision than asking \textit{What}.
+    
+    \item Span-based technique is generally found to give the best recall values. This can be attributed to the risk-averse span detector which identifies all candidate entity spans irrespective of entity type.
+    
+    \item The recall of span detector is inversely proportional to number of output entity types. With more entity types, the heterogeneity increases making span detector error-prone. This is the reason for low recall on \texttt{BIONLP13CG} corpus with $16$ entity types compared to \texttt{CoNLL 2003} and \texttt{JNLPBA} datasets with $4$ and $5$ types respectively.
+    
+    \item Due to its large advantage in precision, the \texttt{BERT-QA(Where)} model gives the best performance among the compared models.
+\end{itemize}
+
+\section{Entity-Wise Performance}
+Next, we deep dive into the \texttt{BioNLP13CG} dataset which has $16$ entity types which includes several high and low-resource types. We compare the model performance at the entity type level for our 3 major NER approaches, sequence labeling, question answering and span-based pipeline. In each of these setups, we take the variant which is gives the best performance. We report entity-level and macro-averaged F1-scores. 
+\begin{align*}
+    Macro-F1 &= \frac{\sum_i^{N}{F1_i}}{N}
+\end{align*}
+
 
 \section{State-of-the-art Comparison}
 \label{sec:sota_comparison}
