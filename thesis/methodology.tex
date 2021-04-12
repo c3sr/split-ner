@@ -649,14 +649,74 @@ From the results summarized in Table \ref{tab:res_precision_recall}, we make the
 \end{itemize}
 
 \section{Entity-Wise Performance}
-Next, we deep dive into the \texttt{BioNLP13CG} dataset which has $16$ entity types which includes several high and low-resource types. We compare the model performance at the entity type level for our 3 major NER approaches, sequence labeling, question answering and span-based pipeline. In each of these setups, we take the variant which is gives the best performance. We report entity-level and macro-averaged F1-scores. 
+Next, we deep dive into the \texttt{BioNLP13CG} dataset which has $16$ entity types including several high and low-resource types. We compare the model performance at the entity type level for our 3 major NER approaches: sequence labeling, question answering and span-based pipeline. From each of these setups, we take the best performing variants and report entity-level and macro-averaged F1-score. Let $\mathcal{T}$ be the set of all entity types and F1$_t$ be the F1-score for individual entity type $t \in \mathcal{T}$. Then,
 \begin{align*}
-    Macro-F1 &= \frac{\sum_i^{N}{F1_i}}{N}
+    \text{Macro-F1} &= \frac{1}{\mathcal{\vert\mathcal{T}\vert}}\,\sum_{t\,\in\,\mathcal{T}}{\text{F1}_t}
 \end{align*}
+We present the comparison among the following models:
+\begin{itemize}
+    \item \texttt{Dice Loss}: Sequence labeling NER approach over BERT model with \texttt{BIO} tagging scheme and dice loss instead of cross entropy.
+    
+    \item \texttt{Special Symbol}: Sequence labeling NER approach over BERT with \texttt{BIO} tagging scheme and additional one-hot input feature to capture if a token is a special symbol like \textit{hyphen}, \textit{parenthesis} etc.
+    
+    \item \texttt{BERT-QA (Where)}: Question answering NER approach with \texttt{BIOE} tagging scheme and \textit{Where} as the question word.
+    
+    \item \texttt{Span Based}: Pipelined approach which uses the QA setup with \texttt{BIOE} tagging scheme and \textit{What} as question word for span detection and QA-based sequence classification for span classification.
+\end{itemize}
 
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|p{4em}|p{4em}|p{4em}|p{4em}|}\hline
+	 & Count & \texttt{Dice Loss} & \texttt{Special Symbol} & \texttt{BERT-QA (Where)} & \texttt{Span Based}\\\hline
+	\texttt{Gene\_or\_gene\_product} & 2520 & 91.14 & 91.22 & 90.43 & 90.36\\\hline
+\texttt{Cell} & 1013 & 89.42 & 89.46 & 91.10 & 89.53\\\hline
+\texttt{Cancer} & 924 & 88.78 & 89.99 & 90.19 & 87.87\\\hline
+\texttt{Simple\_chemical} & 727 & 82.97 & 81.77 & 81.36 & 80.89\\\hline
+\texttt{Organism} & 518 & 88.65 & 89.17 & 88.27 & 87.51\\\hline
+\texttt{Multi-tissue\_structure} & 303 & 75.75 & 76.82 & 77.78 & 77.99\\\hline
+\texttt{Tissue} & 184 & 69.34 & 68.97 & 71.28 & 65.60\\\hline
+\texttt{Cellular\_component} & 180 & 83.73 & 85.56 & 86.63 & 83.51\\\hline
+\texttt{Organ} & 156 & 74.83 & 74.84 & 77.13 & 76.69\\\hline
+\texttt{Organism\_substance} & 102 & 82.80 & 86.17 & 83.80 & 86.32\\\hline
+\texttt{Pathological\_formation} & 88 & 62.07 & 56.63 & 60.40 & 65.79\\\hline
+\texttt{Amino\_acid} & 62 & 59.81 & 55.56 & 51.11 & 48.28\\\hline
+\texttt{Organism\_subdivision} & 39 & 58.67 & 62.34 & 55.38 & 62.16\\\hline
+\texttt{Immaterial\_anatomical\_entity} & 31 & 57.53 & 64.62 & 70.00 & 60.00\\\hline
+\texttt{Developing\_anatomical\_structure} & 17 & 51.61 & 45.71 & 66.67 & 61.54\\\hline
+\texttt{Anatomical\_system} & 17 & 11.11 & 10.53 & 10.53 & 34.78\\\hline
+\textbf{Macro F1} & 6881 & 70.51 & 70.59 & 72.00 & \textbf{72.43}\\\hline
+	\end{tabular}
+    \caption{Results: Entity-Wise Performance (Test set F1 in \%)}
+    \label{tab:res_entity_wise}
+\end{table}
+
+From results in Table \ref{tab:res_entity_wise}, we make the following observations:
+\begin{itemize}
+    \item \texttt{Span Based} pipelined approach reports the best overall macro-averaged F1. It is able to perform well even on low-resource entity types. This can be attributed to the span detector which is entity type agnostic and hence does not develop high-resource bias.
+    
+    \item Overall, \texttt{BERT-QA (Where)} and \texttt{Span Based} both use question answering approach internally and perform better than sequence labeling methods. 
+    
+    \item For high-resource entity types all variants perform comparably with \texttt{BERT-QA (Where)} model having a slight advantage. On low-resource entities, \texttt{Span Based} method takes the lead.
+\end{itemize}
 
 \section{State-of-the-art Comparison}
 \label{sec:sota_comparison}
+Based on our literature review in the NER domain, we have found that comparison with state-of-the-art is non-trivial. Nevertheless, for completeness, we present previously published state-of-the-art results along with their assumptions and system settings. 
+
+Note that, in this section, we are not summarizing the results in a tabular form because each model comes with its own intricacies. We find it much more intuitive to report results along with modeling techniques and assumptions in a survey form here.
+
+\subsection{BioNLP13CG}
+The original BioBERT paper\cite{lee2020biobert} does not state their performance on this dataset. However, \cite{banerjee2019knowledge} replicate this system and report $85.56$ as test set micro-F1. We replicate this as a baseline and get $85.99$. \cite{banerjee2019knowledge} combine the training and development corpus of 15 biomedical datasets and train their system on it. Then use individual test corpora to report F1-scores. They achieve $89.58$, however, this setting is not comparable to ours which uses just the \texttt{BioNLP13CG} available training data. With same data, they report $82.39$. \cite{crichton2017neural} report $78.90$ in a multi-task learning setup and \cite{neumann2019scispacy} report $77.60$ in their SciSpacy framework. Our \texttt{BERT-QA (Where)} model achieves $86.83$ and \texttt{Span Based} model reports $85.89$ which set the new state-of-the-art results on this dataset.
+
+\subsection{CoNLL 2003}
+
+
+\subsection{JNLPBA}
+From literature review we find that there are two groups into which the past results can be segregated. All reported numbers are micro-averaged F1 scores on 5 output entity types. The first group of works use the version of dataset provided by MTL-Bioinformatics\cite{crichton2017neural} paper on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/}. For ease of comparison, we also fall into this category. The source paper\cite{crichton2017neural} have a multi-task learning setup and report $70.09$. Then, \cite{wang2019cross} also do multi-task modeling combining training and development sets for multiple datasets and report $73.52$. SciSpacy\cite{neumann2019scispacy} report $73.21$. \cite{banerjee2019knowledge} combine multiple datasets together for training in their proposed model. However, they report $73.63$ for BioBERT model fine-tuned on just the JNLPBA data as a baseline. We also replicate simple BioBERT setup and get $74.35$. \cite{sachan2018effective} report $75.03$ using LSTM-based language model pretraining and fine-tuning procedure. To the best of our knowledge, this serves as the state-of-the-art on this dataset. Our span-based proposed model reaches $75.01$ which matches with the SOTA.
+
+The second group of papers have parsed and preprocessed the raw JNLPBA dataset from scratch. This is because \cite{yoon2019collabonet} find that the data score provided by MTL-Bioinformatics has sentence segmentation issues and report custom-parsed data with $78.58$ micro-averaged F1. However, they train on combined data source having multiple datasets and remove \texttt{Cell\_type} entity type from data. The original BioBERT paper\cite{lee2020biobert} also custom-parsed the raw data and report $77.59$. SciBERT\cite{beltagy2019scibert} reports $77.28$ and apply a CRF final layer. They mark their results as macro-F1 scores however, cross-referencing with figures reported in other papers, we suspect it to a typo and should be micro-F1. Recently, \cite{kocaman2021spark} report $81.29$ which serves as a new state-of-the-art in this setting.
+
+We conclude from the survey that our proposed span-based architecture reports comparable results to the state-of-the-art on JNLPBA dataset provided on GitHub by the MTL-Bioinformatics\cite{crichton2017neural} paper.
 
 \begin{table}[h!]
 \centering
