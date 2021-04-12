@@ -173,7 +173,7 @@ Table \ref{tab:res_span} reports the results of the pipelined span detection and
     
     \item The results of span pipeline are limited by the performance of the span detector part. Since this procedure is pipelined, errors in this first step propagate to the next step. Boundary detection serves as the primary challenge in Span Detector and has a large scope for improvement on biomedical datasets.
     
-    \item Qualitative analysis, later discussed in Section \ref{sec:qualitative_analysis} reveals that both \texttt{BERT-QA} and \texttt{Span Detector} share very similar boundary detection issues.
+    \item Qualitative analysis reveals that both \texttt{BERT-QA} and \texttt{Span Detector} share very similar boundary detection issues as highlighted in Section \ref{subsec:qualitative_analysis}.
 \end{itemize}
 
 \section{Learning Objective Variation}
@@ -190,7 +190,7 @@ As can be seen from Equation \eqref{eq:cross_entropy}, Cross Entropy loss penali
 Not all entity types may have an equable distribution in the labeled dataset. Generally negative samples outweigh positive samples in NER datasets. Only $23.5\%$ tokens in \texttt{BIONLP13CG} dataset belong to some entity, rest are labeled \texttt{O}. This may introduce bias in the model which can be countered by giving different importance/weights to different entity types. In our case, we want to reduce the dominant influence of \texttt{O} labels, hence, any token with a gold label \texttt{O} is given a weight of $0.5$ while all others have a weight of $1$. This can be further extended to give different weights to high and low resource entity types. However, this approach makes the model very sensitive to the assigned weights and it can rather easily develop a bias towards low-resource entities\cite{valverde2017improving}.
 
 \subsection{Punctuation Weighted CE Loss}
-From qualitative analysis of misclassified samples (Section \ref{sec:qualitative_analysis} in standard CE loss setup we notice that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, slash etc. Hence, we emphasize these symbols by penalizing the model twice if the misclassified token is a punctuation/special symbol.
+From qualitative analysis of misclassified samples (Section \ref{subsec:qualitative_analysis}) in standard CE loss setup we notice that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, slash etc. Hence, we emphasize these symbols by penalizing the model twice if the misclassified token is a punctuation/special symbol.
 
 \subsection{Dice Loss}
 As detailed earlier, Cross Entropy is an accuracy-oriented objective while during evaluation, we calculate the F1-Score. This difference can lead to sub-optimal model training. To counteract, \cite{li2019dice} make use of S{\o}rensen-Dice coefficient(DSC)\cite{sorensen1948method, dice1945measures} and Tversky index\cite{tversky1977features} which are F-Score oriented statistics. Given sets $A$ and $B$, DSC is used to gauge similarity among two sets and is defined as,
@@ -248,6 +248,8 @@ where $\gamma$ is the smoothing parameter. Then over all samples, dice loss (DL)
 After having run through the three major approaches for NER namely, sequence labeling, question answering and span detection and classification, in this section we present a qualitative error analysis. Next, we address the identified issues by either architectural modification or additional input features.
 
 \subsection{Qualitative Error Analysis}
+\label{subsec:qualitative_analysis}
+
 Different approaches have their own strengths and weaknesses highlighted later in Section \ref{sec:precision_recall_analysis}. However there are several common errors which can be segregated into three major categories:
 
 \begin{itemize}
@@ -283,6 +285,8 @@ Different approaches have their own strengths and weaknesses highlighted later i
         \label{tab:boundary_issue}
     \end{table}
 \end{itemize}
+
+In general, we conclude that for a gold entity mention $\langle s, e, t \rangle$ where $s$ and $e$ represent the span boundaries and $t$ represents entity type, the detection of accurate boundary indices ($s$ and $e$) serves as a primary bottleneck of all current NER approaches discussed. Given a correct mention span, classifying it into an entity type $t$ is relatively simpler, as observed in Section \ref{sec:span_pipeline}.
 
 \subsection{Experiment Details}
 
@@ -709,7 +713,7 @@ Note that, in this section, we are not summarizing the results in a tabular form
 The original BioBERT paper\cite{lee2020biobert} does not state their performance on this dataset. However, \cite{banerjee2019knowledge} replicate this system and report $85.56$ as test set micro-F1. We replicate this as a baseline and get $85.99$. \cite{banerjee2019knowledge} combine the training and development corpus of 15 biomedical datasets and train their system on it. Then use individual test corpora to report F1-scores. They achieve $89.58$, however, this setting is not comparable to ours which uses just the \texttt{BioNLP13CG} available training data. With same data, they report $82.39$. \cite{crichton2017neural} report $78.90$ in a multi-task learning setup and \cite{neumann2019scispacy} report $77.60$ in their SciSpacy framework. Our \texttt{BERT-QA (Where)} model achieves $86.83$ and \texttt{Span Based} model reports $85.89$ which set the new state-of-the-art results on this dataset.
 
 \subsection{CoNLL 2003}
-
+Doing NER on \texttt{CoNLL 2003} data has been a popular NLP task for long. \cite{yamada2020luke} set the current state-of-the-art result at $94.3$ micro-F1 score on test  set. They design a customized pretraining objective and pretrain the BERT model on a huge corpus. Besides, they provide document context as input apart from each sample sentence both during training and inference. The original BERT paper\cite{devlin2018bert} reports $92.4$ however as per some discussions on GitHub\footnote{https://github.com/google-research/bert/issues/22}, they achieve this by including additional CRF layer, adding full document context with each input sentence, applying truecasing and heuristic-based intelligent input sentence splitting as preprocessing. Without these additional steps, the Vanilla BERT-Base model is found to achieve around $91.0$. Our experiments with vanilla BERT achieved $91.36$. We see that using the same vanilla BERT model but in our proposed span-based setup, we can get $91.64$. Our proposed approach is very generic, simple and more efficient. It can be easily combined with all the other preprocessing steps done by \cite{devlin2018bert} and custom pretraining objectives proposed by \cite{yamada2020luke} to further enhance the state-of-the-art results on this popular dataset.
 
 \subsection{JNLPBA}
 From literature review we find that there are two groups into which the past results can be segregated. All reported numbers are micro-averaged F1 scores on 5 output entity types. The first group of works use the version of dataset provided by MTL-Bioinformatics\cite{crichton2017neural} paper on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/}. For ease of comparison, we also fall into this category. The source paper\cite{crichton2017neural} have a multi-task learning setup and report $70.09$. Then, \cite{wang2019cross} also do multi-task modeling combining training and development sets for multiple datasets and report $73.52$. SciSpacy\cite{neumann2019scispacy} report $73.21$. \cite{banerjee2019knowledge} combine multiple datasets together for training in their proposed model. However, they report $73.63$ for BioBERT model fine-tuned on just the JNLPBA data as a baseline. We also replicate simple BioBERT setup and get $74.35$. \cite{sachan2018effective} report $75.03$ using LSTM-based language model pretraining and fine-tuning procedure. To the best of our knowledge, this serves as the state-of-the-art on this dataset. Our span-based proposed model reaches $75.01$ which matches with the SOTA.
@@ -718,19 +722,13 @@ The second group of papers have parsed and preprocessed the raw JNLPBA dataset f
 
 We conclude from the survey that our proposed span-based architecture reports comparable results to the state-of-the-art on JNLPBA dataset provided on GitHub by the MTL-Bioinformatics\cite{crichton2017neural} paper.
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|c|}\hline
-	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003} & \textbf{JNLPBA}\\\hline
-	\texttt{Span-Based} & 86.83 & 91.82 & 75.01\\\hline
-	\texttt{SOTA} & 85.56* & 94.3* & 81.29*\\\hline
-	\end{tabular}
-    \caption{Results: Comparison with SOTA (Test set Micro-F1 in \%)}
-    \label{tab:context_bio_dataset}
-\end{table}
-
-\section{Qualitative Analysis}
-\label{sec:qualitative_analysis}
-From span detection, additional semantics sections, we observe than boundary detection of spans serves as the primary issue of NER task. Once a span has been identified, then classifying it and differentiating it from other entity types is relatively simpler.
-
-Span detection faces similar issues as NER normal.
+% \begin{table}[h!]
+% \centering
+% \begin{tabular}{|c|c|c|c|}\hline
+% 	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003} & \textbf{JNLPBA}\\\hline
+% 	\texttt{Span-Based} & 86.83 & 91.82 & 75.01\\\hline
+% 	\texttt{SOTA} & 85.56* & 94.3* & 81.29*\\\hline
+% 	\end{tabular}
+%     \caption{Results: Comparison with SOTA (Test set Micro-F1 in \%)}
+%     \label{tab:context_bio_dataset}
+% \end{table}
