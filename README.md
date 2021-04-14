@@ -37,7 +37,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
 |------------------------------------------|-----------------------------|----------------|----------------------------|-----------|----------------------|
-| BERT-Base                                | 81.940                      |                |                            |           |                      |
+| BERT-Base                                | 81.940                      | 72.362         |                            |           |                      |
 | RoBERTa-Base                             | -                           |                |  90.728                    |           | 86.780               |
 | BioBERT                                  | 85.644                      | 74.35          |  90.932                    |           | 83.204 (LR:5e-5)     |
 | BioBERT-2LayerClassifier                 | 85.681                      |                |                            |           |                      |
@@ -89,7 +89,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 | BioBERT-QA4                              | **86.172**                  | 74.499         |  90.954                    |           |                      |
 | BioBERT-QA4-Scrambled                    | 85.506(can be trained more) |                |                            |           |                      |
 | BioBERT-QA4-QuestionType2(Where)         | **86.642**                  | 74.330         |  91.358                    |           |                      |
-| BioBERT-QA4-QType2-WordType-SubText      | 85.811(running)             |                |                            |           |                      |
+| BioBERT-QA4-QType2-WordType-SubText      | 85.811                      |                |                            |           |                      |
 | RoBERTa-QA4                              | -                           |                |  91.338                    |           |                      |
 | BioBERT-QA4-Nested                       | 85.855                      |                |                            |           |                      |
 | BioBERT-QA4-Punctuation                  | **86.167**                  |                |                            |           |                      |
@@ -235,7 +235,7 @@ Precision, Recall distribution for some good performing models to understand whe
 
 | Model                                    | Precision              | Recall                 | Micro F1               |
 |------------------------------------------|------------------------|------------------------|------------------------|
-| BERT                                     | todo                   | todo                   | todo                   |
+| BERT                                     | 69.8882                | 76.4719                | 73.0320                |
 | BioBERT                                  | 70.9698                | 78.0651                | 74.3485                |
 | SciBERT                                  | 71.0077                | 78.7462                | 74.6770                |
 | BioBERT-Freeze                           | 53.5119                | 58.5777                | 55.9303                |
