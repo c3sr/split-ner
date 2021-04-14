@@ -17,6 +17,14 @@ For NER, we extract entity mentions by making output labels follow a tagging sch
     \item \texttt{BERT-Freeze}: To understand how much semantic information is already captured in a pretrained BERT model, we use the exact same architecture as \texttt{BERT} model above but freeze the BERT model parameters. So, the only trainable parameters remain from the fully connected layer.
 \end{itemize}
 
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.8]{sequence_labeling}
+    \caption{Sequence Labeling Setup with \texttt{BIO} tagging scheme (colored tokens are the gold entity mentions and expected output labels)}
+    \label{fig:sequence_labeling}
+\end{figure}
+
 \subsection{Experiment Details}
 For \texttt{CNN-LSTM-CRF (BERT-Freeze)} setup, we take the mean of sub-token embeddings from BERT to get the embedding for each input token. We make use of \texttt{BIO} tagging scheme in all our sequence labeling experiments. Models with frozen BERT parameters used learning rate $0.005$. CNN input channels is set to character vocabulary size and each character is fed as a one-hot vector. CNN has $128$ output channels, kernel size of $5$ and does a max pooling to get word-level representation from character-level outputs. LSTM hidden dimensions is set to $256$.
 
@@ -67,6 +75,13 @@ However, for learning spans (start and end indices), the classification layer ha
         \label{tab:entity_scramble_bio}
     \end{table}
 \end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.63]{question_answering}
+    \caption{Question Answering Setup with \texttt{BIOE} scheme and \textit{What} as question word (colored tokens depict the entity type in question and gold entity mention with expected output labels)}
+    \label{fig:question_answering}
+\end{figure}
 
 \begin{table}[h!]
 \centering
@@ -120,10 +135,24 @@ Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} 
 
 We formulate this as a question answering task asking the model to identify all entity spans in a given sentence. For example, the sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted to the input, \textit{What is the \texttt{entity} mentioned in the text? Emily lives in United States}. This is fed to BERT model which outputs labels for each token following the \texttt{BIOE} scheme. In this example, we expect two spans, \textit{Emily} and \textit{United States}. 
 
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.63]{span_detection}
+    \caption{Span Detection Setup with \texttt{BIOE} scheme and \textit{What} as question word (colored tokens depict the generic entity type in question and gold entity mentions with expected output labels)}
+    \label{fig:span_detection}
+\end{figure}
+
 \subsection{Span Classification}
 Here, we are given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$ and a span $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. The goal is to output a label $t$ for the span such that $t \in \mathcal{T}$, where $\mathcal{T}$ is the set of all entity types.
 
 This is modeled as the reverse of QA model for NER described in Section \ref{sec:question_answering}. For every gold entity mention (Eg. \textit{Emily}) in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample input, \textit{Emily lives in United States. What is Emily?} The sentence is fed to a BERT model where we do sequence classification. The pooled sequence embedding returned by BERT is fed to a fully connected layer and converted to a probability distribution over possible entity types. In this example, the model is expected to assign maximum probability to \texttt{PERSON}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.63]{span_classification}
+    \caption{Span Classification Setup (colored tokens depict the entity mention in question with expected output entity label)}
+    \label{fig:span_classification}
+\end{figure}
 
 \subsection{Pipeline}
 Both the models can be trained independently. The pipeline structure comes during the inference time. Here, every unlabeled sentence is first passed through Span Detector and for each output span, we convert to an input sample for Span Classifier.
@@ -542,61 +571,61 @@ We work with \texttt{BioNLP13CG} dataset using question answering setup on only 
 \subsection{Observations}
 From results in Table \ref{tab:res_clustering}, we observe that entity partitioning technique gives slightly reduced performance compared to original setup. This is because our current clustering is on the basis of semantic similarity captured by BERT embeddings and not similarity among word patterns. As an example, among \texttt{Simple\_chemical}, we want formulas like \textit{CaSO4} to be segregated from names like \textit{calcium sulphate}. However, the BERT model clubs them into the same sub-entity since they are semantically same. Hence, our sub-entities still have high heterogeneity and not well separated, making it difficult for the model to train well. However, with better word-pattern oriented clusters, this technique has potential to give better results.
 
-\section{Handling Nested Entities}
+% \section{Handling Nested Entities}
 
-As described in \ref{sec:nature_of_entities}, not always are entities of interest completely disjoint of each other in a sentence. There may be nested and overlapping cases. Such examples are frequent in biomedical and news-based datasets like GENIA\cite{kim2003genia}, ACE-2004\cite{mitchell2005ace} and ACE-2005\cite{walker2006ace}. As reported by \cite{finkel2009nested}, around $17\%$ of named entities in GENIA are nested. In biomedical texts, it is common to find nested \texttt{Chemical} and \texttt{Gene} instances, for example, \textit{tyrosine} is a \texttt{Chemical} while \textit{tyrosine kinase} is a \texttt{Gene}. \cite{wang2018penner} extract such nested structures by constructing meta-patterns like, `\texttt{Gene} $\leftarrow$ \texttt{Chemical} \textit{kinase}'. Similarly, in general English text, \textit{Goldman Sachs, Bangalore} is an \texttt{Organization} while \textit{Bangalore} is a \texttt{Location}. \cite{finkel2009nested} align sentences into a tree-structure with entities for capturing nesting and \cite{li2019unified} extract each entity independently by querying a sentence multiple times in a question-answering setup. 
+% As described in \ref{sec:nature_of_entities}, not always are entities of interest completely disjoint of each other in a sentence. There may be nested and overlapping cases. Such examples are frequent in biomedical and news-based datasets like GENIA\cite{kim2003genia}, ACE-2004\cite{mitchell2005ace} and ACE-2005\cite{walker2006ace}. As reported by \cite{finkel2009nested}, around $17\%$ of named entities in GENIA are nested. In biomedical texts, it is common to find nested \texttt{Chemical} and \texttt{Gene} instances, for example, \textit{tyrosine} is a \texttt{Chemical} while \textit{tyrosine kinase} is a \texttt{Gene}. \cite{wang2018penner} extract such nested structures by constructing meta-patterns like, `\texttt{Gene} $\leftarrow$ \texttt{Chemical} \textit{kinase}'. Similarly, in general English text, \textit{Goldman Sachs, Bangalore} is an \texttt{Organization} while \textit{Bangalore} is a \texttt{Location}. \cite{finkel2009nested} align sentences into a tree-structure with entities for capturing nesting and \cite{li2019unified} extract each entity independently by querying a sentence multiple times in a question-answering setup. 
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
-	\texttt{Flat Entities} & 86.45\\\hline
-	\texttt{Flat + Nested Entities} & 85.90\\\hline
-	\end{tabular}
-    \caption{Results: Nested Entities (Test set Micro-F1 in \%)}
-    \label{tab:res_nesting}
-\end{table}
+% \begin{table}[h!]
+% \centering
+% \begin{tabular}{|c|c|}\hline
+% 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+% 	\texttt{Flat Entities} & 86.45\\\hline
+% 	\texttt{Flat + Nested Entities} & 85.90\\\hline
+% 	\end{tabular}
+%     \caption{Results: Nested Entities (Test set Micro-F1 in \%)}
+%     \label{tab:res_nesting}
+% \end{table}
 
-\subsection{Experiment Details and Observations}
+% \subsection{Experiment Details and Observations}
 
-In \texttt{BIONLP13CG} corpus, there are around 1\% nested entity structures. It is not a very significant proportion but still helps us understand how well our model can handle such nested cases. The sequence tagging setup just outputs tags for each token sequentially and hence cannot output multiple tags for the same token. However, in the question answering setup, for each sentence, we ask multiple separate questions enquiring for different entities. Hence, this setup can handle nested entities. For the example mentioned above, we can once ask for \texttt{Organization} in text and get \textit{Goldman Sachs, Bangalore} and then ask for \texttt{Location} and get \textit{Bangalore}. Using this QA setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word, we observe that our model is able to perform comparably well on nested entity extraction as well, as shown in Table \ref{tab:res_nesting}.
+% In \texttt{BIONLP13CG} corpus, there are around 1\% nested entity structures. It is not a very significant proportion but still helps us understand how well our model can handle such nested cases. The sequence tagging setup just outputs tags for each token sequentially and hence cannot output multiple tags for the same token. However, in the question answering setup, for each sentence, we ask multiple separate questions enquiring for different entities. Hence, this setup can handle nested entities. For the example mentioned above, we can once ask for \texttt{Organization} in text and get \textit{Goldman Sachs, Bangalore} and then ask for \texttt{Location} and get \textit{Bangalore}. Using this QA setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word, we observe that our model is able to perform comparably well on nested entity extraction as well, as shown in Table \ref{tab:res_nesting}.
 
-\section{Multi-Sentence Context}
-The general NER task setup (as described formally in Section \ref{sec:task_formulation}) is, given a sentence, identify all entity mentions in it. However in most real-world applications we have to extract all entities from a given document. A document can be considered as a collection of inter-connected sentences. If our model works with individual sentences, it may not be able to fully resolve co-references and may find some unknown terms, which were defined in other sentences. This could lead to sub-optimal performance. 
+% \section{Multi-Sentence Context}
+% The general NER task setup (as described formally in Section \ref{sec:task_formulation}) is, given a sentence, identify all entity mentions in it. However in most real-world applications we have to extract all entities from a given document. A document can be considered as a collection of inter-connected sentences. If our model works with individual sentences, it may not be able to fully resolve co-references and may find some unknown terms, which were defined in other sentences. This could lead to sub-optimal performance. 
 
-In benchmark datasets like \texttt{BIONLP13CG} and \texttt{CoNLL 2003}, the document structure is present but not fully used. \texttt{BIONLP13CG} dataset consists of abstracts from biomedical research papers. Individual sentences have been segmented from them to create train/dev/test sets. In \texttt{CoNLL 2003} dataset, there is a special \texttt{--DOCSTART--} token which signifies article boundaries. So, by looking at the neighbor sentences we can stitch the news article together. 
+% In benchmark datasets like \texttt{BIONLP13CG} and \texttt{CoNLL 2003}, the document structure is present but not fully used. \texttt{BIONLP13CG} dataset consists of abstracts from biomedical research papers. Individual sentences have been segmented from them to create train/dev/test sets. In \texttt{CoNLL 2003} dataset, there is a special \texttt{--DOCSTART--} token which signifies article boundaries. So, by looking at the neighbor sentences we can stitch the news article together. 
 
-Recently, it has become popular to utilize document context with individual sentences for NER\cite{devlin2018bert, yamada2020luke}. \cite{luoma2020exploring} show the effectiveness of a majority voting scheme taking a window of neighboring sentences around the target sentence and achieve better performance on \texttt{CoNLL 2003} NER dataset. 
+% Recently, it has become popular to utilize document context with individual sentences for NER\cite{devlin2018bert, yamada2020luke}. \cite{luoma2020exploring} show the effectiveness of a majority voting scheme taking a window of neighboring sentences around the target sentence and achieve better performance on \texttt{CoNLL 2003} NER dataset. 
 
-\subsection{Experiment Details}
-We conduct a simple context capturing experiment on \texttt{BioNLP13CG} dataset. We parse the raw dataset and create training samples consists of around $300$ tokens each. When broken down using WordPiece tokenizer, this requires the maximum sequence length to be $512$ in the BERT model. In each training sample, we easily get around $10$ sentences. Hence, in terms of context, this dataset is richer. However, it is around $10$ times shorter. For the last chunk which may have much lesser than $300$ tokens, we retain it as it is, as a separate training sample. We train the BERT model in sequence labeling setup with \texttt{BIO} tagging scheme.
+% \subsection{Experiment Details}
+% We conduct a simple context capturing experiment on \texttt{BioNLP13CG} dataset. We parse the raw dataset and create training samples consists of around $300$ tokens each. When broken down using WordPiece tokenizer, this requires the maximum sequence length to be $512$ in the BERT model. In each training sample, we easily get around $10$ sentences. Hence, in terms of context, this dataset is richer. However, it is around $10$ times shorter. For the last chunk which may have much lesser than $300$ tokens, we retain it as it is, as a separate training sample. We train the BERT model in sequence labeling setup with \texttt{BIO} tagging scheme.
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|}\hline
-	\textbf{} & \textbf{BIONLP13CG} & \textbf{BIONLP13CG-Context}\\\hline
-	\texttt{Train (\# Sentences)} & 3033 & 397\\\hline
-	\texttt{Dev (\# Sentences)} & 1003 & 122\\\hline
-	\texttt{Test (\# Sentences)} & 1906 & 249\\\hline
-	\texttt{Avg. Sentence Length (\# Tokens)} & 27.6 & 223.9\\\hline
-	\end{tabular}
-    \caption{Multi-Sentence Context Dataset Stats}
-    \label{tab:context_bio_dataset}
-\end{table}
+% \begin{table}[h!]
+% \centering
+% \begin{tabular}{|c|c|c|}\hline
+% 	\textbf{} & \textbf{BIONLP13CG} & \textbf{BIONLP13CG-Context}\\\hline
+% 	\texttt{Train (\# Sentences)} & 3033 & 397\\\hline
+% 	\texttt{Dev (\# Sentences)} & 1003 & 122\\\hline
+% 	\texttt{Test (\# Sentences)} & 1906 & 249\\\hline
+% 	\texttt{Avg. Sentence Length (\# Tokens)} & 27.6 & 223.9\\\hline
+% 	\end{tabular}
+%     \caption{Multi-Sentence Context Dataset Stats}
+%     \label{tab:context_bio_dataset}
+% \end{table}
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
-	\texttt{Normal Dataset} & 86.45\\\hline
-	\texttt{Multi-Sentence Context Dataset} & 85.90\\\hline
-	\end{tabular}
-    \caption{Results: Multi-Sentence Context (Test set Micro-F1 in \%)}
-    \label{tab:res_context_bio}
-\end{table}
+% \begin{table}[h!]
+% \centering
+% \begin{tabular}{|c|c|}\hline
+% 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+% 	\texttt{Normal Dataset} & 86.45\\\hline
+% 	\texttt{Multi-Sentence Context Dataset} & 85.90\\\hline
+% 	\end{tabular}
+%     \caption{Results: Multi-Sentence Context (Test set Micro-F1 in \%)}
+%     \label{tab:res_context_bio}
+% \end{table}
 
-\subsection{Observations}
-From the stats reported in Tables \ref{tab:context_bio_dataset} and \ref{tab:res_context_bio}, we observe that forming longer training samples makes each instance content rich but also reduces the size of the dataset significantly. Hence, even with richer context, this naive chunking strategy performs similar to the original setup and is not able to show its advantages. 
+% \subsection{Observations}
+% From the stats reported in Tables \ref{tab:context_bio_dataset} and \ref{tab:res_context_bio}, we observe that forming longer training samples makes each instance content rich but also reduces the size of the dataset significantly. Hence, even with richer context, this naive chunking strategy performs similar to the original setup and is not able to show its advantages. 
 
 \section{Comparative Precision/Recall Analysis}
 \label{sec:precision_recall_analysis}
@@ -667,39 +696,66 @@ We present the comparison among the following models:
     \item \texttt{Span Based}: Pipelined approach which uses the QA setup with \texttt{BIOE} tagging scheme and \textit{What} as question word for span detection and QA-based sequence classification for span classification.
 \end{itemize}
 
+% \begin{table}[h!]
+% \centering
+% \begin{tabular}{|c|c|p{4em}|p{4em}|p{4em}|p{4em}|}\hline
+% 	 & Count & \texttt{Dice Loss} & \texttt{Special Symbol} & \texttt{BERT-QA (Where)} & \texttt{Span Based}\\\hline
+% 	\texttt{Gene\_or\_gene\_product} & 2520 & 91.14 & 91.22 & 90.43 & 90.36\\\hline
+% \texttt{Cell} & 1013 & 89.42 & 89.46 & 91.10 & 89.53\\\hline
+% \texttt{Cancer} & 924 & 88.78 & 89.99 & 90.19 & 87.87\\\hline
+% \texttt{Simple\_chemical} & 727 & 82.97 & 81.77 & 81.36 & 80.89\\\hline
+% \texttt{Organism} & 518 & 88.65 & 89.17 & 88.27 & 87.51\\\hline
+% \texttt{Multi-tissue\_structure} & 303 & 75.75 & 76.82 & 77.78 & 77.99\\\hline
+% \texttt{Tissue} & 184 & 69.34 & 68.97 & 71.28 & 65.60\\\hline
+% \texttt{Cellular\_component} & 180 & 83.73 & 85.56 & 86.63 & 83.51\\\hline
+% \texttt{Organ} & 156 & 74.83 & 74.84 & 77.13 & 76.69\\\hline
+% \texttt{Organism\_substance} & 102 & 82.80 & 86.17 & 83.80 & 86.32\\\hline
+% \texttt{Pathological\_formation} & 88 & 62.07 & 56.63 & 60.40 & 65.79\\\hline
+% \texttt{Amino\_acid} & 62 & 59.81 & 55.56 & 51.11 & 48.28\\\hline
+% \texttt{Organism\_subdivision} & 39 & 58.67 & 62.34 & 55.38 & 62.16\\\hline
+% \texttt{Immaterial\_anatomical\_entity} & 31 & 57.53 & 64.62 & 70.00 & 60.00\\\hline
+% \texttt{Developing\_anatomical\_structure} & 17 & 51.61 & 45.71 & 66.67 & 61.54\\\hline
+% \texttt{Anatomical\_system} & 17 & 11.11 & 10.53 & 10.53 & 34.78\\\hline
+% \textbf{Macro F1} & 6881 & 70.51 & 70.59 & 72.00 & \textbf{72.43}\\\hline
+% 	\end{tabular}
+%     \caption{Results: Entity-Wise Performance (Test set F1 in \%)}
+%     \label{tab:res_entity_wise}
+% \end{table}
+
 \begin{table}[h!]
 \centering
-\begin{tabular}{|c|c|p{4em}|p{4em}|p{4em}|p{4em}|}\hline
-	 & Count & \texttt{Dice Loss} & \texttt{Special Symbol} & \texttt{BERT-QA (Where)} & \texttt{Span Based}\\\hline
-	\texttt{Gene\_or\_gene\_product} & 2520 & 91.14 & 91.22 & 90.43 & 90.36\\\hline
-\texttt{Cell} & 1013 & 89.42 & 89.46 & 91.10 & 89.53\\\hline
-\texttt{Cancer} & 924 & 88.78 & 89.99 & 90.19 & 87.87\\\hline
-\texttt{Simple\_chemical} & 727 & 82.97 & 81.77 & 81.36 & 80.89\\\hline
-\texttt{Organism} & 518 & 88.65 & 89.17 & 88.27 & 87.51\\\hline
-\texttt{Multi-tissue\_structure} & 303 & 75.75 & 76.82 & 77.78 & 77.99\\\hline
-\texttt{Tissue} & 184 & 69.34 & 68.97 & 71.28 & 65.60\\\hline
-\texttt{Cellular\_component} & 180 & 83.73 & 85.56 & 86.63 & 83.51\\\hline
-\texttt{Organ} & 156 & 74.83 & 74.84 & 77.13 & 76.69\\\hline
-\texttt{Organism\_substance} & 102 & 82.80 & 86.17 & 83.80 & 86.32\\\hline
-\texttt{Pathological\_formation} & 88 & 62.07 & 56.63 & 60.40 & 65.79\\\hline
-\texttt{Amino\_acid} & 62 & 59.81 & 55.56 & 51.11 & 48.28\\\hline
-\texttt{Organism\_subdivision} & 39 & 58.67 & 62.34 & 55.38 & 62.16\\\hline
-\texttt{Immaterial\_anatomical\_entity} & 31 & 57.53 & 64.62 & 70.00 & 60.00\\\hline
-\texttt{Developing\_anatomical\_structure} & 17 & 51.61 & 45.71 & 66.67 & 61.54\\\hline
-\texttt{Anatomical\_system} & 17 & 11.11 & 10.53 & 10.53 & 34.78\\\hline
-\textbf{Macro F1} & 6881 & 70.51 & 70.59 & 72.00 & \textbf{72.43}\\\hline
+\begin{tabular}{|c|c|}\hline
+	\textbf{Model} & \textbf{Macro F1}\\\hline
+	\texttt{Dice Loss} & $70.51$\\\hline
+	\texttt{Special Symbol} & $70.59$\\\hline
+	\texttt{BERT-QA (Where)} & $72.00$\\\hline
+	\texttt{Span Based} & $\textbf{72.43}$\\\hline
 	\end{tabular}
-    \caption{Results: Entity-Wise Performance (Test set F1 in \%)}
-    \label{tab:res_entity_wise}
+    \caption{Results: Test set Macro-F1 in \%}
+    \label{tab:res_macro_f1}
 \end{table}
 
-From results in Table \ref{tab:res_entity_wise}, we make the following observations:
+\begin{figure}
+    \centering
+    \includegraphics[scale=1.25]{high_resource_entity_metrics}
+    \caption{Test set Entity-level F1 scores for high resource entities in \texttt{BioNLP13CG} dataset}
+    \label{fig:high_resource_entity_metrics}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=1.25]{low_resource_entity_metrics}
+    \caption{Test set Entity-level F1 scores for low resource entities in \texttt{BioNLP13CG} dataset}
+    \label{fig:low_resource_entity_metrics}
+\end{figure}
+
+From results in Table \ref{tab:res_macro_f1} and Figures \ref{fig:high_resource_entity_metrics} and \ref{fig:low_resource_entity_metrics}, we make the following observations:
 \begin{itemize}
     \item \texttt{Span Based} pipelined approach reports the best overall macro-averaged F1. It is able to perform well even on low-resource entity types. This can be attributed to the span detector which is entity type agnostic and hence does not develop high-resource bias.
     
     \item From overall Macro-F1 scores we see that \texttt{BERT-QA (Where)} and \texttt{Span Based} both use question answering approach internally and perform better than sequence labeling methods. 
     
-    % \item For high-resource entity types all variants perform comparably with \texttt{BERT-QA (Where)} model having a slight advantage. On low-resource entities, \texttt{Span Based} method takes the lead.
+    \item For high-resource entity types all variants perform comparably while for several low-resource entities, \texttt{Span Based} method takes the lead.
 \end{itemize}
 
 \section{Comparison with Other Works}
