@@ -25,16 +25,16 @@ NER has been a popular research area for long and has seen transitions in parall
 %     \item Different entities have different semantics which may require explicit modeling. Entities like \texttt{Person}, \texttt{Location} are wordy, while others like \texttt{Date}, \texttt{SSN}, \texttt{Telephone} can be numeric codes having patterns within them. (We handle this by parallel Char-CNN+Patterns)
 % \end{itemize}
 
-In this work, we use the popular \texttt{CNN-LSTM-CRF} and BERT models as baselines and develop on top of them. We present a thorough study and compare and contrast the NER task from three different perspectives, as a sequence labeling problem, a question answering-based approach and span detection and classification task. The contributions of our work are:
+In this work, we develop several variants for NER on top of the vanilla BERT architecture making sure that the setup is domain-agnostic, i.e. does not making any assumptions about the nature of entities in the underlying dataset. We present a thorough study and compare and contrast the NER task from three different perspectives, as a sequence labeling problem, a question answering task and span detection and classification task. The contributions of our work are:
 
 \begin{itemize}
     \item We introduce a novel pattern modeling approach which converts sparse character space to dense pattern space for more effective training of alphanumeric entities even with minimal training samples.
     
-    \item We propose a novel question answering based setup for span detection and classification which gives competitive performance and performs particularly well for low-resource entities.
+    \item We propose a span detection and classification framework for NER which first queries on the input text to detect mention spans. It then does a novel reverse question answering wherein instead of querying to extract all mentions of a given entity type, we feed the detected mention spans as input and query for their entity type. 
     
-    \item Our system achieves new state-of-the-art on \texttt{BIONLP13CG} dataset which consists of 16 fine-grained alphanumeric named entity types and achieves competitive results in both biomedical as well as general English news domains.
+    \item Our approach is easy to apply and achieves competitive and even better results on general English as well as scientific and biomedical NER domains. We also set a new state-of-the-art for \texttt{BIONLP13CG} corpus consisting of 16 fine-grained named entity types.
     
-    \item We show that mere concatenation of additional semantic features with BERT (transformer-based) features is not able to achieve its full modeling potential at the recommended low learning rates. More sophisticated feature fusion is essential.
+    \item We present a study showing that mere concatenation of additional semantic features with BERT outputs may not able to effectively train and reach its full potential at the recommended low learning rates. More sophisticated feature fusion is essential.
 \end{itemize}
 
 % In this work, we focus on latest present a detailed NER analysis across different domains including news articles and biomedical literature. We present a general domain-agnostic model architecture for NER and also present detailed ablations of the model components. Additionally, we do a thorough qualitative analysis of the used corpora and present the bottlenecks of existing benchmarks as well as concrete scopes of improvement to give direction to future research.
