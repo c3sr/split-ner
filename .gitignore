@@ -4,3 +4,4 @@ data/bio_context/raw
 **/wandb/
 *.egg-info/
 **/__pycache__/
+.idea/
