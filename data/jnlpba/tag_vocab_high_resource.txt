@@ -1,5 +1,0 @@
-B-DNA
-B-protein
-I-DNA
-I-protein
-O
