@@ -80,7 +80,7 @@ However, for learning spans (start and end indices), the classification layer ha
 
 \begin{figure}
     \centering
-    \includegraphics[scale=0.63]{question_answering}
+    \includegraphics[scale=0.59]{question_answering}
     \caption{Question Answering Setup with \texttt{BIOE} scheme and \textit{What} as question word (colored tokens depict the entity type in question and gold entity mention with expected output labels)}
     \label{fig:question_answering}
 \end{figure}
@@ -139,7 +139,7 @@ We formulate this as a question answering task asking the model to identify all 
 
 \begin{figure}
     \centering
-    \includegraphics[scale=0.63]{span_detection}
+    \includegraphics[scale=0.59]{span_detection}
     \caption{Span Detection Setup with \texttt{BIOE} scheme and \textit{What} as question word (colored tokens depict the generic entity type in question and gold entity mentions with expected output labels)}
     \label{fig:span_detection}
 \end{figure}
@@ -230,21 +230,32 @@ As detailed earlier, Cross Entropy is an accuracy-oriented objective while durin
     DSC(A, B) = \frac{2\ \vert A \cap B \vert}{\vert A \vert + \vert B \vert}
 \end{equation}
 Consider $A$ as set of all positive samples predicted by a model and $B$ as set of all ground truth positives. Then, by definition of true positive ($TP$), false positive ($FP$) and false negative ($FN$) from Section \ref{sec:evaluation_metrics}, we have,
-\begin{align*}
-    TP &= \vert A \cap B \vert &
-    \vert A \vert &= TP + FP &
-    \vert B \vert &= TP + FN &
-\end{align*}
-\begin{align*}
-     DSC(A, B) &= \frac{2TP}{2TP + FP + FN} &= \frac{2\ \frac{TP}{TP + FN}\ \frac{TP}{TP + FP}}{\frac{TP}{TP + FN} + \frac{TP}{TP + FP}} &= \frac{2\ Precision \times Recall}{Precision + Recall} &= F1
-\end{align*}
-
-The dice coefficient gives equal importance to false-positives and false-negatives at training time and is more immune to data-imbalance issues\cite{sudre2017generalised, shen2018influence, kodym2018segmentation}. The above formulation shows its equivalence to F1-score thus removing the discrepancy among training and evaluation metrics. From Equation \eqref{eq:dsc_set}, for an individual sample $x_i$, dice coefficient is defined as,
-\begin{align*}
-    DSC(x_i) = \frac{2p_{i1}y_{i1} + \gamma}{p_{i1} + y_{i1} + \gamma}
-\end{align*}
-where $\gamma$ is the smoothing parameter. Then over all samples, dice loss (DL) is defined as:
 \begin{equation}
+\label{eq:dsc_tp}
+    TP = \vert A \cap B \vert
+\end{equation}
+\begin{equation}
+\label{eq:dsc_a}
+    \vert A \vert = TP + FP
+\end{equation}'
+\begin{equation}
+\label{eq:dsc_b}
+    \vert B \vert = TP + FN
+\end{equation}
+Using Equations \ref{eq:dsc_tp}, \ref{eq:dsc_a} and \ref{eq:dsc_b}, in Equation \ref{eq:dsc_set}, we get,
+\begin{equation}
+\label{eq:dsc_as_f1}
+     DSC(A, B) = \frac{2TP}{2TP + FP + FN} = \frac{2\ \frac{TP}{TP + FN}\ \frac{TP}{TP + FP}}{\frac{TP}{TP + FN} + \frac{TP}{TP + FP}} = \frac{2\ Precision \times Recall}{Precision + Recall} = F1
+\end{equation}
+
+The dice coefficient gives equal importance to false-positives and false-negatives at training time and is more immune to data-imbalance issues\cite{sudre2017generalised, shen2018influence, kodym2018segmentation}. The above formulation (Equation \ref{eq:dsc_as_f1}) shows its equivalence to F1-score thus removing the discrepancy among training and evaluation metrics. From Equation \ref{eq:dsc_set}, for an individual sample $x_i$, dice coefficient is defined as,
+\begin{equation}
+\label{eq:dsc_per_sample}
+    DSC(x_i) = \frac{2p_{i1}y_{i1} + \gamma}{p_{i1} + y_{i1} + \gamma}
+\end{equation}
+where $\gamma$ is the smoothing parameter. Then over all samples, from Equation \ref{eq:dsc_per_sample}, dice loss (DL) is defined in Equation \ref{eq:dice_loss} as:
+\begin{equation}
+\label{eq:dice_loss}
     DL = 1 - \frac{2\sum_i{p_{i1}y_{i1}} + \gamma}{\sum_i{p_{i1}} + \sum_i{y_{i1}} + \gamma}
 \end{equation}
 
@@ -393,7 +404,7 @@ Our results are summarized in Table \ref{tab:res_token_semantics}. We also exper
     
     \item \texttt{Part-of-Speech} and \texttt{Dependency Parse} features give some additional insights to the model over \texttt{Vanilla BERT} and hence give comparable or even better performance. 
     
-    \item Considering only \texttt{Head Tokens} helps over \texttt{Vanilla BERT} on both datasets. \texttt{Special Symbol + Head Tokens} gives the best performance on \texttt{CoNLL 2003} data. On \texttt{BioNLP13CG}, the improvement is reduced compared to \texttt{Special Symbol}. We suspect this is because of the loss of intrinsic sub-word details which can be crucial for biomedical text since they have lots of out-of-vocabulary chemical/gene names.
+    \item Considering only \texttt{Head Tokens} helps over \texttt{Vanilla BERT} on both datasets. \texttt{Special Symbol + Head Tokens} gives the best performance on \texttt{CoNLL 2003} data. The improvement is reduced compared to \texttt{Special Symbol} on the \texttt{BioNLP13CG} data. We suspect this is because of the loss of intrinsic sub-word details which can be crucial for biomedical text since they have lots of out-of-vocabulary chemical/gene names.
     
     \item \texttt{Highway Net} rightly ignores confusing character-level information for \texttt{CoNLL 2003} data and hence gives a performance boost over \texttt{Character/Patterns}. For the \texttt{BioNLP13CG} data, this additional highway layer is unable to give improvements since it adds undesired complexity to the model.
 \end{itemize}
@@ -443,7 +454,7 @@ From the previous section, we see that model needs training at high learning rat
     
     \item \texttt{BERT + Gold Span}: Same as the above model but with BERT fine-tuning. We train this in two settings, with low learning rate of $10^{-5}$ and high learning rate of $0.005$.
     
-    \item For comparison, we also present the results for simple \texttt{BERT} (fine-tuned) and \texttt{BERT(Freeze)} models.
+    \item We also present \texttt{BERT} (fine-tuned) and \texttt{BERT(Freeze)} results for comparison.
 \end{itemize}
 
 \begin{table}[h!]
@@ -639,11 +650,11 @@ In this section, we take some major models described in the previous sections an
     
     \item \texttt{Dice Loss}: Same as \texttt{BERT} model using dice loss instead of standard cross-entropy loss.
     
-    \item \texttt{Special Symbol}: Same as \texttt{BERT} model with additional one-hot input feature to capture if the token is a special symbol like \textit{hyphen}, \textit{comma}, or \textit{parenthesis}.
+    \item \texttt{Special Sym.}: Same as \texttt{BERT} model with additional one-hot input feature to capture if the token is a special symbol like \textit{hyphen}, \textit{comma}, or \textit{parenthesis}.
     
     \item \texttt{BERT-QA}: Represents question answering NER setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word.
     
-    \item \texttt{BERT-QA(Where)}: Same as \texttt{BERT-QA} with \textit{Where} as the question word.
+    \item \texttt{QA(Where)}: Same as \texttt{BERT-QA} with \textit{Where} as the question word.
     
     \item \texttt{Span-Based}: Uses the \texttt{BERT-QA} setup for span detection and QA-based sequence classification for span classification.
 \end{itemize}
@@ -655,9 +666,9 @@ In this section, we take some major models described in the previous sections an
 	 & P & R & F1 & P & R & F1 & P & R & F1\\\hline
 	\texttt{BERT} & 86.17 & 85.82 & 85.99 & 91.24 & 91.48 & 91.36 & 70.97 & 78.07 & 74.35\\\hline
 	\texttt{Dice Loss} & 86.68 & \textbf{86.03} & 86.35 & 91.05 & 90.47 & 90.76 & \textbf{72.05} & 78.23 & \textbf{75.01}\\\hline
-	\texttt{Special Symbol} & 87.62 & 85.66 & 86.63 & 91.75 & 91.60 & 91.67 & 70.42 & 78.47 & 74.23\\\hline
+	\texttt{Special Sym.} & 87.62 & 85.66 & 86.63 & 91.75 & 91.60 & 91.67 & 70.42 & 78.47 & 74.23\\\hline
 	\texttt{BERT-QA} & 88.62 & 84.39 & 86.45 & 91.54 & 90.80 & 91.17 & 71.97 & 78.11 & 74.92\\\hline
-	\texttt{BERT-QA(Where)} & \textbf{89.21} & 84.58 & \textbf{86.83} & \textbf{92.47} & 91.19 & \textbf{91.82} & 71.45 & 78.11 & 74.64\\\hline
+	\texttt{QA(Where)} & \textbf{89.21} & 84.58 & \textbf{86.83} & \textbf{92.47} & 91.19 & \textbf{91.82} & 71.45 & 78.11 & 74.64\\\hline
 	\texttt{Span-Based} & 86.33 & 85.47 & 85.89 & 91.46 & \textbf{91.82} & 91.64 & 71.14 & \textbf{79.34} & \textbf{75.01}\\\hline
 	\end{tabular}
     \caption{Results: Precision/Recall Comparison}
@@ -667,11 +678,11 @@ In this section, we take some major models described in the previous sections an
 From the results summarized in Table \ref{tab:res_precision_recall}, we make the following observations:
 
 \begin{itemize}
-    \item QA-based models give a much higher precision than sequence labeling or span-based methods. However, they compromise on the recall. This is especially true for \texttt{BioNLP13CG} data with $16$ entity types and less prevalent in \texttt{CoNLL 2003} and \texttt{JNLPBA} datasets with $4$ and $5$ entity types respectively. We suspect that this is because in QA setup, each sentence is fed $K$ times (once with each entity type) during training/testing where $K$ is the number of entity types. A sentence generally has mentions belonging to at most 3-4 entity types. So, the model receives positive samples corresponding to each of these and a negative sample for every other entity type. These large number of negative samples (especially in \texttt{BioNLP13CG} dataset) make the model very risk-averse. It outputs a mention only when it is highly confident (giving high precision) else considers it a negative sample and ignores the entity completely (giving low recall).
+    \item QA-based models report higher precision than sequence labeling or span-based methods. However, they compromise on recall. This is especially true for \texttt{BioNLP13CG} data with $16$ entity types and less prevalent in \texttt{CoNLL 2003} and \texttt{JNLPBA} datasets with $4$ and $5$ entity types respectively. We suspect that this is because in QA setup, each sentence is fed $K$ times (once with each entity type) during training/testing where $K$ is the number of entity types. A sentence generally has mentions belonging to at most 3-4 entity types. So, the model receives positive samples corresponding to each of these and a negative sample for every other entity type. These large number of negative samples (especially in \texttt{BioNLP13CG} dataset) make the model very risk-averse. It outputs a mention only when it is highly confident (giving high precision) else considers it a negative sample and ignores the entity completely (giving low recall).
     
     \item Sequence labeling and span-based methods both have a low margin between their precision and recall values while QA setup gives a larger gap. 
     
-    \item \texttt{Dice Loss} is found to help improve recall in sequence labeling setup and \texttt{Special Symbol} helps improve precision (mention span boundary detection).
+    \item \texttt{Dice Loss} is found to help improve recall in sequence labeling setup and \texttt{Special Sym.} helps improve precision (mention span boundary detection).
     
     \item In QA setup, asking \textit{Where} gives a higher precision than asking \textit{What}.
     
@@ -679,14 +690,15 @@ From the results summarized in Table \ref{tab:res_precision_recall}, we make the
     
     \item The recall of span detector is inversely proportional to number of output entity types. With more entity types, the heterogeneity increases making span detector error-prone. This is the reason for low recall on \texttt{BioNLP13CG} corpus with $16$ entity types compared to \texttt{CoNLL 2003} and \texttt{JNLPBA} datasets with $4$ and $5$ types respectively.
     
-    \item Due to its large advantage in precision, the \texttt{BERT-QA(Where)} model gives the best performance among the compared models.
+    \item Due to its large advantage in precision, the \texttt{QA(Where)} model gives the best performance among the compared models.
 \end{itemize}
 
 \section{Entity-Wise Performance}
-Next, we deep dive into the \texttt{BioNLP13CG} dataset which has $16$ entity types including several high and low-resource types. We compare the model performance at the entity type level for our 3 major NER approaches: sequence labeling, question answering and span-based pipeline. We compare our best performing model variants through entity-level and macro-averaged F1-scores. Let $\mathcal{T}$ be the set of all entity types and F1$_t$ be the F1-score for individual entity type $t \in \mathcal{T}$. Then,
-\begin{align*}
-    \text{Macro-F1} &= \frac{1}{\mathcal{\vert\mathcal{T}\vert}}\,\sum_{t\,\in\,\mathcal{T}}{\text{F1}_t}
-\end{align*}
+Next, we deep dive into the \texttt{BioNLP13CG} dataset which has $16$ entity types including several high and low-resource types. We compare the model performance at the entity type level for our 3 major NER approaches: sequence labeling, question answering and span-based pipeline. We compare our best performing model variants through entity-level and macro-averaged F1-scores. Let $\mathcal{T}$ be the set of all entity types and F1$_t$ be the F1-score for individual entity type $t \in \mathcal{T}$. Then, Macro-averaged F1-Score is defined in Equation \ref{eq:macro_f1} as:
+\begin{equation}
+\label{eq:macro_f1}
+    \text{Macro-F1} = \frac{1}{\mathcal{\vert\mathcal{T}\vert}}\,\sum_{t\,\in\,\mathcal{T}}{\text{F1}_t}
+\end{equation}
 We present the comparison among the following models:
 \begin{itemize}
     \item \texttt{Dice Loss}: Sequence labeling NER approach over BERT model with \texttt{BIO} tagging scheme and dice loss instead of cross entropy.
@@ -775,4 +787,4 @@ From literature review we find that there are two groups into which the past res
 
 The second group of papers have parsed and pre-processed the JNLPBA data from scratch. This follows from \cite{yoon2019collabonet} who identified that the MTL-Bioinformatics data version has sentence segmentation issues. \cite{yoon2019collabonet} train on a combined data source consisting of multiple datasets and remove \texttt{Cell\_type} entity class from consideration. They report $78.58$ micro-averaged F1. BioBERT\cite{lee2020biobert} achieves $77.59$. SciBERT\cite{beltagy2019scibert} reports $77.28$ with a CRF used in the final classification step. They mark their results as a macro-F1 score however on cross-referencing with other papers, we suspect it to be a typo which should be micro-F1. Recently \cite{kocaman2021spark} report $81.29$ which serves as a new state-of-the-art in this setting.
 
-We conclude from the survey that our proposed span-based architecture gives equivalent results to the state-of-the-art model on JNLPBA dataset provided on GitHub by MTL-Bioinformatics\cite{crichton2017neural}.
+We conclude that our proposed span-based architecture gives results equivalent to state-of-the-art on JNLPBA corpus provided on GitHub by MTL-Bioinformatics\cite{crichton2017neural}.

@@ -42,13 +42,19 @@ Based on Definition \ref{def:mention_correctness}, we count:
     \item False Negatives ($FN$): Count of mention tuples which appear in ground truth but are not extracted by the NER system.
 \end{itemize}
 
-Precision refers to percentage of retrieved NER results which are correct. Recall refers to the percentage of ground truth entities correctly retrieved by our system. F$_1$ score is the harmonic mean of precision and recall. Note that here we are counting mention tuples as a whole and not separately for each entity type. So the values calculated are known as \textit{micro-averaged} values over all entity types.
-\begin{align*}
-    \text{Micro-Precision} &= \frac{TP}{TP + FP} & \text{Micro-Recall} &= \frac{TP}{TP + FN}
-\end{align*}
-\begin{align*}
-    \text{Micro-F}_1 &= 2 \times \frac{\text{Micro-Precision} \times \text{Micro-Recall}}{\text{Micro-Precision} + \text{Micro-Recall}}
-\end{align*}
+Precision (Equation \ref{eq:micro_precision}) refers to percentage of retrieved NER results which are correct. Recall (Equation \ref{eq:micro_recall}) refers to the percentage of ground truth entities correctly retrieved by our system. F$_1$ score (Equation \ref{eq:micro_f1}) is the harmonic mean of precision and recall. Note that here we are counting mention tuples as a whole and not separately for each entity type. So the values calculated are known as \textit{micro-averaged} values over all entity types.
+\begin{equation}
+\label{eq:micro_precision}
+    \text{Micro-Precision} = \frac{TP}{TP + FP}
+\end{equation}
+\begin{equation}
+\label{eq:micro_recall}
+    \text{Micro-Recall} = \frac{TP}{TP + FN}
+\end{equation}
+\begin{equation}
+\label{eq:micro_f1}
+    \text{Micro-F}_1 = 2 \times \frac{\text{Micro-Precision} \times \text{Micro-Recall}}{\text{Micro-Precision} + \text{Micro-Recall}}
+\end{equation}
 
 \section{Tagging Scheme}
 \label{sec:tagging_scheme}

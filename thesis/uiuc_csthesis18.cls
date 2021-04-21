@@ -206,7 +206,7 @@
           \hspace*{-0.5in}Master's Committee:\\[12pt] 
          \begin{tabular}{l}\@committee\end{tabular}%\vfil} 
         \else
-        \hspace*{-0.5in}Adviser:\\[12pt] 
+        \hspace*{-0.5in}Adviser: %\\[12pt] 
          \@advisor%\vfil} 
         \fi
       \fi}
