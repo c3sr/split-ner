@@ -10,8 +10,8 @@ from transformers import HfArgumentParser, AutoTokenizer
 from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 
+logging.basicConfig(filename='dataset.log',  level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 class NerDataset(Dataset):
 
@@ -171,6 +171,8 @@ class NerDataset(Dataset):
             return NerDataset.make_pattern_type1(text)
         if pattern_type == "2":
             return NerDataset.make_pattern_type2(text)
+        if pattern_type == "3":
+            return NerDataset.make_pattern_type3(text)
         raise NotImplementedError
 
     @staticmethod
@@ -215,6 +217,24 @@ class NerDataset(Dataset):
             else:
                 pattern_text += c
         return pattern_text
+
+    @staticmethod
+    def make_pattern_type3(text):
+        if text == "[CLS]":
+            return "C"
+        if text == "[SEP]":
+            return "S"
+        if re.fullmatch(r"[a-z]+", text):
+            return "L"
+        if re.fullmatch(r"[A-Z]+", text):
+            return "U"
+        if re.fullmatch(r"[A-Z][a-z]+", text):
+            return "F"
+        if re.fullmatch(r"[A-Za-z]+", text):
+            return "M"
+        # for tokens with digits/punctuations
+        return NerDataset.make_pattern_type2(text)
+
 
     @staticmethod
     def get_word_type(text):
@@ -292,21 +312,28 @@ class NerDataset(Dataset):
                                      token=Token(sep_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                                      is_head=True)
         return start_token, first_sep_token, second_sep_token
-
+    
+    #YJ : updated to support BIOES tagging scheme
     def process_sentence(self, index):
         sentence = self.sentences[index]
         sentence.bert_tokens = [self.bert_start_token]
         for token in sentence.tokens:
             out = self.tokenizer(token.text, add_special_tokens=False, return_offsets_mapping=True)
             token_tag = token.tags[0]
+
             for i in range(len(out["input_ids"])):
-                if i == 0 or not token_tag.startswith("B-"):
+                if  token_tag == "O" or token_tag.startswith("I-"):
+                    tag = token_tag
+                elif i == 0 and (token_tag.startswith("B-") or token_tag.startswith("S-")):
+                    tag = token_tag
+                elif i == len(out["input_ids"]) and token_tag.startswith("E-"):
                     tag = token_tag
                 else:
                     tag = "I-" + token_tag[2:]
 
                 # Handle 'BO' tagging scheme
-                if self.args.tagging == "bo" and tag[:2] == "I-":
+                #if self.args.tagging == "bo" and tag[:2] == "I-":
+                if self.args.tagging == "bo" and (not tag == "O"):
                     tag = "B-" + tag[2:]
 
                 bert_token = Token(token.text, [tag], token.offset, token.pos_tag, token.dep_tag, token.guidance_tag)
@@ -342,7 +369,7 @@ class NerDataset(Dataset):
             return len(list("O.,-/()P"))
 
     @staticmethod
-    def handle_punctuation(word, punctuation_type):
+    def handle_punctuation1(word, punctuation_type):
         all_punctuations = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
         if punctuation_type == "type1":
             return 1 if word in all_punctuations else 0
@@ -361,6 +388,28 @@ class NerDataset(Dataset):
                 return len(punctuation_vocab)
             return 0  # non-punctuation (O)
         raise NotImplementedError
+
+    @staticmethod
+    def handle_punctuation2(word, punctuation_type):
+        all_punctuations = list(",;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
+        if punctuation_type == "type1":
+            return 1 if word in all_punctuations else 2
+        if punctuation_type == "type1-and":
+            if word in all_punctuations:
+                return 1
+            if word.lower() in ["and"]:
+                return 2
+            return 3
+        if punctuation_type == "type2":
+            punctuation_vocab = list(".,-/()")
+            if word in punctuation_vocab:
+                return punctuation_vocab.index(word)+1
+            if word in all_punctuations:
+                # catch all other punctuations (P)
+                return len(punctuation_vocab)+1
+            return len(punctuation_vocab)+2
+        raise NotImplementedError
+
 
     @staticmethod
     def get_char_vocab():
@@ -392,6 +441,11 @@ class NerDataset(Dataset):
         if pattern_type == "2":
             vocab += list("uld")
             return vocab
+        if pattern_type == "3":
+            vocab += list("ulCSLUFM")
+            vocab += list("uld")
+            return vocab
+
         raise NotImplementedError
 
     @staticmethod
@@ -409,13 +463,19 @@ class NerDataCollator:
 
     def __call__(self, features):
         # post-padding
+        # YJ changes: 
+        # (1) make sure that all the actual value is not 0 as 0 is used for padding 
+        # (2) better to group input data by lengths so that all sequences in a batch are in the (almost) same length and then shuffle the groups
+        # (3) move to pre-padding as it is preferred? (https://arxiv.org/pdf/1903.07288.pdf, no results for BiLSTM)
+
         max_len = max(len(entry["labels"]) for entry in features)
         # max_len = self.args.max_seq_len
         batch = dict()
-
+                
         # input_ids
+        # does the BERT's input_id start from 101? 101 is for CLS and 201 is SEP.
         if "input_ids" in features[0]:
-            entry = []
+            entry = [] 
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["input_ids"])
                 entry.append(torch.tensor(features[i]["input_ids"] + [self.tokenizer.pad_token_id] * pad_len))
@@ -437,6 +497,7 @@ class NerDataCollator:
                 entry.append(torch.tensor(features[i]["token_type_ids"] + [self.tokenizer.pad_token_type_id] * pad_len))
             batch["token_type_ids"] = torch.stack(entry)
 
+        # YJ: char_ids and pattern_id add 1 to index and  padd the rest with 0
         # char_ids
         if self.args.use_char_cnn in ["char", "both"]:
             batch_text = [entry[self.args.token_type] for entry in features]
@@ -484,6 +545,7 @@ class NerDataCollator:
             batch["flair_ids"] = torch.stack(entry)
             batch["flair_attention_mask"] = torch.stack(entry_mask)
 
+        # YJ: update handle_punctuation not to return 0 or negative value
         if self.args.punctuation_handling != "none" or self.args.loss_type == "ce_punct":
             punct_type = self.args.punctuation_handling
             if self.args.loss_type == "ce_punct":
@@ -492,11 +554,11 @@ class NerDataCollator:
             entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i][self.args.token_type])
-                # TODO: BUG!! type1-and
-                entry.append(torch.tensor([NerDataset.handle_punctuation(w, punct_type)
+                entry.append(torch.tensor([NerDataset.handle_punctuation2(w, punct_type)
                                            for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["punctuation_vec"] = torch.stack(entry)
 
+        # YJ: add 1 to index, so padding 0 is fine
         if self.args.word_type_handling != "none":
             entry = []
             word_type_vocab = NerDataset.get_word_type_vocab()
@@ -504,17 +566,19 @@ class NerDataCollator:
                 pad_len = max_len - len(features[i][self.args.token_type])
                 # padding tokens get word_type 0, all others get valid word_type indices (1 onwards)
                 entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w)) + 1
-                                           for w in features[i][self.args.token_type]] + [0] * pad_len))
+                                           for w in features[i][self.args.token_type]] + [0] * pad_len ))
             batch["word_type_ids"] = torch.stack(entry)
 
-        # TODO: padding is inconsistent! why not always maintain an additional padding token (+1)
         # head_mask
+        # YJ: how is this field used?  need to add 1?
         entry = []
         for i in range(len(features)):
             pad_len = max_len - len(features[i]["head_mask"])
             entry.append(torch.tensor(features[i]["head_mask"] + [0] * pad_len))
         batch["head_mask"] = torch.stack(entry)
 
+        # YJ: pos_tag and dep_tag's vocabulary contain [PAD] as the first element, so padding 0 is fine
+        # pos_tag
         if self.args.use_pos_tag:
             entry = []
             for i in range(len(features)):
@@ -522,6 +586,7 @@ class NerDataCollator:
                 entry.append(torch.tensor(features[i]["pos_tag"] + [0] * pad_len))
             batch["pos_tag"] = torch.stack(entry)
 
+        # dep_tag
         if self.args.use_dep_tag:
             entry = []
             for i in range(len(features)):
