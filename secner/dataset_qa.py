@@ -1,5 +1,6 @@
 import argparse
 import re
+
 import spacy
 from spacy.tokens.doc import Doc
 from torch.utils.data import Dataset
@@ -146,11 +147,23 @@ class NerQADataset(Dataset):
         return self.tokenizer_cache[text]
 
     def get_tag_query_text(self, tag):
-        tag_text = "entity" if self.args.detect_spans else self.tag_to_text_mapping[tag]
+        if self.args.detect_spans:
+            if self.args.query_type == "question3":
+                tag_text = "named entities"
+            elif self.args.query_type == "question4":
+                tag_text = "important entity spans"
+            else:
+                tag_text = "entity"
+        else:
+            tag_text = self.tag_to_text_mapping[tag]
         if self.args.query_type == "question":
             return "What is the {0} mentioned in the text ?".format(tag_text)
         if self.args.query_type == "question2":
             return "Where is the {0} mentioned in the text ?".format(tag_text)
+        if self.args.query_type == "question3":
+            return "Find {0} in the following text .".format(tag_text)
+        if self.args.query_type == "question4":
+            return "Extract {0} from the following text .".format(tag_text)
         return tag_text
 
     def prep_context(self, sentence, tag):
