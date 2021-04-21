@@ -1,5 +1,4 @@
 import argparse
-
 import torch
 from dataclasses import dataclass
 from torch.utils.data import Dataset

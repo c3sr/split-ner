@@ -1,6 +1,5 @@
 import argparse
 import re
-
 import spacy
 from spacy.tokens.doc import Doc
 from torch.utils.data import Dataset

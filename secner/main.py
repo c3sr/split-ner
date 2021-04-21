@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-
 import numpy as np
 from transformers import AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser

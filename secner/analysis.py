@@ -52,18 +52,21 @@ def calc_micro_f1(data):
     total_tp = sum([len(v) for v in tp.values()])
     total_fp = sum([len(v) for v in fp.values()])
     total_fn = sum([len(v) for v in fn.values()])
+    total_cnt = total_tp + total_fn
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("Overall | P: {0:.4f} | R: {1:.4f} | Micro F1: {2:.4f}".format(100.0 * p, 100.0 * r, 100.0 * f1))
+    print("Overall | Cnt: {0} | P: {1:.4f} | R: {2:.4f} | Micro F1: {3:.4f}"
+          .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
 
-    for tag in tp.keys():
+    tags = sorted(list(tp.keys()), key=lambda x: len(tp[x]) + len(fn[x]), reverse=True)
+    for tag in tags:
         tag_tp, tag_fp, tag_fn = len(tp[tag]), len(fp[tag]), len(fn[tag])
         tag_cnt = tag_tp + tag_fn
         tag_p = tag_tp * 1.0 / (tag_tp + tag_fp + 1e-7)
         tag_r = tag_tp * 1.0 / (tag_tp + tag_fn + 1e-7)
         tag_f1 = 2.0 * tag_p * tag_r / (tag_p + tag_r + 1e-7)
-        print("Tag: {0} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
+        print("Tag: {0} | Cnt: {1} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
               .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
 
     return tp, fp, fn
@@ -384,9 +387,9 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--dataset", type=str, default="bio")
-    ap.add_argument("--model", type=str, default="ner-biobert-qa4-querytype2-span")
-    ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
+    ap.add_argument("--dataset", type=str, default="jnlpba")
+    ap.add_argument("--model", type=str, default="ner-biobert-spanclass")
+    ap.add_argument("--file", type=str, default="infer", help="which file to evaluate (train|dev|test|infer)")
     ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
     ap.add_argument("--span_based", dest="span_based", action="store_true", help="set this flag if using span detector")
     ap = ap.parse_args()

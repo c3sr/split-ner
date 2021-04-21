@@ -1,18 +1,17 @@
+import dataclasses
 import json
 import logging
+import numpy as np
 import os
 import random
-from pathlib import Path
-from shutil import copyfile
-from typing import Tuple
-
-import dataclasses
-import numpy as np
 import torch
 import wandb
+from pathlib import Path
+from shutil import copyfile
 from transformers import HfArgumentParser
 from transformers.hf_argparser import DataClass
 from transformers.training_args import default_logdir
+from typing import Tuple
 
 
 class Token:

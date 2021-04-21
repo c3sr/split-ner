@@ -1,5 +1,4 @@
 import logging
-
 import spacy
 from datasets import load_dataset
 from spacy.tokens import Doc

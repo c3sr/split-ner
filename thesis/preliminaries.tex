@@ -9,9 +9,9 @@
 Language dynamics and style of writing varies from domain-to-domain and so does the nature of informing entities in corresponding sentences. This affects the approaches one should use for extracting entities and the expected performance. Some differentiating characteristics of entities are:
 
 \begin{itemize}
-    \item \textbf{N-gram length}. Scientific literature include \texttt{chemicals}, \texttt{diseases}, \texttt{phenomena} etc. which are generally long and wordy while news articles include \texttt{person}, \texttt{location} etc. which are comparatively smaller. 
+    \item \textbf{N-gram length}. Scientific literature include \texttt{chemicals}, \texttt{diseases}, \texttt{phenomena} which are all generally long and wordy while news articles include \texttt{person}, \texttt{organization}, and \texttt{location} which are comparatively smaller. 
     
-    \item \textbf{Intrinsic properties}. Common entities in news articles like \texttt{person}, \texttt{location} are wordy and alphabetic. They are called \textbf{word-based entities}. Frequently occurring ones can be learnt or else can be inferred from surrounding context. However there are entities like \texttt{driving license}, \texttt{telephone number} etc. that have semantics encoded in the form of alphanumeric and special symbol patterns (like \texttt{telephone number} has form \texttt{xxx-xxx-xxxx} with a area code in the beginning). Similarly, in biomedical domain, there are \texttt{chemical} and \texttt{gene} abbreviations/formulas like \textit{MgCl2}, \textit{mutCK1delta gene} etc. Their semantics lies in the intrinsic language of chemistry where \textit{Mg} is \textit{Magnesium} and \textit{Cl} is \textit{Chlorine}. We call these \textbf{non-word entities}.
+    \item \textbf{Intrinsic properties}. Common entities in news articles like \texttt{person}, \texttt{location} are wordy and alphabetic. They are called \textbf{word-based entities}. Frequently occurring ones can be learnt or else can be inferred from surrounding context. However there are entities like \texttt{driving license} and \texttt{telephone number} that have semantics encoded in the form of alphanumeric and special symbol patterns (like \texttt{telephone number} has form \texttt{xxx-xxx-xxxx} with a area code in the beginning). Similarly, in biomedical domain, there are \texttt{chemical} and \texttt{gene} abbreviations/formulas like \textit{MgCl2} and \textit{mutCK1delta gene}. Their semantics lies in the intrinsic language of chemistry where \textit{Mg} is \textit{Magnesium} and \textit{Cl} is \textit{Chlorine}. We call these \textbf{non-word entities}.
     
     \item \textbf{Diversity}. Some entities are \textit{broad spectrum} with lots of diverse variety of mentions. For example, \texttt{chemicals} are sometimes written in words like \textit{potassium permanganate} or as formula \textit{KMnO4}, sometimes with intricate special symbols like, \textit{Ca(2+)}. Other entities may be \textit{narrow spectrum} following some distinct patterns, like \texttt{phone numbers}. 
     
@@ -73,7 +73,7 @@ In this study we work with multiple English language datasets belonging to news 
 	\textbf{Dataset} & \textbf{Domain} & \textbf{\#Entities} & \textbf{Non-Word} & \textbf{High/Low Resource} & \textbf{Nesting}\\\hline
 	\texttt{CoNLL 2003} & News & 4 & No & High & Flat\\\hline
 	\texttt{OntoNotes 5.0} & News & 18 & Yes & High + Low & Flat\\\hline
-	\texttt{BIONLP13CG} & Biomedical & 16 & Yes & High + Low & Nested\\\hline
+	\texttt{BioNLP13CG} & Biomedical & 16 & Yes & High + Low & Nested\\\hline
 	\texttt{JNLPBA} & Biomedical & 4 & Yes & High & Flat\\\hline
 	\end{tabular}
 	\caption{Datasets Summary}
@@ -114,9 +114,9 @@ The \texttt{CoNLL 2003}\cite{sang2003introduction} corpus is a collection of new
 
 \subsection{OntoNotes 5.0 Dataset}
 
-\texttt{OntoNotes 5.0}\cite{weischedel2013ontonotes} is a large corpus consisting of text from various genres (news, weblogs, talk shows, broadcast, conversational
-telephone speech etc.) labeled with structural information (syntax) and shallow semantics (word sense linked to an ontology, coreference etc.). There are
-5 versions, from Release 1.0 to Release 5.0. We work with Release 5.0 and focus on named entity labels on English data. There are 18 entity types including common ones like \texttt{PERSON}, \texttt{ORG} and entities having numerical semantics like \texttt{DATE}, \texttt{MONEY} etc. We obtain the dataset from GitHub\footnote{https://github.com/yuchenlin/OntoNotes-5.0-NER-BIO}. Around $11.0\%$ of tokens in the dataset are part of some entity mention. There are some entities like \texttt{GPE} (geo-political entity) and \texttt{LOCATION} which have very subtle difference in their semantics making them challenging to disambiguate. Corpus is flat-labeled and around $19.3\%$  entity-mention tokens are non-word. As per Table \ref{tab:onto_entity_distribution}, entities like \texttt{PERSON}, \texttt{DATE} are high-resource while \texttt{LANGUAGE}, \texttt{LAW} are low-resource. Average sentence length is $19.0$ tokens. Table \ref{tab:onto_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
+\texttt{OntoNotes 5.0}\cite{weischedel2013ontonotes} is a large corpus consisting of text from various genres (news, weblogs, talk shows, broadcast, and conversational
+telephone speech) labeled with structural information (syntax) and shallow semantics (word sense linked to an ontology and coreference). There are
+5 versions, from Release 1.0 to Release 5.0. We work with Release 5.0 and focus on named entity labels on English data. There are 18 entity types including common ones like \texttt{PERSON}, \texttt{ORG} and entities having numerical semantics like \texttt{DATE} and \texttt{MONEY}. We obtain the dataset from GitHub\footnote{https://github.com/yuchenlin/OntoNotes-5.0-NER-BIO}. Around $11.0\%$ of tokens in the dataset are part of some entity mention. There are some entities like \texttt{GPE} (geo-political entity) and \texttt{LOCATION} which have very subtle difference in their semantics making them challenging to disambiguate. Corpus is flat-labeled and around $19.3\%$  entity-mention tokens are non-word. As per Table \ref{tab:onto_entity_distribution}, entities like \texttt{PERSON}, \texttt{DATE} are high-resource while \texttt{LANGUAGE}, \texttt{LAW} are low-resource. Average sentence length is $19.0$ tokens. Table \ref{tab:onto_dataset_split} shows the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
 
 \begin{table}[h!]
 \begin{subtable}[t]{.48\linewidth}
@@ -193,9 +193,9 @@ The \texttt{JNLPBA}\cite{kim2004introduction} dataset comes from GENIA\cite{kim2
 \caption{JNLPBA Dataset Stats}
 \end{table}
 
-\subsection{BIONLP13CG Dataset}
+\subsection{BioNLP13CG Dataset}
 
-The \texttt{BIONLP13CG}\cite{pyysalo2015overview} (Cancer Genetics) dataset comes from BioNLP Shared Task 2013. The text belongs to the theme of biological processes relating to the development and progression of cancer. It consists of 16 entity types with a mix of high-resource and low-resource ones. We obtain the dataset available on the shared task website\footnote{http://2013.bionlp-st.org/tasks/cancer-genetics} and process it into \texttt{tsv} format. For most part of NER study when using this dataset we focus on flat-annotated entity mentions and ignore the small percentage (around $1\%$) of nested entities both from training and evaluation. The flat-annotated corpus is consistent with the one available on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/tree/master/data/BioNLP13CG-IOB}. Around $23.5\%$ of tokens in the dataset are part of some entity mention. Around $24.9\%$ of entity mention tokens are non-word. Average sentence length is $27.6$ tokens. Table \ref{tab:bio_entity_distribution} shows the distribution of entities and Table \ref{tab:bio_dataset_split} gives the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
+The \texttt{BioNLP13CG}\cite{pyysalo2015overview} (Cancer Genetics) dataset comes from BioNLP Shared Task 2013. The text belongs to the theme of biological processes relating to the development and progression of cancer. It consists of 16 entity types with a mix of high-resource and low-resource ones. We obtain the dataset available on the shared task website\footnote{http://2013.bionlp-st.org/tasks/cancer-genetics} and process it into \texttt{tsv} format. For most part of NER study when using this dataset we focus on flat-annotated entity mentions and ignore the small percentage (around $1\%$) of nested entities both from training and evaluation. The flat-annotated corpus is consistent with the one available on GitHub\footnote{https://github.com/cambridgeltl/MTL-Bioinformatics-2016/tree/master/data/BioNLP13CG-IOB}. Around $23.5\%$ of tokens in the dataset are part of some entity mention. Around $24.9\%$ of entity mention tokens are non-word. Average sentence length is $27.6$ tokens. Table \ref{tab:bio_entity_distribution} shows the distribution of entities and Table \ref{tab:bio_dataset_split} gives the \texttt{Train}/\texttt{Dev}/\texttt{Test} splits. 
 
 \begin{table}[h!]
 \begin{subtable}[t]{.48\linewidth}
@@ -234,12 +234,13 @@ The \texttt{BIONLP13CG}\cite{pyysalo2015overview} (Cancer Genetics) dataset come
 	\caption{Data Split}
 	\label{tab:bio_dataset_split}
 \end{subtable}
-\caption{BIONLP13CG Dataset Stats}
+\caption{BioNLP13CG Dataset Stats}
 \end{table}
 
 \section{Experimental Setup}
-We report all our results on the test sets after taking the model checkpoint corresponding to the best micro-averaged F1-score on dev set. The dev set evaluation takes place at steps of 0.5 training epochs. We train the models for $300$ epochs at learning rate $10^{-5}$ unless otherwise specified. 
+We report all our results on the test sets after taking the model checkpoint corresponding to the best micro-averaged F1-score on development set. The development set evaluation takes place at steps of 0.5 training epochs. We train the models for $300$ epochs at learning rate $10^{-5}$ unless otherwise specified. 
 
 We use \texttt{transformers}\footnote{https://github.com/huggingface/transformers} python library by HuggingFace and \texttt{pytorch} for implementation and fix random seed to $42$ for replication. For general English corpora like \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0}, by default, we use the pretrained \texttt{bert-base-uncased}\footnote{https://huggingface.co/bert-base-uncased} model. For biomedical datasets, \texttt{BioNLP13CG} and \texttt{JNLPBA}, we use \texttt{BioBERT-Base}\footnote{https://github.com/dmis-lab/biobert\#download} model. Note that in all our experiments, we only use the BERT-Base architecture which has around 110M trainable parameters. We use \texttt{Nvidia GeForce GTX 1080} and \texttt{Nvidia Tesla V100} gpus for model training and evaluation.
 
-We use cross entropy loss during training unless otherwise specified. The training data is randomly shuffled and a batch size of $16$ is used with post-padding. For BERT-based models, we fix maximum sequence length to $256$ for \texttt{BIONLP13CG}, \texttt{CoNLL 2003}, \texttt{JNLPBA} datasets and $512$ for \texttt{OntoNotes 5.0} data. Unless otherwise specified, the BERT-based models output entity labels for each sub-token (as per WordPiece tokenization) of an existing token in the dataset. As a heuristic, we take the label of first sub-token as the label for the corresponding token during our evaluations.
+We use cross entropy loss during training unless otherwise specified. The training data is randomly shuffled and a batch size of $16$ is used with post-padding. For BERT-based models, we fix maximum sequence length to $256$ for \texttt{BioNLP13CG}, \texttt{CoNLL 2003}, \texttt{JNLPBA} datasets and $512$ for \texttt{OntoNotes 5.0} data. Unless otherwise specified, the BERT-based models output entity labels for each sub-token (as per WordPiece tokenization) of an existing token in the dataset. As a heuristic, we take the label of first sub-token as the label for the corresponding token during our evaluations.
+>>>>>>> 2199b95bdfd174f3c72f4d5eb42943af56a16467

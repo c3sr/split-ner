@@ -1,8 +1,7 @@
 import argparse
 import logging
-import os
-
 import numpy as np
+import os
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForNextSentencePrediction
 

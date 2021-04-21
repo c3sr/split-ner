@@ -1,9 +1,8 @@
 import argparse
 import logging
 import re
-from collections import defaultdict
-
 import torch
+from collections import defaultdict
 from dataclasses import dataclass
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
@@ -344,24 +343,20 @@ class NerDataset(Dataset):
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_first_sep_token)
 
-
     @staticmethod
     def get_char_ids(batch_text, max_len, vocab):
         max_word_len = max(len(word) for sent in batch_text for word in sent)
-        max_word_len = max(max_word_len, 3)
+        max_word_len = max(max_word_len, 3)  # TODO: Check CNN kernel size issue here
         batch_ids = []
-
         for sent_text in batch_text:
             sent_ids = []
             for word_text in sent_text:
                 word_ids = [(vocab.index(c) + 1) for c in word_text if c in vocab]
-
                 pad_word_len = max_word_len - len(word_ids)
                 sent_ids.append(torch.tensor(word_ids + [0] * pad_word_len, dtype=torch.int64))
             pad_len = max_len - len(sent_ids)
             sent_ids += [torch.zeros(max_word_len, dtype=torch.int64)] * pad_len
             batch_ids.append(torch.stack(sent_ids))
-
         return torch.stack(batch_ids)
 
     @staticmethod
@@ -468,7 +463,6 @@ class NerDataCollator:
 
     def __call__(self, features):
         # post-padding
-
         # YJ changes: 
         # (1) make sure that all the actual value is not 0 as 0 is used for padding 
         # (2) better to group input data by lengths so that all sequences in a batch are in the (almost) same length and then shuffle the groups
@@ -478,12 +472,10 @@ class NerDataCollator:
         # max_len = self.args.max_seq_len
         batch = dict()
                 
-
         # input_ids
         # does the BERT's input_id start from 101? 101 is for CLS and 201 is SEP.
         if "input_ids" in features[0]:
             entry = [] 
-
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["input_ids"])
                 entry.append(torch.tensor(features[i]["input_ids"] + [self.tokenizer.pad_token_id] * pad_len))
@@ -500,7 +492,6 @@ class NerDataCollator:
         # token_type_ids
         if "token_type_ids" in features[0]:
             entry = []
-
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["token_type_ids"])
                 entry.append(torch.tensor(features[i]["token_type_ids"] + [self.tokenizer.pad_token_type_id] * pad_len))
@@ -510,7 +501,6 @@ class NerDataCollator:
         # char_ids
         if self.args.use_char_cnn in ["char", "both"]:
             batch_text = [entry[self.args.token_type] for entry in features]
-
             char_vocab = NerDataset.get_char_vocab()
             batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len, char_vocab)
 
@@ -518,7 +508,6 @@ class NerDataCollator:
         if self.args.use_char_cnn in ["pattern", "both", "both-flair"]:
             batch_pattern = [[NerDataset.make_pattern(word, self.args.pattern_type)
                               for word in entry[self.args.token_type]] for entry in features]
-
             pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
 
@@ -583,7 +572,6 @@ class NerDataCollator:
         # head_mask
         # YJ: how is this field used?  need to add 1?
         entry = []
-
         for i in range(len(features)):
             pad_len = max_len - len(features[i]["head_mask"])
             entry.append(torch.tensor(features[i]["head_mask"] + [0] * pad_len))
@@ -614,7 +602,6 @@ class NerDataCollator:
                               features[i]["head_mask"][j]]
             else:
                 labels_mod = features[i]["labels"]
-
             pad_len = max_len - len(labels_mod)
             entry.append(torch.tensor(labels_mod + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)

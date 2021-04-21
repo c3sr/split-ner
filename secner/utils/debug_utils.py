@@ -1,8 +1,7 @@
-from typing import Optional
-
 import torch
 from torch.utils.data import SequentialSampler
 from transformers.trainer import Trainer
+from typing import Optional
 
 
 # use learning_rate=0.001 to replicate old sec-ner model behavior

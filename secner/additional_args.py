@@ -1,10 +1,9 @@
+import dataclasses
 import json
 import os
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
-
-import dataclasses
-from dataclasses import dataclass, field
 
 
 @dataclass

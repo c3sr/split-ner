@@ -1,6 +1,5 @@
 import argparse
 import logging
-
 import torch
 from attr import dataclass
 from torch.utils.data import Dataset

@@ -1,4 +1,4 @@
-We approach the named entity recognition problem from different perspectives, as a sequence labeling task, a question answering task and a span detection and classification task. In this chapter, we look at all these in detail and compare and contract them with one-another. Primarily, we develop on top of pretrained BERT model. We look at the effect of loss function, tagging schemes, providing additional semantic information etc. on the overall task. We also study how much guidance the model derives from any additional information fed with the input. Experiments are conducted on multiple datasets and we simultaneously compare our models with previously published state-of-the-art results as well. 
+We approach the named entity recognition problem from different perspectives, as a sequence labeling task, a question answering task and a span detection and classification task. In this chapter, we look at all these in detail and compare and contract them with one-another. Primarily, we develop on top of pretrained BERT model. We look at the effect of loss function, tagging schemes, and providing additional semantic information on the overall task. We also study how much guidance the model derives from any additional information fed with the input. Experiments are conducted on multiple datasets and we simultaneously compare our models with previously published state-of-the-art results as well. 
 
 \section{Sequence Labeling}
 \begin{definition}
@@ -6,15 +6,15 @@ We approach the named entity recognition problem from different perspectives, as
     Given sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, sequence labeling is the task of forming output sequence $\mathcal{L} = \langle l_1, l_2 \ldots l_N \rangle$ where $l_i$ is the label assigned to token $w_i$. 
 \end{definition}
 
-For NER, we extract entity mentions by making output labels follow a tagging scheme (Section \ref{sec:tagging_scheme}). For example, with \texttt{BIO} scheme, each output label is of the form \texttt{B-Tag}, \texttt{I-Tag} or \texttt{O} with $\texttt{Tag} \in \mathcal{T}$ where $\mathcal{T}$ is the set of all possible entity types. For this task, we use two deep neural architectures:
+For NER, we extract entity mentions by making output labels follow a tagging scheme (Section \ref{sec:tagging_scheme}). For example, with \texttt{BIO} scheme, each output label is of the form \texttt{B-Tag}, \texttt{I-Tag} or \texttt{O} with $\texttt{Tag} \in \mathcal{T}$ where $\mathcal{T}$ is the set of all possible entity types. Figure \ref{fig:sequence_labeling} gives a diagrammatic representation of our setup. In all our sequence labeling experiments, we make use of \texttt{BIO} tagging scheme and train the following variants:
 
 \begin{itemize}
 
     \item \texttt{BERT}: Proposed by \cite{devlin2018bert}, BERT is a bidirectional encoder transformer\cite{vaswani2017attention}. It applies WordPiece\cite{wu2016google} tokenization on input sentence which is then passed through several encoder layers with multiple attention heads capturing sentence semantics and inter-token relationships well. The model outputs contextualized embeddings for each sub-token in the sentence. We take the last hidden layer outputs from BERT model and pass it to a fully connected layer. The outputs are converted to a probability distribution over labels space. Model parameters are initialized from a pretrained model and fine-tuned on our NER task.
     
-    \item \texttt{CNN-LSTM-CRF (BERT-Freeze)}: Proposed by \cite{ma2016end}, this model has three components. A CNN layer helps capture intrinsic character-level semantics and patterns. These features are then concatenated with word embeddings and fed to a bidirectional LSTM\cite{hochreiter1997long} which captures sentence grammar and token inter-dependencies. Finally, a CRF\cite{lafferty2001conditional} layer on top helps make sure that output label sequence does not contain abrupt and unexpected transitions. We use the contextual word embeddings from pretrained BERT model as word embeddings fed to LSTM but freeze BERT parameters during training. This makes sure that ultimate model being trained remains CNN-LSTM-CRF.
+    % \item \texttt{CNN-LSTM-CRF (BERT-Freeze)}: Proposed by \cite{ma2016end}, this model has three components. A CNN layer helps capture intrinsic character-level semantics and patterns. These features are then concatenated with word embeddings and fed to a bidirectional LSTM\cite{hochreiter1997long} which captures sentence grammar and token inter-dependencies. Finally, a CRF\cite{lafferty2001conditional} layer on top helps make sure that output label sequence does not contain abrupt and unexpected transitions. We use the contextual word embeddings from pretrained BERT model as word embeddings fed to LSTM but freeze BERT parameters during training. This makes sure that ultimate model being trained remains CNN-LSTM-CRF.
     
-    \item \texttt{BERT-Freeze}: To understand how much semantic information is already captured in a pretrained BERT model, we use the exact same architecture as \texttt{BERT} model above but freeze the BERT model parameters. So, the only trainable parameters remain from the fully connected layer.
+    \item \texttt{BERT-Freeze}: To understand how much semantic information is already captured in a pretrained BERT model, we use the exact same architecture as \texttt{BERT} model above but freeze the BERT model parameters. So, the only trainable parameters remain from the fully connected layer. For this setting, we use learning rate as $0.005$.
 \end{itemize}
 
 
@@ -25,27 +25,29 @@ For NER, we extract entity mentions by making output labels follow a tagging sch
     \label{fig:sequence_labeling}
 \end{figure}
 
-\subsection{Experiment Details}
-For \texttt{CNN-LSTM-CRF (BERT-Freeze)} setup, we take the mean of sub-token embeddings from BERT to get the embedding for each input token. We make use of \texttt{BIO} tagging scheme in all our sequence labeling experiments. Models with frozen BERT parameters used learning rate $0.005$. CNN input channels is set to character vocabulary size and each character is fed as a one-hot vector. CNN has $128$ output channels, kernel size of $5$ and does a max pooling to get word-level representation from character-level outputs. LSTM hidden dimensions is set to $256$.
+% \subsection{Experiment Details}
+% For \texttt{CNN-LSTM-CRF (BERT-Freeze)} setup, we take the mean of sub-token embeddings from BERT to get the embedding for each input token. We make use of \texttt{BIO} tagging scheme in all our sequence labeling experiments. Models with frozen BERT parameters used learning rate $0.005$. CNN input channels is set to character vocabulary size and each character is fed as a one-hot vector. CNN has $128$ output channels, kernel size of $5$ and does a max pooling to get word-level representation from character-level outputs. LSTM hidden dimensions is set to $256$.
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003} & \textbf{OntoNotes 5.0}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003} & \textbf{OntoNotes 5.0}\\\hline
 	\texttt{BERT-Freeze} & 75.42 & 55.93 & 82.79 & 67.35 \\\hline
-	\texttt{CNN-LSTM-CRF (BERT-Freeze)} & 84.1 & 76.2 & 91.6 & 86.4 \\\hline
-	\texttt{BERT} & \textbf{85.99} & 74.35 & 91.36 & 83.39 \\\hline
+% 	\texttt{CNN-LSTM-CRF (BERT-Freeze)} & 84.1 & 76.2 & 91.6 & 86.4 \\\hline
+	\texttt{BERT} & \textbf{85.99} & \textbf{74.35} & \textbf{91.36} & \textbf{83.39} \\\hline
 	\end{tabular}
     \caption{Results: Sequence Labeling (Test set Micro-F1 in \%)}
     \label{tab:res_seq_labeling}
 \end{table}
 
 \subsection{Observations}
-Based on results summarized in Table \ref{tab:res_seq_labeling}:
-\begin{itemize}
-    \item \texttt{BERT-Freeze} serves as a naive baseline for the other two language models to improve upon.
-    \item Both CNN-LSTM-CRF and transformer-based BERT architecture perform comparably on NER task on these relatively small-sized datasets as can be seen from \texttt{BERT} and \texttt{CNN-LSTM-CRF (BERT-Freeze)} results.
-\end{itemize}
+Based on results summarized in Table \ref{tab:res_seq_labeling} we see that BERT-Freeze serves as a naive yet strong baseline. Nevertheless, as expected, after fine-tuning the BERT model we get much better results since the representative power of the model increases many fold.
+
+% Based on results summarized in Table \ref{tab:res_seq_labeling}:
+% \begin{itemize}
+%     \item \texttt{BERT-Freeze} serves as a naive yet strong baseline for the other two language models to improve upon.
+%     \item Both CNN-LSTM-CRF and transformer-based BERT architecture perform comparably on NER task on these relatively small-sized datasets as can be seen from \texttt{BERT} and \texttt{CNN-LSTM-CRF (BERT-Freeze)} results.
+% \end{itemize}
 
 \section{Question Answering}
 \label{sec:question_answering}
@@ -53,14 +55,14 @@ In recent years there has been a trend of formulating NER problems as question a
 
 For NER using a QA setup, we feed a question to the model asking it to extract all mentions of a given entity type from the supplied text. Since there can be multiple entities of interest, each combination of entity question and input sentence is fed to the model. \cite{li2019unified, li2019dice} show the effectiveness of such a setup using BERT over multiple general English and Chinese news datasets and output candidate spans (start and end indices) where the entity in question is present. This setup has advantages over sequence labeling since it can handle nested entities as well. 
 
-However, for learning spans (start and end indices), the classification layer has to do $\mathcal{O}(n^2)$ computations where $n$ is the number of tokens in the input sentence. Such a computation can be expensive for large sentences. To mitigate this, \cite{banerjee2019knowledge} propose an approach in the middle of question answering and sequence labeling. They return \texttt{B}, \texttt{I} and \texttt{O} labels for each token to mark the presence of the entity in question. Hence, their problem complexity becomes $\mathcal{O}(n)$ since they output one label for each token. We implement this framework and study the effect of several factors:
+However, for learning spans (start and end indices), the classification layer has to do $\mathcal{O}(n^2)$ computations where $n$ is the number of tokens in the input sentence. Such a computation can be expensive for large sentences. To mitigate this, \cite{banerjee2019knowledge} propose an approach in the middle of question answering and sequence labeling. They return \texttt{B}, \texttt{I} and \texttt{O} labels for each token to mark the presence of the entity in question. Hence, their problem complexity becomes $\mathcal{O}(n)$ since they output one label for each token. We implement this framework (shown in Figure \ref{fig:question_answering}) and study the effect of several factors:
 
 \begin{itemize}
     \item \textbf{Tagging Scheme}: Classify each token using \texttt{BIO} or \texttt{BIOE} scheme. In both these models, we ask questions of the form, \textit{What is the person mentioned in the text?}.
     
     \item \textbf{Question Formulation}: In QA setup, extraction from a sentence is highly dependent on the question semantics. We study the importance of the question word being used (\texttt{What} or \texttt{Where}). Our sample question is of the form, \textit{\texttt{What}$\vert$\texttt{Where} is the person mentioned in the text?} In both these models, we follow the \texttt{BIOE} output tagging scheme.
     
-    \item \textbf{Entity Scrambling}: In the question, \textit{What is the \texttt{entity} mentioned in the text?}, we study the effect of the entity keyword used. We replace each entity with some scrambled English letters, for example, \texttt{Person} becomes \texttt{xyz12qqr}. So, during training, we ask questions like \textit{What is the \texttt{xyz12qqr} mentioned in the text?} but give the right \texttt{person} mentions as gold labels to the model. Since our task here is to probe the model and develop an understanding of what it focuses on, so we conduct this experiment on a single dataset, \texttt{BIONLP13CG}. Table \ref{tab:entity_scramble_bio} shows some example scrambled entity keywords. We compare it with the unscrambled model in the same \texttt{BIOE} tagging scheme setting.
+    \item \textbf{Entity Scrambling}: In the question, \textit{What is the \texttt{entity} mentioned in the text?}, we study the effect of the entity keyword used. We replace each entity with some scrambled English letters, for example, \texttt{Person} becomes \texttt{xyz12qqr}. So, during training, we ask questions like \textit{What is the \texttt{xyz12qqr} mentioned in the text?} but give the right \texttt{person} mentions as gold labels to the model. Since our task here is to probe the model and develop an understanding of what it focuses on, so we conduct this experiment on a single dataset, \texttt{BioNLP13CG}. Table \ref{tab:entity_scramble_bio} shows some example scrambled entity keywords. We compare it with the unscrambled model in the same \texttt{BIOE} tagging scheme setting.
     
     \begin{table}[h!]
     \centering
@@ -86,7 +88,7 @@ However, for learning spans (start and end indices), the classification layer ha
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
 	\texttt{BERT-QA(BIO)} & 86.15 & 74.81 & 91.06\\\hline
 	\texttt{BERT-QA(BIOE)} & \textbf{86.45} & \textbf{74.92} & \textbf{91.17}\\\hline
 	\end{tabular}
@@ -97,7 +99,7 @@ However, for learning spans (start and end indices), the classification layer ha
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
 	\texttt{BERT-QA(What)} & 86.45 & \textbf{74.81} & 91.17\\\hline
 	\texttt{BERT-QA(Where)} & \textbf{86.83} & 74.64 & \textbf{91.82}\\\hline
 	\end{tabular}
@@ -108,7 +110,7 @@ However, for learning spans (start and end indices), the classification layer ha
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG}\\\hline
 	\texttt{Original} & \textbf{86.45}\\\hline
 	\texttt{Scrambled} & 85.83\\\hline
 	\end{tabular}
@@ -133,7 +135,7 @@ Previous approaches like sequence labeling and question answering (QA) treat the
 \subsection{Span Detection}
 Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, the goal of this module is to output a list of spans (mention tuples) $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. Note that here the mention tuples are not associated with an entity type. 
 
-We formulate this as a question answering task asking the model to identify all entity spans in a given sentence. For example, the sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted to the input, \textit{What is the \texttt{entity} mentioned in the text? Emily lives in United States}. This is fed to BERT model which outputs labels for each token following the \texttt{BIOE} scheme. In this example, we expect two spans, \textit{Emily} and \textit{United States}. 
+We formulate this as a question answering task asking the model to identify all entity spans in a given sentence. For example, the sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted to the input, \textit{What is the \texttt{entity} mentioned in the text? Emily lives in United States}. This is fed to BERT model which outputs labels for each token following the \texttt{BIOE} scheme. In this example, we expect two spans, \textit{Emily} and \textit{United States}. Figure \ref{fig:span_detection} shows our span detection setup.
 
 \begin{figure}
     \centering
@@ -145,7 +147,7 @@ We formulate this as a question answering task asking the model to identify all 
 \subsection{Span Classification}
 Here, we are given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$ and a span $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. The goal is to output a label $t$ for the span such that $t \in \mathcal{T}$, where $\mathcal{T}$ is the set of all entity types.
 
-This is modeled as the reverse of QA model for NER described in Section \ref{sec:question_answering}. For every gold entity mention (Eg. \textit{Emily}) in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample input, \textit{Emily lives in United States. What is Emily?} The sentence is fed to a BERT model where we do sequence classification. The pooled sequence embedding returned by BERT is fed to a fully connected layer and converted to a probability distribution over possible entity types. In this example, the model is expected to assign maximum probability to \texttt{PERSON}.
+This is modeled as the reverse of QA model for NER described in Section \ref{sec:question_answering}. For every gold entity mention (E.g. \textit{United States}) in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample input, \textit{Emily lives in United States. What is United States?} The sentence is fed to a BERT model where we do sequence classification. The pooled sequence embedding returned by BERT is fed to a fully connected layer and converted to a probability distribution over possible entity types. In this example, the model is expected to assign maximum probability to \texttt{LOCATION}. Figure \ref{fig:span_classification} shows our span classification setup.
 
 \begin{figure}[h!]
     \centering
@@ -178,7 +180,7 @@ Both the models can be trained independently. The pipeline structure comes durin
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
-	\textbf{} & \textbf{BIONLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
+	\textbf{} & \textbf{BioNLP13CG} & \textbf{JNLPBA} & \textbf{CoNLL 2003}\\\hline
 	\texttt{Span Detection} & 90.12 & 78.35 & 95.23\\\hline
 	\texttt{Span Classification} & 94.06 & 95.08 & 94.50\\\hline
 	\texttt{Pipeline} & 85.89 & \textbf{75.01} & \textbf{91.64}\\\hline
@@ -212,14 +214,14 @@ An ML algorithm learns by optimizing its learning objective (loss function). In 
 As can be seen from Equation \eqref{eq:cross_entropy}, Cross Entropy loss penalizes misclassifications. When the classification is correct, it pushes the model to output the correct result with a probability of 1. Hence, Cross Entropy loss models accuracy. However, during evaluation in NER setting, we calculate F1-Score. This difference between training objective and evaluation metric may lead to sub-optimal performance in some situations.
 \begin{equation}
 \label{eq:cross_entropy}
-    CE &= -\frac{1}{N}\sum_{i}\sum_{j \in \{0, 1\}} y_{ij}\log p_{ij}
+    CE = -\frac{1}{N}\sum_{i}\sum_{j \in \{0, 1\}} y_{ij}\log p_{ij}
 \end{equation}
 
 \subsection{Weighted CE Loss}
-Not all entity types may have an equable distribution in the labeled dataset. Generally negative samples outweigh positive samples in NER datasets. Only $23.5\%$ tokens in \texttt{BIONLP13CG} dataset belong to some entity, rest are labeled \texttt{O}. This may introduce bias in the model which can be countered by giving different importance/weights to different entity types. In our case, we want to reduce the dominant influence of \texttt{O} labels, hence, any token with a gold label \texttt{O} is given a weight of $0.5$ while all others have a weight of $1$. This can be further extended to give different weights to high and low resource entity types. However, this approach makes the model very sensitive to the assigned weights and it can rather easily develop a bias towards low-resource entities\cite{valverde2017improving}.
+Not all entity types may have an equable distribution in the labeled dataset. Generally negative samples outweigh positive samples in NER datasets. Only $23.5\%$ tokens in \texttt{BioNLP13CG} dataset belong to some entity, rest are labeled \texttt{O}. This may introduce bias in the model which can be countered by giving different importance/weights to different entity types. In our case, we want to reduce the dominant influence of \texttt{O} labels, hence, any token with a gold label \texttt{O} is given a weight of $0.5$ while all others have a weight of $1$. This can be further extended to give different weights to high and low resource entity types. However, this approach makes the model very sensitive to the assigned weights and it can rather easily develop a bias towards low-resource entities\cite{valverde2017improving}.
 
 \subsection{Punctuation Weighted CE Loss}
-From qualitative analysis of misclassified samples (Section \ref{subsec:qualitative_analysis}) in standard CE loss setup we notice that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, slash etc. Hence, we emphasize these symbols by penalizing the model twice if the misclassified token is a punctuation/special symbol.
+From qualitative analysis of misclassified samples (Section \ref{subsec:qualitative_analysis}) in standard CE loss setup we notice that the model is not able to learn good representations for special symbols like parenthesis, hyphen, period, or slash. Hence, we emphasize these symbols by penalizing the model twice if the misclassified token is a punctuation/special symbol.
 
 \subsection{Dice Loss}
 As detailed earlier, Cross Entropy is an accuracy-oriented objective while during evaluation, we calculate the F1-Score. This difference can lead to sub-optimal model training. To counteract, \cite{li2019dice} make use of S{\o}rensen-Dice coefficient(DSC)\cite{sorensen1948method, dice1945measures} and Tversky index\cite{tversky1977features} which are F-Score oriented statistics. Given sets $A$ and $B$, DSC is used to gauge similarity among two sets and is defined as,
@@ -252,7 +254,7 @@ where $\gamma$ is the smoothing parameter. Then over all samples, dice loss (DL)
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|}\hline
-	\textbf{} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003}\\\hline
+	\textbf{} & \textbf{BioNLP13CG} & \textbf{CoNLL 2003}\\\hline
 	\texttt{CE Loss} & 85.99 & 91.36\\\hline
 	\texttt{Weighted CE Loss} & 85.93 & 91.26\\\hline
 	\texttt{Punctuation CE Loss} & 85.74 & 91.55\\\hline
@@ -267,9 +269,9 @@ where $\gamma$ is the smoothing parameter. Then over all samples, dice loss (DL)
 \begin{itemize}
     \item \texttt{Weighted CE Loss} and \texttt{Punctuation CE Loss} give mixed results. Their performance varies with the weights set for different misclassification cases. The same set of weights do not generalize across both datasets.
     
-    \item In \texttt{BIONLP13CG} corpus, \texttt{Dice Loss} performs well as this corpus as several high and low resource entities (data imbalance). \texttt{Dice Loss} is not able to give its advantages with \texttt{CoNLL 2003} corpus since here all 4 entity types have a comparable and high representation.
+    \item In \texttt{BioNLP13CG} corpus, \texttt{Dice Loss} performs well as this corpus as several high and low resource entities (data imbalance). \texttt{Dice Loss} is not able to give its advantages with \texttt{CoNLL 2003} corpus since here all 4 entity types have a comparable and high representation.
     
-    \item From a sequence labeling perspective with \texttt{BIO} tagging scheme, we get $2K + 1$ output entity classes for $K$ entity types. This means \texttt{BioNLP13CG} corpus with $16$ entity types requires $33$ output classes and \texttt{CONLL 2003} with $4$ entities requires $9$ output classes. A \texttt{CRF} primarily captures tag transitions and is found to be helpful when number of output labels is more, i.e. on \texttt{BioNLP13CG} corpus. On \texttt{CONLL 2003} data, it gives comparable performance to the base model.
+    \item From a sequence labeling perspective with \texttt{BIO} tagging scheme, we get $2K + 1$ output entity classes for $K$ entity types. This means \texttt{BioNLP13CG} corpus with $16$ entity types requires $33$ output classes and \texttt{CoNLL 2003} with $4$ entities requires $9$ output classes. A \texttt{CRF} primarily captures tag transitions and is found to be helpful when number of output labels is more, that is, on \texttt{BioNLP13CG} corpus. On \texttt{CoNLL 2003} data, it gives comparable performance to the base model.
 \end{itemize}
 
 \section{Capturing Additional Token Semantics}
@@ -282,7 +284,7 @@ After having run through the three major approaches for NER namely, sequence lab
 Different approaches have their own strengths and weaknesses highlighted later in Section \ref{sec:precision_recall_analysis}. However there are several common errors which can be segregated into three major categories:
 
 \begin{itemize}
-    \item \textbf{Out of Vocabulary Terms}: Both in news articles and research texts, it is common to coin new terms and abbreviations to describe latest events or new concepts. Such terms are pretty much localized to that article and rare otherwise. Additionally scientific texts also have chemical formulas etc. which have numerals etc. encoded within. Semantics of many such terms may not be captured well by generically pretrained BERT models. Although BERT uses sub-word semantics using WordPiece tokenizer but such sub-word combinations may still be rare. Hence we call these \textit{out-of-vocabulary} terms. Table \ref{tab:oov_issue} shows some errors made by our models on \texttt{BioNLP13CG} corpus which fall in this category.
+    \item \textbf{Out of Vocabulary Terms}: Both in news articles and research texts, it is common to coin new terms and abbreviations to describe latest events or new concepts. Such terms are pretty much localized to that article and rare otherwise. Additionally scientific texts also have chemical formulas which have numerals encoded within. Semantics of many such terms may not be captured well by generically pretrained BERT models. Although BERT uses sub-word semantics using WordPiece tokenizer but such sub-word combinations may still be rare. Hence we call these \textit{out-of-vocabulary} terms. Table \ref{tab:oov_issue} shows some errors made by our models on \texttt{BioNLP13CG} corpus which fall in this category.
     
     \begin{table}[h!]
     \centering
@@ -297,7 +299,7 @@ Different approaches have their own strengths and weaknesses highlighted later i
         \label{tab:oov_issue}
     \end{table}
     
-    \item \textbf{Special Symbols}: Several entity mentions have hyphens, periods, parenthesis within them. Pretrained embeddings to not capture their semantics well leading to boundary detection issues. Table \ref{tab:boundary_issue} shows some errors of this type from \texttt{BioNLP13CG} dataset.
+    \item \textbf{Special Symbols}: Several entity mentions have hyphens, periods, parenthesis within them. Pretrained embeddings do not capture their semantics well leading to boundary detection issues. Table \ref{tab:boundary_issue} shows some errors of this type from \texttt{BioNLP13CG} dataset.
     
     \item \textbf{Modifier Suffix/Prefix}: Apart from the root entity required to be extracted the gold labels sometimes expect a modifier term as well which occurs as a prefix/suffix. Missing these leads to boundary detection issues. Table \ref{tab:boundary_issue} lists some error cases of this type from \texttt{BioNLP13CG} corpus.
     
@@ -322,7 +324,7 @@ In general, we conclude that for a gold entity mention $\langle s, e, t \rangle$
 To address the above mentioned issues, we provide additional inputs and infrastructure to the model to learn the underlying semantics better. In these experiments, we develop on top of the sequence labeling setup with \texttt{BIO} tagging scheme.
 
 \begin{itemize}
-    \item \textbf{Special Symbol Features}: Before feeding to final classifier, concatenate BERT hidden layer output with a one-dimensional vector, set if the input token is a pure special symbol. This means we assign $1$ for \textit{hyphen}(\texttt{-}), \textit{parenthesis}(\texttt{(} and \texttt{)}), \textit{comma}(\texttt{,}) etc. and $0$ for \texttt{carbon}, \texttt{123}, \texttt{Ca(2+)}, \texttt{AB-3} etc.
+    \item \textbf{Special Symbol Features}: Before feeding to final classifier, concatenate BERT hidden layer output with a one-dimensional vector, set if the input token is a pure special symbol. This means we assign $1$ for \textit{hyphen}(\texttt{-}), \textit{parenthesis}(\texttt{(} and \texttt{)}), and \textit{comma}(\texttt{,}). Terms like \texttt{carbon}, \texttt{123}, \texttt{Ca(2+)}, and \texttt{AB-3} get assigned $0$.
     
     \item \textbf{Word Type Features}: As an extension to special symbol features, here we associate each input token with a word type (shown in Table \ref{tab:word_type_encoding}) which is converted into a one-hot vector concatenated with BERT output embeddings before feeding to the classifier layer.
     
@@ -344,15 +346,15 @@ To address the above mentioned issues, we provide additional inputs and infrastr
         \label{tab:word_type_encoding}
     \end{table}
     
-    \item \textbf{Character and Pattern Features}: Chemical formulas and scientific terms generally follow a nomenclature convention or pattern. Similarly, out-of-vocabulary terms may have some intrinsic character-level information which is not well captured by the sub-words fed to the BERT model. \cite{boukkouri2020characterbert} study this issue and propose a character-CNN instead of WordPiece tokenizer at the input stage to the BERT model. Motivated by the CNN-LSTM-CRF model and this study, we do the following:
+    \item \textbf{Character and Pattern Features}: Chemical formulas and scientific terms generally follow a nomenclature convention or pattern. Similarly, out-of-vocabulary terms may have some intrinsic character-level information which is not well captured by the sub-words fed to the BERT model. \cite{boukkouri2020characterbert} study this issue and propose a character-CNN instead of WordPiece tokenizer at the input stage to the BERT model. Motivated by the CNN-LSTM-CRF\cite{ma2016end} model and this study, we do the following:
     
     \textbf{Modeling characters}. Each word is passed to BERT and simultaneously to five one-dimensional CNNs with kernel sizes of $1$ to $5$, each having $16$ input and $16$ output channels. Input character is indexed and mapped to a $16$-dimensional embedding. Character-level outputs are max-pooled to get word representation. Outputs from multiple CNNs are concatenated and passed through a linear layer to get overall $768$-dimensional output vector for each token.
     
-    \textbf{Modeling patterns}. Each word is converted to a pattern (a regular expression or a denser space with smaller character set). For example, all uppercase letters are mapped to \texttt{U}, lowercase to \texttt{L}, digits to \texttt{D} etc. These patterns are then fed to a Character-CNN (like the one described above) and then to a bidirectional LSTM to get contextual pattern token embeddings.
+    \textbf{Modeling patterns}. Each word is converted to a pattern (a regular expression or a denser space with smaller character set). For example, all uppercase letters are mapped to \texttt{U}, lowercase to \texttt{L}, and digits to \texttt{D}. These patterns are then fed to a Character-CNN (like the one described above) and then to a bidirectional LSTM to get contextual pattern token embeddings.
     
     Finally, these character and pattern embeddings are concatenated with BERT outputs and fed to final classifier layer.
     
-    \item \textbf{Part-of-Speech and Dependency Parse Features}: Concatenate BERT embeddings with the one-hot part-of-speech and dependency parse features before feeding to final classifier layer. The part-of-speech and dependency parse tags are generated using \texttt{scispacy} for \texttt{BIONLP13CG} and \texttt{JNLPBA} datasets, \texttt{spacy} for \texttt{CONLL 2003} and \texttt{OntoNotes 5.0} datasets.
+    \item \textbf{Part-of-Speech and Dependency Parse Features}: Concatenate BERT embeddings with the one-hot part-of-speech and dependency parse features before feeding to final classifier layer. The part-of-speech and dependency parse tags are generated using \texttt{scispacy} for \texttt{BioNLP13CG} and \texttt{JNLPBA} datasets, \texttt{spacy} for \texttt{CoNLL 2003} and \texttt{OntoNotes 5.0} datasets.
     
     \item \textbf{Head Tokens}: BERT uses WordPiece tokenizer and may break a single input token into multiple sub-words. Instead of doing token classification on each of these sub-words and making sure everything is correct, it is simpler to take the BERT hidden layer output for the first (\textit{head}) sub-word for each token. This technique is also used in the original BERT paper\cite{devlin2018bert} for NER.
     
@@ -362,7 +364,7 @@ To address the above mentioned issues, we provide additional inputs and infrastr
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{CoNLL 2003}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG} & \textbf{CoNLL 2003}\\\hline
 	\texttt{Vanilla BERT} & 85.99 & 91.36\\\hline
 	\texttt{Special Symbol} & 86.63 & 91.67\\\hline
 	\texttt{Word Type} & 86.50 & 91.55\\\hline
@@ -387,11 +389,11 @@ Our results are summarized in Table \ref{tab:res_token_semantics}. We also exper
     
     \item Extending the special symbol features to word types gives mixed signals to the model. \texttt{Word Type} model hence gives the second best performance on both datasets.
     
-    \item \texttt{Character/Patterns} modeling helps in the biomedical text setting since it helps understand semantics of chemical names etc. However, giving importance to intrinsic patterns gives conflicting signals for general English entities and hence gives lower performance on \texttt{CoNLL 2003} data.
+    \item \texttt{Character/Patterns} modeling helps in the biomedical text setting since it helps understand semantics of chemical names. However, giving importance to intrinsic patterns gives conflicting signals for general English entities and hence gives lower performance on \texttt{CoNLL 2003} data.
     
     \item \texttt{Part-of-Speech} and \texttt{Dependency Parse} features give some additional insights to the model over \texttt{Vanilla BERT} and hence give comparable or even better performance. 
     
-    \item Considering only \texttt{Head Tokens} helps over \texttt{Vanilla BERT} on both datasets. \texttt{Special Symbol + Head Tokens} gives the best performance on \texttt{CoNLL 2003} data. On \texttt{BioNLP13CG}, the improvement is reduced compared to \texttt{Special Symbol}. We suspect this is because of the loss of intrinsic sub-word details which can be crucial for biomedical text since they have lots of out-of-vocabulary chemical/gene names etc.
+    \item Considering only \texttt{Head Tokens} helps over \texttt{Vanilla BERT} on both datasets. \texttt{Special Symbol + Head Tokens} gives the best performance on \texttt{CoNLL 2003} data. On \texttt{BioNLP13CG}, the improvement is reduced compared to \texttt{Special Symbol}. We suspect this is because of the loss of intrinsic sub-word details which can be crucial for biomedical text since they have lots of out-of-vocabulary chemical/gene names.
     
     \item \texttt{Highway Net} rightly ignores confusing character-level information for \texttt{CoNLL 2003} data and hence gives a performance boost over \texttt{Character/Patterns}. For the \texttt{BioNLP13CG} data, this additional highway layer is unable to give improvements since it adds undesired complexity to the model.
 \end{itemize}
@@ -400,7 +402,7 @@ Our results are summarized in Table \ref{tab:res_token_semantics}. We also exper
 In section \ref{sec:additional_token_semantics}, we looked at some limitations of the pretrained BERT model in capturing special symbols and rare word semantics. To counteract, we proposed feeding in some additional token semantics. In this section, we study how effectively the model is able to pick cues and learn from the supplied additional features. Our experiments are conducted in sequence labeling setting on \texttt{BioNLP13CG} corpus using \texttt{BIO} tagging scheme.
 
 \subsection{Feeding Answer as Input}
-To study the training effectiveness, we give the model the best ideal-case information, i.e. for each token, we feed its gold label as a one-hot vector. This is concatenated with BERT outputs before feeding to final classifier. We study the following variants:
+To study the training effectiveness, we give the model the best ideal-case information, that is, for each token, we feed its gold label as a one-hot vector. This is concatenated with BERT outputs before feeding to final classifier. We study the following variants:
 
 \begin{itemize}
     \item \texttt{BERT(Freeze) + Answer}: We concatenate BERT outputs with answer vectors and freeze BERT model parameters during training. This effectively reduces the no. of trainable parameters to around $26,000$. We train this in two settings, low learning rate of $10^{-5}$ (recommended BioBERT learning rate\footnote{https://github.com/dmis-lab/biobert\#named-entity-recognition-ner}) and high learning rate of $0.005$.
@@ -413,7 +415,7 @@ To study the training effectiveness, we give the model the best ideal-case infor
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}\hline
-	\textbf{Model} & \textbf{Learning Rate} & \textbf{BIONLP13CG}\\\hline
+	\textbf{Model} & \textbf{Learning Rate} & \textbf{BioNLP13CG}\\\hline
 	\texttt{BERT} & $10^{-5}$ & $85.99$\\\hline
 	\texttt{BERT + Answer} & $10^{-5}$ & $86.35$\\\hline
 	\texttt{BERT(Freeze)} & $0.005$ & $75.42$\\\hline
@@ -447,7 +449,7 @@ From the previous section, we see that model needs training at high learning rat
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}\hline
-	\textbf{Model} & \textbf{Learning Rate} & \textbf{BIONLP13CG}\\\hline
+	\textbf{Model} & \textbf{Learning Rate} & \textbf{BioNLP13CG}\\\hline
 	\texttt{BERT(Freeze)} & $0.005$ & $75.42$\\\hline
 	\texttt{BERT(Freeze) + Gold Span} & $0.005$ & $79.18$\\\hline
 	\texttt{BERT} & $10^{-5}$ & 85.99\\\hline
@@ -471,14 +473,14 @@ From Table \ref{tab:res_training_span_input}, we make the following observations
 \end{itemize}
 
 % \section{Tagging Scheme Variation}
-% As described in Section \ref{sec:tagging_scheme}, in this section, we study how much impact do different output tagging schemes have on boundary detection and learning of the model. We test the \texttt{2-Tag}, \texttt{BIO} and \texttt{BIOE} tagging schemes in question answering setup on \texttt{BIONLP13CG} corpus.
+% As described in Section \ref{sec:tagging_scheme}, in this section, we study how much impact do different output tagging schemes have on boundary detection and learning of the model. We test the \texttt{2-Tag}, \texttt{BIO} and \texttt{BIOE} tagging schemes in question answering setup on \texttt{BioNLP13CG} corpus.
 
-% We omit the experiments with sequence labeling setup since for \texttt{K} output tags, \texttt{2-Tag} scheme gives \texttt{K + 1} output tags (\texttt{+1} for \texttt{O} tag). With \texttt{BIO} scheme, we have \texttt{2K + 1} output tags and with \texttt{BIOE} scheme, we have \texttt{3K + 1} tags. For \texttt{BIONLP13CG} corpus which already has \texttt{K = 16}, the \texttt{BIOE} scheme makes number of output tags as \texttt{49}, which is too large to train well since we don't have enough training data. However, for the question answering setup, the number of output tags remains \texttt{3} for \texttt{2-Tag}, \texttt{4} for \texttt{BIO} and \texttt{5} for \texttt{BIOE} scheme which is manageable.
+% We omit the experiments with sequence labeling setup since for \texttt{K} output tags, \texttt{2-Tag} scheme gives \texttt{K + 1} output tags (\texttt{+1} for \texttt{O} tag). With \texttt{BIO} scheme, we have \texttt{2K + 1} output tags and with \texttt{BIOE} scheme, we have \texttt{3K + 1} tags. For \texttt{BioNLP13CG} corpus which already has \texttt{K = 16}, the \texttt{BIOE} scheme makes number of output tags as \texttt{49}, which is too large to train well since we don't have enough training data. However, for the question answering setup, the number of output tags remains \texttt{3} for \texttt{2-Tag}, \texttt{4} for \texttt{BIO} and \texttt{5} for \texttt{BIOE} scheme which is manageable.
 
 % \begin{table}[h!]
 % \centering
 % \begin{tabular}{|c|c|}\hline
-% 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+% 	\textbf{Model} & \textbf{BioNLP13CG}\\\hline
 % 	\texttt{BERT-QA (2-Tag)} & todo\\\hline
 % 	\texttt{BERT-QA (BIO)} & 86.15\\\hline
 % 	\texttt{BERT-QA (BIOE)} & 86.45\\\hline
@@ -506,7 +508,7 @@ In all the experiments done in this work, pretrained BERT model serves as our mo
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG} & \textbf{JNLPBA}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG} & \textbf{JNLPBA}\\\hline
 	\texttt{BERT-Base-Uncased} & $82.63$ & $73.03$\\\hline
 	\texttt{BioBERT-Base} & $85.99$ & $74.35$\\\hline
 	\texttt{SciBERT-Base-Uncased} & $86.01$ & $74.68$\\\hline
@@ -536,7 +538,7 @@ In Tables \ref{tab:res_pretrained_model_bio} and \ref{tab:res_pretrained_model_g
 
 \section{Partitioning Diverse Entities}
 \label{sec:clustering}
-From the entity distribution in \texttt{BioNLP13CG} dataset (Table \ref{tab:bio_entity_distribution}), we see that \texttt{Cancer}, \texttt{Gene\_or\_gene\_product} etc. are high-resource entity types. They may have high mention diversity and hence it may be difficult for a model to capture all their mention representations. Instead, it may be easier to break a heterogeneous entity class into relatively homogeneous sub-entity classes and work with them. At inference time, remap the sub-entities to the original entity and report F1-scores.
+From the entity distribution in \texttt{BioNLP13CG} dataset (Table \ref{tab:bio_entity_distribution}), we see that entities like \texttt{Cancer} and \texttt{Gene\_or\_gene\_product} are high-resource entity types. They may have high mention diversity and hence it may be difficult for a model to capture all their mention representations. Instead, it may be easier to break a heterogeneous entity class into relatively homogeneous sub-entity classes and work with them. At inference time, remap the sub-entities to the original entity and report F1-scores.
 
 \subsection{Experiment Details}
 We work with \texttt{BioNLP13CG} dataset using question answering setup on only 3 entities, \texttt{Gene\_or\_gene\_product}, \texttt{Cancer} and \texttt{Simple\_chemical}. All other entities are ignored. We partition \texttt{Gene\_or\_gene\_product} (the largest entity class) into $K$ sub-entities ($K$ becomes a hyper-parameter). The procedure is described below:
@@ -560,7 +562,7 @@ We work with \texttt{BioNLP13CG} dataset using question answering setup on only 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}\hline
-	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+	\textbf{Model} & \textbf{BioNLP13CG}\\\hline
 	\texttt{BERT-QA} & 87.97\\\hline
 	\texttt{BERT-QA (With Partitioning)} & 86.66\\\hline
 	\end{tabular}
@@ -578,7 +580,7 @@ From results in Table \ref{tab:res_clustering}, we observe that entity partition
 % \begin{table}[h!]
 % \centering
 % \begin{tabular}{|c|c|}\hline
-% 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+% 	\textbf{Model} & \textbf{BioNLP13CG}\\\hline
 % 	\texttt{Flat Entities} & 86.45\\\hline
 % 	\texttt{Flat + Nested Entities} & 85.90\\\hline
 % 	\end{tabular}
@@ -588,12 +590,12 @@ From results in Table \ref{tab:res_clustering}, we observe that entity partition
 
 % \subsection{Experiment Details and Observations}
 
-% In \texttt{BIONLP13CG} corpus, there are around 1\% nested entity structures. It is not a very significant proportion but still helps us understand how well our model can handle such nested cases. The sequence tagging setup just outputs tags for each token sequentially and hence cannot output multiple tags for the same token. However, in the question answering setup, for each sentence, we ask multiple separate questions enquiring for different entities. Hence, this setup can handle nested entities. For the example mentioned above, we can once ask for \texttt{Organization} in text and get \textit{Goldman Sachs, Bangalore} and then ask for \texttt{Location} and get \textit{Bangalore}. Using this QA setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word, we observe that our model is able to perform comparably well on nested entity extraction as well, as shown in Table \ref{tab:res_nesting}.
+% In \texttt{BioNLP13CG} corpus, there are around 1\% nested entity structures. It is not a very significant proportion but still helps us understand how well our model can handle such nested cases. The sequence tagging setup just outputs tags for each token sequentially and hence cannot output multiple tags for the same token. However, in the question answering setup, for each sentence, we ask multiple separate questions enquiring for different entities. Hence, this setup can handle nested entities. For the example mentioned above, we can once ask for \texttt{Organization} in text and get \textit{Goldman Sachs, Bangalore} and then ask for \texttt{Location} and get \textit{Bangalore}. Using this QA setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word, we observe that our model is able to perform comparably well on nested entity extraction as well, as shown in Table \ref{tab:res_nesting}.
 
 % \section{Multi-Sentence Context}
 % The general NER task setup (as described formally in Section \ref{sec:task_formulation}) is, given a sentence, identify all entity mentions in it. However in most real-world applications we have to extract all entities from a given document. A document can be considered as a collection of inter-connected sentences. If our model works with individual sentences, it may not be able to fully resolve co-references and may find some unknown terms, which were defined in other sentences. This could lead to sub-optimal performance. 
 
-% In benchmark datasets like \texttt{BIONLP13CG} and \texttt{CoNLL 2003}, the document structure is present but not fully used. \texttt{BIONLP13CG} dataset consists of abstracts from biomedical research papers. Individual sentences have been segmented from them to create train/dev/test sets. In \texttt{CoNLL 2003} dataset, there is a special \texttt{--DOCSTART--} token which signifies article boundaries. So, by looking at the neighbor sentences we can stitch the news article together. 
+% In benchmark datasets like \texttt{BioNLP13CG} and \texttt{CoNLL 2003}, the document structure is present but not fully used. \texttt{BioNLP13CG} dataset consists of abstracts from biomedical research papers. Individual sentences have been segmented from them to create train/dev/test sets. In \texttt{CoNLL 2003} dataset, there is a special \texttt{--DOCSTART--} token which signifies article boundaries. So, by looking at the neighbor sentences we can stitch the news article together. 
 
 % Recently, it has become popular to utilize document context with individual sentences for NER\cite{devlin2018bert, yamada2020luke}. \cite{luoma2020exploring} show the effectiveness of a majority voting scheme taking a window of neighboring sentences around the target sentence and achieve better performance on \texttt{CoNLL 2003} NER dataset. 
 
@@ -603,7 +605,7 @@ From results in Table \ref{tab:res_clustering}, we observe that entity partition
 % \begin{table}[h!]
 % \centering
 % \begin{tabular}{|c|c|c|}\hline
-% 	\textbf{} & \textbf{BIONLP13CG} & \textbf{BIONLP13CG-Context}\\\hline
+% 	\textbf{} & \textbf{BioNLP13CG} & \textbf{BioNLP13CG-Context}\\\hline
 % 	\texttt{Train (\# Sentences)} & 3033 & 397\\\hline
 % 	\texttt{Dev (\# Sentences)} & 1003 & 122\\\hline
 % 	\texttt{Test (\# Sentences)} & 1906 & 249\\\hline
@@ -616,7 +618,7 @@ From results in Table \ref{tab:res_clustering}, we observe that entity partition
 % \begin{table}[h!]
 % \centering
 % \begin{tabular}{|c|c|}\hline
-% 	\textbf{Model} & \textbf{BIONLP13CG}\\\hline
+% 	\textbf{Model} & \textbf{BioNLP13CG}\\\hline
 % 	\texttt{Normal Dataset} & 86.45\\\hline
 % 	\texttt{Multi-Sentence Context Dataset} & 85.90\\\hline
 % 	\end{tabular}
@@ -637,7 +639,7 @@ In this section, we take some major models described in the previous sections an
     
     \item \texttt{Dice Loss}: Same as \texttt{BERT} model using dice loss instead of standard cross-entropy loss.
     
-    \item \texttt{Special Symbol}: Same as \texttt{BERT} model with additional one-hot input feature to capture if the token is a special symbol like \textit{hyphen}, \textit{parenthesis} etc.
+    \item \texttt{Special Symbol}: Same as \texttt{BERT} model with additional one-hot input feature to capture if the token is a special symbol like \textit{hyphen}, \textit{comma}, or \textit{parenthesis}.
     
     \item \texttt{BERT-QA}: Represents question answering NER setup with \texttt{BIOE} tagging scheme and \textit{What} as the question word.
     
@@ -649,7 +651,7 @@ In this section, we take some major models described in the previous sections an
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
-     & \multicolumn{3}{c|}{\textbf{BIONLP13CG}} & \multicolumn{3}{c|}{\textbf{CoNLL 2003}} & \multicolumn{3}{c|}{\textbf{JNLPBA}}\\\hline
+     & \multicolumn{3}{c|}{\textbf{BioNLP13CG}} & \multicolumn{3}{c|}{\textbf{CoNLL 2003}} & \multicolumn{3}{c|}{\textbf{JNLPBA}}\\\hline
 	 & P & R & F1 & P & R & F1 & P & R & F1\\\hline
 	\texttt{BERT} & 86.17 & 85.82 & 85.99 & 91.24 & 91.48 & 91.36 & 70.97 & 78.07 & 74.35\\\hline
 	\texttt{Dice Loss} & 86.68 & \textbf{86.03} & 86.35 & 91.05 & 90.47 & 90.76 & \textbf{72.05} & 78.23 & \textbf{75.01}\\\hline
@@ -675,7 +677,7 @@ From the results summarized in Table \ref{tab:res_precision_recall}, we make the
     
     \item Span-based technique is generally found to give the best recall values. This can be attributed to the entity-agnostic span detector which identifies all candidate entity spans irrespective of their type.
     
-    \item The recall of span detector is inversely proportional to number of output entity types. With more entity types, the heterogeneity increases making span detector error-prone. This is the reason for low recall on \texttt{BIONLP13CG} corpus with $16$ entity types compared to \texttt{CoNLL 2003} and \texttt{JNLPBA} datasets with $4$ and $5$ types respectively.
+    \item The recall of span detector is inversely proportional to number of output entity types. With more entity types, the heterogeneity increases making span detector error-prone. This is the reason for low recall on \texttt{BioNLP13CG} corpus with $16$ entity types compared to \texttt{CoNLL 2003} and \texttt{JNLPBA} datasets with $4$ and $5$ types respectively.
     
     \item Due to its large advantage in precision, the \texttt{BERT-QA(Where)} model gives the best performance among the compared models.
 \end{itemize}
@@ -689,7 +691,7 @@ We present the comparison among the following models:
 \begin{itemize}
     \item \texttt{Dice Loss}: Sequence labeling NER approach over BERT model with \texttt{BIO} tagging scheme and dice loss instead of cross entropy.
     
-    \item \texttt{Special Symbol}: Sequence labeling NER approach over BERT with \texttt{BIO} tagging scheme and additional one-hot input feature to capture if a token is a special symbol like \textit{hyphen}, \textit{parenthesis} etc.
+    \item \texttt{Special Symbol}: Sequence labeling NER approach over BERT with \texttt{BIO} tagging scheme and additional one-hot input feature to capture if a token is a special symbol like \textit{hyphen}, or \textit{parenthesis}.
     
     \item \texttt{BERT-QA (Where)}: Question answering NER approach with \texttt{BIOE} tagging scheme and \textit{Where} as the question word.
     

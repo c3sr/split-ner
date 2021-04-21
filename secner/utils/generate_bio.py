@@ -1,10 +1,10 @@
 import argparse
 import os
 import re
-
 import spacy
-from secner.utils.general import Token, Sentence
 from spacy.tokens import Doc
+
+from secner.utils.general import Token, Sentence
 
 nlp = spacy.load("en_core_sci_sm")
 tokenizer_map = dict()

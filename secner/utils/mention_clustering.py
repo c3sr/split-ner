@@ -1,12 +1,11 @@
 import argparse
-import os
-import pickle
-from collections import defaultdict
-
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import pickle
 import seaborn as sns
 import torch
+from collections import defaultdict
 from numpy.random import default_rng
 from pyclustering.cluster.kmedoids import kmedoids
 from scipy.spatial import distance

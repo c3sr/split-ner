@@ -1,9 +1,8 @@
 import os
 import re
 from pathlib import Path
-from typing import List
-
 from transformers.trainer import Trainer, PREFIX_CHECKPOINT_DIR
+from typing import List
 
 
 class NerTrainer(Trainer):

@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
 from transformers import BertConfig
 from transformers.models.bert import BertPreTrainedModel
+
+from secner.additional_args import AdditionalArguments
+from secner.dataset import NerDataset
 
 
 class NerModelChar(BertPreTrainedModel):
