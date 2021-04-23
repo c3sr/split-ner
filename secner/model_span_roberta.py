@@ -14,7 +14,7 @@ class NerSpanRobertaModel(RobertaPreTrainedModel):
         self.num_labels = config.num_labels
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
 
-        self.roberta = RobertaModel(config, add_pooling_layer=False)
+        self.roberta = RobertaModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         classifier_inp_dim = self.roberta.config.hidden_size
 
