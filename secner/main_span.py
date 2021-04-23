@@ -1,7 +1,8 @@
 import argparse
 import logging
-import numpy as np
 import os
+
+import numpy as np
 from transformers import AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser
 from transformers.trainer import TrainingArguments
@@ -10,6 +11,7 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset_span import NerSpanDataCollator, NerSpanDataset, NerInferSpanDataset
 from secner.evaluator_span import EvaluatorSpan
 from secner.model_span import NerSpanModel
+from secner.model_span_roberta import NerSpanRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -99,8 +101,8 @@ class NerSpanExecutor:
     def get_model_class(self):
         if self.additional_args.model_mode == "std":
             return NerSpanModel
-        # TODO: Need to create a separate class with RoBERTa base class for spans, if required
-        # if self.additional_args.model_mode == "roberta_std":
+        if self.additional_args.model_mode == "roberta_std":
+            return NerSpanRobertaModel
         raise NotImplementedError
 
     def run(self):
