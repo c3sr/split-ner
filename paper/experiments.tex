@@ -1,0 +1,16 @@
+\subsection{Observations}
+Table \ref{tab:res_span} reports the results of the pipelined span detection and classification procedure and compares it with simple BERT QA setup. We present this comparison since QA model serves as the primary backbone of our span-based approach. All models here use \texttt{BIOE} tagging scheme and use \textit{What} as the question word in question formulation.
+
+\begin{itemize}
+    \item \textbf{Span Detection}: Detecting all mention spans together without classification is a simpler problem for the model than full NER and we get better performance on this sub-task compared to complete NER task in QA setup.
+    
+    \item \textbf{Span Classification}: Given that spans are pre-identified, classifying them to an entity type is a relatively simple task for the BERT model. On all datasets, we see around $95\%$ Micro-F1 on test set.
+    
+    \item \textbf{Pipeline}: The pipelined procedure gives comparable and even better performance than standard QA NER model on all datasets demonstrating the effectiveness of this division of labor. 
+    
+    \item Since out \texttt{Pipeline} results are comparable to \texttt{BERT-QA} model, we conclude that internally \texttt{BERT-QA} model also tries to logically segregate boundary detection and classification as separate tasks.
+    
+    \item The results of span pipeline are limited by the performance of the span detector part. Since this procedure is pipelined, errors in this first step propagate to the next step. Boundary detection serves as the primary challenge in Span Detector and has a large scope for improvement on biomedical datasets.
+    
+    \item Qualitative analysis reveals that both \texttt{BERT-QA} and \texttt{Span Detector} share very similar boundary detection issues.
+\end{itemize}
