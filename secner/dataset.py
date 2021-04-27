@@ -1,8 +1,9 @@
 import argparse
 import logging
 import re
-import torch
 from collections import defaultdict
+
+import torch
 from dataclasses import dataclass
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
@@ -10,8 +11,9 @@ from transformers import HfArgumentParser, AutoTokenizer
 from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 
-logging.basicConfig(filename='dataset.log',  level=logging.INFO)
+logging.basicConfig(filename='dataset.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class NerDataset(Dataset):
 
@@ -235,7 +237,6 @@ class NerDataset(Dataset):
         # for tokens with digits/punctuations
         return NerDataset.make_pattern_type2(text)
 
-
     @staticmethod
     def get_word_type(text):
         if text == "[CLS]":
@@ -312,8 +313,8 @@ class NerDataset(Dataset):
                                      token=Token(sep_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                                      is_head=True)
         return start_token, first_sep_token, second_sep_token
-    
-    #YJ : updated to support BIOES tagging scheme
+
+    # YJ : updated to support BIOES tagging scheme
     def process_sentence(self, index):
         sentence = self.sentences[index]
         sentence.bert_tokens = [self.bert_start_token]
@@ -322,7 +323,7 @@ class NerDataset(Dataset):
             token_tag = token.tags[0]
 
             for i in range(len(out["input_ids"])):
-                if  token_tag == "O" or token_tag.startswith("I-"):
+                if token_tag == "O" or token_tag.startswith("I-"):
                     tag = token_tag
                 elif i == 0 and (token_tag.startswith("B-") or token_tag.startswith("S-")):
                     tag = token_tag
@@ -332,7 +333,7 @@ class NerDataset(Dataset):
                     tag = "I-" + token_tag[2:]
 
                 # Handle 'BO' tagging scheme
-                #if self.args.tagging == "bo" and tag[:2] == "I-":
+                # if self.args.tagging == "bo" and tag[:2] == "I-":
                 if self.args.tagging == "bo" and (not tag == "O"):
                     tag = "B-" + tag[2:]
 
@@ -403,13 +404,12 @@ class NerDataset(Dataset):
         if punctuation_type == "type2":
             punctuation_vocab = list(".,-/()")
             if word in punctuation_vocab:
-                return punctuation_vocab.index(word)+1
+                return punctuation_vocab.index(word) + 1
             if word in all_punctuations:
                 # catch all other punctuations (P)
-                return len(punctuation_vocab)+1
-            return len(punctuation_vocab)+2
+                return len(punctuation_vocab) + 1
+            return len(punctuation_vocab) + 2
         raise NotImplementedError
-
 
     @staticmethod
     def get_char_vocab():
@@ -471,11 +471,11 @@ class NerDataCollator:
         max_len = max(len(entry["labels"]) for entry in features)
         # max_len = self.args.max_seq_len
         batch = dict()
-                
+
         # input_ids
         # does the BERT's input_id start from 101? 101 is for CLS and 201 is SEP.
         if "input_ids" in features[0]:
-            entry = [] 
+            entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["input_ids"])
                 entry.append(torch.tensor(features[i]["input_ids"] + [self.tokenizer.pad_token_id] * pad_len))
@@ -566,7 +566,7 @@ class NerDataCollator:
                 pad_len = max_len - len(features[i][self.args.token_type])
                 # padding tokens get word_type 0, all others get valid word_type indices (1 onwards)
                 entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w)) + 1
-                                           for w in features[i][self.args.token_type]] + [0] * pad_len ))
+                                           for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["word_type_ids"] = torch.stack(entry)
 
         # head_mask
@@ -597,11 +597,7 @@ class NerDataCollator:
         # labels
         entry = []
         for i in range(len(features)):
-            if self.args.use_head_mask:
-                labels_mod = [features[i]["labels"][j] for j in range(len(features[i]["labels"])) if
-                              features[i]["head_mask"][j]]
-            else:
-                labels_mod = features[i]["labels"]
+            labels_mod = features[i]["labels"]
             pad_len = max_len - len(labels_mod)
             entry.append(torch.tensor(labels_mod + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)

@@ -217,7 +217,10 @@ class NerQADataset(Dataset):
                 new_tag = self.args.none_tag
             out = self.tokenize_with_cache(tok.text)
             for i in range(len(out["input_ids"])):
-                bert_tag = new_tag if i == 0 or new_tag != "B" else "I"
+                if self.args.use_head_mask:
+                    bert_tag = new_tag
+                else:
+                    bert_tag = new_tag if i == 0 or new_tag != "B" else "I"
                 bert_token = Token(tok.text, [bert_tag], tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
                 tup = out["offset_mapping"][i]
                 sub_text = tok.text[tup[0]:tup[1]]
@@ -228,7 +231,8 @@ class NerQADataset(Dataset):
             # BO tagging scheme
             for i in range(len(bert_sent_tokens)):
                 if bert_sent_tokens[i].token.tags[0] == "I":
-                    bert_sent_tokens[i].token.tags[0] = "B"
+                    if not self.args.use_head_mask or bert_sent_tokens[i].is_head:
+                        bert_sent_tokens[i].token.tags[0] = "B"
 
         elif self.args.num_labels > 3:
             # BIOE tagging scheme
@@ -236,17 +240,38 @@ class NerQADataset(Dataset):
             for i in range(len(bert_sent_tokens) - 1, 0, -1):
                 if bert_sent_tokens[i].token.tags[0] == "I":
                     if is_end_token:
-                        bert_sent_tokens[i].token.tags[0] = "E"
-                        is_end_token = False
+                        if not self.args.use_head_mask or bert_sent_tokens[i].is_head:
+                            bert_sent_tokens[i].token.tags[0] = "E"
+                            is_end_token = False
                 else:
                     is_end_token = True
 
             if self.args.num_labels == 5:
                 # BIOES tagging scheme
-                for i in range(len(bert_sent_tokens)):
-                    if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
-                            bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
-                        bert_sent_tokens[i].token.tags[0] = "S"
+                if self.args.use_head_mask:
+                    mention_length = 0
+                    mention_index = -1
+                    for i in range(len(bert_sent_tokens)):
+                        if not bert_sent_tokens[i].is_head:
+                            continue
+                        if bert_sent_tokens[i].token.tags[0] == "B":
+                            if mention_length == 1:
+                                bert_sent_tokens[mention_index].token.tags[0] = "S"
+                            mention_length = 1
+                            mention_index = i
+                        elif bert_sent_tokens[i].token.tags[0] in ["I", "E"]:
+                            mention_length += 1
+                        elif mention_length == 1:
+                            bert_sent_tokens[mention_index].token.tags[0] = "S"
+                            mention_length = 0
+                            mention_index = -1
+                    if mention_length == 1:
+                        bert_sent_tokens[mention_index].token.tags[0] = "S"
+                else:
+                    for i in range(len(bert_sent_tokens)):
+                        if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
+                                bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
+                            bert_sent_tokens[i].token.tags[0] = "S"
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)
@@ -301,7 +326,8 @@ class NerQADataset(Dataset):
             # BO tagging scheme
             for i in range(len(bert_sent_tokens)):
                 if bert_sent_tokens[i].token.tags[0] == "I":
-                    bert_sent_tokens[i].token.tags[0] = "B"
+                    if not self.args.use_head_mask or bert_sent_tokens[i].is_head:
+                        bert_sent_tokens[i].token.tags[0] = "B"
 
         elif self.args.num_labels > 3:
             # BIOE tagging scheme
@@ -309,17 +335,38 @@ class NerQADataset(Dataset):
             for i in range(len(bert_sent_tokens) - 1, 0, -1):
                 if bert_sent_tokens[i].token.tags[0] == "I":
                     if is_end_token:
-                        bert_sent_tokens[i].token.tags[0] = "E"
-                        is_end_token = False
+                        if not self.args.use_head_mask or bert_sent_tokens[i].is_head:
+                            bert_sent_tokens[i].token.tags[0] = "E"
+                            is_end_token = False
                 else:
                     is_end_token = True
 
             if self.args.num_labels == 5:
                 # BIOES tagging scheme
-                for i in range(len(bert_sent_tokens)):
-                    if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
-                            bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
-                        bert_sent_tokens[i].token.tags[0] = "S"
+                if self.args.use_head_mask:
+                    mention_length = 0
+                    mention_index = -1
+                    for i in range(len(bert_sent_tokens)):
+                        if not bert_sent_tokens[i].is_head:
+                            continue
+                        if bert_sent_tokens[i].token.tags[0] == "B":
+                            if mention_length == 1:
+                                bert_sent_tokens[mention_index].token.tags[0] = "S"
+                            mention_length = 1
+                            mention_index = i
+                        elif bert_sent_tokens[i].token.tags[0] in ["I", "E"]:
+                            mention_length += 1
+                        elif mention_length == 1:
+                            bert_sent_tokens[mention_index].token.tags[0] = "S"
+                            mention_length = 0
+                            mention_index = -1
+                    if mention_length == 1:
+                        bert_sent_tokens[mention_index].token.tags[0] = "S"
+                else:
+                    for i in range(len(bert_sent_tokens)):
+                        if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
+                                bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
+                            bert_sent_tokens[i].token.tags[0] = "S"
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)
