@@ -230,7 +230,7 @@ class NerQADataset(Dataset):
                 if bert_sent_tokens[i].token.tags[0] == "I":
                     bert_sent_tokens[i].token.tags[0] = "B"
 
-        elif self.args.num_labels == 4:
+        elif self.args.num_labels > 3:
             # BIOE tagging scheme
             is_end_token = False
             for i in range(len(bert_sent_tokens) - 1, 0, -1):
@@ -240,6 +240,13 @@ class NerQADataset(Dataset):
                         is_end_token = False
                 else:
                     is_end_token = True
+
+            if self.args.num_labels == 5:
+                # BIOES tagging scheme
+                for i in range(len(bert_sent_tokens)):
+                    if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
+                            bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
+                        bert_sent_tokens[i].token.tags[0] = "S"
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)
@@ -296,7 +303,7 @@ class NerQADataset(Dataset):
                 if bert_sent_tokens[i].token.tags[0] == "I":
                     bert_sent_tokens[i].token.tags[0] = "B"
 
-        elif self.args.num_labels == 4:
+        elif self.args.num_labels > 3:
             # BIOE tagging scheme
             is_end_token = False
             for i in range(len(bert_sent_tokens) - 1, 0, -1):
@@ -306,6 +313,13 @@ class NerQADataset(Dataset):
                         is_end_token = False
                 else:
                     is_end_token = True
+
+            if self.args.num_labels == 5:
+                # BIOES tagging scheme
+                for i in range(len(bert_sent_tokens)):
+                    if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
+                            bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
+                        bert_sent_tokens[i].token.tags[0] = "S"
 
         bert_tokens = [self.bert_start_token]
         bert_tokens.extend(bert_query_tokens)

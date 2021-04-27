@@ -1,9 +1,10 @@
-import dataclasses
 import json
 import os
-from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
+
+import dataclasses
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -11,7 +12,7 @@ class AdditionalArguments:
     model_name: str = field(default="ner-bert", metadata={"help": "model identifier"})
     resume: Optional[str] = field(default=None, metadata={"help": "checkpoint to resume. Starts from scratch, if None"})
     dataset_dir: str = field(default="bio", metadata={"help": "dataset dir relative to data root dir"})
-    num_labels: int = field(default=4, metadata={"help": "# output labels in QA setup: 2(BO), 3(BIO), 4(BIOE)"})
+    num_labels: int = field(default=4, metadata={"help": "# output labels in QA setup: 2(BO)|3(BIO)|4(BIOE)|5(BIOES)"})
     tagging: str = field(default="bio", metadata={"help": "tagging scheme (bo|bio). Not used in QA currently"})
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
