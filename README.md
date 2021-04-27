@@ -141,6 +141,8 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector            | 89.808                                                  | 90.6365                   | 89.6091                   | 90.1198                    |
 | Span Detector-QType2     | 90.252                                                  | 90.6150                   | 90.3648                   | 90.4897                    |
 | Span Detector-SciBERT-QType2| 90.147                                               | 90.9988                   | 89.7689                   | 90.3797                    |
+| Span Detector-SciBERT-QType3| need to note                                         | 90.4048                   | 90.2340                   | 90.3193                    |
+| Span Detector-SciBERT-QType4| need to note                                         | 91.4084                   | 90.4520                   | 90.9277                    |
 | Span Detector-SciBERT-Cased-QType2| 89.626                                         | 88.9157                   | 90.9316                   | 89.9123                    |
 | Span Detector-SciBERT    | 90.441                                                  | 90.3114                   | 91.0333                   | 90.6709                    |
 | Span Classifier          | 94.056                                                  | 94.0561                   | 94.0561                   | 94.0561                    |
