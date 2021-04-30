@@ -33,6 +33,8 @@
 % and will typically save some space.
 \usepackage{microtype}
 
+
+\newcommand{\comment}[1]{{\color{red} #1}}
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -61,7 +63,7 @@
   Affiliation / Address line 1 \\
   Affiliation / Address line 2 \\
   Affiliation / Address line 3 \\
-  \texttt{email@domain} \\\And
+  \texttt{email@domain} \\\Andj
   Second Author \\
   Affiliation / Address line 1 \\
   Affiliation / Address line 2 \\
@@ -79,13 +81,21 @@
 \label{sec:intro}
 \input{intro}
 
-\section{Span Detection}
+\section{Pipelined NER}
+\label{sec:method}
+\input{method.tex}
+
+\subsection{Span Detection}
 \label{sec:span}
 \input{span}
 
-\section{Span Classification}
+\subsection{Span Classification}
 \label{sec:class}
 \input{classification}
+
+\subsection{Learning Objective Function}
+\label{sec:loss}
+\input{loss}
 
 \section{Experimental Results}
 \label{sec:exp}
@@ -93,7 +103,7 @@
 
 \section{Related Work}
 \label{sec:related}
-\input{related}
+\input{related_work}
 
 \section{Conclusion}
 \input{conclusion}

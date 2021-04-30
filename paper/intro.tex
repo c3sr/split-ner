@@ -1,2 +1,12 @@
+\comment{
+1. first paragraph: (1) a couple of sentneces  for NER 
+    and current state of the art; (2)short description on the problem 
+    we try to address in this paper (NER for low resource types)
+2. a paragraph about our approach: pipeline of span detection and
+    classification. convince the readers
+3. a short summary on the novelities of the approach and the result
+}
+
 Previous approaches like sequence labeling and question answering (QA) treat the NER problem as a whole. One single model must take a sentence as input and return mention tuples with correct boundaries and correct entity type. Another possibility is to have a division of labor. We break down the NER problem into a two-step pipelined process. In the first step (\textbf{Span Detector}), we detect all mention spans in a given sentence. In the next step (\textbf{Span Classifier}), we classify these spans into their corresponding entity type. Now, we can train two separate models independently which specialize in their own sub-tasks and together solve the NER problem. We borrow the basic intuitions of QA model to solve both our sub-tasks.
 
+Both the models can be trained independently. The pipeline structure comes during the inference time. Here, every unlabeled sentence is first passed through Span Detector and for each output span, we convert to an input sample for Span Classifier.
