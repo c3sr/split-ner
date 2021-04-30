@@ -387,9 +387,9 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
-    ap.add_argument("--dataset", type=str, default="jnlpba")
-    ap.add_argument("--model", type=str, default="ner-biobert-spanclass")
-    ap.add_argument("--file", type=str, default="infer", help="which file to evaluate (train|dev|test|infer)")
+    ap.add_argument("--dataset", type=str, default="bio")
+    ap.add_argument("--model", type=str, default="ner-biobert-qa4")
+    ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
     ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
     ap.add_argument("--span_based", dest="span_based", action="store_true", help="set this flag if using span detector")
     ap = ap.parse_args()

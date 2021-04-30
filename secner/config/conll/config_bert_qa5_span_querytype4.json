@@ -1,5 +1,5 @@
 {
-  "model_name": "ner-scibert-qa5-span-querytype4",
+  "model_name": "ner-bert-qa5-span-querytype4",
   "dataset_dir": "conll",
   "num_labels": 5,
   "do_train": true,
