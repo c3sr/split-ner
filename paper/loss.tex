@@ -1,0 +1,34 @@
+As detailed earlier, Cross Entropy is an accuracy-oriented objective while during evaluation, we calculate the F1-Score. This difference can lead to sub-optimal model training. To counteract, \cite{li2019dice} make use of S{\o}rensen-Dice coefficient(DSC)\cite{sorensen1948method, dice1945measures} and Tversky index\cite{tversky1977features} which are F-Score oriented statistics. Given sets $A$ and $B$, DSC is used to gauge similarity among two sets and is defined as,
+\begin{equation}
+\label{eq:dsc_set}
+    DSC(A, B) = \frac{2\ \vert A \cap B \vert}{\vert A \vert + \vert B \vert}
+\end{equation}
+Consider $A$ as set of all positive samples predicted by a model and $B$ as set of all ground truth positives. Then, by definition of true positive ($TP$), false positive ($FP$) and false negative ($FN$) from Section \ref{sec:evaluation_metrics}, we have,
+\begin{equation}
+\label{eq:dsc_tp}
+    TP = \vert A \cap B \vert
+\end{equation}
+\begin{equation}
+\label{eq:dsc_a}
+    \vert A \vert = TP + FP
+\end{equation}'
+\begin{equation}
+\label{eq:dsc_b}
+    \vert B \vert = TP + FN
+\end{equation}
+Using Equations \ref{eq:dsc_tp}, \ref{eq:dsc_a} and \ref{eq:dsc_b}, in Equation \ref{eq:dsc_set}, we get,
+\begin{equation}
+\label{eq:dsc_as_f1}
+     DSC(A, B) = \frac{2TP}{2TP + FP + FN} = \frac{2\ \frac{TP}{TP + FN}\ \frac{TP}{TP + FP}}{\frac{TP}{TP + FN} + \frac{TP}{TP + FP}} = \frac{2\ Precision \times Recall}{Precision + Recall} = F1
+\end{equation}
+
+The dice coefficient gives equal importance to false-positives and false-negatives at training time and is more immune to data-imbalance issues\cite{sudre2017generalised, shen2018influence, kodym2018segmentation}. The above formulation (Equation \ref{eq:dsc_as_f1}) shows its equivalence to F1-score thus removing the discrepancy among training and evaluation metrics. From Equation \ref{eq:dsc_set}, for an individual sample $x_i$, dice coefficient is defined as,
+\begin{equation}
+\label{eq:dsc_per_sample}
+    DSC(x_i) = \frac{2p_{i1}y_{i1} + \gamma}{p_{i1} + y_{i1} + \gamma}
+\end{equation}
+where $\gamma$ is the smoothing parameter. Then over all samples, from Equation \ref{eq:dsc_per_sample}, dice loss (DL) is defined in Equation \ref{eq:dice_loss} as:
+\begin{equation}
+\label{eq:dice_loss}
+    DL = 1 - \frac{2\sum_i{p_{i1}y_{i1}} + \gamma}{\sum_i{p_{i1}} + \sum_i{y_{i1}} + \gamma}
+\end{equation}
