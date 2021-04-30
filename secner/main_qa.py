@@ -1,7 +1,8 @@
 import argparse
 import logging
-import numpy as np
 import os
+
+import numpy as np
 from transformers import AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser
 from transformers.trainer import TrainingArguments
@@ -35,7 +36,7 @@ class NerQAExecutor:
         self.dev_dataset = NerQADataset(additional_args, "dev")
         self.test_dataset = NerQADataset(additional_args, "test")
 
-        # num_labels = 3 (for BIO tagging scheme), num_labels = 4 (for BIOE tagging scheme)
+        # num_labels = 3 (for BIO tagging scheme), num_labels = 4 (for BIOE tagging scheme) etc.
         self.num_labels = self.additional_args.num_labels
 
         model_path = additional_args.resume if additional_args.resume else additional_args.base_model

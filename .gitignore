@@ -5,3 +5,11 @@ data/bio_context/raw
 *.egg-info/
 **/__pycache__/
 .idea/
+.DS_Store
+.project
+.pydevproject
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.pdf
+paper/*.gz

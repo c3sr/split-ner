@@ -131,42 +131,54 @@ class NerModel(BertPreTrainedModel):
         attention_mask = self.compress_with_head_mask(head_mask, attention_mask, 0)
 
         if self.additional_args.punctuation_handling == "type1":
+            punctuation_vec = self.compress_with_head_mask(head_mask, punctuation_vec, 0)
             sequence_output = torch.cat([sequence_output, punctuation_vec.unsqueeze(-1)], dim=2)
         elif self.additional_args.punctuation_handling == "type1-and":
+            punctuation_vec = self.compress_with_head_mask(head_mask, punctuation_vec, -1)
             vec = NerModel.expand_punctuation_vec(punctuation_vec)
             sequence_output = torch.cat([sequence_output, vec], dim=2)
         elif self.additional_args.punctuation_handling == "type2":
+            punctuation_vec = self.compress_with_head_mask(head_mask, punctuation_vec, 0)
             punctuation_one_hot_vec = torch.eye(self.punctuation_vocab_size)[punctuation_vec].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, punctuation_one_hot_vec], dim=2)
 
         if self.additional_args.word_type_handling == "1hot":
+            word_type_ids = self.compress_with_head_mask(head_mask, word_type_ids, 0)
             word_type_vec = torch.eye(self.num_word_types)[word_type_ids].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, word_type_vec], dim=2)
 
         if self.additional_args.use_pos_tag:
+            pos_tag = self.compress_with_head_mask(head_mask, pos_tag, 0)
             pos_tag_vec = torch.eye(self.num_pos_tags)[pos_tag].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
 
         if self.additional_args.use_dep_tag:
+            dep_tag = self.compress_with_head_mask(head_mask, dep_tag, 0)
             dep_tag_vec = torch.eye(self.num_dep_tags)[dep_tag].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, dep_tag_vec], dim=2)
 
         if self.additional_args.gold_span_inp == "simple":
-            sequence_output = torch.cat([sequence_output, gold_span_inp.unsqueeze(-1)], dim=2)
+            gold_span_inp = self.compress_with_head_mask(head_mask, gold_span_inp, 0)
+            vec = gold_span_inp.unsqueeze(-1)
+            sequence_output = torch.cat([sequence_output, vec], dim=2)
 
         elif self.additional_args.gold_span_inp == "label":
+            gold_span_inp = self.compress_with_head_mask(head_mask, gold_span_inp, 0)
             span_vec = torch.eye(self.num_labels)[gold_span_inp].to(sequence_output.device)
             sequence_output = torch.cat([sequence_output, span_vec], dim=2)
 
         if self.additional_args.use_char_cnn in ["char", "both"]:
+            char_ids = self.compress_with_head_mask(head_mask, char_ids, 0)
             char_vec = self.char_cnn(char_ids)
             sequence_output = torch.cat([sequence_output, char_vec], dim=2)
 
         if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
+            # TODO: Handle head mask, if required
             flair_vec = self.flair_cnn(flair_ids, flair_attention_mask, flair_boundary)
             sequence_output = torch.cat([sequence_output, flair_vec], dim=2)
 
         if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
+            pattern_ids = self.compress_with_head_mask(head_mask, pattern_ids, 0)
             pattern_vec = self.pattern_cnn(pattern_ids)
             lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
             packed_inp = nn.utils.rnn.pack_padded_sequence(input=pattern_vec,
@@ -209,6 +221,7 @@ class NerModel(BertPreTrainedModel):
         outputs = (predictions,) + outputs[2:]  # add hidden states and attention if they are here
 
         if labels is not None:
+            labels = self.compress_with_head_mask(head_mask, labels, self.ignore_label)
             # Only keep active parts of the loss
             if attention_mask is not None:
                 active_loss = attention_mask.view(-1).eq(1)

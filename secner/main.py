@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+
 import numpy as np
 from transformers import AutoConfig, AutoTokenizer
 from transformers import HfArgumentParser
@@ -59,7 +60,7 @@ class NerExecutor:
 
     def compute_metrics(self, eval_prediction):
         evaluator = Evaluator(gold=eval_prediction.label_ids, predicted=eval_prediction.predictions,
-                              tags=self.dev_dataset.tag_vocab)
+                              tags=self.dev_dataset.tag_vocab, tagging_scheme=self.additional_args.tagging)
         logger.info("entity metrics:\n{0}".format(evaluator.entity_metric.report()))
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 

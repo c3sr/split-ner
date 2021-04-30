@@ -41,6 +41,7 @@ class EvaluatorQA:
         b_tag_index = NerQADataset.get_tag_index("B", none_tag=self.none_tag)
         i_tag_index = NerQADataset.get_tag_index("I", none_tag=self.none_tag)
         e_tag_index = NerQADataset.get_tag_index("E", none_tag=self.none_tag)
+        s_tag_index = NerQADataset.get_tag_index("S", none_tag=self.none_tag)
         for context_index in range(len(batch)):
             context_spans = []
             prev_span = None
@@ -53,6 +54,11 @@ class EvaluatorQA:
                     curr_span = Span(context_index, tok_index, tok_index, tag)
                     context_spans.append(curr_span)
                     prev_span = curr_span
+                elif batch[context_index][tok_index] == s_tag_index:
+                    tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
+                    curr_span = Span(context_index, tok_index, tok_index, tag)
+                    context_spans.append(curr_span)
+                    prev_span = None
                 elif prev_span and batch[context_index][tok_index] == i_tag_index:
                     tag = self.dataset.contexts[context_index].entity if self.dataset else "TAG"
                     if tag == prev_span.tag:

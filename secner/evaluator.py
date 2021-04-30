@@ -1,16 +1,20 @@
-import numpy as np
 from collections import defaultdict
+
+import numpy as np
 
 
 class Evaluator:
 
-    def __init__(self, gold, predicted, tags):
+    def __init__(self, gold, predicted, tags, tagging_scheme="bio"):
         self.gold = gold.tolist() if isinstance(gold, np.ndarray) else gold
         self.predicted = predicted.tolist() if isinstance(predicted, np.ndarray) else predicted
         self.tags = tags
-        self.b_to_i = self.generate_bi_tag_mapping()
+        self.tagging_scheme = tagging_scheme
+        self.b_to_i, self.b_to_e = self.generate_bie_tag_mapping()
         self.i_to_b = {v: k for k, v in self.b_to_i.items()}
+        self.e_to_b = {v: k for k, v in self.b_to_e.items()}
         self.b_to_tag = {k: v[2:] for k, v in enumerate(self.tags) if v.startswith("B-")}
+        self.s_to_tag = {k: v[2:] for k, v in enumerate(self.tags) if v.startswith("S-")}
 
         if len(self.b_to_i) == 0:
             # "BO" tagging scheme
@@ -34,18 +38,23 @@ class Evaluator:
                     entity_metric.add_fn(span)
         return entity_metric
 
-    def generate_bi_tag_mapping(self):
+    def generate_bie_tag_mapping(self):
         tag_to_index = dict()
         for index, tag_text in enumerate(self.tags):
             if tag_text.startswith("B-"):
                 tag_to_index[tag_text[2:]] = index
 
-        next_tag = dict()
+        i_tag = dict()
         for index, tag_text in enumerate(self.tags):
             if tag_text.startswith("I-"):
-                next_tag[tag_to_index[tag_text[2:]]] = index
+                i_tag[tag_to_index[tag_text[2:]]] = index
 
-        return next_tag
+        e_tag = dict()
+        for index, tag_text in enumerate(self.tags):
+            if tag_text.startswith("E-"):
+                e_tag[tag_to_index[tag_text[2:]]] = index
+
+        return i_tag, e_tag
 
     def get_spans(self, batch):
         batch_spans = []
@@ -61,8 +70,20 @@ class Evaluator:
                     curr_span = Span(sent_index, tok_index, tok_index, tag)
                     sent_spans.append(curr_span)
                     prev_span = curr_span
+                elif batch[sent_index][tok_index] in self.s_to_tag:
+                    tag = self.s_to_tag[batch[sent_index][tok_index]]
+                    curr_span = Span(sent_index, tok_index, tok_index, tag)
+                    sent_spans.append(curr_span)
+                    prev_span = None
                 elif prev_span and batch[sent_index][tok_index] in self.i_to_b:
                     tag = self.b_to_tag[self.i_to_b[batch[sent_index][tok_index]]]
+                    if tag == prev_span.tag:
+                        if self.tagging_scheme == "bio":
+                            prev_span.end = tok_index
+                    else:
+                        prev_span = None
+                elif prev_span and batch[sent_index][tok_index] in self.e_to_b:
+                    tag = self.b_to_tag[self.e_to_b[batch[sent_index][tok_index]]]
                     if tag == prev_span.tag:
                         prev_span.end = tok_index
                     else:

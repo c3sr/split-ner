@@ -1,8 +1,9 @@
 import argparse
 import logging
 import re
-import torch
 from collections import defaultdict
+
+import torch
 from dataclasses import dataclass
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
@@ -10,8 +11,9 @@ from transformers import HfArgumentParser, AutoTokenizer
 from secner.additional_args import AdditionalArguments
 from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 
-logging.basicConfig(filename='dataset.log',  level=logging.INFO)
+logging.basicConfig(filename='dataset.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class NerDataset(Dataset):
 
@@ -21,7 +23,12 @@ class NerDataset(Dataset):
         self.corpus_type = corpus_type
         self.corpus_path = self.set_corpus_path()
 
-        self.tag_vocab = NerDataset.parse_tag_vocab(self.args.tag_vocab_path)
+        if self.args.detect_spans:
+            self.tag_vocab = self.get_span_tag_vocab()
+        else:
+            self.tag_vocab = NerDataset.parse_tag_vocab(self.args.tag_vocab_path)
+            self.add_tags_as_per_tagging_scheme()
+
         self.pos_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.pos_tag_vocab_path, self.args.none_tag,
                                                             self.args.use_pos_tag)
         self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
@@ -34,6 +41,25 @@ class NerDataset(Dataset):
         self.filter_tags()
         self.split_tags()
         self.parse_dataset()
+
+    def get_span_tag_vocab(self):
+        tag_vocab = ["B-ENTITY", "I-ENTITY"]
+        if self.args.tagging == "bioe":
+            tag_vocab.append("E-ENTITY")
+        if self.args.tagging == "bioes":
+            tag_vocab.append("E-ENTITY")
+            tag_vocab.append("S-ENTITY")
+        tag_vocab.append("O")
+        return tag_vocab
+
+    def add_tags_as_per_tagging_scheme(self):
+        e_tags = ["E-" + tag[2:] for tag in self.tag_vocab if tag.startswith("B-")]
+        s_tags = ["S-" + tag[2:] for tag in self.tag_vocab if tag.startswith("B-")]
+        # Note: in "bioe" and "bioes" schemes, the "O" tag comes in the middle in the tag_vocab
+        if self.args.tagging == "bioe":
+            self.tag_vocab += e_tags
+        if self.args.tagging == "bioes":
+            self.tag_vocab += e_tags + s_tags
 
     def set_corpus_path(self):
         if self.corpus_type == "train":
@@ -235,7 +261,6 @@ class NerDataset(Dataset):
         # for tokens with digits/punctuations
         return NerDataset.make_pattern_type2(text)
 
-
     @staticmethod
     def get_word_type(text):
         if text == "[CLS]":
@@ -312,8 +337,8 @@ class NerDataset(Dataset):
                                      token=Token(sep_text, [none_tag], offset=-1, pos_tag=none_tag, dep_tag=none_tag),
                                      is_head=True)
         return start_token, first_sep_token, second_sep_token
-    
-    #YJ : updated to support BIOES tagging scheme
+
+    # YJ : updated to support BIOES tagging scheme
     def process_sentence(self, index):
         sentence = self.sentences[index]
         sentence.bert_tokens = [self.bert_start_token]
@@ -322,7 +347,7 @@ class NerDataset(Dataset):
             token_tag = token.tags[0]
 
             for i in range(len(out["input_ids"])):
-                if  token_tag == "O" or token_tag.startswith("I-"):
+                if token_tag == "O" or token_tag.startswith("I-"):
                     tag = token_tag
                 elif i == 0 and (token_tag.startswith("B-") or token_tag.startswith("S-")):
                     tag = token_tag
@@ -332,7 +357,7 @@ class NerDataset(Dataset):
                     tag = "I-" + token_tag[2:]
 
                 # Handle 'BO' tagging scheme
-                #if self.args.tagging == "bo" and tag[:2] == "I-":
+                # if self.args.tagging == "bo" and tag[:2] == "I-":
                 if self.args.tagging == "bo" and (not tag == "O"):
                     tag = "B-" + tag[2:]
 
@@ -340,6 +365,55 @@ class NerDataset(Dataset):
                 tup = out["offset_mapping"][i]
                 sub_text = token.text[tup[0]:tup[1]]
                 sentence.bert_tokens.append(BertToken(out["input_ids"][i], sub_text, 0, bert_token, is_head=(i == 0)))
+
+        if self.args.tagging in ["bioe", "bioes"]:
+            is_end_token = False
+            for i in range(len(sentence.bert_tokens) - 1, -1, -1):
+                if sentence.bert_tokens[i].token.tags[0][0] == "I":
+                    if is_end_token:
+                        if not self.args.use_head_mask or sentence.bert_tokens[i].is_head:
+                            tmp = sentence.bert_tokens[i].token.tags[0]
+                            sentence.bert_tokens[i].token.tags[0] = "E-" + tmp[2:]
+                            is_end_token = False
+                else:
+                    is_end_token = True
+
+        if self.args.tagging == "bioes":
+            if self.args.use_head_mask:
+                mention_length = 0
+                mention_index = -1
+                for i in range(len(sentence.bert_tokens)):
+                    if not sentence.bert_tokens[i].is_head:
+                        continue
+                    if sentence.bert_tokens[i].token.tags[0][0] == "B":
+                        if mention_length == 1:
+                            tmp = sentence.bert_tokens[mention_index].token.tags[0]
+                            sentence.bert_tokens[mention_index].token.tags[0] = "S-" + tmp[2:]
+                        mention_length = 1
+                        mention_index = i
+                    elif sentence.bert_tokens[i].token.tags[0][0] in ["I", "E"]:
+                        mention_length += 1
+                    elif mention_length == 1:
+                        tmp = sentence.bert_tokens[mention_index].token.tags[0]
+                        sentence.bert_tokens[mention_index].token.tags[0] = "S-" + tmp[2:]
+                        mention_length = 0
+                        mention_index = -1
+                if mention_length == 1:
+                    tmp = sentence.bert_tokens[mention_index].token.tags[0]
+                    sentence.bert_tokens[mention_index].token.tags[0] = "S-" + tmp[2:]
+            else:
+                for i in range(len(sentence.bert_tokens)):
+                    if sentence.bert_tokens[i].token.tags[0][0] == "B" and i + 1 < len(sentence.bert_tokens) and \
+                            sentence.bert_tokens[i + 1].token.tags[0][0] not in ["I", "E"]:
+                        tmp = sentence.bert_tokens[i].token.tags[0]
+                        sentence.bert_tokens[i].token.tags[0] = "S-" + tmp[2:]
+
+        if self.args.detect_spans:
+            for bert_token in sentence.bert_tokens:
+                if bert_token.token.tags[0] != "O":
+                    tmp = bert_token.token.tags[0]
+                    bert_token.token.tags[0] = tmp[:2] + "ENTITY"
+
         sentence.bert_tokens = sentence.bert_tokens[:self.args.max_seq_len - 1]
         sentence.bert_tokens.append(self.bert_first_sep_token)
 
@@ -403,13 +477,12 @@ class NerDataset(Dataset):
         if punctuation_type == "type2":
             punctuation_vocab = list(".,-/()")
             if word in punctuation_vocab:
-                return punctuation_vocab.index(word)+1
+                return punctuation_vocab.index(word) + 1
             if word in all_punctuations:
                 # catch all other punctuations (P)
-                return len(punctuation_vocab)+1
-            return len(punctuation_vocab)+2
+                return len(punctuation_vocab) + 1
+            return len(punctuation_vocab) + 2
         raise NotImplementedError
-
 
     @staticmethod
     def get_char_vocab():
@@ -471,11 +544,11 @@ class NerDataCollator:
         max_len = max(len(entry["labels"]) for entry in features)
         # max_len = self.args.max_seq_len
         batch = dict()
-                
+
         # input_ids
         # does the BERT's input_id start from 101? 101 is for CLS and 201 is SEP.
         if "input_ids" in features[0]:
-            entry = [] 
+            entry = []
             for i in range(len(features)):
                 pad_len = max_len - len(features[i]["input_ids"])
                 entry.append(torch.tensor(features[i]["input_ids"] + [self.tokenizer.pad_token_id] * pad_len))
@@ -566,7 +639,7 @@ class NerDataCollator:
                 pad_len = max_len - len(features[i][self.args.token_type])
                 # padding tokens get word_type 0, all others get valid word_type indices (1 onwards)
                 entry.append(torch.tensor([word_type_vocab.index(NerDataset.get_word_type(w)) + 1
-                                           for w in features[i][self.args.token_type]] + [0] * pad_len ))
+                                           for w in features[i][self.args.token_type]] + [0] * pad_len))
             batch["word_type_ids"] = torch.stack(entry)
 
         # head_mask
@@ -597,11 +670,7 @@ class NerDataCollator:
         # labels
         entry = []
         for i in range(len(features)):
-            if self.args.use_head_mask:
-                labels_mod = [features[i]["labels"][j] for j in range(len(features[i]["labels"])) if
-                              features[i]["head_mask"][j]]
-            else:
-                labels_mod = features[i]["labels"]
+            labels_mod = features[i]["labels"]
             pad_len = max_len - len(labels_mod)
             entry.append(torch.tensor(labels_mod + [-100] * pad_len))
         batch["labels"] = torch.stack(entry)
