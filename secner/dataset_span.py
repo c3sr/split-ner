@@ -1,5 +1,6 @@
 import argparse
 import logging
+
 import torch
 from attr import dataclass
 from torch.utils.data import Dataset
@@ -78,6 +79,13 @@ class NerSpanDataset(Dataset):
             self.tokenizer_cache[text] = self.tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
         return self.tokenizer_cache[text]
 
+    def get_mention_query_text(self, mention):
+        if self.args.query_type == "question":
+            return "What is {0} ?".format(mention)
+        if self.args.query_type == "question2":
+            return "Classify {0} .".format(mention)
+        raise NotImplementedError
+
     def prep_context(self, sentence: Sentence, mention_span: PairSpan):
         # sentence
         bert_sent_tokens = []
@@ -101,7 +109,7 @@ class NerSpanDataset(Dataset):
         # query
         bert_query_tokens = []
         mention = " ".join([sentence.tokens[i].text for i in range(mention_span.start, mention_span.end + 1)])
-        query_tokens = "What is {0} ?".format(mention).split()
+        query_tokens = self.get_mention_query_text(mention).split()
         for index, word in enumerate(query_tokens):
             out = self.tokenize_with_cache(word)
             for i in range(len(out["input_ids"])):
