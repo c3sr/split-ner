@@ -4,6 +4,7 @@ from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
 from secner.additional_args import AdditionalArguments
+from secner.loss import DiceLoss
 
 
 class NerSpanModel(BertPreTrainedModel):
@@ -59,7 +60,9 @@ class NerSpanModel(BertPreTrainedModel):
         outputs = (predictions,) + outputs[2:]  # add hidden states and attention if they are here
 
         if labels is not None:
-            if self.additional_args.loss_type == "ce_wt":
+            if self.additional_args.loss_type == "dice":
+                loss = DiceLoss()(logits, labels, torch.ones_like(labels))
+            elif self.additional_args.loss_type == "ce_wt":
                 loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(logits.device))(logits, labels)
             else:
                 loss = nn.CrossEntropyLoss()(logits, labels)
