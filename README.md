@@ -150,10 +150,10 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector-SciBERT-Punct                                               | 86.276        | todo         | todo         | todo          |
 | Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | 90.9157       |
 | Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | 90.5159       |
-| Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | running       | running      | running      | running       |
-| Span Detector-SciBERT-BIOE-SeqTag-Char-Pattern1-Large5                    | running       | running      | running      | running       |
-| Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | running       | running      | running      | running       |
-| Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | running       | running      | running      | running       |
+| Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | 89.590        | 89.6367      | 90.0015      | 89.8187       |
+| Span Detector-SciBERT-BIOE-SeqTag-Char-Pattern1-Large5                    | 89.811        | 89.9377      | 90.1468      | 90.0421       |
+| Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | 90.593        | 90.9502      | 90.6990      | 90.8244       |
+| Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | 90.080        | 89.9827      | 90.4665      | 90.2239       |
 | Span Classifier                                                           | 94.056        | 94.0561      | 94.0561      | 94.0561       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
 
