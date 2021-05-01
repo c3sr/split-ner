@@ -101,6 +101,11 @@ class NerExecutor:
                         continue
                     data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
                     ptr += 1
+            for j in range(len(data[i])):
+                if data[i][j][2].startswith("S-"):
+                    data[i][j][2] = "B-" + data[i][j][2][2:]
+                elif data[i][j][2].startswith("E-"):
+                    data[i][j][2] = "I-" + data[i][j][2][2:]
         return data
 
     # for each original token, if the output for bert sub-tokens is inconsistent, then map to NONE_TAG else take the tag
