@@ -1,9 +1,9 @@
 {
-  "model_name": "ner-scibert-qa4-span-punct",
+  "model_name": "ner-scibert-qa4-span-punct-new",
   "dataset_dir": "bio",
   "num_labels": 4,
-  "do_train": false,
-  "resume": "15120",
+  "do_train": true,
+  "resume": null,
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
