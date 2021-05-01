@@ -148,8 +148,8 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector-SciBERT                                                     | 90.441        | 90.3114      | 91.0333      | 90.6709       |
 | Span Detector-SciBERT-Dice                                                | 86.022        | todo         | todo         | todo          |
 | Span Detector-SciBERT-Punct                                               | 86.276        | todo         | todo         | todo          |
-| Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | todo          |
-| Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | todo          |
+| Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | 90.9157       |
+| Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | 90.5159       |
 | Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | running       | running      | running      | running       |
 | Span Detector-SciBERT-BIOE-SeqTag-Char-Pattern1-Large5                    | running       | running      | running      | running       |
 | Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | running       | running      | running      | running       |
