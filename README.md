@@ -155,9 +155,9 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | 90.593        | 90.9502      | 90.6990      | 90.8244       |
 | Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | 90.080        | 89.9827      | 90.4665      | 90.2239       |
 | Span Classifier                                                           | 94.056        | 94.0561      | 94.0561      | 94.0561       |
-| Span Classifier-SciBERT                                                   | running       | running      | running      | running       |
+| Span Classifier-SciBERT                                                   | 94.042        | 94.0416      | 94.0416      | 94.0416       |
 | Span Classifier-SciBERT-Dice                                              | running       | running      | running      | running       |
-| Span Classifier-SciBERT-QType2                                            | running       | running      | running      | running       |
+| Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
 
 #### CoNLL
@@ -167,7 +167,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector                                                             | 94.991        | 95.3300      | 95.1376      | 95.2337       |
 | Span Detector-BERT-QA5-QType4                                             | 93.554        | todo         | todo         | todo          |
 | Span Classifier                                                           | 95.149        | 95.0835      | 95.0835      | 95.0835       |
-| Span Classifier-RoBERTa                                                   | running       | running      | running      | running       |
+| Span Classifier-RoBERTa                                                   | 94.069        | 93.9828      | 93.9828      | 93.9828       |
 | Pipeline                                                                  | 94.795*       | 91.4506      | 91.8220      | **91.6360**   |
 
 #### JNLPBA
