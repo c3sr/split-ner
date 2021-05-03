@@ -170,6 +170,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 94.991        | 95.3300      | 95.1376      | 95.2337       |
 | Span Detector-BERT-QA5-QType4                                             | 93.554        | todo         | todo         | todo          |
+| Span Detector-BERT-QA4-QType4                                             | running       | running      | running      | running       |
 | Span Classifier                                                           | 95.149        | 95.0835      | 95.0835      | 95.0835       |
 | Span Classifier-RoBERTa                                                   | 94.069        | 93.9828      | 93.9828      | 93.9828       |
 | Pipeline                                                                  | 94.795*       | 91.4506      | 91.8220      | **91.6360**   |
@@ -179,6 +180,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 77.753        | 74.7685      | 82.2835      | 78.3462       |
+| Span Detector-SciBERT-QA4-QType4                                          | running       | running      | running      | running       |
 | Span Classifier                                                           | 94.528        | 94.4682      | 94.5229      | 94.4956       |
 | Pipeline                                                                  | 94.009*       | 71.1385      | 79.3358      | **75.0139**   |
 
