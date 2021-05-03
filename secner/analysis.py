@@ -59,15 +59,19 @@ def calc_micro_f1(data):
     print("Overall | Cnt: {0} | P: {1:.4f} | R: {2:.4f} | Micro F1: {3:.4f}"
           .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
 
-    tags = sorted(list(tp.keys()), key=lambda x: len(tp[x]) + len(fn[x]), reverse=True)
+    tags = list(set(tp.keys()).union(set(fn.keys())))
+    tags = sorted(tags, key=lambda x: len(tp[x]) + len(fn[x]), reverse=True)
+    tag_f1_sum = 0.0
     for tag in tags:
         tag_tp, tag_fp, tag_fn = len(tp[tag]), len(fp[tag]), len(fn[tag])
         tag_cnt = tag_tp + tag_fn
         tag_p = tag_tp * 1.0 / (tag_tp + tag_fp + 1e-7)
         tag_r = tag_tp * 1.0 / (tag_tp + tag_fn + 1e-7)
         tag_f1 = 2.0 * tag_p * tag_r / (tag_p + tag_r + 1e-7)
+        tag_f1_sum += tag_f1
         print("Tag: {0} | Cnt: {1} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
               .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
+    print("Macro F1: {0:.4f}".format(tag_f1_sum * 100.0 / len(tags)))
 
     return tp, fp, fn
 
@@ -346,6 +350,41 @@ def analyse_oov_errors(train_data, test_data):
           .format(unigram_error_ratio, oov_unigram_error_ratio))
 
 
+def get_boundary_error_ratio(data):
+    gold_spans = [get_spans([[tok[0], tok[1]] for tok in sent], index) for index, sent in enumerate(data)]
+    pred_spans = [get_spans([[tok[0], tok[2]] for tok in sent], index) for index, sent in enumerate(data)]
+    boundary_error_cnt = 0
+    exact_match_tag_error_cnt = 0
+    total_error_cnt = 0
+    for i in range(len(data)):
+        for g_span in gold_spans[i]:
+            has_error = False
+            has_boundary_error = False
+            for p_span in pred_spans[i]:
+                if g_span == p_span:
+                    has_error = False
+                    break
+                has_error = True
+                g_start, g_end = g_span[3]
+                g_tag = g_span[0]
+                p_start, p_end = p_span[3]
+                p_tag = p_span[0]
+                if g_start == p_start and g_end == p_end:
+                    exact_match_tag_error_cnt += 1
+                    has_boundary_error = False
+                    break
+                if (g_start <= p_start <= g_end or g_start <= p_end <= g_end) and g_tag == p_tag:
+                    has_boundary_error = True
+            if has_error:
+                total_error_cnt += 1
+            if has_boundary_error:
+                boundary_error_cnt += 1
+    print("total: {0} | boundary: {1} | exact-match-tag-error: {2}".format(total_error_cnt, boundary_error_cnt,
+                                                                           exact_match_tag_error_cnt))
+    print("Boundary errors: {0:.2f}".format(boundary_error_cnt * 100.0 / total_error_cnt))
+    print("Exact match - tag errors: {0:.2f}".format(exact_match_tag_error_cnt * 100.0 / total_error_cnt))
+
+
 def convert_to_span_based(data):
     new_data = []
     for sent in data:
@@ -377,6 +416,7 @@ def main(args):
         data["dev"] = convert_to_span_based(data["dev"])
         data["test"] = convert_to_span_based(data["test"])
 
+    get_boundary_error_ratio(data[args.file])
     if args.only_f1:
         calc_micro_f1(data[args.file])
     else:
