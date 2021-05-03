@@ -66,8 +66,12 @@ class NerExecutor:
 
     def dump_predictions(self, dataset):
         model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
-        data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
-        # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+        if self.additional_args.prediction_mapping == "type1":
+            data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
+        elif self.additional_args.prediction_mapping == "type2":
+            data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+        else:
+            raise NotImplementedError
 
         os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
         predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
@@ -126,8 +130,15 @@ class NerExecutor:
                 if offsets[j] > ptr:
                     ptr += 1
                     data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
-                elif ("I-" + data[i][ptr][2][2:]) != dataset.tag_vocab[prediction[j]]:
+                elif dataset.tag_vocab[prediction[j]] != "I-" + data[i][ptr][2][2:] or \
+                        dataset.tag_vocab[prediction[j]] != "E-" + data[i][ptr][2][2:]:
+                    # not enforcing that E should be the last one. This works if I and E used interchangeably
                     data[i][ptr][2] = none_tag
+            for j in range(len(data[i])):
+                if data[i][j][2].startswith("S-"):
+                    data[i][j][2] = "B-" + data[i][j][2][2:]
+                elif data[i][j][2].startswith("E-"):
+                    data[i][j][2] = "I-" + data[i][j][2][2:]
         return data
 
     def run(self):

@@ -51,6 +51,7 @@
   "use_main_lstm": false,
   "detect_spans": false,
   "query_type": "question",
+  "prediction_mapping": "type2",
   "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",
   "logging_steps": 2,
