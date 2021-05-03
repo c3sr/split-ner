@@ -148,13 +148,16 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector-SciBERT                                                     | 90.441        | 90.3114      | 91.0333      | 90.6709       |
 | Span Detector-SciBERT-Dice                                                | 86.022        | todo         | todo         | todo          |
 | Span Detector-SciBERT-Punct                                               | 86.276        | todo         | todo         | todo          |
-| Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | todo          |
-| Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | todo          |
-| Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | running       | running      | running      | running       |
-| Span Detector-SciBERT-BIOE-SeqTag-Char-Pattern1-Large5                    | running       | running      | running      | running       |
-| Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | running       | running      | running      | running       |
-| Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | running       | running      | running      | running       |
+| Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | 90.9157       |
+| Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | 90.5159       |
+| Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | 89.590        | 89.6367      | 90.0015      | 89.8187       |
+| Span Detector-SciBERT-BIOE-SeqTag-Char-Pattern1-Large5                    | 89.811        | 89.9377      | 90.1468      | 90.0421       |
+| Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | 90.593        | 90.9502      | 90.6990      | 90.8244       |
+| Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | 90.080        | 89.9827      | 90.4665      | 90.2239       |
 | Span Classifier                                                           | 94.056        | 94.0561      | 94.0561      | 94.0561       |
+| Span Classifier-SciBERT                                                   | 94.042        | 94.0416      | 94.0416      | 94.0416       |
+| Span Classifier-SciBERT-Dice                                              | running       | running      | running      | running       |
+| Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
 
 #### CoNLL
@@ -164,6 +167,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector                                                             | 94.991        | 95.3300      | 95.1376      | 95.2337       |
 | Span Detector-BERT-QA5-QType4                                             | 93.554        | todo         | todo         | todo          |
 | Span Classifier                                                           | 95.149        | 95.0835      | 95.0835      | 95.0835       |
+| Span Classifier-RoBERTa                                                   | 94.069        | 93.9828      | 93.9828      | 93.9828       |
 | Pipeline                                                                  | 94.795*       | 91.4506      | 91.8220      | **91.6360**   |
 
 #### JNLPBA
@@ -179,7 +183,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector (RoBERTa)                                                   | 89.260        | todo         | todo         | todo          |
-| Span Classifier (RoBERTa)                                                 | 96.131        | need file    | need file    | need file     |
+| Span Classifier (RoBERTa)                                                 | 96.131        | todo         | todo         | todo          |
 | Pipeline (RoBERTa) (needs re-run as span detector improved)               | 95.781*       | 85.5045      | 90.0107      | **87.6998**   |
 
 ```*: for span class. on gen. output from span det.```
