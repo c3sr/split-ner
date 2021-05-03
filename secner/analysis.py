@@ -71,7 +71,7 @@ def calc_micro_f1(data):
         tag_f1_sum += tag_f1
         print("Tag: {0} | Cnt: {1} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
               .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
-    print("Macro F1: {0:.4f}".format(tag_f1_sum * 100.0 / len(tags)))
+    print("Macro F1: {0:.4f}".format(tag_f1_sum * 100.0 / (len(tags) + 1e-7)))
 
     return tp, fp, fn
 
