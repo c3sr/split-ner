@@ -160,7 +160,7 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Classifier-SciBERT-Dice                                              | running       | running      | running      | running       |
 | Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
-| Pipeline(Detector-SciBERT-QType4)                                         | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
+| Pipeline(Detector-SciBERT-QA4-QType4)                                     | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct)                              | 93.605*       | 86.6511      | 86.4873      | **86.5691**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2)                     | 93.622*       | 86.8363      | 86.3564      | **86.5957**   |
 
@@ -174,15 +174,17 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Classifier                                                           | 95.149        | 95.0835      | 95.0835      | 95.0835       |
 | Span Classifier-RoBERTa                                                   | 94.069        | 93.9828      | 93.9828      | 93.9828       |
 | Pipeline                                                                  | 94.795*       | 91.4506      | 91.8220      | **91.6360**   |
+| Pipeline(Detector-BERT-QA4-QType4)                                        | 
 
 #### JNLPBA
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 77.753        | 74.7685      | 82.2835      | 78.3462       |
-| Span Detector-SciBERT-QA4-QType4                                          | running       | running      | running      | running       |
+| Span Detector-SciBERT-QA4-QType4                                          | 78.352        | 75.0105      | 82.8215      | 78.7227       |
 | Span Classifier                                                           | 94.528        | 94.4682      | 94.5229      | 94.4956       |
 | Pipeline                                                                  | 94.009*       | 71.1385      | 79.3358      | **75.0139**   |
+| Pipeline(Detector-SciBERT-QA4-QType4)                                     | 94.016*       | 71.3851      | 79.7937      | **75.3556**   |
 
 #### OntoNotes
 
