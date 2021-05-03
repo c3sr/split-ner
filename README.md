@@ -159,6 +159,8 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Classifier-SciBERT-Dice                                              | running       | running      | running      | running       |
 | Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
+| Pipeline(Detector-SciBERT-QType4)                                         | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
+| Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct)                              | 93.605*       | 86.6511      | 86.4873      | **86.5691**   |
 
 #### CoNLL
 
