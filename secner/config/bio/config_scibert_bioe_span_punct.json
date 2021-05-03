@@ -17,6 +17,7 @@
   "freeze_bert": false,
   "punctuation_handling": "type1",
   "detect_spans": true,
+  "prediction_mapping": "type2",
   "base_model": "allenai/scibert_scivocab_uncased",
   "evaluation_strategy": "steps",
   "logging_steps": 50,

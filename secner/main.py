@@ -130,7 +130,7 @@ class NerExecutor:
                 if offsets[j] > ptr:
                     ptr += 1
                     data[i][ptr][2] = dataset.tag_vocab[prediction[j]]
-                elif dataset.tag_vocab[prediction[j]] != "I-" + data[i][ptr][2][2:] or \
+                elif dataset.tag_vocab[prediction[j]] != "I-" + data[i][ptr][2][2:] and \
                         dataset.tag_vocab[prediction[j]] != "E-" + data[i][ptr][2][2:]:
                     # not enforcing that E should be the last one. This works if I and E used interchangeably
                     data[i][ptr][2] = none_tag
