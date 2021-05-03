@@ -381,8 +381,8 @@ def get_boundary_error_ratio(data):
                 boundary_error_cnt += 1
     print("total: {0} | boundary: {1} | exact-match-tag-error: {2}".format(total_error_cnt, boundary_error_cnt,
                                                                            exact_match_tag_error_cnt))
-    print("Boundary errors: {0:.2f}".format(boundary_error_cnt * 100.0 / total_error_cnt))
-    print("Exact match - tag errors: {0:.2f}".format(exact_match_tag_error_cnt * 100.0 / total_error_cnt))
+    print("Boundary errors: {0:.2f}".format(boundary_error_cnt * 100.0 / (total_error_cnt + 1e-7)))
+    print("Exact match - tag errors: {0:.2f}".format(exact_match_tag_error_cnt * 100.0 / (total_error_cnt + 1e-7)))
 
 
 def convert_to_span_based(data):
