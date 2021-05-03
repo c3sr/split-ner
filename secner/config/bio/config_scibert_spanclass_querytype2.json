@@ -1,8 +1,8 @@
 {
   "model_name": "ner-scibert-spanclass-querytype2",
   "dataset_dir": "bio",
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "12900",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",

@@ -1,8 +1,8 @@
 {
   "model_name": "ner-roberta-spanclass",
   "dataset_dir": "conll",
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "11550",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
