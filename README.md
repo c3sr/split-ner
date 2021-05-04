@@ -157,12 +157,14 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 | Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | 90.080        | 89.9827      | 90.4665      | 90.2239       |
 | Span Classifier                                                           | 94.056        | 94.0561      | 94.0561      | 94.0561       |
 | Span Classifier-SciBERT                                                   | 94.042        | 94.0416      | 94.0416      | 94.0416       |
-| Span Classifier-SciBERT-Dice                                              | running       | running      | running      | running       |
+| Span Classifier-SciBERT-Dice                                              | 94.274        | 94.2741      | 94.2741      | 94.2741       |
 | Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
 | Pipeline(Detector-SciBERT-QA4-QType4)                                     | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct)                              | 93.605*       | 86.6511      | 86.4873      | **86.5691**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2)                     | 93.622*       | 86.8363      | 86.3564      | **86.5957**   |
+| Pipeline(Detector-SciBERT-QA4-QType4, Classifier-SciBERT-Dice)            | 93.580*       | 87.0759      | 86.3153      | **86.6940**   |
+| Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2, Classifier-SciBERT-Dice)| 93.789*   | 86.8510      | 86.3709      | **86.6103**   |
 
 #### CoNLL
 
