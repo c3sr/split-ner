@@ -170,11 +170,10 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 94.991        | 95.3300      | 95.1376      | 95.2337       |
 | Span Detector-BERT-QA5-QType4                                             | 93.554        | todo         | todo         | todo          |
-| Span Detector-BERT-QA4-QType4                                             | running       | running      | running      | running       |
+| Span Detector-BERT-QA4-QType4                                             | 94.548        | 94.7564      | 95.0248      | 94.8904       |
 | Span Classifier                                                           | 95.149        | 95.0835      | 95.0835      | 95.0835       |
 | Span Classifier-RoBERTa                                                   | 94.069        | 93.9828      | 93.9828      | 93.9828       |
 | Pipeline                                                                  | 94.795*       | 91.4506      | 91.8220      | **91.6360**   |
-| Pipeline(Detector-BERT-QA4-QType4)                                        | 
 
 #### JNLPBA
 
