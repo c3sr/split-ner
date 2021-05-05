@@ -207,7 +207,13 @@ class NerDataset(Dataset):
         return NerDataset.make_pattern_type0(text)
 
     @staticmethod
+    #YJP: added CLS and SEP
     def make_pattern_type2(text):
+        if text == "[CLS]":
+            return text
+        if text == "[SEP]":
+            return text
+
         pattern_text = ""
         for c in text:
             if "a" <= c <= "z":
@@ -258,6 +264,7 @@ class NerDataset(Dataset):
         if re.fullmatch(r"[A-Za-z0-9]+", text):
             return "A"
         return "B"
+
 
     def __len__(self):
         return len(self.sentences)
