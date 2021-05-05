@@ -110,7 +110,8 @@ class NerQAExecutor:
                     ptr += 1
                     continue
 
-                if prediction[j] == NerQADataset.get_tag_index("B", none_tag):
+                if prediction[j] == NerQADataset.get_tag_index("B", none_tag) or \
+                        prediction[j] == NerQADataset.get_tag_index("S", none_tag):
                     tag_assignment = "B-" + context.entity
                 elif prediction[j] == NerQADataset.get_tag_index("I", none_tag) or \
                         prediction[j] == NerQADataset.get_tag_index("E", none_tag):
@@ -158,7 +159,8 @@ class NerQAExecutor:
                 if context.bert_tokens[j].token.offset > ptr:
                     ptr += 1
 
-                    if prediction[j] == NerQADataset.get_tag_index("B", none_tag):
+                    if prediction[j] == NerQADataset.get_tag_index("B", none_tag) or \
+                            prediction[j] == NerQADataset.get_tag_index("S", none_tag):
                         tag_assignment = "B-" + context.entity
                     elif prediction[j] == NerQADataset.get_tag_index("I", none_tag) or \
                             prediction[j] == NerQADataset.get_tag_index("E", none_tag):

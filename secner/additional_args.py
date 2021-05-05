@@ -41,6 +41,8 @@ class AdditionalArguments:
     use_char_cnn: str = field(default="none", metadata=
     {"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
     token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
+    prediction_mapping: str = field(default="type1", metadata=
+    {"help": "converting from bert to dataset level outputs (type1|type2)"})
     pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1|2)(1 works best)"})
     use_end_cnn: bool = field(default=False, metadata={"help": "use end CNN"})
     add_qa_helper_sentence: bool = field(default=False, metadata={"help": "add helper sentence with known entities"})
