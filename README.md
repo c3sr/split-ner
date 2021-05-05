@@ -134,6 +134,16 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 1. Part 1 QA: What is the entity mentioned in the text ? <Sentence> . Training: Every span converted to B/I/E-Entity span and train 4-class QA model. Training data size does not hence increase at all.
 2. Part 2 QA: <Sentence> . What is <mention span> ? Training: Gold spans are taken and all data is converted to this format. One training sample for each span in gold dataset. **Note**: We don't currently train the span classifier on **imperfect spans** but that can be added as well.
 
+```shell script
+
+CUDA_VISIBLE_DEVICES=0,1 python main.py --config config/conll/config_bert_qa4_span_querytype4.json
+
+CUDA_VISIBLE_DEVICES=4,5,6 python main_span.py --config config/bio/config_scibert_spanclass_dice.json
+
+python analysis.py --dataset bio --model ner-biobert-spanclass-dice --file infer --only_f1
+
+```
+
 #### BioNLP13CG
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
