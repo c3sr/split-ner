@@ -167,12 +167,14 @@ python analysis.py --dataset bio --model ner-biobert-spanclass-dice --file infer
 | Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | 90.080        | 89.9827      | 90.4665      | 90.2239       |
 | Span Classifier                                                           | 94.056        | 94.0561      | 94.0561      | 94.0561       |
 | Span Classifier-SciBERT                                                   | 94.042        | 94.0416      | 94.0416      | 94.0416       |
-| Span Classifier-SciBERT-Dice                                              | running       | running      | running      | running       |
+| Span Classifier-SciBERT-Dice                                              | 94.274        | 94.2741      | 94.2741      | 94.2741       |
 | Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
-| Pipeline(Detector-SciBERT-QType4)                                         | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
+| Pipeline(Detector-SciBERT-QA4-QType4)                                     | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct)                              | 93.605*       | 86.6511      | 86.4873      | **86.5691**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2)                     | 93.622*       | 86.8363      | 86.3564      | **86.5957**   |
+| Pipeline(Detector-SciBERT-QA4-QType4, Classifier-SciBERT-Dice)            | 93.580*       | 87.0759      | 86.3153      | **86.6940**   |
+| Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2, Classifier-SciBERT-Dice)| 93.789*   | 86.8510      | 86.3709      | **86.6103**   |
 
 #### CoNLL
 
@@ -180,6 +182,7 @@ python analysis.py --dataset bio --model ner-biobert-spanclass-dice --file infer
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 94.991        | 95.3300      | 95.1376      | 95.2337       |
 | Span Detector-BERT-QA5-QType4                                             | 93.554        | todo         | todo         | todo          |
+| Span Detector-BERT-QA4-QType4                                             | 94.548        | 94.7564      | 95.0248      | 94.8904       |
 | Span Classifier                                                           | 95.149        | 95.0835      | 95.0835      | 95.0835       |
 | Span Classifier-RoBERTa                                                   | 94.069        | 93.9828      | 93.9828      | 93.9828       |
 | Pipeline                                                                  | 94.795*       | 91.4506      | 91.8220      | **91.6360**   |
@@ -189,8 +192,10 @@ python analysis.py --dataset bio --model ner-biobert-spanclass-dice --file infer
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 77.753        | 74.7685      | 82.2835      | 78.3462       |
+| Span Detector-SciBERT-QA4-QType4                                          | 78.352        | 75.0105      | 82.8215      | 78.7227       |
 | Span Classifier                                                           | 94.528        | 94.4682      | 94.5229      | 94.4956       |
 | Pipeline                                                                  | 94.009*       | 71.1385      | 79.3358      | **75.0139**   |
+| Pipeline(Detector-SciBERT-QA4-QType4)                                     | 94.016*       | 71.3851      | 79.7937      | **75.3556**   |
 
 #### OntoNotes
 

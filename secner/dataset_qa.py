@@ -119,6 +119,9 @@ class NerQADataset(Dataset):
         bert_tag_ids = [NerQADataset.get_tag_index(tok.token.tags[0], self.args.none_tag) for tok in
                         context.bert_tokens]
 
+        print("labels="+str([tok.token.tags[0] for tok in context.bert_tokens]))
+        print("label_ids="+str(bert_tag_ids))
+
         return {"input_ids": bert_token_ids,
                 "token_type_ids": bert_token_type_ids,
                 "head_mask": bert_head_mask,
@@ -138,6 +141,8 @@ class NerQADataset(Dataset):
             return 2
         if text_tag == "E":
             return 3
+        if text_tag == "S":
+            return 4
         # should never occur
         return -100
 
