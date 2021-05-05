@@ -548,6 +548,7 @@ class NerDataCollator:
         # (2) better to group input data by lengths so that all sequences in a batch are in the (almost) same length and then shuffle the groups
         # (3) move to pre-padding as it is preferred? (https://arxiv.org/pdf/1903.07288.pdf, no results for BiLSTM)
 
+
         max_len = max(len(entry["labels"]) for entry in features)
         # max_len = self.args.max_seq_len
         batch = dict()
