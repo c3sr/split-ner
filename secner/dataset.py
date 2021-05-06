@@ -199,6 +199,8 @@ class NerDataset(Dataset):
             return NerDataset.make_pattern_type2(text)
         if pattern_type == "3":
             return NerDataset.make_pattern_type3(text)
+        if pattern_type == "4":
+            return NerDataset.make_pattern_type4(text)
         raise NotImplementedError
 
     @staticmethod
@@ -234,9 +236,9 @@ class NerDataset(Dataset):
     #YJP: added CLS and SEP
     def make_pattern_type2(text):
         if text == "[CLS]":
-            return text
+            return "C"
         if text == "[SEP]":
-            return text
+            return "S"
 
         pattern_text = ""
         for c in text:
@@ -248,6 +250,7 @@ class NerDataset(Dataset):
                 pattern_text += "d"
             else:
                 pattern_text += c
+
         return pattern_text
 
     @staticmethod
@@ -266,6 +269,48 @@ class NerDataset(Dataset):
             return "M"
         # for tokens with digits/punctuations
         return NerDataset.make_pattern_type2(text)
+
+    @staticmethod
+    def make_pattern_type4(text):
+        if text == "[CLS]":
+            return "C"
+        if text == "[SEP]":
+            return "S"
+
+        pattern_text = ""
+        pattern = ""
+        prev_pattern = ""
+        cnt = 0
+        for c in text:
+            is_symbol = False
+            if "a" <= c <= "z":
+                pattern = "L"
+            elif "A" <= c <= "Z":
+                pattern = "U"
+            elif "0" <= c <= "9":
+                pattern = "D"
+            else:
+                pattern = c
+                is_symbol = True
+
+            if prev_pattern == "":
+               prev_pattern = pattern
+
+            if is_symbol:
+                pattern_text += pattern
+                prev_pattern = pattern
+                cnt=0
+            elif prev_pattern != pattern:
+                pattern_text += prev_pattern + str(cnt)
+                prev_pattern = pattern
+                cnt=0
+
+            cnt += 1
+
+        if not is_symbol:
+            pattern_text += pattern + str(cnt)
+
+        return pattern_text
 
     @staticmethod
     def get_word_type(text):
@@ -519,11 +564,15 @@ class NerDataset(Dataset):
             vocab += list("0123456789")
             return vocab
         if pattern_type == "2":
-            vocab += list("uld")
+            vocab += list("CSlud")
             return vocab
         if pattern_type == "3":
-            vocab += list("ulCSLUFM")
-            vocab += list("uld")
+            vocab += list("CSLUFMlud")
+            return vocab
+
+        if pattern_type == "4":
+            vocab += list("CSLUD")
+            vocab += list("0123456789")
             return vocab
 
         raise NotImplementedError
