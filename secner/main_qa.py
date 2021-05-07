@@ -58,6 +58,16 @@ class NerQAExecutor:
                                   eval_dataset=self.dev_dataset,
                                   compute_metrics=self.compute_metrics)
 
+        ''' 
+        for i in range(0, 4):
+            print("Sentence:"+str(self.trainer.train_dataset.contexts[i].sentence))
+            print(str(self.trainer.train_dataset.contexts[i].entity))
+            print("Entity_Text:"+str(self.trainer.train_dataset.contexts[i].entity_text))
+            print(str(self.trainer.train_dataset.contexts[i].bert_tokens))
+            print(str(self.trainer.train_dataset.contexts[i].mention_span))
+       ''' 
+
+
     def compute_metrics(self, eval_prediction):
         evaluator = EvaluatorQA(gold=eval_prediction.label_ids, predicted=eval_prediction.predictions,
                                 num_labels=self.num_labels, none_tag=self.additional_args.none_tag)
@@ -211,6 +221,7 @@ class NerQAExecutor:
 def main(args):
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
+    print (args.config)
     train_args, additional_args = parse_config(parser, args.config)
     executor = NerQAExecutor(train_args, additional_args)
     executor.run()
@@ -219,5 +230,6 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="QA Model Runner")
     ap.add_argument("--config", default="config/config_debug.json", help="config json file")
+    ap.add_argument("--output", default="out/ner", help="output path")
     ap = ap.parse_args()
     main(ap)
