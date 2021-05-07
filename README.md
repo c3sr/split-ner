@@ -134,14 +134,44 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 1. Part 1 QA: What is the entity mentioned in the text ? <Sentence> . Training: Every span converted to B/I/E-Entity span and train 4-class QA model. Training data size does not hence increase at all.
 2. Part 2 QA: <Sentence> . What is <mention span> ? Training: Gold spans are taken and all data is converted to this format. One training sample for each span in gold dataset. **Note**: We don't currently train the span classifier on **imperfect spans** but that can be added as well.
 
+
+### Run Commands
+
+#### Span Detection Training
+
+In the config (json) file, set ```"detect_spans": true```. For running using QA-based model using ```BIOE``` scheme, set ```"num_labels": 4```. We support multiple question types which can be set, for example, ```"query_type": "question4"```. Example run command:
+
 ```shell script
+CUDA_VISIBLE_DEVICES=0,1 python main_qa.py --config config/conll/config_bert_qa4_span_querytype4.json
+```
 
-CUDA_VISIBLE_DEVICES=0,1 python main.py --config config/conll/config_bert_qa4_span_querytype4.json
+For sequence labeling procedure using ```BIOE``` scheme, set ```"tagging": "bioe"``` along with ```"detect_spans": true```. Example run command:
 
-CUDA_VISIBLE_DEVICES=4,5,6 python main_span.py --config config/bio/config_scibert_spanclass_dice.json
+```shell script
+CUDA_VISIBLE_DEVICES=0,1 python main.py --config config/conll/config_bert_bioe_span.json
+```
 
-python analysis.py --dataset bio --model ner-biobert-spanclass-dice --file infer --only_f1
+Next, we generate predictions using the standard evaluation procedure.
 
+#### Span Classification Training
+
+It does not depend on tagging schemes. Example run command:
+
+```shell script
+CUDA_VISIBLE_DEVICES=0,1,2 python main_span.py --config config/bio/config_bert_spanclass_dice.json
+```
+
+#### Pipeline
+Once the above models are individually trained, we copy ```test.tsv``` from ```predictions``` folder of span detector into the corresponding folder in span classifier model. Rename this test file as say, ```infer_inp.tsv```. Specify this file name in the config for span classifier (as shown below) and also set ```"do_train": false``` and provide the checkpoint using the ```resume``` option (the standard model evaluation procedure).
+
+```json
+"infer_path": "infer_inp.tsv"
+```
+
+The final outputs are generated always in file ```infer.tsv``` under the ```predictions``` folder of span classifier. To get the overall F1-score metrics run:
+
+```shell script
+python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer --only_f1
 ```
 
 #### BioNLP13CG
