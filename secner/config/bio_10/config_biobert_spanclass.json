@@ -1,5 +1,5 @@
 {
-  "model_name": "ner-scibert-spanclass",
+  "model_name": "ner-biobert-spanclass",
   "dataset_dir": "bio_10",
   "do_train": true,
   "resume": null,
@@ -16,9 +16,9 @@
   "max_seq_len": 256,
   "freeze_bert": false,
   "query_type": "question",
-  "base_model": "allenai/scibert_scivocab_uncased",
+  "base_model": "dmis-lab/biobert-base-cased-v1.1",
   "evaluation_strategy": "steps",
-  "logging_steps": 15,
+  "logging_steps": 30,
   "save_total_limit": 2,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
