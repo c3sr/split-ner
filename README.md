@@ -209,7 +209,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | todo          | todo         | todo         | todo          |
-| Span Classifier                                                           | todo          | todo         | todo         | todo          |
+| Span Classifier                                                           | 93.166        | 93.1952      | 93.2492      | 93.2222       |
 | Pipeline                                                                  | todo          | todo         | todo         | todo          |
 
 ### Full Dataset Utilization
