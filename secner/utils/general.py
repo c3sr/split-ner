@@ -1,17 +1,18 @@
-import dataclasses
 import json
 import logging
-import numpy as np
 import os
 import random
-import torch
-import wandb
 from pathlib import Path
 from shutil import copyfile
+from typing import Tuple
+
+import dataclasses
+import numpy as np
+import torch
+import wandb
 from transformers import HfArgumentParser
 from transformers.hf_argparser import DataClass
 from transformers.training_args import default_logdir
-from typing import Tuple
 
 
 class Token:
@@ -203,12 +204,12 @@ def write_data(data, data_path):
             f.write("\n")
 
 
-def make_shorter_dataset(inp_path, shrink_factor=0.2):
+def make_shorter_dataset(inp_path, shrink_factor=0.1):
     out_path = "{0}_{1}".format(inp_path, int(shrink_factor * 100))
     os.makedirs(out_path, exist_ok=True)
     make_shorter_dataset_util(os.path.join(inp_path, "train.tsv"), os.path.join(out_path, "train.tsv"), shrink_factor)
-    make_shorter_dataset_util(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"), shrink_factor)
-    make_shorter_dataset_util(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"), shrink_factor)
+    copyfile(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"))
+    copyfile(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"))
     copyfile(os.path.join(inp_path, "tag_vocab.txt"), os.path.join(out_path, "tag_vocab.txt"))
     copyfile(os.path.join(inp_path, "tag_names.txt"), os.path.join(out_path, "tag_names.txt"))
     copyfile(os.path.join(inp_path, "pos_tag_vocab.txt"), os.path.join(out_path, "pos_tag_vocab.txt"))
