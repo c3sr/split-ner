@@ -176,6 +176,10 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 ### Few-Shot NER
 
+```
+*Was trained with smaller dev set (can retrain now to work with original dev set)
+```
+
 #### CoNLL
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
@@ -183,10 +187,6 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector*                                                            | 92.684        | 93.8006      | 93.5596      | 93.6800       |
 | Span Classifier*                                                          | 94.016        | 93.8543      | 93.8543      | 93.8543       |
 | Pipeline*                                                                 | 93.385        | 89.2568      | 89.6692      | 89.4625       |
-
-```
-*Was trained with smaller dev set (can retrain now to work with original dev set)
-```
 
 #### BioNLP13CG
 
@@ -200,17 +200,17 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector                                                             | todo          | todo         | todo         | todo          |
-| Span Classifier                                                           | todo          | todo         | todo         | todo          |
-| Pipeline                                                                  | todo          | todo         | todo         | todo          |
+| Span Detector*                                                            | todo          | todo         | todo         | todo          |
+| Span Classifier*                                                          | 95.185        | 95.2036      | 95.2036      | 95.2036       |
+| Pipeline*                                                                 | todo          | todo         | todo         | todo          |
 
 #### JNLPBA
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector                                                             | todo          | todo         | todo         | todo          |
-| Span Classifier                                                           | 93.166        | 93.1952      | 93.2492      | 93.2222       |
-| Pipeline                                                                  | todo          | todo         | todo         | todo          |
+| Span Detector*                                                            | todo          | todo         | todo         | todo          |
+| Span Classifier*                                                          | 93.166        | 93.1952      | 93.2492      | 93.2222       |
+| Pipeline*                                                                 | todo          | todo         | todo         | todo          |
 
 ### Full Dataset Utilization
 
