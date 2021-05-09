@@ -193,8 +193,8 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 83.320        | 83.3924      | 85.4527      | 84.4100       |
-| Span Classifier                                                           | 90.902        | todo         | todo         | todo          |
-| Pipeline                                                                  | todo          | todo         | todo         | todo          |
+| Span Classifier                                                           | 90.902        | 90.9025      | 90.9025      | 90.9025       |
+| Pipeline                                                                  | 89.520        | 77.1380      | 79.1588      | 78.1353       |
 
 #### OntoNotes
 
@@ -211,6 +211,38 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector*                                                            | 75.457        | 72.3553      | 80.4655      | 76.1952       |
 | Span Classifier*                                                          | 93.166        | 93.1952      | 93.2492      | 93.2222       |
 | Pipeline*                                                                 | 92.305        | 67.9717      | 76.4492      | 71.9616       |
+
+#### Mit-Restaurant
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QType4)*                                                    | 80.935        | 77.9503      | 79.6573      | 78.7945       |
+| Span Classifier(at best step:10590)*                                      | 89.749        | 89.7493      | 89.7493      | 89.7493       |
+| Pipeline*                                                                 | 88.395        | 71.2733      | 73.0194      | 72.1358       |
+
+#### Mit-Movie
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QType4)*                                                    | 88.671        | 86.6178      | 88.5163      | 87.5567       |
+| Span Classifier*                                                          | 93.332        | 93.3308      | 93.3308      | 93.3308       |
+| Pipeline*                                                                 | 92.400        | 81.8698      | 83.9474      | 82.8956       |
+
+#### WNUT17
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QType4)                                                     | 45.981        | 67.3222      | 41.2801      | 51.1788       |
+| Span Classifier                                                           | 62.095        | 62.0945      | 62.0945      | 62.0945       |
+| Pipeline                                                                  | 70.939        | 50.9834      | 49.3411      | 50.1488       |
+
+#### ATIS
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QType4)*                                                    | running       | running      | running      | running       |
+| Span Classifier*                                                          | running       | running      | running      | running       |
+| Pipeline*                                                                 | running       | running      | running      | running       |
 
 ### Full Dataset Utilization
 
