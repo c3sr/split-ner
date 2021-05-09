@@ -1,0 +1,6 @@
+corporation	corporation
+creative-work	creative work
+group	group
+location	location
+person	person
+product	product
