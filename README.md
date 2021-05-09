@@ -192,7 +192,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector                                                             | todo          | todo         | todo         | todo          |
+| Span Detector                                                             | 83.320        | 83.3924      | 85.4527      | 84.4100       |
 | Span Classifier                                                           | todo          | todo         | todo         | todo          |
 | Pipeline                                                                  | todo          | todo         | todo         | todo          |
 
@@ -208,9 +208,9 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector*                                                            | todo          | todo         | todo         | todo          |
+| Span Detector*                                                            | 75.457        | 72.3553      | 80.4655      | 76.1952       |
 | Span Classifier*                                                          | 93.166        | 93.1952      | 93.2492      | 93.2222       |
-| Pipeline*                                                                 | todo          | todo         | todo         | todo          |
+| Pipeline*                                                                 | 92.305        | 67.9717      | 76.4492      | 71.9616       |
 
 ### Full Dataset Utilization
 
