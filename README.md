@@ -193,16 +193,16 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector                                                             | 83.320        | 83.3924      | 85.4527      | 84.4100       |
-| Span Classifier                                                           | todo          | todo         | todo         | todo          |
+| Span Classifier                                                           | 90.902        | todo         | todo         | todo          |
 | Pipeline                                                                  | todo          | todo         | todo         | todo          |
 
 #### OntoNotes
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector*                                                            | todo          | todo         | todo         | todo          |
+| Span Detector*                                                            | 85.106        | 82.5609      | 88.4187      | 85.3895       |
 | Span Classifier*                                                          | 95.185        | 95.2036      | 95.2036      | 95.2036       |
-| Pipeline*                                                                 | todo          | todo         | todo         | todo          |
+| Pipeline*                                                                 | 94.644        | 79.2261      | 87.0136      | 82.9374       |
 
 #### JNLPBA
 
