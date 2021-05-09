@@ -1,12 +1,12 @@
-ACTOR actor
-CHARACTER character
-DIRECTOR  director
-GENRE genre
-PLOT  plot
-RATING    rating
-RATINGS_AVERAGE   ratings average
-REVIEW    review
-SONG  song
-TITLE title
-TRAILER   trailer
-YEAR  year
+ACTOR	actor
+CHARACTER	character
+DIRECTOR	director
+GENRE	genre
+PLOT	plot
+RATING	rating
+RATINGS_AVERAGE	ratings	average
+REVIEW	review
+SONG	song
+TITLE	title
+TRAILER	trailer
+YEAR	year
