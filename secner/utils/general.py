@@ -1,17 +1,18 @@
-import dataclasses
 import json
 import logging
-import numpy as np
 import os
 import random
-import torch
-import wandb
 from pathlib import Path
 from shutil import copyfile
+from typing import Tuple
+
+import dataclasses
+import numpy as np
+import torch
+import wandb
 from transformers import HfArgumentParser
 from transformers.hf_argparser import DataClass
 from transformers.training_args import default_logdir
-from typing import Tuple
 
 
 class Token:
@@ -203,12 +204,13 @@ def write_data(data, data_path):
             f.write("\n")
 
 
-def make_shorter_dataset(inp_path, shrink_factor=0.2):
+def make_shorter_dataset(inp_path, shrink_factor=0.1):
     out_path = "{0}_{1}".format(inp_path, int(shrink_factor * 100))
     os.makedirs(out_path, exist_ok=True)
     make_shorter_dataset_util(os.path.join(inp_path, "train.tsv"), os.path.join(out_path, "train.tsv"), shrink_factor)
     make_shorter_dataset_util(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"), shrink_factor)
-    make_shorter_dataset_util(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"), shrink_factor)
+    # copyfile(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"))
+    copyfile(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"))
     copyfile(os.path.join(inp_path, "tag_vocab.txt"), os.path.join(out_path, "tag_vocab.txt"))
     copyfile(os.path.join(inp_path, "tag_names.txt"), os.path.join(out_path, "tag_names.txt"))
     copyfile(os.path.join(inp_path, "pos_tag_vocab.txt"), os.path.join(out_path, "pos_tag_vocab.txt"))
@@ -222,3 +224,119 @@ def make_shorter_dataset_util(inp_data_path, out_data_path, shrink_factor):
     vec = np.random.choice(np.arange(n), int(shrink_factor * n), replace=False)
     new_data = [data[k] for k in vec]
     write_data(new_data, out_data_path)
+
+
+def read_mit_data(file_path):
+    raw_data = read_data(file_path)
+    new_data = []
+    for sent in raw_data:
+        new_sent = []
+        for offset, tup in enumerate(sent):
+            new_sent.append(Token(text=tup[1], tags=[tup[0]], offset=offset))
+        new_data.append(new_sent)
+    return new_data
+
+
+def add_pos_dep_features(data, spacy_model_name):
+    import spacy
+    from spacy.tokens import Doc
+
+    nlp = spacy.load(spacy_model_name)
+    tokenizer_map = dict()
+    nlp.tokenizer = lambda x: Doc(nlp.vocab, tokenizer_map[x])
+    for sent in data:
+        words = [tok.text for tok in sent]
+        sent_text = " ".join(words)
+        tokenizer_map[sent_text] = words
+        doc = nlp(sent_text)
+        for i, token in enumerate(doc):
+            sent[i].pos_tag = token.tag_
+            sent[i].dep_tag = token.dep_
+    return data
+
+
+def write_token_data(data, file_path):
+    with open(file_path, "w", encoding="utf-8") as f:
+        for sent in data:
+            for tok in sent:
+                f.write("{0}\t{1}\t{2}\t{3}\n".format(tok.text, tok.pos_tag, tok.dep_tag, tok.tags[0]))
+            f.write("\n")
+
+
+def partition_data(data, ratio):
+    set_all_seeds(42)
+    n = len(data)
+    vec = np.random.choice(np.arange(n), int(ratio * n), replace=False)
+    part1 = [data[k] for k in vec]
+    part2 = [data[k] for k in range(n) if k not in vec]
+    return part1, part2
+
+
+def process_mit_corpora(dir_path, raw_file_prefix):
+    raw_root_dir = os.path.join(dir_path, "raw")
+    orig_train = read_mit_data(os.path.join(raw_root_dir, "{0}train.bio".format(raw_file_prefix)))
+    orig_train = add_pos_dep_features(orig_train, "en_core_web_sm")
+    test = read_mit_data(os.path.join(raw_root_dir, "{0}test.bio".format(raw_file_prefix)))
+    test = add_pos_dep_features(test, "en_core_web_sm")
+    train, dev = partition_data(orig_train, 0.9)
+    generate_dataset_files(train, dev, test, dir_path)
+
+
+def generate_dataset_files(train, dev, test, dir_path):
+    corpus = train + dev + test
+    tag_vocab = sorted(list(set([tok.tags[0] for sent in corpus for tok in sent])))
+    pos_tag_vocab = sorted(list(set([tok.pos_tag for sent in corpus for tok in sent])))
+    dep_tag_vocab = sorted(list(set([tok.dep_tag for sent in corpus for tok in sent])))
+    write_token_data(train, os.path.join(dir_path, "train.tsv"))
+    write_token_data(dev, os.path.join(dir_path, "dev.tsv"))
+    write_token_data(test, os.path.join(dir_path, "test.tsv"))
+    with open(os.path.join(dir_path, "tag_vocab.txt"), "w", encoding="utf-8") as f:
+        f.write("\n".join(tag_vocab) + "\n")
+    with open(os.path.join(dir_path, "pos_tag_vocab.txt"), "w", encoding="utf-8") as f:
+        f.write("\n".join(pos_tag_vocab) + "\n")
+    with open(os.path.join(dir_path, "dep_tag_vocab.txt"), "w", encoding="utf-8") as f:
+        f.write("\n".join(dep_tag_vocab) + "\n")
+    with open(os.path.join(dir_path, "tag_names.txt"), "w", encoding="utf-8") as f:
+        for tag in tag_vocab:
+            f.write("{0}\t{1}\n".format(tag, tag))
+
+
+def read_wnut_data(file_path):
+    raw_data = read_data(file_path)
+    new_data = []
+    for sent in raw_data:
+        new_sent = []
+        for offset, tup in enumerate(sent):
+            new_sent.append(Token(text=tup[0], tags=[tup[1]], offset=offset))
+        new_data.append(new_sent)
+    return new_data
+
+
+def process_wnut_corpus(corpus_path):
+    raw_root_dir = os.path.join(corpus_path, "raw")
+    train = add_pos_dep_features(read_wnut_data(os.path.join(raw_root_dir, "train.txt")), "en_core_web_sm")
+    dev = add_pos_dep_features(read_wnut_data(os.path.join(raw_root_dir, "dev.txt")), "en_core_web_sm")
+    test = add_pos_dep_features(read_wnut_data(os.path.join(raw_root_dir, "test.txt")), "en_core_web_sm")
+    generate_dataset_files(train, dev, test, corpus_path)
+
+
+def read_atis_data(file_path):
+    data = []
+    with open(file_path, "r", encoding="utf-8") as f:
+        for line in f:
+            tok_sent, tag_sent = line.split("\t")
+            tokens = tok_sent.split()[1:-1]
+            tags = tag_sent.split()[1:-1]
+            sent = []
+            for i in range(len(tokens)):
+                sent.append(Token(text=tokens[i], tags=[tags[i]], offset=i))
+            data.append(sent)
+    return data
+
+
+def process_atis_corpus(corpus_path):
+    raw_root_dir = os.path.join(corpus_path, "raw")
+    train = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.train.iob.txt")), "en_core_web_sm")
+    dev = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.dev.iob.txt")), "en_core_web_sm")
+    test = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.test.iob.txt")), "en_core_web_sm")
+    generate_dataset_files(train, dev, test, corpus_path)
