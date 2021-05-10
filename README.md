@@ -272,6 +272,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector-SciBERT                                                     | 90.441        | 90.3114      | 91.0333      | 90.6709       |
 | Span Detector-SciBERT-Dice                                                | 86.022        | todo         | todo         | todo          |
 | Span Detector-SciBERT-Punct                                               | 86.276        | todo         | todo         | todo          |
+| Span Detector-SciBERT-QA4-Char-Pattern3-SubText-dim50                     | 90.86         | 91.4298         | 90.6990         | 91.0630  |
 | Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | 90.9157       |
 | Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | 90.5159       |
 | Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | 89.590        | 89.6367      | 90.0015      | 89.8187       |
