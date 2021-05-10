@@ -267,7 +267,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector-SciBERT-QType2                                              | 90.147        | 90.9988      | 89.7689      | 90.3797       |
 | Span Detector-SciBERT-QType3                                              | wandb logs    | 90.4048      | 90.2340      | 90.3193       |
 | Span Detector-SciBERT-QType4                                              | 90.806        | 91.4084      | 90.4520      | 90.9277       |
-| Span Detector-SciBERT-QA5-QType4                                          | 89.698        | todo         | todo         | todo          |
+| Span Detector-SciBERT-QA5-QType4                                          | 90.279        | todo         | todo         | todo          |
 | Span Detector-SciBERT-Cased-QType2                                        | 89.626        | 88.9157      | 90.9316      | 89.9123       |
 | Span Detector-SciBERT                                                     | 90.441        | 90.3114      | 91.0333      | 90.6709       |
 | Span Detector-SciBERT-Dice                                                | 86.022        | todo         | todo         | todo          |
