@@ -185,10 +185,12 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector*                                                            | 92.684        | 93.8006      | 93.5596      | 93.6800       |
-| Span Detector(QA4-QType4)*                                                | running       | running      | running      | running       |
-| Span Detector(BIOE-SeqTag)*                                               | running       | running      | running      | running       |
+| Span Detector(QA4-QType4)*                                                | 92.956        | 93.6291      | 94.1101      | 93.8690       |
+| Span Detector(BIOE-SeqTag)*                                               | 92.904        | 94.1774      | 93.6438      | 93.9098       |
 | Span Classifier*                                                          | 94.016        | 93.8543      | 93.8543      | 93.8543       |
 | Pipeline*                                                                 | 93.385        | 89.2568      | 89.6692      | 89.4625       |
+| Pipeline(Detector:QA4-QType4)*                                            | 93.424        | 89.7872      | 89.9037      | 89.8454       |
+| Pipeline(Detector:BIOE-SeqTag)*                                           | 93.385        | 89.2568      | 89.6692      | 89.4625       |
 
 #### BioNLP13CG
 
@@ -234,9 +236,9 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector(BIOE-SeqTag)*                                               | running       | running      | running      | running       |
-| Span Classifier*                                                          | running       | running      | running      | running       |
-| Pipeline*                                                                 | running       | running      | running      | running       |
+| Span Detector(BIOE-SeqTag)*                                               | 71.170        | 70.5673      | 69.7854      | 70.1742       |
+| Span Classifier*                                                          | 93.282        | 93.2817      | 93.2817      | 93.2817       |
+| Pipeline*                                                                 | 89.954        | 66.9038      | 66.6549      | 66.7791       |
 
 #### WNUT17
 
