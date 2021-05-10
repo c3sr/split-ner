@@ -12,8 +12,8 @@ from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
 from secner.evaluator_qa import EvaluatorQA
 from secner.model import NerModel
-from secner.model_bidaf import NerModelBiDAF
-from secner.model_crf import NerModelWithCrf
+#from secner.model_bidaf import NerModelBiDAF
+#from secner.model_crf import NerModelWithCrf
 from secner.model_roberta import NerRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging

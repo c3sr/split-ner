@@ -1,9 +1,11 @@
 {
-  "model_name": "span_scibert_query4_tag4",
+  "model_name": "test_query4_tag4",
   "dataset_dir": "bio",
   "num_labels": 4,
+  "group_by_length": true,
   "do_train": true,
   "resume": null,
+  "wandb_mode": "dryrun",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
