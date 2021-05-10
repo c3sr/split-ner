@@ -190,7 +190,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Classifier*                                                          | 94.016        | 93.8543      | 93.8543      | 93.8543       |
 | Pipeline*                                                                 | 93.385        | 89.2568      | 89.6692      | 89.4625       |
 | Pipeline(Detector:QA4-QType4)*                                            | 93.424        | 89.7872      | 89.9037      | 89.8454       |
-| Pipeline(Detector:BIOE-SeqTag)*                                           | 93.385        | 89.2568      | 89.6692      | 89.4625       |
+| Pipeline(Detector:BIOE-SeqTag)*                                           | running |
 
 #### BioNLP13CG
 
