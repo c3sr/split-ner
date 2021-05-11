@@ -2,6 +2,7 @@ import os
 import re
 from pathlib import Path
 from transformers.trainer import Trainer, PREFIX_CHECKPOINT_DIR
+#from transformers import Trainer, PREFIX_CHECKPOINT_DIR
 from typing import List
 
 
@@ -10,10 +11,13 @@ class NerTrainer(Trainer):
         super(NerTrainer, self).__init__(**kwargs)
 
     # don't swap best and last models. Instead maintain ordering and make best model least likely to be removed
-    def _sorted_checkpoints(self, checkpoint_prefix=PREFIX_CHECKPOINT_DIR, use_mtime=False) -> List[str]:
+    def _sorted_checkpoints(
+        self, output_dir=None, checkpoint_prefix=PREFIX_CHECKPOINT_DIR, use_mtime=False
+    ) -> List[str]:
         ordering_and_checkpoint_path = []
 
-        glob_checkpoints = [str(x) for x in Path(self.args.output_dir).glob(f"{checkpoint_prefix}-*")]
+        #glob_checkpoints = [str(x) for x in Path(self.args.output_dir).glob(f"{checkpoint_prefix}-*")]
+        glob_checkpoints = [str(x) for x in Path(output_dir).glob(f"{checkpoint_prefix}-*")]
 
         for path in glob_checkpoints:
             if use_mtime:
