@@ -272,7 +272,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector-SciBERT                                                     | 90.441        | 90.3114      | 91.0333      | 90.6709       |
 | Span Detector-SciBERT-Dice                                                | 86.022        | todo         | todo         | todo          |
 | Span Detector-SciBERT-Punct                                               | 86.276        | todo         | todo         | todo          |
-| Span Detector-SciBERT-QA4-Char-Pattern3-SubText-dim50                     | 90.86         | 91.4298         | 90.6990         | 91.0630  |
+| Span Detector-SciBERT-QA4-Char-Pattern3-SubText-dim50                     | 90.86         | 91.4298      | 90.6990      | **91.0630**  |
 | Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | 90.9157       |
 | Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | 90.5159       |
 | Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | 89.590        | 89.6367      | 90.0015      | 89.8187       |
@@ -285,12 +285,14 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Classifier-SciBERT                                                   | 94.042        | 94.0416      | 94.0416      | 94.0416       |
 | Span Classifier-SciBERT-Dice                                              | 94.274        | 94.2741      | 94.2741      | 94.2741       |
 | Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
+| Span Classifier-SciBERT-QA4-Char-Pattern3-SubText-dim50                   | 93.882        | todo         | todo         | todo          |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
 | Pipeline(Detector-SciBERT-QA4-QType4)                                     | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct)                              | 93.605*       | 86.6511      | 86.4873      | **86.5691**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2)                     | 93.622*       | 86.8363      | 86.3564      | **86.5957**   |
 | Pipeline(Detector-SciBERT-QA4-QType4, Classifier-SciBERT-Dice)            | 93.580*       | 87.0759      | 86.3153      | **86.6940**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2, Classifier-SciBERT-Dice)| 93.789*   | 86.8510      | 86.3709      | **86.6103**   |
+| Pipeline(SciBERT-QA4-Char-Pattern3-SubText-dim50)                         | 93.715        | 87.0202      | 86.4629      | **86.7406**   |
 
 #### CoNLL
 
