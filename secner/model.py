@@ -29,12 +29,34 @@ class NerModel(BertPreTrainedModel):
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         classifier_inp_dim = self.bert.config.hidden_size
+        print("Word Dim="+str(self.bert.config.hidden_size))
 
         if self.additional_args.word_type_handling == "1hot":
             classifier_inp_dim += self.num_word_types
 
         if self.additional_args.use_pos_tag:
-            classifier_inp_dim += self.num_pos_tags
+            if self.additional_args.use_pos_embedding:
+                #pos_emb_dim = self.additional_args.char_emb_dim
+                pos_emb_dim = 20
+                self.pos_emb = nn.Embedding(self.num_pos_tags, pos_emb_dim) 
+                self.pos_cnn = CharCNN(additional_args, "pos")
+                classifier_inp_dim += self.pos_cnn.char_out_dim
+                print("POS Dim="+str(self.pos_cnn.char_out_dim))
+
+                '''
+                self.pos_lstm = nn.LSTM(input_size=pos_emb_dim,
+                                        hidden_size=self.additional_args.lstm_hidden_dim,
+                                        bidirectional=True,
+                                        batch_first=True,
+                                        num_layers=self.additional_args.lstm_num_layers,
+                                        dropout=dropout_prob)
+                classifier_inp_dim += 2 * self.additional_args.lstm_hidden_dim
+                print("POS Dim="+str(2 * self.additional_args.lstm_hidden_dim))
+                '''
+            else:
+                classifier_inp_dim += self.num_pos_tags
+                print("POS Dim="+str(self.num_pos_tags))
+
 
         if self.additional_args.use_dep_tag:
             classifier_inp_dim += self.num_dep_tags
@@ -52,6 +74,7 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.use_char_cnn in ["char", "both"]:
             self.char_cnn = CharCNN(additional_args, "char")
             classifier_inp_dim += self.char_cnn.char_out_dim
+            print("Char Dim="+str(self.char_cnn.char_out_dim))
 
         if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
             self.flair_cnn = FlairCNN(additional_args)
@@ -65,6 +88,7 @@ class NerModel(BertPreTrainedModel):
                                         batch_first=True,
                                         num_layers=self.additional_args.lstm_num_layers,
                                         dropout=dropout_prob)
+            print("Pattern dim="+str(2 * self.additional_args.lstm_hidden_dim))
             classifier_inp_dim += 2 * self.additional_args.lstm_hidden_dim
 
         if self.additional_args.use_end_cnn:
@@ -99,6 +123,8 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.freeze_bert:
             for param in self.bert.parameters():
                 param.requires_grad = False
+
+        print("Total Dim="+str(classifier_inp_dim))
 
     def forward(
             self,
@@ -148,9 +174,32 @@ class NerModel(BertPreTrainedModel):
             sequence_output = torch.cat([sequence_output, word_type_vec], dim=2)
 
         if self.additional_args.use_pos_tag:
-            pos_tag = self.compress_with_head_mask(head_mask, pos_tag, 0)
-            pos_tag_vec = torch.eye(self.num_pos_tags)[pos_tag].to(sequence_output.device)
-            sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
+            if self.additional_args.use_pos_embedding:
+                pos_tag = self.compress_with_head_mask(head_mask, pos_tag, 0)
+                pos_tag_vec = self.pos_emb(pos_tag)
+
+                pos_tag_vec = self.char_cnn(pos_tag)
+                sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
+
+                '''
+                lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
+                packed_inp = nn.utils.rnn.pack_padded_sequence(input=pos_tag_vec,
+                                                           lengths=lengths,
+                                                           batch_first=True,
+                                                           enforce_sorted=False)
+                self.pos_lstm.flatten_parameters()
+                packed_out, _ = self.pos_lstm(packed_inp)
+                pos_tag_vec, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out,
+                                                              batch_first=True,
+                                                              total_length=seq_len)
+                #YJ --why add dropout?
+                pos_tag_vec = self.dropout(pos_tag_vec)
+                sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
+                '''
+            else:
+                pos_tag = self.compress_with_head_mask(head_mask, pos_tag, 0)
+                pos_tag_vec = torch.eye(self.num_pos_tags)[pos_tag].to(sequence_output.device)
+                sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
 
         if self.additional_args.use_dep_tag:
             dep_tag = self.compress_with_head_mask(head_mask, dep_tag, 0)
