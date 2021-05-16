@@ -208,6 +208,14 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Classifier*                                                          | 95.185        | 95.2036      | 95.2036      | 95.2036       |
 | Pipeline*                                                                 | 94.644        | 79.2261      | 87.0136      | 82.9374       |
 
+#### OntoNotes-New
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 88.808        | 88.7235      | 89.4643      | 89.0924       |
+| Span Classifier*                                                          | 95.070        | 95.1081      | 95.1081      | 95.1081       |
+| Pipeline*                                                                 | 94.348        | 84.9409      | 87.1461      | 86.0294       |
+
 #### JNLPBA
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |

@@ -2,7 +2,6 @@
   "model_name": "ner-roberta-qa4-querytype4-span",
   "dataset_dir": "onto_new_10",
   "num_labels": 4,
-  "data_pos_dep": false,
   "do_train": true,
   "resume": null,
   "num_train_epochs": 300,

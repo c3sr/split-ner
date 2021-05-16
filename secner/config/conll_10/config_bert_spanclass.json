@@ -1,6 +1,7 @@
 {
   "model_name": "ner-bert-spanclass",
   "dataset_dir": "conll_10",
+  "wandb_mode": "dryrun",
   "do_train": false,
   "resume": "16660",
   "num_train_epochs": 300,
