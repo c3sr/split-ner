@@ -237,21 +237,26 @@ def read_mit_data(file_path):
     return new_data
 
 
-def add_pos_dep_features(data, spacy_model_name):
+def add_pos_dep_features(data, spacy_model_name, add_pos=True, add_dep=True):
     import spacy
     from spacy.tokens import Doc
 
     nlp = spacy.load(spacy_model_name)
     tokenizer_map = dict()
     nlp.tokenizer = lambda x: Doc(nlp.vocab, tokenizer_map[x])
-    for sent in data:
+    print("total: {0}".format(len(data)))
+    for index, sent in enumerate(data):
+        if index % 1000 == 0:
+            print("processing sentence: {0}".format(index))
         words = [tok.text for tok in sent]
         sent_text = " ".join(words)
         tokenizer_map[sent_text] = words
         doc = nlp(sent_text)
         for i, token in enumerate(doc):
-            sent[i].pos_tag = token.tag_
-            sent[i].dep_tag = token.dep_
+            if add_pos:
+                sent[i].pos_tag = token.tag_
+            if add_dep:
+                sent[i].dep_tag = token.dep_
     return data
 
 
@@ -340,3 +345,129 @@ def process_atis_corpus(corpus_path):
     dev = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.dev.iob.txt")), "en_core_web_sm")
     test = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.test.iob.txt")), "en_core_web_sm")
     generate_dataset_files(train, dev, test, corpus_path)
+
+
+def read_onto_data(file_path):
+    data = []
+    with open(file_path, "r", encoding="utf-8") as f:
+        sent = []
+        num_parts = 0
+        for line in f:
+            line = line.strip()
+            s = line.split()
+            if line.startswith("#end document"):
+                continue
+            if line.startswith("#begin document"):
+                num_parts += 1
+                continue
+
+            if not line or len(s) < 11:
+                if len(sent) > 0:
+                    data.append(sent)
+                    sent = []
+                continue
+            text = s[3]
+            pos_tag = s[4]
+            tag = s[10]
+            token = Token(text=text, tags=[tag], offset=len(sent), pos_tag=pos_tag)
+            sent.append(token)
+        if len(sent) > 0:
+            data.append(sent)
+    return data, num_parts
+
+
+def process_onto_entity_spans(sent):
+    spans = []
+    for index, tok in enumerate(sent):
+        if tok.tags[0].startswith("("):
+            tag = tok.tags[0][1:-1]
+            spans.append((tag, PairSpan(index, index)))
+        if tok.tags[0].endswith(")"):
+            spans[-1][1].end = index
+    for tok in sent:
+        tok.tags[0] = "O"
+    for span in spans:
+        sent[span[1].start].tags[0] = "B-{0}".format(span[0])
+        for i in range(span[1].start + 1, span[1].end + 1):
+            sent[i].tags[0] = "I-{0}".format(span[0])
+    return sent
+
+
+def process_onto_corpus_split(root_path, split_type):
+    path = os.path.join(root_path, split_type, "data", "english", "annotations")
+    data = []
+    num_docs = 0
+    num_parts = 0
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            name, ext = os.path.splitext(file_path)
+            version, quality, layer = ext[1:].split("_")
+            if not (layer == "conll" and quality == "gold"):
+                continue
+            doc_data, doc_num_parts = read_onto_data(file_path)
+            num_parts += doc_num_parts
+            num_docs += 1
+            data.extend(doc_data)
+
+    for i in range(len(data)):
+        data[i] = process_onto_entity_spans(data[i])
+
+    print("#docs: {0} | #parts: {1}".format(num_docs, num_parts))
+    return data
+
+
+def count_onto_entities(data):
+    num_entities = 0
+    for sent in data:
+        sent_num_entities = 0
+        for tok in sent:
+            if tok.tags[0][0] == "B":
+                sent_num_entities += 1
+        num_entities += sent_num_entities
+    print("#entities: {0}".format(num_entities))
+
+
+def process_onto_corpus(corpus_path):
+    path = os.path.join(corpus_path, "raw", "conll-2012", "v4", "data")
+    train = process_onto_corpus_split(path, "train")
+    dev = process_onto_corpus_split(path, "development")
+    test = process_onto_corpus_split(path, "test")
+
+    train = add_pos_dep_features(train, "en_core_web_sm", add_pos=False, add_dep=True)
+    dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=False, add_dep=True)
+    test = add_pos_dep_features(test, "en_core_web_sm", add_pos=False, add_dep=True)
+
+    write_token_data(train, os.path.join(corpus_path, "train.tsv"))
+    write_token_data(dev, os.path.join(corpus_path, "dev.tsv"))
+    write_token_data(test, os.path.join(corpus_path, "test.tsv"))
+    generate_dataset_files(train, dev, test, corpus_path)
+
+
+def read_conllpp_data(file_path):
+    raw_data = read_data(file_path, sep=" ")
+    new_data = []
+    for sent in raw_data:
+        new_sent = []
+        for offset, tup in enumerate(sent):
+            pos_tag = "O" if tup[1] == "-X-" else tup[1]
+            new_sent.append(Token(text=tup[0], tags=[tup[3]], pos_tag=pos_tag, offset=offset))
+        new_data.append(new_sent)
+    return new_data
+
+
+def process_conllpp_corpus(corpus_path):
+    raw_path = os.path.join(corpus_path, "raw")
+    train = read_conllpp_data(os.path.join(raw_path, "conllpp_train.txt"))
+    dev = read_conllpp_data(os.path.join(raw_path, "conllpp_dev.txt"))
+    test = read_conllpp_data(os.path.join(raw_path, "conllpp_test.txt"))
+
+    train = add_pos_dep_features(train, "en_core_web_sm", add_pos=False, add_dep=True)
+    dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=False, add_dep=True)
+    test = add_pos_dep_features(test, "en_core_web_sm", add_pos=False, add_dep=True)
+
+    write_token_data(train, os.path.join(raw_path, "train.tsv"))
+    write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
+    write_token_data(test, os.path.join(raw_path, "test.tsv"))
+    generate_dataset_files(train, dev, test, corpus_path)
+
