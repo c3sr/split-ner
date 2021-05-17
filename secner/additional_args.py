@@ -38,8 +38,8 @@ class AdditionalArguments:
     freeze_bert: bool = field(default=False, metadata={"help": "freeze base bert model's parameters during training"})
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char|roberta_std)"})
     loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|ce_punct|dice)"})
-    use_char_cnn: str = field(default="none", metadata=
-    {"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
+    use_char_cnn: str = field(default="none", metadata={"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
+    add_cnn: bool = field(default=True, metadata={"help": "use CNN for pattern embedding"})
     token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
     prediction_mapping: str = field(default="type1", metadata=
     {"help": "converting from bert to dataset level outputs (type1|type2)"})
@@ -51,7 +51,9 @@ class AdditionalArguments:
     {"help": "query type for entities fed in QA model (question|question2)"})
     detect_spans: bool = field(default=False, metadata={"help": "in QA mode with this set, we detect only spans"})
     char_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
+    pos_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
+    pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_num_layers: int = field(default=1, metadata={"help": "pattern LSTM: no. of layers"})
     cnn_num_filters: int = field(default=16, metadata={"help": "# char CNN filters"})
     cnn_kernel_size: int = field(default=5, metadata={"help": "char CNN kernel size"})
