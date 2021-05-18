@@ -8,10 +8,8 @@ from transformers import HfArgumentParser
 from transformers.trainer import TrainingArguments
 
 from secner.additional_args import AdditionalArguments
-from secner.dataset_span import NerSpanDataCollator, NerSpanDataset, NerInferSpanDataset
+from secner.dataset_span import NerSpanDataCollator, NerSpanDataset
 from secner.evaluator_span import EvaluatorSpan
-from secner.model_span import NerSpanModel
-from secner.model_span_roberta import NerSpanRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -100,8 +98,10 @@ class NerSpanExecutor:
 
     def get_model_class(self):
         if self.additional_args.model_mode == "std":
+            from secner.model_span import NerSpanModel
             return NerSpanModel
         if self.additional_args.model_mode == "roberta_std":
+            from secner.model_span_roberta import NerSpanRobertaModel
             return NerSpanRobertaModel
         raise NotImplementedError
 
@@ -113,6 +113,7 @@ class NerSpanExecutor:
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
             if self.additional_args.infer_path:
                 logger.info("inference mode")
+                from secner.dataset_span import NerInferSpanDataset
                 self.dump_predictions(NerInferSpanDataset(self.additional_args))
             else:
                 logger.info("prediction mode")

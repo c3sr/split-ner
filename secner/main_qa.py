@@ -11,10 +11,6 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
 from secner.evaluator_qa import EvaluatorQA
-from secner.model import NerModel
-from secner.model_bidaf import NerModelBiDAF
-from secner.model_crf import NerModelWithCrf
-from secner.model_roberta import NerRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -209,12 +205,16 @@ class NerQAExecutor:
 
     def get_model_class(self):
         if self.additional_args.model_mode == "std":
+            from secner.model import NerModel
             return NerModel
         if self.additional_args.model_mode == "roberta_std":
+            from secner.model_roberta import NerRobertaModel
             return NerRobertaModel
         if self.additional_args.model_mode == "crf":
+            from secner.model_crf import NerModelWithCrf
             return NerModelWithCrf
         if self.additional_args.model_mode == "bidaf":
+            from secner.model_bidaf import NerModelBiDAF
             return NerModelBiDAF
 
 

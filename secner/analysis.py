@@ -2,8 +2,6 @@ import argparse
 import os
 from collections import defaultdict
 
-from sklearn.metrics import confusion_matrix
-
 
 def parse_file(file_path):
     data = []
@@ -102,6 +100,7 @@ def span_corrector(spans):
 
 
 def print_confusion_matrix_csv(data):
+    from sklearn.metrics import confusion_matrix
     print("CONFUSION MATRIX:")
     labels = sorted(list(set([tok[1] for sent in data for tok in sent])))
     y_true = [tok[1] for sent in data for tok in sent]

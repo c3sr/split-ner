@@ -1,8 +1,6 @@
 import argparse
 import re
 
-import spacy
-from spacy.tokens.doc import Doc
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
 
@@ -26,6 +24,8 @@ class NerQADataset(Dataset):
         self.tag_to_text_mapping = self.parse_tag_names()
 
         if self.args.use_pos_tag or self.args.use_dep_tag:
+            import spacy
+            from spacy.tokens.doc import Doc
             self.nlp = spacy.load("en_core_web_sm")
             self.tokenizer_map = dict()
             self.nlp.tokenizer = lambda x: Doc(self.nlp.vocab, self.tokenizer_map[x])

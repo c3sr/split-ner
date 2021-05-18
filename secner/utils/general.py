@@ -9,8 +9,6 @@ from typing import Tuple
 
 import dataclasses
 import numpy as np
-import torch
-import wandb
 from transformers import HfArgumentParser
 from transformers.hf_argparser import DataClass
 from transformers.training_args import default_logdir
@@ -91,6 +89,7 @@ class Context:
 
 
 def set_all_seeds(seed=42):
+    import torch
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -110,6 +109,7 @@ def setup_logging():
 
 
 def set_wandb(wandb_dir):
+    import wandb
     os.environ["WANDB_WATCH"] = "all"
     os.makedirs(os.path.join(wandb_dir, "wandb"), exist_ok=True)
     wandb.init(project=os.getenv("WANDB_PROJECT", "sec-ner"), dir=wandb_dir)
