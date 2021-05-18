@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import random
+from collections import defaultdict
 from pathlib import Path
 from shutil import copyfile
 from typing import Tuple
@@ -13,6 +14,8 @@ import wandb
 from transformers import HfArgumentParser
 from transformers.hf_argparser import DataClass
 from transformers.training_args import default_logdir
+
+logger = logging.getLogger(__name__)
 
 
 class Token:
@@ -224,6 +227,54 @@ def make_shorter_dataset_util(inp_data_path, out_data_path, shrink_factor):
     vec = np.random.choice(np.arange(n), int(shrink_factor * n), replace=False)
     new_data = [data[k] for k in vec]
     write_data(new_data, out_data_path)
+
+
+def make_k_shot_dataset(inp_path, k, seed):
+    setup_logging()
+    set_all_seeds(seed)
+    out_path = "{0}_{1}shot_sd{2}".format(inp_path, k, seed)
+    os.makedirs(out_path, exist_ok=True)
+    make_k_shot_dataset_util(os.path.join(inp_path, "train.tsv"), os.path.join(out_path, "train.tsv"), k)
+    make_k_shot_dataset_util(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"), k)
+    copyfile(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"))
+    copyfile(os.path.join(inp_path, "tag_vocab.txt"), os.path.join(out_path, "tag_vocab.txt"))
+    copyfile(os.path.join(inp_path, "tag_names.txt"), os.path.join(out_path, "tag_names.txt"))
+    copyfile(os.path.join(inp_path, "pos_tag_vocab.txt"), os.path.join(out_path, "pos_tag_vocab.txt"))
+    copyfile(os.path.join(inp_path, "dep_tag_vocab.txt"), os.path.join(out_path, "dep_tag_vocab.txt"))
+
+
+def make_k_shot_dataset_util(inp_data_path, out_data_path, k):
+    data = read_data(inp_data_path)
+    tag_to_sent_map_tmp = defaultdict(set)
+    for sent_index, sent in enumerate(data):
+        for token in sent:
+            if token[-1][0] in ["B", "S"]:
+                tag_to_sent_map_tmp[token[-1][2:]].add(sent_index)
+    tag_to_sent_map = {t: sorted(list(tag_to_sent_map_tmp[t])) for t in tag_to_sent_map_tmp}
+    sorted_tags = sorted(list(tag_to_sent_map.keys()), key=lambda t: (len(tag_to_sent_map[t]), t))
+    tag_cnt = {t: k for t in sorted_tags}
+    tag_index = 0
+    k_shot_data = []
+    while tag_index < len(sorted_tags):
+        tag = sorted_tags[tag_index]
+        if tag_cnt[tag] <= 0:
+            tag_index += 1
+            continue
+        sent_indices = tag_to_sent_map[tag]
+        if len(sent_indices) == 0:
+            logger.warning("{0} has less than {1} samples in {2}".format(tag, k, inp_data_path))
+            tag_index += 1
+            continue
+        index = np.random.choice(sent_indices)
+        sent = data[index]
+        k_shot_data.append(sent)
+        for token in sent:
+            if token[-1][0] in ["B", "S"]:
+                t = token[-1][2:]
+                if index in tag_to_sent_map[t]:
+                    tag_to_sent_map[t].remove(index)
+                tag_cnt[t] -= 1
+    write_data(k_shot_data, out_data_path)
 
 
 def read_mit_data(file_path):
