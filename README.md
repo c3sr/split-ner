@@ -174,7 +174,86 @@ The final outputs are generated always in file ```infer.tsv``` under the ```pred
 python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer --only_f1
 ```
 
-### Few-Shot NER
+### Few-Shot NER (10% data)
+
+```
+*Was trained with smaller dev set (can retrain now to work with original dev set)
+```
+
+#### CoNLL
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| **Span Detector(QA4-QType4-Char-Pattern3-SubText)***                      | running       | running      | running      | running       |
+| Span Classifier(Dice)(5ep. eval steps)*                                   | 59.649        | 59.3836      | 59.3836      | 59.3836       |
+| **Pipeline***                                                             | running       | running      | running      | running       |
+
+#### ATIS
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 95.505        | 96.5058      | 97.1708      | 96.8372       |
+| Span Classifier(Dice)*                                                    | running       | running      | running      | running       |
+| Pipeline*                                                                 | 88.212        | 86.2392      | 86.8966      | 86.5666       |
+
+#### Mit-Trivia
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 42.243        | 52.7790      | 41.0834      | 46.2025       |
+| Span Classifier(Dice)*                                                    | 78.087        | 78.0865      | 78.0865      | 78.0865       |
+| Pipeline*                                                                 | 69.725        | 42.5667      | 36.5896      | 39.3525       |
+
+#### Mit-Movie
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | running       | running      | running      | running       |
+| Span Classifier(Dice)*                                                    | running       | running      | running      | running       |
+| Pipeline*                                                                 | running       | running      | running      | running       |
+
+#### Mit-Restaurant
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | running       | running      | running      | running       |
+| Span Classifier(Dice)*                                                    | running       | running      | running      | running       |
+| Pipeline*                                                                 | running       | running      | running      | running       |
+
+#### Onto-New
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | running       | running      | running      | running       |
+| Span Classifier(Dice)*                                                    | running       | running      | running      | running       |
+| Pipeline*                                                                 | running       | running      | running      | running       |
+
+#### WNUT
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | running       | running      | running      | running       |
+| Span Classifier(Dice)*                                                    | running       | running      | running      | running       |
+| Pipeline*                                                                 | running       | running      | running      | running       |
+
+#### BIONLP13CG
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 76.376        | 73.2535      | 81.8340      | 77.3064       |
+| Span Classifier(Dice)*                                                    | 85.583        | 85.5835      | 85.5835      | 85.5835       |
+| Pipeline*                                                                 | 82.121        | 63.6399      | 71.2289      | 67.2209       |
+
+#### JNLPBA
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | running       | running      | running      | running       |
+| Span Classifier(Dice)*                                                    | running       | running      | running      | running       |
+| Pipeline*                                                                 | running       | running      | running      | running       |
+
+
+### Few-Shot NER (10% data)
 
 ```
 *Was trained with smaller dev set (can retrain now to work with original dev set)
