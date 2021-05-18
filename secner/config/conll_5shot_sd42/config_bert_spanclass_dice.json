@@ -1,8 +1,8 @@
 {
   "model_name": "ner-bert-spanclass-dice",
   "dataset_dir": "conll_5shot_sd42",
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "470",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
