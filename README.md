@@ -214,9 +214,10 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
 | Span Detector(BIOE-SeqTag)*                                               | 88.808        | 88.7235      | 89.4643      | 89.0924       |
 | Span Detector(QA4-Dice-Char-Pattern3-SubText-Dim50)*                      | 87.659        | 88.3742      | 87.8947      | 88.1338       |
-| Span Detector(QA4-QType4-Char-Pattern3-SubText-Dim50)*                    | running       | running      | running      | running       |
+| Span Detector(QA4-QType4-Char-Pattern3-SubText-Dim50)*                    | 88.433        | 89.3452      | 88.2327      | 88.7855       |
 | Span Classifier*                                                          | 95.070        | 95.1081      | 95.1081      | 95.1081       |
 | Pipeline*                                                                 | 94.348        | 84.9409      | 87.1461      | 86.0294       |
+| Pipeline(Det:QA4-QType4-Char-Pattern3-SubText-Dim50)*                     | 94.462        | 85.6255      | 86.6163      | 86.1180       |
 
 #### JNLPBA
 
