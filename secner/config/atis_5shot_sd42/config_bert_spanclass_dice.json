@@ -1,8 +1,8 @@
 {
   "model_name": "ner-bert-spanclass-dice",
   "dataset_dir": "atis_5shot_sd42",
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "5950",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
