@@ -17,7 +17,7 @@
   "freeze_bert": false,
   "loss_type": "dice",
   "query_type": "question",
-  "base_model": "dmis-lab/biobert-base-cased-v1.1",
+  "base_model": "allenai/scibert_scivocab_uncased",
   "evaluation_strategy": "steps",
   "logging_steps": 10,
   "save_total_limit": 2,

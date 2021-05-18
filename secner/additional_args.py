@@ -68,7 +68,7 @@ class AdditionalArguments:
     filter_tags: object = field(default=None, metadata={"help": "consider only given output tags"})
     split_tags: bool = field(default=False, metadata={"help": "split big categories into smaller ones"})
     gold_span_inp: str = field(default="none", metadata={"help": "provide gold span as input (none|simple|label)"})
-    wandb_mode: str = field(default="run", metadata={"help": "can enable/disable wandb online sync (run/dryrun)"})
+    wandb_mode: str = field(default="dryrun", metadata={"help": "can enable/disable wandb online sync (run/dryrun)"})
     debug_mode: bool = field(default=False, metadata={"help": "truncate dataset for faster debugging"})
 
     def __post_init__(self):
