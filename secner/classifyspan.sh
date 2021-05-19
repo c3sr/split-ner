@@ -1,1 +1,1 @@
-python main_span.py --config myconfig/bio/$1
+python main_span.py --config $1
