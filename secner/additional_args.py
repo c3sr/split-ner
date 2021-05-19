@@ -53,7 +53,6 @@ class AdditionalArguments:
     char_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     pos_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
-    pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_num_layers: int = field(default=1, metadata={"help": "pattern LSTM: no. of layers"})
     cnn_num_filters: int = field(default=16, metadata={"help": "# char CNN filters"})
     cnn_kernel_size: int = field(default=5, metadata={"help": "char CNN kernel size"})
@@ -64,7 +63,6 @@ class AdditionalArguments:
     use_head_mask: bool = field(default=False, metadata={"help": "use only head sub-token's output from BERT"})
     data_pos_dep: bool = field(default=True, metadata={"help": "dataset has labeled POS/DEP tags"})
     use_pos_tag: bool = field(default=False, metadata={"help": "use POS tag vectors for tokens"})
-    use_pos_embedding: bool = field(default=False, metadata={"help": "use 1-hot or embedding"})
     use_dep_tag: bool = field(default=False, metadata={"help": "use 1-hot DEP-parse tag vectors for tokens"})
     use_main_lstm: bool = field(default=False, metadata={"help": "use bi-LSTM as the main LM"})
     use_bidaf_orig_cnn: bool = field(default=False, metadata={"help": "use orig. CNN used in BiDAF for backward comp."})
@@ -73,6 +71,10 @@ class AdditionalArguments:
     gold_span_inp: str = field(default="none", metadata={"help": "provide gold span as input (none|simple|label)"})
     wandb_mode: str = field(default="run", metadata={"help": "can enable/disable wandb online sync (run/dryrun)"})
     debug_mode: bool = field(default=False, metadata={"help": "truncate dataset for faster debugging"})
+
+    use_pos_embedding: bool = field(default=False, metadata={"help": "use 1-hot or embedding"})
+    pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
+    pattern_vocab_path: str = field(default="pattern_vocab.txt", metadata={"help": "pattern vocab file path"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
@@ -92,6 +94,7 @@ class AdditionalArguments:
         self.pos_tag_vocab_path = os.path.join(self.abs_dataset_dir, self.pos_tag_vocab_path)
         self.dep_tag_vocab_path = os.path.join(self.abs_dataset_dir, self.dep_tag_vocab_path)
         self.tag_names_path = os.path.join(self.abs_dataset_dir, self.tag_names_path)
+        self.pattern_vocab_path = os.path.join(self.abs_dataset_dir, self.pattern_vocab_path)
 
     def to_dict(self):
         """
