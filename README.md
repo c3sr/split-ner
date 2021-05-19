@@ -212,9 +212,9 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector(BIOE-SeqTag)*                                               | running       | running      | running      | running       |
-| Span Classifier*                                                          | running       | running      | running      | running       |
-| Pipeline*                                                                 | running       | running      | running      | running       |
+| Span Detector(BIOE-SeqTag)*                                               | 68.947        | 67.9255      | 76.4750      | 71.9471       |
+| Span Classifier*                                                          | 73.253        | 73.2484      | 73.2484      | 73.2484       |
+| Pipeline*                                                                 | 68.864        | 50.7321      | 57.2905      | 53.8122       |
 
 #### Mit-Restaurant
 
@@ -252,9 +252,9 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
 |---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector(BIOE-SeqTag)*                                               | running       | running      | running      | running       |
-| Span Classifier*                                                          | running       | running      | running      | running       |
-| Pipeline*                                                                 | running       | running      | running      | running       |
+| Span Detector(BIOE-SeqTag)*                                               | 52.414        | 52.3584      | 62.6645      | 57.0498       |
+| Span Classifier*                                                          | 78.065        | 78.0581      | 78.1033      | 78.0807       |
+| Pipeline*                                                                 | 75.718        | 42.2474      | 51.3469      | 46.3548       |
 
 
 ### Few-Shot NER (10% data)
