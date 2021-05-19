@@ -1,1 +1,1 @@
-python main_qa.py --config myconfig/bio/span_scibert_qa_char_pattern.json --output $1
+python main_qa.py --config $1 --output $2
