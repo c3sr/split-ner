@@ -2,17 +2,18 @@ import json
 import logging
 import os
 import random
+from collections import defaultdict
 from pathlib import Path
 from shutil import copyfile
 from typing import Tuple
 
 import dataclasses
 import numpy as np
-import torch
-import wandb
 from transformers import HfArgumentParser
 from transformers.hf_argparser import DataClass
 from transformers.training_args import default_logdir
+
+logger = logging.getLogger(__name__)
 
 
 class Token:
@@ -88,6 +89,7 @@ class Context:
 
 
 def set_all_seeds(seed=42):
+    import torch
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -107,6 +109,7 @@ def setup_logging():
 
 
 def set_wandb(wandb_dir):
+    import wandb
     os.environ["WANDB_WATCH"] = "all"
     os.makedirs(os.path.join(wandb_dir, "wandb"), exist_ok=True)
     wandb.init(project=os.getenv("WANDB_PROJECT", "sec-ner"), dir=wandb_dir)
@@ -226,6 +229,54 @@ def make_shorter_dataset_util(inp_data_path, out_data_path, shrink_factor):
     write_data(new_data, out_data_path)
 
 
+def make_k_shot_dataset(inp_path, k, seed):
+    setup_logging()
+    set_all_seeds(seed)
+    out_path = "{0}_{1}shot_sd{2}".format(inp_path, k, seed)
+    os.makedirs(out_path, exist_ok=True)
+    make_k_shot_dataset_util(os.path.join(inp_path, "train.tsv"), os.path.join(out_path, "train.tsv"), k)
+    make_k_shot_dataset_util(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"), k)
+    copyfile(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"))
+    copyfile(os.path.join(inp_path, "tag_vocab.txt"), os.path.join(out_path, "tag_vocab.txt"))
+    copyfile(os.path.join(inp_path, "tag_names.txt"), os.path.join(out_path, "tag_names.txt"))
+    copyfile(os.path.join(inp_path, "pos_tag_vocab.txt"), os.path.join(out_path, "pos_tag_vocab.txt"))
+    copyfile(os.path.join(inp_path, "dep_tag_vocab.txt"), os.path.join(out_path, "dep_tag_vocab.txt"))
+
+
+def make_k_shot_dataset_util(inp_data_path, out_data_path, k):
+    data = read_data(inp_data_path)
+    tag_to_sent_map_tmp = defaultdict(set)
+    for sent_index, sent in enumerate(data):
+        for token in sent:
+            if token[-1][0] in ["B", "S"]:
+                tag_to_sent_map_tmp[token[-1][2:]].add(sent_index)
+    tag_to_sent_map = {t: sorted(list(tag_to_sent_map_tmp[t])) for t in tag_to_sent_map_tmp}
+    sorted_tags = sorted(list(tag_to_sent_map.keys()), key=lambda t: (len(tag_to_sent_map[t]), t))
+    tag_cnt = {t: k for t in sorted_tags}
+    tag_index = 0
+    k_shot_data = []
+    while tag_index < len(sorted_tags):
+        tag = sorted_tags[tag_index]
+        if tag_cnt[tag] <= 0:
+            tag_index += 1
+            continue
+        sent_indices = tag_to_sent_map[tag]
+        if len(sent_indices) == 0:
+            logger.warning("{0} has less than {1} samples in {2}".format(tag, k, inp_data_path))
+            tag_index += 1
+            continue
+        index = np.random.choice(sent_indices)
+        sent = data[index]
+        k_shot_data.append(sent)
+        for token in sent:
+            if token[-1][0] in ["B", "S"]:
+                t = token[-1][2:]
+                if index in tag_to_sent_map[t]:
+                    tag_to_sent_map[t].remove(index)
+                tag_cnt[t] -= 1
+    write_data(k_shot_data, out_data_path)
+
+
 def read_mit_data(file_path):
     raw_data = read_data(file_path)
     new_data = []
@@ -237,21 +288,26 @@ def read_mit_data(file_path):
     return new_data
 
 
-def add_pos_dep_features(data, spacy_model_name):
+def add_pos_dep_features(data, spacy_model_name, add_pos=True, add_dep=True):
     import spacy
     from spacy.tokens import Doc
 
     nlp = spacy.load(spacy_model_name)
     tokenizer_map = dict()
     nlp.tokenizer = lambda x: Doc(nlp.vocab, tokenizer_map[x])
-    for sent in data:
+    print("total: {0}".format(len(data)))
+    for index, sent in enumerate(data):
+        if index % 1000 == 0:
+            print("processing sentence: {0}".format(index))
         words = [tok.text for tok in sent]
         sent_text = " ".join(words)
         tokenizer_map[sent_text] = words
         doc = nlp(sent_text)
         for i, token in enumerate(doc):
-            sent[i].pos_tag = token.tag_
-            sent[i].dep_tag = token.dep_
+            if add_pos:
+                sent[i].pos_tag = token.tag_
+            if add_dep:
+                sent[i].dep_tag = token.dep_
     return data
 
 
@@ -340,3 +396,129 @@ def process_atis_corpus(corpus_path):
     dev = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.dev.iob.txt")), "en_core_web_sm")
     test = add_pos_dep_features(read_atis_data(os.path.join(raw_root_dir, "atis.test.iob.txt")), "en_core_web_sm")
     generate_dataset_files(train, dev, test, corpus_path)
+
+
+def read_onto_data(file_path):
+    data = []
+    with open(file_path, "r", encoding="utf-8") as f:
+        sent = []
+        num_parts = 0
+        for line in f:
+            line = line.strip()
+            s = line.split()
+            if line.startswith("#end document"):
+                continue
+            if line.startswith("#begin document"):
+                num_parts += 1
+                continue
+
+            if not line or len(s) < 11:
+                if len(sent) > 0:
+                    data.append(sent)
+                    sent = []
+                continue
+            text = s[3]
+            pos_tag = s[4]
+            tag = s[10]
+            token = Token(text=text, tags=[tag], offset=len(sent), pos_tag=pos_tag)
+            sent.append(token)
+        if len(sent) > 0:
+            data.append(sent)
+    return data, num_parts
+
+
+def process_onto_entity_spans(sent):
+    spans = []
+    for index, tok in enumerate(sent):
+        if tok.tags[0].startswith("("):
+            tag = tok.tags[0][1:-1]
+            spans.append((tag, PairSpan(index, index)))
+        if tok.tags[0].endswith(")"):
+            spans[-1][1].end = index
+    for tok in sent:
+        tok.tags[0] = "O"
+    for span in spans:
+        sent[span[1].start].tags[0] = "B-{0}".format(span[0])
+        for i in range(span[1].start + 1, span[1].end + 1):
+            sent[i].tags[0] = "I-{0}".format(span[0])
+    return sent
+
+
+def process_onto_corpus_split(root_path, split_type):
+    path = os.path.join(root_path, split_type, "data", "english", "annotations")
+    data = []
+    num_docs = 0
+    num_parts = 0
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            name, ext = os.path.splitext(file_path)
+            version, quality, layer = ext[1:].split("_")
+            if not (layer == "conll" and quality == "gold"):
+                continue
+            doc_data, doc_num_parts = read_onto_data(file_path)
+            num_parts += doc_num_parts
+            num_docs += 1
+            data.extend(doc_data)
+
+    for i in range(len(data)):
+        data[i] = process_onto_entity_spans(data[i])
+
+    print("#docs: {0} | #parts: {1}".format(num_docs, num_parts))
+    return data
+
+
+def count_onto_entities(data):
+    num_entities = 0
+    for sent in data:
+        sent_num_entities = 0
+        for tok in sent:
+            if tok.tags[0][0] == "B":
+                sent_num_entities += 1
+        num_entities += sent_num_entities
+    print("#entities: {0}".format(num_entities))
+
+
+def process_onto_corpus(corpus_path):
+    path = os.path.join(corpus_path, "raw", "conll-2012", "v4", "data")
+    train = process_onto_corpus_split(path, "train")
+    dev = process_onto_corpus_split(path, "development")
+    test = process_onto_corpus_split(path, "test")
+
+    train = add_pos_dep_features(train, "en_core_web_sm", add_pos=False, add_dep=True)
+    dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=False, add_dep=True)
+    test = add_pos_dep_features(test, "en_core_web_sm", add_pos=False, add_dep=True)
+
+    write_token_data(train, os.path.join(corpus_path, "train.tsv"))
+    write_token_data(dev, os.path.join(corpus_path, "dev.tsv"))
+    write_token_data(test, os.path.join(corpus_path, "test.tsv"))
+    generate_dataset_files(train, dev, test, corpus_path)
+
+
+def read_conllpp_data(file_path):
+    raw_data = read_data(file_path, sep=" ")
+    new_data = []
+    for sent in raw_data:
+        new_sent = []
+        for offset, tup in enumerate(sent):
+            pos_tag = "O" if tup[1] == "-X-" else tup[1]
+            new_sent.append(Token(text=tup[0], tags=[tup[3]], pos_tag=pos_tag, offset=offset))
+        new_data.append(new_sent)
+    return new_data
+
+
+def process_conllpp_corpus(corpus_path):
+    raw_path = os.path.join(corpus_path, "raw")
+    train = read_conllpp_data(os.path.join(raw_path, "conllpp_train.txt"))
+    dev = read_conllpp_data(os.path.join(raw_path, "conllpp_dev.txt"))
+    test = read_conllpp_data(os.path.join(raw_path, "conllpp_test.txt"))
+
+    train = add_pos_dep_features(train, "en_core_web_sm", add_pos=False, add_dep=True)
+    dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=False, add_dep=True)
+    test = add_pos_dep_features(test, "en_core_web_sm", add_pos=False, add_dep=True)
+
+    write_token_data(train, os.path.join(raw_path, "train.tsv"))
+    write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
+    write_token_data(test, os.path.join(raw_path, "test.tsv"))
+    generate_dataset_files(train, dev, test, corpus_path)
+

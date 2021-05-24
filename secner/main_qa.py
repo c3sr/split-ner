@@ -49,7 +49,7 @@ class NerQAExecutor:
         logger.info("# trainable params: {0}".format(sum([np.prod(p.size()) for p in trainable_params])))
 
         tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
-        data_collator = NerDataCollator(args=additional_args)
+        data_collator = NerDataCollator(args=additional_args, pattern_vocab=self.train_dataset.pattern_vocab)
         self.trainer = NerTrainer(model=self.model,
                                   args=train_args,
                                   tokenizer=tokenizer,
@@ -209,12 +209,16 @@ class NerQAExecutor:
 
     def get_model_class(self):
         if self.additional_args.model_mode == "std":
+            from secner.model import NerModel
             return NerModel
         if self.additional_args.model_mode == "roberta_std":
+            from secner.model_roberta import NerRobertaModel
             return NerRobertaModel
         if self.additional_args.model_mode == "crf":
+            from secner.model_crf import NerModelWithCrf
             return NerModelWithCrf
         if self.additional_args.model_mode == "bidaf":
+            from secner.model_bidaf import NerModelBiDAF
             return NerModelBiDAF
 
 

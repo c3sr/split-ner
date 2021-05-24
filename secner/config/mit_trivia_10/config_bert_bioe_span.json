@@ -1,9 +1,10 @@
 {
   "model_name": "ner-bert-bioe-span",
   "dataset_dir": "mit_trivia_10",
+  "wandb_mode": "dryrun",
   "tagging": "bioe",
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "10960",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",

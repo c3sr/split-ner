@@ -2,7 +2,7 @@
   "model_name": "class_scibert_dice",
   "dataset_dir": "bio",
   "do_train": true,
-  "resume": "",
+  "resume": null,
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out/class",

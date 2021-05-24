@@ -1,0 +1,18 @@
+CARDINAL	Cardinal
+DATE	Date
+EVENT	Event
+FAC	Facility
+GPE	Geo Political Entity
+LANGUAGE	Language
+LAW	Law
+LOC	Location
+MONEY	Money
+NORP	Nationalities or Religious or Political Groups
+ORDINAL	Ordinal
+ORG	Organization
+PERCENT	Percent
+PERSON	Person
+PRODUCT	Product
+QUANTITY	Quantity
+TIME	Time
+WORK_OF_ART	Work of Art

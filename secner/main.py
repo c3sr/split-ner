@@ -8,14 +8,7 @@ from transformers import HfArgumentParser
 from transformers.trainer import TrainingArguments
 
 from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset, NerDataCollator
-from secner.dataset_char import NerCharDataset, NerCharDataCollator
 from secner.evaluator import Evaluator
-from secner.model import NerModel
-from secner.model_bidaf import NerModelBiDAF
-from secner.model_char import NerModelChar
-from secner.model_crf import NerModelWithCrf
-from secner.model_roberta import NerRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -155,26 +148,36 @@ class NerExecutor:
 
     def get_model_class(self):
         if self.additional_args.model_mode == "std":
+            from secner.model import NerModel
             return NerModel
         if self.additional_args.model_mode == "roberta_std":
+            from secner.model_roberta import NerRobertaModel
             return NerRobertaModel
         if self.additional_args.model_mode == "crf":
+            from secner.model_crf import NerModelWithCrf
             return NerModelWithCrf
         if self.additional_args.model_mode == "bidaf":
+            from secner.model_bidaf import NerModelBiDAF
             return NerModelBiDAF
         if self.additional_args.model_mode == "char":
+            from secner.model_char import NerModelChar
             return NerModelChar
 
     def get_dataset_class(self):
         if self.additional_args.model_mode == "char":
+            from secner.dataset_char import NerCharDataset
             return NerCharDataset
+
+        from secner.dataset import NerDataset
         return NerDataset
 
     def get_data_collator(self):
         if self.additional_args.model_mode == "char":
+            from secner.dataset_char import NerCharDataCollator
             return NerCharDataCollator(args=self.additional_args)
 
         # return DataCollatorForTokenClassification(tokenizer=self.tokenizer)
+        from secner.dataset import NerDataCollator
         return NerDataCollator(args=self.additional_args)
 
 

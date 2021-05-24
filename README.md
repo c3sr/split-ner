@@ -15,6 +15,7 @@ In corresponding config.json, do:
 }
 ```
 Then,
+
 ```commandline
 cd secner
 CUDA_VISIBLE_DEVICES=0,1 python main.py --config config.json
@@ -174,7 +175,90 @@ The final outputs are generated always in file ```infer.tsv``` under the ```pred
 python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer --only_f1
 ```
 
-### Few-Shot NER
+### Few-Shot NER (5-shot)
+
+```
+*Was trained with smaller dev set (can retrain now to work with original dev set)
+```
+
+#### CoNLL
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 46.562        | 57.7885      | 59.3130      | 58.5408       |
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 37.942        | 51.2272      | 56.6789      | 53.8153       |
+| Span Classifier*                                                          | 35.428        | 36.6722      | 36.6722      | 36.6722       |
+| Span Classifier(Dice)(5ep. eval steps)*                                   | 59.649        | 59.3836      | 59.3836      | 59.3836       |
+| Pipeline(Det:QA4-QType4-Char-Pattern3-SubText, Class: Dice)*              | 53.653        | 29.9668      | 35.7326      | 32.5967       |
+| Pipeline*                                                                 | 30.634        | 17.1092      | 18.8383      | 17.9322       |
+| Pipeline(Det:BIOE-SeqTag, Class:Dice)*                                    | 55.093        | 31.9729      | 35.2041      | 33.5108       |
+
+#### ATIS
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 95.505        | 96.5058      | 97.1708      | 96.8372       |
+| Span Classifier(Dice)*                                                    | 88.227        | 88.3206      | 88.3206      | 88.3206       |
+| Pipeline*                                                                 | 88.212        | 86.2392      | 86.8966      | 86.5666       |
+
+#### Mit-Trivia
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 42.243        | 52.7790      | 41.0834      | 46.2025       |
+| Span Classifier(Dice)*                                                    | 78.087        | 78.0865      | 78.0865      | 78.0865       |
+| Pipeline*                                                                 | 69.725        | 42.5667      | 36.5896      | 39.3525       |
+
+#### Mit-Movie
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 68.947        | 67.9255      | 76.4750      | 71.9471       |
+| Span Classifier*                                                          | 73.253        | 73.2484      | 73.2484      | 73.2484       |
+| Pipeline*                                                                 | 68.864        | 50.7321      | 57.2905      | 53.8122       |
+
+#### Mit-Restaurant
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 55.276        | 50.0560      | 56.7122      | 53.1766       |
+| Span Classifier*                                                          | 75.056        | 75.0555      | 75.0555      | 75.0555       |
+| Pipeline*                                                                 | 67.207        | 39.5798      | 45.5659      | 42.3625       |
+
+#### Onto-New
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 61.741        | 60.0842      | 71.0314      | 65.1007       |
+| Span Classifier*                                                          | 77.339        | 77.3815      | 77.3815      | 77.3815       |
+| Pipeline*                                                                 | 75.416        | 47.4932      | 56.8665      | 51.7589       |
+
+#### WNUT
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 25.385        | 28.2280      | 38.0908      | 32.4260       |
+| Span Classifier*                                                          | 45.598        | 45.5978      | 45.5978      | 45.5978       |
+| Pipeline*                                                                 | 51.714        | 14.8966      | 25.5018      | 18.8071       |
+
+#### BIONLP13CG
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(QA4-QType4-Char-Pattern3-SubText)*                          | 76.376        | 73.2535      | 81.8340      | 77.3064       |
+| Span Classifier(Dice)*                                                    | 85.583        | 85.5835      | 85.5835      | 85.5835       |
+| Pipeline*                                                                 | 82.121        | 63.6399      | 71.2289      | 67.2209       |
+
+#### JNLPBA
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 52.414        | 52.3584      | 62.6645      | 57.0498       |
+| Span Classifier*                                                          | 78.065        | 78.0581      | 78.1033      | 78.0807       |
+| Pipeline*                                                                 | 75.718        | 42.2474      | 51.3469      | 46.3548       |
+
+
+### Few-Shot NER (10% data)
 
 ```
 *Was trained with smaller dev set (can retrain now to work with original dev set)
@@ -189,8 +273,8 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector(BIOE-SeqTag)*                                               | 92.904        | 94.1774      | 93.6438      | 93.9098       |
 | Span Classifier*                                                          | 94.016        | 93.8543      | 93.8543      | 93.8543       |
 | Pipeline*                                                                 | 93.385        | 89.2568      | 89.6692      | 89.4625       |
-| Pipeline(Detector:QA4-QType4)*                                            | 93.424        | 89.7872      | 89.9037      | 89.8454       |
-| Pipeline(Detector:BIOE-SeqTag)*                                           | running |
+| Pipeline(Detector:QA4-QType4)*                                            | 93.424        | 89.2114      | 90.1328      | 89.6697       |
+| Pipeline(Detector:BIOE-SeqTag)*                                           | 93.642        | 89.7872      | 89.9037      | 89.8454       |
 
 #### BioNLP13CG
 
@@ -207,6 +291,17 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector*                                                            | 85.106        | 82.5609      | 88.4187      | 85.3895       |
 | Span Classifier*                                                          | 95.185        | 95.2036      | 95.2036      | 95.2036       |
 | Pipeline*                                                                 | 94.644        | 79.2261      | 87.0136      | 82.9374       |
+
+#### OntoNotes-New
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(BIOE-SeqTag)*                                               | 88.808        | 88.7235      | 89.4643      | 89.0924       |
+| Span Detector(QA4-Dice-Char-Pattern3-SubText-Dim50)*                      | 87.659        | 88.3742      | 87.8947      | 88.1338       |
+| Span Detector(QA4-QType4-Char-Pattern3-SubText-Dim50)*                    | 88.433        | 89.3452      | 88.2327      | 88.7855       |
+| Span Classifier*                                                          | 95.070        | 95.1081      | 95.1081      | 95.1081       |
+| Pipeline*                                                                 | 94.348        | 84.9409      | 87.1461      | 86.0294       |
+| Pipeline(Det:QA4-QType4-Char-Pattern3-SubText-Dim50)*                     | 94.462        | 85.6255      | 86.6163      | 86.1180       |
 
 #### JNLPBA
 
@@ -272,7 +367,7 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector-SciBERT                                                     | 90.441        | 90.3114      | 91.0333      | 90.6709       |
 | Span Detector-SciBERT-Dice                                                | 86.022        | todo         | todo         | todo          |
 | Span Detector-SciBERT-Punct                                               | 86.276        | todo         | todo         | todo          |
-| Span Detector-SciBERT-QA4-Char-Pattern3-SubText-dim50                     | 90.86         | 91.4298         | 90.6990         | 91.0630  |
+| Span Detector-SciBERT-QA4-Char-Pattern3-SubText-dim50                     | 90.86         | 91.4298      | 90.6990      | **91.0630**  |
 | Span Detector-SciBERT-BIOE-SeqTag                                         | 90.635        | todo         | todo         | 90.9157       |
 | Span Detector-SciBERT-BIOES-SeqTag                                        | 90.293        | todo         | todo         | 90.5159       |
 | Span Detector-SciBERT-BIOE-SeqTag-Dice                                    | 89.590        | 89.6367      | 90.0015      | 89.8187       |
@@ -280,16 +375,19 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Detector-SciBERT-BIOE-SeqTag-Punct                                   | 90.593        | 90.9502      | 90.6990      | 90.8244       |
 | Span Detector-SciBERT-BIOE-SeqTag-Punct(Mapping2)                         | 90.593        | 91.1511      | 90.5682      | 90.8587       |
 | Span Detector-SciBERT-BIOE-SeqTag-WordType-SubText                        | 90.080        | 89.9827      | 90.4665      | 90.2239       |
+| Span Detector-SciBERT-BIOE-SeqTag-Char-Pattern3-SubText-dim50             | 90.166        | 90.0665      | 90.5246      | 90.2950       |
 | Span Classifier                                                           | 94.056        | 94.0561      | 94.0561      | 94.0561       |
 | Span Classifier-SciBERT                                                   | 94.042        | 94.0416      | 94.0416      | 94.0416       |
 | Span Classifier-SciBERT-Dice                                              | 94.274        | 94.2741      | 94.2741      | 94.2741       |
 | Span Classifier-SciBERT-QType2                                            | 93.562        | 93.5620      | 93.5620      | 93.5620       |
+| Span Classifier-SciBERT-QA4-Char-Pattern3-SubText-dim50                   | 93.882        | todo         | todo         | todo          |
 | Pipeline                                                                  | 93.465*       | 86.3296      | 85.4627      | **85.8940**   |
 | Pipeline(Detector-SciBERT-QA4-QType4)                                     | 93.428*       | 86.9878      | 86.2280      | **86.6062**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct)                              | 93.605*       | 86.6511      | 86.4873      | **86.5691**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2)                     | 93.622*       | 86.8363      | 86.3564      | **86.5957**   |
 | Pipeline(Detector-SciBERT-QA4-QType4, Classifier-SciBERT-Dice)            | 93.580*       | 87.0759      | 86.3153      | **86.6940**   |
 | Pipeline(Detector-SciBERT-BIOE-SeqTag-Punct-Mapping2, Classifier-SciBERT-Dice)| 93.789*   | 86.8510      | 86.3709      | **86.6103**   |
+| Pipeline(SciBERT-QA4-Char-Pattern3-SubText-dim50)                         | 93.715        | 87.0202      | 86.4629      | **86.7406**   |
 
 #### CoNLL
 

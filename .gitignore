@@ -13,3 +13,4 @@ paper/*.log
 paper/*.out
 paper/*.pdf
 paper/*.gz
+**/raw/
