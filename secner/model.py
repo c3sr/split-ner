@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
+import gensim
 
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
@@ -17,10 +18,14 @@ class NerModel(BertPreTrainedModel):
         # added (+1) to give special importance to <PAD> token (breaks backward compatibility with prev. trained models)
         self.num_word_types = len(NerDataset.get_word_type_vocab()) + 1
         none_tag = self.additional_args.none_tag
+
         self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag,
                                                                self.additional_args.use_pos_tag))
         self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
                                                                self.additional_args.use_dep_tag))
+        self.num_patterns = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pattern_vocab_path, none_tag,
+                                                               self.additional_args.use_pattern_embedding))
+
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
         dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
 
@@ -34,7 +39,6 @@ class NerModel(BertPreTrainedModel):
 
         if self.additional_args.use_pos_tag:
             if self.additional_args.use_pos_embedding:
-                vocab_size  = self.num_pos_tags+1
                 self.pos_emb = nn.Embedding(self.num_pos_tags+1, self.additional_args.pos_emb_dim) 
 
                 self.pos_lstm = nn.LSTM(input_size=self.additional_args.pos_emb_dim,
@@ -75,13 +79,22 @@ class NerModel(BertPreTrainedModel):
             classifier_inp_dim += self.flair_cnn.out_dim
 
         if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
-            if self.additional_args.add_cnn:
-                self.pattern_emb = CharCNN(additional_args, "pattern")
-            else:
-                vocab_size = len(NerDataset.get_pattern_vocab(self.additional_args.pattern_type)) + 1
-                print("pattern vocab size = "+str(vocab_size))
-                self.pattern_emb = nn.Embedding(vocab_size, self.additional_args.char_emb_dim)
+            if self.additional_args.use_pattern_embedding:
+                '''
+                if self.additional_args.pretrained_emb:
+                    w2vmodel =  gensim.models.word2vec.Word2Vec.load('./bio/patternemb.w2v.txt')
+                    w2vmodel.most_similar("ddd", topn=10)
+                    w2vec_vectors = []
+                    for token in w2vmodel.wv.vocab.keys():
+                        w2vec_vectors.append(torch.FloatTensor(w2vmodel[token]))
+                    self.pattern_emb = nn.Embedding.from_pretrained(torch.stack(w2vec_vectors), freeze=False)
+                    self.pattern_emb.char_out_dim = w2vec_vectors[0].size()[0] 
+                else:
+                '''
+                self.pattern_emb = nn.Embedding(self.num_patterns+1, self.additional_args.char_emb_dim)
                 self.pattern_emb.char_out_dim = self.additional_args.char_emb_dim
+            else:
+                self.pattern_emb = CharCNN(additional_args, "pattern")
 
             self.pattern_lstm = nn.LSTM(input_size=self.pattern_emb.char_out_dim,
                                         hidden_size=self.additional_args.lstm_hidden_dim,
@@ -179,12 +192,7 @@ class NerModel(BertPreTrainedModel):
                 pos_tag = self.compress_with_head_mask(head_mask, pos_tag, 0)
 
                 # embedding_layer
-                #print("pos_tag.shape---------")
-                #print(pos_tag.shape)
-                #print(pos_tag[0])
                 pos_tag_vec = self.pos_emb(pos_tag)
-                #print("pos_tag_vec.shape---------")
-                #print(pos_tag_vec.shape)
        
                 # LSTM
                 lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
@@ -197,8 +205,9 @@ class NerModel(BertPreTrainedModel):
                 pos_tag_vec, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out,
                                                               batch_first=True,
                                                               total_length=seq_len)
-                #YJ --why add dropout?
-                pos_tag_vec = self.dropout(pos_tag_vec)
+                if self.additional_args.lstm_dropout:
+                    pos_tag_vec = self.dropout(pos_tag_vec)
+
                 sequence_output = torch.cat([sequence_output, pos_tag_vec], dim=2)
             else:
                 pos_tag = self.compress_with_head_mask(head_mask, pos_tag, 0)
@@ -232,14 +241,8 @@ class NerModel(BertPreTrainedModel):
 
         if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
             pattern_ids = self.compress_with_head_mask(head_mask, pattern_ids, 0)
-            #print("pattern_ids.shape---------")
-            #print(pattern_ids.shape)
-            #print(pattern_ids[0])
 
             pattern_vec = self.pattern_emb(pattern_ids)
-
-            #print("pattern_vec.shape---------")
-            #print(pattern_vec.shape)
 
             lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))
             packed_inp = nn.utils.rnn.pack_padded_sequence(input=pattern_vec,
@@ -251,7 +254,9 @@ class NerModel(BertPreTrainedModel):
             pattern_vec, _ = nn.utils.rnn.pad_packed_sequence(sequence=packed_out,
                                                               batch_first=True,
                                                               total_length=seq_len)
-            pattern_vec = self.dropout(pattern_vec)
+            if self.additional_args.lstm_dropout:
+                pattern_vec = self.dropout(pattern_vec)
+
             sequence_output = torch.cat([sequence_output, pattern_vec], dim=2)
 
         if self.additional_args.use_end_cnn:

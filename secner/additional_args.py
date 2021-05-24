@@ -39,7 +39,6 @@ class AdditionalArguments:
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char|roberta_std)"})
     loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|ce_punct|dice)"})
     use_char_cnn: str = field(default="none", metadata={"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
-    add_cnn: bool = field(default=True, metadata={"help": "use CNN for pattern embedding"})
     token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
     prediction_mapping: str = field(default="type1", metadata=
     {"help": "converting from bert to dataset level outputs (type1|type2)"})
@@ -73,8 +72,11 @@ class AdditionalArguments:
     debug_mode: bool = field(default=False, metadata={"help": "truncate dataset for faster debugging"})
 
     use_pos_embedding: bool = field(default=False, metadata={"help": "use 1-hot or embedding"})
+    use_pattern_embedding: bool = field(default=False, metadata={"help": "use CNN or embedding"})
     pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
+    lstm_dropout: bool = field(default=True, metadata={"help": "add dropout after LSTM"})
     pattern_vocab_path: str = field(default="pattern_vocab.txt", metadata={"help": "pattern vocab file path"})
+    pattern_vocab_size: int = field(default=0, metadata={"help": "pattern vocab file path"})
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)

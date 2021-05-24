@@ -20,8 +20,11 @@ class NerQADataset(Dataset):
                                                             self.args.use_pos_tag)
         self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
                                                             self.args.use_dep_tag)
+        self.pattern_vocab = NerDataset.parse_aux_tag_vocab(self.args.pattern_vocab_path, self.args.none_tag,
+                                                            self.args.use_pattern_embedding)
 
         self.tag_to_text_mapping = self.parse_tag_names()
+        self.tag_text = ",".join(list(self.tag_to_text_mapping.values()))
 
         if self.args.use_pos_tag or self.args.use_dep_tag:
             import spacy
@@ -157,18 +160,10 @@ class NerQADataset(Dataset):
                 tag_text = "named entities"
             elif self.args.query_type == "question4":
                 tag_text = "important entity spans"
+            elif self.args.query_type == "question5":
+                tag_text = self.tag_text+" entity spans"
             else:
                 tag_text = "entity"
-
-            '''
-            tag_text = tag
-
-            if self.args.query_type == "question3":
-                tag_text = tag+ " named entities"
-            elif self.args.query_type == "question4":
-                tag_text = tag+ " entity spans"
-            '''
-
         else:
             tag_text = self.tag_to_text_mapping[tag]
 
@@ -180,6 +175,9 @@ class NerQADataset(Dataset):
             return "Find {0} in the following text .".format(tag_text)
         if self.args.query_type == "question4":
             return "Extract {0} from the following text .".format(tag_text)
+        if self.args.query_type == "question5":
+            return "Extract {0} from the following text .".format(tag_text)
+
         return tag_text
 
     def prep_context(self, sentence, tag):
@@ -300,100 +298,9 @@ class NerQADataset(Dataset):
         bert_tokens.append(self.bert_second_sep_token)
         return Context(sentence, tag, tag_text, bert_tokens)
 
-    def prep_context_span_query(self, sentence, query):
-        tag_text = self.get_tag_query_text(query)
-        # query
-        bert_query_tokens = []
-        query_tokens = tag_text.split()
-        doc = None
-        if self.args.use_pos_tag or self.args.use_dep_tag:
-            self.tokenizer_map[tag_text] = query_tokens
-            doc = self.nlp(tag_text)
-        for index, word in enumerate(query_tokens):
-            out = self.tokenize_with_cache(word)
-            pos_tag = doc[index].tag_ if self.args.use_pos_tag else None
-            dep_tag = doc[index].dep_ if self.args.use_dep_tag else None
-            for i in range(len(out["input_ids"])):
-                bert_token = Token(word, [self.args.none_tag], offset=index, pos_tag=pos_tag, dep_tag=dep_tag)
-                tup = out["offset_mapping"][i]
-                sub_text = word[tup[0]:tup[1]]
-                bert_query_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=0,
-                                                   token=bert_token, is_head=(i == 0)))
-
-        # sentence
-        bert_sent_tokens = []
-        for tok in sentence.tokens:
-            token_tags = [t[2:] for t in tok.tags]
-            if token_tags != [self.args.none_tag]:
-                # TODO: This needs to be corrected for nested entity cases
-                new_tag = tok.tags[0][0]
-            else:
-                new_tag = self.args.none_tag
-            out = self.tokenize_with_cache(tok.text)
-            for i in range(len(out["input_ids"])):
-                bert_tag = new_tag if i == 0 or new_tag != "B" else "I"
-                bert_token = Token(tok.text, [bert_tag], tok.offset, tok.pos_tag, tok.dep_tag, tok.guidance_tag)
-                tup = out["offset_mapping"][i]
-                sub_text = tok.text[tup[0]:tup[1]]
-                bert_sent_tokens.append(BertToken(bert_id=out["input_ids"][i], sub_text=sub_text, token_type=1,
-                                                  token=bert_token, is_head=(i == 0)))
-
-        if self.args.num_labels == 2:
-            # BO tagging scheme
-            for i in range(len(bert_sent_tokens)):
-                if bert_sent_tokens[i].token.tags[0] == "I":
-                    if not self.args.use_head_mask or bert_sent_tokens[i].is_head:
-                        bert_sent_tokens[i].token.tags[0] = "B"
-
-        elif self.args.num_labels > 3:
-            # BIOE tagging scheme
-            is_end_token = False
-            for i in range(len(bert_sent_tokens) - 1, 0, -1):
-                if bert_sent_tokens[i].token.tags[0] == "I":
-                    if is_end_token:
-                        if not self.args.use_head_mask or bert_sent_tokens[i].is_head:
-                            bert_sent_tokens[i].token.tags[0] = "E"
-                            is_end_token = False
-                else:
-                    is_end_token = True
-
-            if self.args.num_labels == 5:
-                # BIOES tagging scheme
-                if self.args.use_head_mask:
-                    mention_length = 0
-                    mention_index = -1
-                    for i in range(len(bert_sent_tokens)):
-                        if not bert_sent_tokens[i].is_head:
-                            continue
-                        if bert_sent_tokens[i].token.tags[0] == "B":
-                            if mention_length == 1:
-                                bert_sent_tokens[mention_index].token.tags[0] = "S"
-                            mention_length = 1
-                            mention_index = i
-                        elif bert_sent_tokens[i].token.tags[0] in ["I", "E"]:
-                            mention_length += 1
-                        elif mention_length == 1:
-                            bert_sent_tokens[mention_index].token.tags[0] = "S"
-                            mention_length = 0
-                            mention_index = -1
-                    if mention_length == 1:
-                        bert_sent_tokens[mention_index].token.tags[0] = "S"
-                else:
-                    for i in range(len(bert_sent_tokens)):
-                        if bert_sent_tokens[i].token.tags[0] == "B" and i + 1 < len(bert_sent_tokens) and \
-                                bert_sent_tokens[i + 1].token.tags[0] not in ["I", "E"]:
-                            bert_sent_tokens[i].token.tags[0] = "S"
-
-        bert_tokens = [self.bert_start_token]
-        bert_tokens.extend(bert_query_tokens)
-        bert_tokens.append(self.bert_first_sep_token)
-        bert_tokens.extend(bert_sent_tokens)
-        bert_tokens = bert_tokens[:self.args.max_seq_len - 1]
-        bert_tokens.append(self.bert_second_sep_token)
-        return Context(sentence, "ENTITY", tag_text, bert_tokens)
-
     def prep_context_span(self, sentence):
         tag_text = self.get_tag_query_text(None)
+
         # query
         bert_query_tokens = []
         query_tokens = tag_text.split()
@@ -491,6 +398,7 @@ class NerQADataset(Dataset):
             for tag in self.tag_to_text_mapping.keys():
                 self.contexts.append(self.prep_context(sentence, tag))
 
+    '''
     def process_sentence_query(self, sentence):
         if self.args.detect_spans:
             query = ""
@@ -514,6 +422,7 @@ class NerQADataset(Dataset):
         else:
             for tag in self.tag_to_text_mapping.keys():
                 self.contexts.append(self.prep_context(sentence, tag))
+    '''
 
 
 def main(args):
