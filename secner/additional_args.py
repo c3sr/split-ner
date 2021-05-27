@@ -72,7 +72,7 @@ class AdditionalArguments:
     debug_mode: bool = field(default=False, metadata={"help": "truncate dataset for faster debugging"})
 
     use_pos_embedding: bool = field(default=False, metadata={"help": "use 1-hot or embedding"})
-    use_pattern_embedding: bool = field(default=False, metadata={"help": "use CNN or embedding"})
+    pattern_embedding_type: str = field(default="cnn", metadata={"help": "use CNN or embedding"})
     pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_dropout: bool = field(default=True, metadata={"help": "add dropout after LSTM"})
     pattern_vocab_path: str = field(default="pattern_vocab.txt", metadata={"help": "pattern vocab file path"})
@@ -80,7 +80,8 @@ class AdditionalArguments:
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
-        if self.resume:
+        print("RESUME:", len(self.resume))
+        if self.resume and len(self.resume) > 0:
             self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
         self.wandb_dir = self.run_root
         self.predictions_dir = os.path.join(self.run_root, "predictions")
