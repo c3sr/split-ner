@@ -441,6 +441,15 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Classifier (RoBERTa)                                                 | 96.131        | todo         | todo         | todo          |
 | Pipeline (RoBERTa) (needs re-run as span detector improved)               | 95.781*       | 85.5045      | 90.0107      | **87.6998**   |
 
+#### OntoNotes-New
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector (RoBERTa-Char-Pat3-QA4-QType4)                              | 91.638        | 91.7118      | 91.8260      | 91.7689       |
+| Span Classifier (RoBERTa-Dice)                                            | 96.607        | todo         | todo         | todo          |
+| Pipeline (RoBERTa) (Det: Char-Pat3-CA4-QType4, Clas: Dice)                | 96.118*       | 89.1090      | 90.5652      | 89.8312       |
+
+
 #### ATIS
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
