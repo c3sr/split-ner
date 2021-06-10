@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import time
 
 import numpy as np
 from transformers import AutoConfig, AutoTokenizer
@@ -127,9 +128,21 @@ def main(args):
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
     train_args, additional_args = parse_config(parser, args.config)
+
+    start = time.time()
     executor = NerSpanExecutor(train_args, additional_args)
     executor.run()
+    end = time.time()
 
+    if train_args.do_train:
+        mode = "train"
+    else:
+        mode = "prediction"
+    filename=additional_args.dataset_dir+"-"+additional_args.model_name+"-"+mode+".elapsed"
+
+    with open(filename, "w") as file:
+        file.write(str(end-start)+" seconds")
+        file.close()
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Span Classification Model Runner")
