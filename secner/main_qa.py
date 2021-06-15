@@ -198,8 +198,21 @@ class NerQAExecutor:
 
     def run(self):
         if self.train_args.do_train:
-            logger.info("training mode")
-            self.trainer.train(self.additional_args.resume)
+            start = time.time()
+            logger.info("training mode: start_time {0}".format(str(start)))
+ 
+            try:
+                self.trainer.train(self.additional_args.resume)
+            except:
+                pass
+
+            elapsed = time.time() - start
+            logger.info("elapsed time: {0}".format(str(elapsed)))
+
+            filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-train-"+str(self.train_args.num_train_epochs)+".elapsed"
+            file = open(filename, "w")
+            file.write(str(elapsed)+" seconds")
+            file.close()
         else:
             logger.info("prediction mode")
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
@@ -228,21 +241,9 @@ def main(args):
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
     print (args.config)
     train_args, additional_args = parse_config(parser, args.config)
-
-    start = time.time()
     executor = NerQAExecutor(train_args, additional_args)
     executor.run()
-    elapsed = time.time() - start
-    print("elapsed time:", elapsed)
 
-    if train_args.do_train:
-        mode = "train"
-    else:
-        mode = "prediction"
-    filename=additional_args.dataset_dir+"-"+additional_args.model_name+"-"+mode+".elapsed"
-    with open(filename, "w") as file:
-        file.write(str(elapsed)+" seconds")
-        file.close()
 
 
 if __name__ == "__main__":
