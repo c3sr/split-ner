@@ -1,8 +1,8 @@
 {
   "model_name": "ner-roberta-spanclass-dice",
   "dataset_dir": "onto_new_10_sd123",
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "6960",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
