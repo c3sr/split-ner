@@ -517,9 +517,9 @@ def process_conllpp_corpus(corpus_path):
     dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=False, add_dep=True)
     test = add_pos_dep_features(test, "en_core_web_sm", add_pos=False, add_dep=True)
 
-    write_token_data(train, os.path.join(raw_path, "train.tsv"))
-    write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
-    write_token_data(test, os.path.join(raw_path, "test.tsv"))
+    write_token_data(train, os.path.join(corpus_path, "train.tsv"))
+    write_token_data(dev, os.path.join(corpus_path, "dev.tsv"))
+    write_token_data(test, os.path.join(corpus_path, "test.tsv"))
     generate_dataset_files(train, dev, test, corpus_path)
 
 
@@ -542,7 +542,7 @@ def read_onto_final_data(words_path, labels_path):
 
 
 def process_onto_final_corpus(corpus_path):
-    raw_path = os.path.join(corpus_path, "raw")
+    raw_path = os.path.join(corpus_path, "raw_committed")
     train = read_onto_final_data(os.path.join(raw_path, "train.words"), os.path.join(raw_path, "train.ner"))
     dev = read_onto_final_data(os.path.join(raw_path, "dev.words"), os.path.join(raw_path, "dev.ner"))
     test = read_onto_final_data(os.path.join(raw_path, "test.words"), os.path.join(raw_path, "test.ner"))
@@ -551,9 +551,9 @@ def process_onto_final_corpus(corpus_path):
     dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=True, add_dep=True)
     test = add_pos_dep_features(test, "en_core_web_sm", add_pos=True, add_dep=True)
 
-    write_token_data(train, os.path.join(raw_path, "train.tsv"))
-    write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
-    write_token_data(test, os.path.join(raw_path, "test.tsv"))
+    write_token_data(train, os.path.join(corpus_path, "train.tsv"))
+    write_token_data(dev, os.path.join(corpus_path, "dev.tsv"))
+    write_token_data(test, os.path.join(corpus_path, "test.tsv"))
     generate_dataset_files(train, dev, test, corpus_path)
 
 
