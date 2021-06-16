@@ -556,6 +556,16 @@ def process_onto_final_corpus(corpus_path):
     write_token_data(test, os.path.join(corpus_path, "test.tsv"))
     generate_dataset_files(train, dev, test, corpus_path)
 
-
-if __name__ == "__main__":
-    process_onto_final_corpus("../../data/onto_final")
+# def process_i2b2_corpus(corpus_path):
+#     raw_path = os.path.join(corpus_path, "raw")
+#     orig_train = read_i2b2_data(os.path.join(raw_path, "train"))
+#     test = read_i2b2_data(os.path.join(raw_path, "test"))
+#
+#     train = add_pos_dep_features(train, "en_core_sci_sm", add_pos=False, add_dep=True)
+#     dev = add_pos_dep_features(dev, "en_core_sci_sm", add_pos=False, add_dep=True)
+#     test = add_pos_dep_features(test, "en_core_sci_sm", add_pos=False, add_dep=True)
+#
+#     write_token_data(train, os.path.join(raw_path, "train.tsv"))
+#     write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
+#     write_token_data(test, os.path.join(raw_path, "test.tsv"))
+#     generate_dataset_files(train, dev, test, corpus_path)
