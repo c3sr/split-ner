@@ -80,7 +80,6 @@ class AdditionalArguments:
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
-        print("RESUME:", len(self.resume))
         if self.resume and len(self.resume) > 0:
             self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
         self.wandb_dir = self.run_root

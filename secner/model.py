@@ -24,7 +24,7 @@ class NerModel(BertPreTrainedModel):
         self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
                                                                self.additional_args.use_dep_tag))
         self.num_patterns = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pattern_vocab_path, none_tag,
-                                                               self.additional_args.use_pattern_embedding))
+                                                               self.additional_args.pattern_embedding_type!="cnn"))
 
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
         dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
@@ -79,22 +79,30 @@ class NerModel(BertPreTrainedModel):
             classifier_inp_dim += self.flair_cnn.out_dim
 
         if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
-            if self.additional_args.use_pattern_embedding:
-                '''
-                if self.additional_args.pretrained_emb:
-                    w2vmodel =  gensim.models.word2vec.Word2Vec.load('./bio/patternemb.w2v.txt')
-                    w2vmodel.most_similar("ddd", topn=10)
-                    w2vec_vectors = []
-                    for token in w2vmodel.wv.vocab.keys():
-                        w2vec_vectors.append(torch.FloatTensor(w2vmodel[token]))
-                    self.pattern_emb = nn.Embedding.from_pretrained(torch.stack(w2vec_vectors), freeze=False)
-                    self.pattern_emb.char_out_dim = w2vec_vectors[0].size()[0] 
-                else:
-                '''
+            if self.additional_args.pattern_embedding_type == "cnn":
+                self.pattern_emb = CharCNN(additional_args, "pattern")
+            elif self.additional_args.pattern_embedding_type == "word2vec":
+                w2vmodel =  gensim.models.word2vec.Word2Vec.load('./pattern_emb/biojnlp.w2v')
+
+                w2vec_vectors = []
+                # add a zero vector for PAD
+                w2vec_vectors.append(torch.zeros(50, dtype=torch.float32, device=torch.device("cpu")))
+
+                for token in w2vmodel.wv.vocab.keys():
+                    w2vec_vectors.append(torch.FloatTensor(w2vmodel[token]))
+                weights = torch.stack(w2vec_vectors)
+
+                # add a mean vector for UNK
+                mean_weight = torch.mean(weights, 0).unsqueeze(0)
+                weights = torch.cat((weights, mean_weight), 0) 
+
+                self.pattern_emb = nn.Embedding.from_pretrained(weights)
+                self.pattern_emb.char_out_dim = w2vec_vectors[0].size()[0] 
+            else:
                 self.pattern_emb = nn.Embedding(self.num_patterns+1, self.additional_args.char_emb_dim)
                 self.pattern_emb.char_out_dim = self.additional_args.char_emb_dim
-            else:
-                self.pattern_emb = CharCNN(additional_args, "pattern")
+                print("Pattern num_patterns = ", self.num_patterns, "  embedding dim=",str(self.pattern_emb.char_out_dim))
+
 
             self.pattern_lstm = nn.LSTM(input_size=self.pattern_emb.char_out_dim,
                                         hidden_size=self.additional_args.lstm_hidden_dim,
@@ -241,7 +249,6 @@ class NerModel(BertPreTrainedModel):
 
         if self.additional_args.use_char_cnn in ["pattern", "both", "both-flair"]:
             pattern_ids = self.compress_with_head_mask(head_mask, pattern_ids, 0)
-
             pattern_vec = self.pattern_emb(pattern_ids)
 
             lengths = torch.as_tensor(attention_mask.sum(1).int(), dtype=torch.int64, device=torch.device("cpu"))

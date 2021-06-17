@@ -6,6 +6,7 @@ from collections import defaultdict
 def parse_file(file_path):
     data = []
     if not os.path.exists(file_path):
+        print("Data file does not exist: "+file_path)
         return data
     with open(file_path, "r", encoding="utf-8") as f:
         sent = []

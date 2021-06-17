@@ -21,7 +21,7 @@ class NerQADataset(Dataset):
         self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
                                                             self.args.use_dep_tag)
         self.pattern_vocab = NerDataset.parse_aux_tag_vocab(self.args.pattern_vocab_path, self.args.none_tag,
-                                                            self.args.use_pattern_embedding)
+                                                            self.args.pattern_embedding_type != "cnn")
 
         self.tag_to_text_mapping = self.parse_tag_names()
         self.tag_text = ",".join(list(self.tag_to_text_mapping.values()))
