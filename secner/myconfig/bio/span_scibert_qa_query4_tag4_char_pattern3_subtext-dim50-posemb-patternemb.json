@@ -5,7 +5,7 @@
   "pattern_type": "3",
   "token_type": "sub_text",
   "char_emb_dim": 50,
-  "use_pattern_embedding": true,
+  "pattern_embedding_type": "random",
   "lstm_hidden_dim": 256,
   "use_pos_tag": true,
   "use_pos_embedding": true,

@@ -5,7 +5,7 @@
   "resume": null,
   "num_train_epochs": 300,
   "data_root": "../data",
-  "out_root": "../out",
+  "out_root": "../models",
   "infer_path": null,
   "train_path": "train.tsv",
   "dev_path": "dev.tsv",

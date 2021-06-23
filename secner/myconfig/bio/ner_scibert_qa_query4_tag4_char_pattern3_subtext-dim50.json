@@ -5,7 +5,6 @@
   "pattern_type": "3",
   "token_type": "sub_text",
   "char_emb_dim": 50,
-  "lstm_dropout": true,
   "use_pos_tag": false,
   "group_by_length": false,
   "do_train": true,
