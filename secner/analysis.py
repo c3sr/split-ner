@@ -399,7 +399,7 @@ def convert_to_span_based(data):
 
 
 def main(args):
-    root_path = os.path.join("..", "out", args.dataset, args.model, "predictions")
+    root_path = os.path.join(args.datapath, args.dataset, args.model, "predictions")
     train_path = os.path.join(root_path, "train.tsv")
     dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
     test_path = os.path.join(root_path, "test.tsv")
@@ -427,6 +427,7 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
+    ap.add_argument("--datapath", type=str, default="../out")
     ap.add_argument("--dataset", type=str, default="bio")
     ap.add_argument("--model", type=str, default="ner-biobert-qa4")
     ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
