@@ -183,14 +183,14 @@ def remove_punct_rows_from_dataset(data_path):
     write_data(data, data_path)
 
 
-def read_data(data_path):
+def read_data(data_path, sep="\t"):
     data = []
     with open(data_path, "r", encoding="utf-8") as f:
         sent = []
         for line in f:
             line = line.strip()
             if line:
-                sent.append(line.split("\t"))
+                sent.append(line.split(sep))
             else:
                 data.append(sent)
                 sent = []
@@ -207,9 +207,10 @@ def write_data(data, data_path):
             f.write("\n")
 
 
-def make_shorter_dataset(inp_path, shrink_factor=0.1):
-    out_path = "{0}_{1}".format(inp_path, int(shrink_factor * 100))
+def make_shorter_dataset(inp_path, shrink_factor=0.1, seed=42):
+    out_path = "{0}_{1}_sd{2}".format(inp_path, int(shrink_factor * 100), seed)
     os.makedirs(out_path, exist_ok=True)
+    set_all_seeds(seed)
     make_shorter_dataset_util(os.path.join(inp_path, "train.tsv"), os.path.join(out_path, "train.tsv"), shrink_factor)
     make_shorter_dataset_util(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"), shrink_factor)
     # copyfile(os.path.join(inp_path, "dev.tsv"), os.path.join(out_path, "dev.tsv"))
@@ -221,7 +222,6 @@ def make_shorter_dataset(inp_path, shrink_factor=0.1):
 
 
 def make_shorter_dataset_util(inp_data_path, out_data_path, shrink_factor):
-    set_all_seeds(42)
     data = read_data(inp_data_path)
     n = len(data)
     vec = np.random.choice(np.arange(n), int(shrink_factor * n), replace=False)
@@ -517,8 +517,55 @@ def process_conllpp_corpus(corpus_path):
     dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=False, add_dep=True)
     test = add_pos_dep_features(test, "en_core_web_sm", add_pos=False, add_dep=True)
 
-    write_token_data(train, os.path.join(raw_path, "train.tsv"))
-    write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
-    write_token_data(test, os.path.join(raw_path, "test.tsv"))
+    write_token_data(train, os.path.join(corpus_path, "train.tsv"))
+    write_token_data(dev, os.path.join(corpus_path, "dev.tsv"))
+    write_token_data(test, os.path.join(corpus_path, "test.tsv"))
     generate_dataset_files(train, dev, test, corpus_path)
 
+
+def read_onto_final_data(words_path, labels_path):
+    with open(words_path, "r", encoding="utf-8") as f:
+        text = [line.split() for line in f]
+    with open(labels_path, "r", encoding="utf-8") as f:
+        labels = [line.split() for line in f]
+    data = []
+    for sent_index in range(len(text)):
+        sent_text = text[sent_index]
+        sent_labels = labels[sent_index]
+        assert len(sent_text) == len(sent_labels), "Error parsing sent: {0} (text: {1}, labels: {2})" \
+            .format(sent_index, len(sent_text), len(sent_labels))
+        sent = []
+        for word_index in range(len(sent_text)):
+            sent.append(Token(text=sent_text[word_index], tags=[sent_labels[word_index]]))
+        data.append(sent)
+    return data
+
+
+def process_onto_final_corpus(corpus_path):
+    raw_path = os.path.join(corpus_path, "raw_committed")
+    train = read_onto_final_data(os.path.join(raw_path, "train.words"), os.path.join(raw_path, "train.ner"))
+    dev = read_onto_final_data(os.path.join(raw_path, "dev.words"), os.path.join(raw_path, "dev.ner"))
+    test = read_onto_final_data(os.path.join(raw_path, "test.words"), os.path.join(raw_path, "test.ner"))
+
+    train = add_pos_dep_features(train, "en_core_web_sm", add_pos=True, add_dep=True)
+    dev = add_pos_dep_features(dev, "en_core_web_sm", add_pos=True, add_dep=True)
+    test = add_pos_dep_features(test, "en_core_web_sm", add_pos=True, add_dep=True)
+
+    write_token_data(train, os.path.join(corpus_path, "train.tsv"))
+    write_token_data(dev, os.path.join(corpus_path, "dev.tsv"))
+    write_token_data(test, os.path.join(corpus_path, "test.tsv"))
+    generate_dataset_files(train, dev, test, corpus_path)
+
+# def process_i2b2_corpus(corpus_path):
+#     raw_path = os.path.join(corpus_path, "raw")
+#     orig_train = read_i2b2_data(os.path.join(raw_path, "train"))
+#     test = read_i2b2_data(os.path.join(raw_path, "test"))
+#
+#     train = add_pos_dep_features(train, "en_core_sci_sm", add_pos=False, add_dep=True)
+#     dev = add_pos_dep_features(dev, "en_core_sci_sm", add_pos=False, add_dep=True)
+#     test = add_pos_dep_features(test, "en_core_sci_sm", add_pos=False, add_dep=True)
+#
+#     write_token_data(train, os.path.join(raw_path, "train.tsv"))
+#     write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
+#     write_token_data(test, os.path.join(raw_path, "test.tsv"))
+#     generate_dataset_files(train, dev, test, corpus_path)
