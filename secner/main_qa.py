@@ -1,6 +1,8 @@
 import argparse
 import logging
 import os
+import time
+import traceback
 
 import numpy as np
 from transformers import AutoConfig, AutoTokenizer
@@ -193,8 +195,14 @@ class NerQAExecutor:
 
     def run(self):
         if self.train_args.do_train:
-            logger.info("training mode")
-            self.trainer.train(self.additional_args.resume)
+            start = time.time()
+            logger.info("training mode: start_time {0}".format(str(start)))
+            try:
+                self.trainer.train(self.additional_args.resume)
+            except:
+                traceback.print_exc()
+            elapsed = time.time() - start
+            logger.info("elapsed time: {0}".format(str(elapsed)))
         else:
             logger.info("prediction mode")
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
