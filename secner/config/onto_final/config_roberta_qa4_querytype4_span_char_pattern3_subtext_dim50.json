@@ -2,8 +2,8 @@
   "model_name": "ner-roberta-qa4-querytype4-span-char-pattern3-subtext-dim50",
   "dataset_dir": "onto_final",
   "num_labels": 4,
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "288000",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
@@ -32,7 +32,7 @@
   "save_total_limit": 2,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
-  "per_device_train_batch_size": 16,
-  "per_device_eval_batch_size": 16,
+  "per_device_train_batch_size": 12,
+  "per_device_eval_batch_size": 12,
   "learning_rate": 1e-5
 }
