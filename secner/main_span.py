@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import time
+import traceback
 
 import numpy as np
 from transformers import AutoConfig, AutoTokenizer
@@ -114,7 +115,7 @@ class NerSpanExecutor:
             try:
                 self.trainer.train(self.additional_args.resume)
             except:
-                pass
+                traceback.print_exc()
 
             elapsed = time.time() - start
             logger.info("elapsed time: {0}".format(str(elapsed)))

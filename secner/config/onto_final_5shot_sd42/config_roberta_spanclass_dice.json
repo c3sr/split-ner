@@ -1,8 +1,8 @@
 {
   "model_name": "ner-roberta-spanclass-dice",
-  "dataset_dir": "onto_final",
+  "dataset_dir": "onto_final_5shot_sd42",
   "do_train": false,
-  "resume": "50000",
+  "resume": "390",
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
@@ -20,11 +20,12 @@
   "model_mode": "roberta_std",
   "base_model": "roberta-base",
   "evaluation_strategy": "steps",
-  "logging_steps": 1000,
+  "logging_steps": 15,
   "save_total_limit": 2,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
   "per_device_train_batch_size": 16,
   "per_device_eval_batch_size": 16,
-  "learning_rate": 1e-5
+  "learning_rate": 1e-5,
+  "wandb_mode": "dryrun"
 }

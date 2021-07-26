@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import time
+import traceback
 
 import numpy as np
 from transformers import AutoConfig, AutoTokenizer
@@ -200,11 +201,11 @@ class NerQAExecutor:
         if self.train_args.do_train:
             start = time.time()
             logger.info("training mode: start_time {0}".format(str(start)))
- 
+
             try:
                 self.trainer.train(self.additional_args.resume)
             except:
-                pass
+                traceback.print_exc()
 
             elapsed = time.time() - start
             logger.info("elapsed time: {0}".format(str(elapsed)))

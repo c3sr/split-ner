@@ -233,6 +233,14 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Classifier*                                                          | 77.339        | 77.3815      | 77.3815      | 77.3815       |
 | Pipeline*                                                                 | 75.416        | 47.4932      | 56.8665      | 51.7589       |
 
+#### Onto-Final
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(Roberta-QA4-QType4-Char-Pattern3-SubText-Dim50)*            | 57.753        | 56.5563      | 67.0195      | 61.3449       |
+| Span Classifier(Dice)*                                                    | 81.198        | 82.2200      | 82.2200      | 82.2200       |
+| Pipeline*                                                                 | 78.116        | 47.0840      | 57.1051      | 51.6126       |
+
 #### WNUT
 
 | Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
@@ -308,8 +316,16 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 | Span Classifier*                                                          | 95.070        | 95.1081      | 95.1081      | 95.1081       |
 | Span Classifier(Dice)*                                                    | 95.096(123)   | 95.1170(123) | 95.1170(123) | 95.1170(123)  |
 | Pipeline*                                                                 | 94.348        | 84.9409      | 87.1461      | 86.0294       |
-| Pipeline(Det:QA4-QType4-Char-Pattern3-SubText-Dim50)*                     | 94.462        | 85.6255      | 86.6163      | 86.1180       |
+| Pipeline(Det:QA4-QType4-Char-Pat3-SubText-Dim50)*                         | 94.462        | 85.6255      | 86.6163      | 86.1180       |
 | Pipeline(Det:QA4-QType4-Char-Pat3-Dim50, Class:Dice)*                     | run-123       | run-123      | run-123      | run-123       |
+
+#### Onto-Final
+
+| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector(Roberta-QA4-QType4-Char-Pattern3-SubText-Dim50)*            | 89.199        | 89.2549      | 90.1361      | 89.6933       |
+| Span Classifier(Dice)*                                                    | 94.874        | 94.9124      | 94.9124      | 94.9124       |
+| Pipeline*                                                                 | 93.919        | 85.2475      | 86.9632      | 86.0968       |
 
 #### JNLPBA
 
@@ -451,11 +467,11 @@ python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer 
 
 #### OntoNotes-Final
 
-| Model (Test Span-Micro-Avg)                                               | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
-|---------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
-| Span Detector (RoBERTa-Char-Pat3-QA4-QType4)                              | 92.368        | 92.1671      | 92.8311      | 92.4979       |
-| Span Classifier (RoBERTa-Dice)                                            | 96.740        | 96.7357      | 96.7357      | 96.7357       |
-| Pipeline (RoBERTa) (Det: Char-Pat3-CA4-QType4, Clas: Dice)                | 96.281*       | 89.5797      | 91.0429      | 90.3053       |
+| Model (Test Span-Micro-Avg)                                                                          | BERT-Level F1 | Data-Level P | Data-Level R | Data-Level F1 |
+|------------------------------------------------------------------------------------------------------|---------------|--------------|--------------|---------------|
+| Span Detector (RoBERTa-Char-Pat3-QA4-QType4) [Train Time: 388225 sec, Batch Size: 12, on 5 GPUs]     | 92.368        | 92.1671      | 92.8311      | 92.4979       |
+| Span Classifier (RoBERTa-Dice) [Train Time: 226,854 sec, Batch Size: 16, on 4 GPUs]                  | 96.740        | 96.7357      | 96.7357      | 96.7357       |
+| Pipeline (RoBERTa) (Det: Char-Pat3-CA4-QType4, Clas: Dice)                                           | 96.281*       | 89.5797      | 91.0429      | 90.3053       |
 
 #### ATIS
 
