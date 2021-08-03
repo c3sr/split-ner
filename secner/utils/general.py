@@ -229,6 +229,39 @@ def make_shorter_dataset_util(inp_data_path, out_data_path, shrink_factor):
     write_data(new_data, out_data_path)
 
 
+def make_k_partition_dataset(inp_path, k=10, seed=42):
+    set_all_seeds(seed)
+
+    data_train = read_data(os.path.join(inp_path, "train.tsv"))
+    random.shuffle(data_train)
+    n_train = len(data_train) // k
+
+    data_dev = read_data(os.path.join(inp_path, "dev.tsv"))
+    random.shuffle(data_dev)
+    n_dev = len(data_dev) // k
+    
+    for i in range(k):
+        start_train = i * n_train
+        end_train = (i + 1) * n_train if i < k else len(data_train)
+        part_train = data_train[start_train: end_train]
+
+        start_dev = i * n_dev
+        end_dev = (i + 1) * n_dev if i < k else len(data_dev)
+        part_dev = data_dev[start_dev: end_dev]
+
+        out_path = "{0}_part{1}_sd{2}".format(inp_path, i, seed)
+        os.makedirs(out_path, exist_ok=True)
+
+        write_data(part_train, os.path.join(out_path, "train.tsv"))
+        write_data(part_dev, os.path.join(out_path, "dev.tsv"))
+
+        copyfile(os.path.join(inp_path, "test.tsv"), os.path.join(out_path, "test.tsv"))
+        copyfile(os.path.join(inp_path, "tag_vocab.txt"), os.path.join(out_path, "tag_vocab.txt"))
+        copyfile(os.path.join(inp_path, "tag_names.txt"), os.path.join(out_path, "tag_names.txt"))
+        copyfile(os.path.join(inp_path, "pos_tag_vocab.txt"), os.path.join(out_path, "pos_tag_vocab.txt"))
+        copyfile(os.path.join(inp_path, "dep_tag_vocab.txt"), os.path.join(out_path, "dep_tag_vocab.txt"))
+
+
 def make_k_shot_dataset(inp_path, k, seed):
     setup_logging()
     set_all_seeds(seed)
