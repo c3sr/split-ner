@@ -403,7 +403,7 @@ def main(args):
     train_path = os.path.join(root_path, "train.tsv")
     dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
     test_path = os.path.join(root_path, "test.tsv")
-    infer_path = os.path.join(root_path, "infer.tsv")
+    infer_path = os.path.join(root_path, "infer.tsv") 
 
     data = dict()
     data["train"] = parse_file(train_path)
