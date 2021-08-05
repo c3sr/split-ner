@@ -71,7 +71,7 @@ def calc_micro_f1(data):
               .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
     print("Macro F1: {0:.4f}".format(tag_f1_sum * 100.0 / (len(tags) + 1e-7)))
 
-    return tp, fp, fn
+    return tp, fp, fn, f1
 
 
 def get_spans(tokens, sent_index):
@@ -139,7 +139,7 @@ def print_all_gold_samples(data, tag):
 
 def analyse_errors(data):
     print_confusion_matrix_csv(data)
-    tp, fp, fn = calc_micro_f1(data)
+    tp, fp, fn, micro_f1 = calc_micro_f1(data)
 
     # BioNLP13CG
     print_error_samples(tp, fp, fn, "Simple_chemical")
@@ -290,7 +290,7 @@ def print_overlap_error_stats(error_dict, data):
 
 
 def analyse_error_overlaps(dir_path, data, dump_errors=False):
-    tp, fp, fn = calc_micro_f1(data)
+    tp, fp, fn, micro_f1 = calc_micro_f1(data)
 
     print("False +ve Overlap Error Stats:")
     print_overlap_error_stats(fp, data)
@@ -306,7 +306,7 @@ def analyse_error_overlaps(dir_path, data, dump_errors=False):
 
 
 def analyse_oov_errors(train_data, test_data):
-    tp, fp, fn = calc_micro_f1(test_data)
+    tp, fp, fn, micro_f1 = calc_micro_f1(test_data)
     train_term_vocab = set([tok[0] for sent in train_data for tok in sent])
 
     total_unigram_error_cnt = 0
@@ -397,7 +397,7 @@ def convert_to_span_based(data):
     return new_data
 
 
-def main(args):
+def pre_process_data(args):
     root_path = os.path.join("..", "out", args.dataset, args.model, "predictions")
     train_path = os.path.join(root_path, "train.tsv")
     dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
@@ -415,7 +415,13 @@ def main(args):
         data["dev"] = convert_to_span_based(data["dev"])
         data["test"] = convert_to_span_based(data["test"])
 
+    return data
+
+
+def main(args):
+    data = pre_process_data(args)
     get_boundary_error_ratio(data[args.file])
+    
     if args.only_f1:
         calc_micro_f1(data[args.file])
     else:
