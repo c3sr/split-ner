@@ -186,7 +186,7 @@ class NerExecutor:
 
         # return DataCollatorForTokenClassification(tokenizer=self.tokenizer)
         from secner.dataset import NerDataCollator
-        return NerDataCollator(args=self.additional_args)
+        return NerDataCollator(args=self.additional_args, pattern_vocab=None)
 
 
 def main(args):

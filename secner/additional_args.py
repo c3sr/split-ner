@@ -75,6 +75,7 @@ class AdditionalArguments:
     pattern_embedding_type: str = field(default="cnn", metadata={"help": "use CNN or embedding"})
     pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_dropout: bool = field(default=True, metadata={"help": "add dropout after LSTM"})
+#    pattern_vocab_path: str = field(default=None, metadata={"help": "pattern vocab file path"})
     pattern_vocab_path: str = field(default="pattern_vocab.txt", metadata={"help": "pattern vocab file path"})
     pattern_vocab_size: int = field(default=0, metadata={"help": "pattern vocab file path"})
 
