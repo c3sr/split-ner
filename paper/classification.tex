@@ -4,8 +4,13 @@ This is modeled as the reverse of QA model for NER described in Section \ref{sec
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=\linewidth]{../thesis/span_classification}
+    \includegraphics[width=\linewidth]{resources/span_classification}
     \caption{Span Classification Setup (colored tokens depict the entity mention in question with expected output entity label)}
     \label{fig:span_classification}
 \end{figure}
 
+- is reverse question answering setup
+- is a simpler step in general compared to span detection. 
+- may suffer from biases because of lots of classes and class imbalance. 
+- Dice loss has been shown to be effective. So, we adopt it here as well.
+- Later ablations show its effectiveness

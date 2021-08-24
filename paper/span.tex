@@ -4,8 +4,16 @@ We formulate this as a question answering task asking the model to identify all 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{../thesis/span_detection}
+    \includegraphics[width=\linewidth]{resources/span_detection}
     \caption{Span Detection Setup with \texttt{BIOE} scheme and \textit{What} as question word (colored tokens depict the generic entity type in question and gold entity mentions with expected output labels)}
     \label{fig:span_detection}
 \end{figure}
+
+- main task here is boundaries. They need to be accurate becuase the classification stage will just take the mention as input and assign a type. It will not correct the boundary later!
+
+- also correct boundary here ensures that type classification will be better (else counter examples like, Apple - Fruit, Apple Inc - Organization) (can probably give a more realisitc example from existing used dataset)
+
+- So, we use pattern and character embeddings (framework explanation - embedding formation, CNN usage, 50 dim) (later, have ablation on it to show its effectiveness)
+
+- this pattetrn based formulation is a personalization over the BERT model that we could do because we split our task up into simpler sub-tasks.
 
