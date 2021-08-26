@@ -1,42 +1,51 @@
 \subsection{Data}
-
-We validate our system using multiple English language datasets belonging to news and biomedical domains. 
+ 
+We validate our system using three publicly available datasets  belonging to general (OntoNotes and WNUT) and biomedical (BioNLP13CG) domains
+ and a private dataset from the cybersecurity domain. 
+ The cybersecurity domain data contains news articles, blogs and technical reports related to malware and vulnerabilities, and
+ we denote the dataset as \texttt{CyberThreats} in this paper.
+Specifically, we demonstrate the effectiveness of our algorithms for non-word, low-resource entity recognition using the datasets from multiple domains and noisy text.
+The datasets include not only traditional entity types with word mentions(e.g., PERSON, LOCATION) but also many entity types with non-word, very long mentions.  
 Table \ref{tab:datasets_summary} shows a summary of the datasets.
 \begin{table*}[h!]
 \centering
 \begin{small}
-\begin{tabular}{ccccccc}\toprule
+\begin{tabular}{ccccrrr}\toprule
  \textbf{Dataset} & \texttt{\#Entities} & \texttt{Non-Word} & \texttt{Low Resource} & \texttt{Train} & \texttt{Dev.} & \texttt{Test} \\ \toprule 
 BioNLP13CG & 16 & Yes & Yes & 3,033  & 1,003 & 1,906 \\
-JNLPBA     & 5 & Yes & No & 16,807 & 1,739 & 3,856 \\
-CoNLL2003 & 4 & No & No & 14,041 & 3,250 & 3,453 \\
-OntoNotes5.0 & 18 & Yes & Yes & 115,812 & 15,680 & 12,217 \\  \bottomrule
+%JNLPBA     & 5 & Yes & No & 16,807 & 1,739 & 3,856 \\
+%CoNLL2003 & 4 & No & No & 14,041 & 3,250 & 3,453 \\
+CyberThreats & 8 & Yes & Yes & 38,721 & 6,322 & 9,837 \\
+OntoNotes5.0 & 18 & Yes & Yes & 115,812 & 15,680 & 12,217 \\  
+WNUT17 & 6 & Yes & Yes & 3,394 & 1,287 & 1,009\\
+\bottomrule
 \end{tabular}
 \caption{Overview of the experimental datasets. \texttt{\#Entities} indicates the number of unique entity types.
-texttt{Non-Word} and \texttt{Low Resource} indicate if the dataset contains non-word mentions and
+\texttt{Non-Word} and \texttt{Low Resource} indicate if the dataset contains non-word mentions (e.g, mentions with digits and symbols) and
 low-resource entity types respectively.  
 \texttt{Train}, \texttt{Dev.} and \texttt{Test} show the number of sentences in the datasets.}
 \label{tab:datasets_summary}
 \end{small}
 \end{table*}
 
+\yjcomment{Shall we show the class distribution for the datasets? We need to use the names of diffrent methods consistently. Let's make a name for our system instead of Span-Pipeline.}
 \comment{Different domains (entity nature \& language context) / dataset sizes / No. of entities 
 - BIONLP13CG: Bio dataset (using Scibert + BERT model)
 - OntoNotes: General entities / newswire (using Roberta base)
-- WNUT17: emerging entities from tweets} (using BERT)
-Also show from result analysis that span class is simpler and gives above 90\% result where as detector is the main bottleneck
+- WNUT17: emerging entities from tweets (using BERT)
+Also show from result analysis that span class is simpler and gives above 90\% result where as detector is the main bottleneck}
 
 \begin{table*}[h!]
 \centering
 \begin{small}
-\begin{tabular}{cccc}\toprule
- \textbf{Model} & \texttt{BioNLP13CG} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
+\begin{tabular}{ccccc}\toprule
+ \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
 BERT-QA & todo & todo & todo  \\
-BERT-Span-Pipeline     & 86.70 & 90.31 & 56.30  \\
-Reported SOTA & 85.56(thesis see) & 92.07(MRC-Dice) & 60.45(CL-KL)  \\
+BERT-Span-Pipeline     & 86.70 & 74.04 & 90.31 & 56.30  \\
+Reported SOTA & 85.56(thesis see) & N/A & 92.07(MRC-Dice) & 60.45(CL-KL)  \\
 \bottomrule
 \end{tabular}
-\caption{Results. \texttt{\#F1} mention-level Micro F1\%.}
+\caption{Results. \texttt{\#F1} mention-level Micro F1\%. \yjcomment{we need to add discussions for MRC-Dice and CL-KL as they use additional knowledge. point out that our system does not rely on external knowledge which is usually unavailable for domain-speicific data and results in longer training}}
 \label{tab:main}
 \end{small}
 \end{table*}
@@ -47,7 +56,7 @@ Reported SOTA & 85.56(thesis see) & 92.07(MRC-Dice) & 60.45(CL-KL)  \\
 \begin{tabular}{cccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
 BERT-Span-Pipeline     & 78.14 & 86.27(best) & 50.15  \\
-Reported SOTA & (no reports) & 86.9(few-shot-paper-unpublished) & 50.5(CL-KL)  \\
+Reported SOTA & N/A & 86.9(few-shot-paper-unpublished) & 50.5(CL-KL)  \\
 \bottomrule
 \end{tabular}
 \caption{Results. (10\% setting) (may remove this table if not very important) \texttt{\#F1} mention-level Micro F1\%.}
@@ -86,13 +95,14 @@ Span-Class-CE     & 94.04 & todo & todo  \\
 \begin{table*}[h!]
 \centering
 \begin{small}
-\begin{tabular}{cccc}\toprule
- \textbf{Model} & \texttt{BioNLP13CG} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
-QA & todo & todo & todo  \\
-Span-Pipeline     & todo & todo & todo  \\
+\begin{tabular}{ccccc}\toprule
+ \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes(10\%)} & \texttt{WNUT17} \\ \toprule 
+QA                & 1,372.8 & todo & todo  & 568.2\\
+Span-Pipeline     & 241.2 (106.3/134.9) & todo & 300.8 (185.5/115.3)  & 122.9 (98.9/24.0)\\
 \bottomrule
 \end{tabular}
-\caption{Training Time Results. sec per training epoch\%.}
+\caption{Comparison of the training time between our method and a non-pipelined QA-based NER method. 
+    The training time is reported in seconds per training epoch. The numbers in the parentheses denote the training times for span detection and span classification. }
 \label{tab:train_time_ablation}
 \end{small}
 \end{table*}
