@@ -7,11 +7,25 @@
 % 3. a short summary on the novelities of the approach and the result
 % }
 
-Named Entity Recognition has been a popular area of Natural Language Processing (NLP) research and serves as a foundation step for various applications like question answering, information retrieval and machine translation. Over the years, NER techniques have evolved in sync with new advances in the area of machine learning. The advent of the BERT \cite{devlin2018bert} and its effectiveness in capturing text semantics have given new traction to the NER domain. 
+Named Entity Recognition has been %a popular area of Natural Language Processing (NLP) research and serves as 
+a foundation step for various applications like question answering, information retrieval and machine translation~\cite{li2020survey}\yjcomment{more citations}. 
+Over the years, NER techniques have evolved in sync with new advances in machine learning. 
+The advent of the BERT \cite{devlin2019bert} and its effectiveness in capturing text semantics have given new traction to the NER domain. 
 
-For long, NER has been seen as a sequence labeling task where a model is trained to classify each token of a sequence into an output category. \cite{ma2016end} and \cite{devlin2018bert} show the effectiveness of a CNN-LSTM-CRF and BERT framework for this, respectively. In recent years, however, there has been a trend of formulating NER problems as question answering(QA) tasks. Here the model is asked a question as plain text and fed the input sentence. The language model is trained to understand the semantics of the question and identify parts of the input that serve as its answer. \cite{li2019entity, levy2017zero} model relation extraction as QA tasks and \cite{mccann2018natural} propose a QA-based multi-task learning setup.
+For long, NER has been seen as a sequence labeling task where a model is trained to classify each token of a sequence into an output category~\cite{Chiu16,Lample16,ma2016end,devlin2019bert}.
+\cite{ma2016end} and \cite{devlin2018bert} show the effectiveness of a CNN-LSTM-CRF and BERT framework for this, respectively. 
+In recent years, however, there has been a new trend of formulating NER problems %as question answering(QA) tasks
+as span classification tasks\yjcomment{QA based can be viewed as a type of span ner}~\cite{li2020MRC,Jiang20,Ouchi20}, 
+where NER is treated as multi-class classification.
 
-However, all of these previous approaches treat the NER problem as a whole. One single model must take a sentence as input and return mention tuples with correct boundaries and correct entity type. We propose a division of labor. We break down the NER problem into a two-step pipelined process. In the first step, \textit{Span Detection}, we detect all mention spans in a given sentence irrespective of their semantic class. In the next step, \textit{Span Classification}, we classify these spans into their corresponding entity type. Using this formulation, we can now train two separate language models independently which specialize in their own sub-tasks and together solve the NER problem. In our experiments, we borrow the basic intuitions of QA setup for NER to solve both our sub-tasks.
+Another new trend is formulating NER as a question answering(QA) task~\cite{li2020MRC}. 
+Here the model is asked a question as plain text and fed the input sentence. The language model is trained to understand the semantics of the question and identify parts of the input that serve as its answer. \cite{li2020MRC,levy2017zero} model relation extraction as QA tasks and \cite{mccann2018natural} propose a QA-based multi-task learning setup.
+
+However, all of these previous approaches treat the NER problem as a whole. One single model must take a sentence as input and return mention tuples with correct boundaries and correct entity type. 
+Further, the existing span classification approaches consider all possible spans up to a predetermined length $l$.
+For an input sentence $\{w_1, w_2, \ldots, w_n\}$, these systems enumerate all possible spans from length 1 to length $l$.
+
+We propose a division of labor. We break down the NER problem into a two-step pipelined process. In the first step, \textit{Span Detection}, we detect all mention spans in a given sentence irrespective of their semantic class. In the next step, \textit{Span Classification}, we classify these spans into their corresponding entity type. Using this formulation, we can now train two separate language models independently which specialize in their own sub-tasks and together solve the NER problem. In our experiments, we borrow the basic intuitions of QA setup for NER to solve both our sub-tasks.
 
 Both our sub-task models can be trained independently. The pipeline structure comes during the inference time. Here, every unlabeled sentence is first passed through the \textit{Span Detection} stage and each output span is converted into an input sample for the \textit{Span Classification} stage which assigns each mention span into an entity type thus completing the NER task. We study this proposed logical separation thoroughly by conducting experiments over multiple NER datasets belonging to different domains. Our contributions through this work are:
 
