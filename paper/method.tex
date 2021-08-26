@@ -1,2 +1,24 @@
-\comment{An overall system description and architecture diagram. Details of span detection and classification go ot the subsections.}
+% \comment{An overall system description and architecture diagram. Details of span detection and classification go ot the subsections.}
+
+- question answering framework is suited to give generalized questions as input and even then expect the model to learn correct answer spans
+
+- QA effectiveness on identifying accurate entity boundaries (which is key for NER) is already proven by its recent success in NER
+
+- QA model is found to give high precision/recall for even very generalized entity types (like Genes). This motivates us to gneralize and try bringing all extractable entities under one bucket (motivation for span detection)
+
+(can show entity level results in appendix)
+
+- Entity scrambling experiment shows that QA model learns a keyword to span mapping. Then why not try to learn an exactly reverse mapping. Given entity span, associate it with a keyword.
+
+(show results in appendix, show that scrambing experiment shows internal term semantics of "Person", "Org" does not contribute much to NER in QA)
+
+Base QA Framework
+- training samples are created for each entity type for each sentence. 
+- Mention spans are treated as answers else left blank
+- Total complexity 
+- Bias towards entities with more samples. Rare entities may have very few positive samples.
+
+Span Detection and classification setup ensures that no extra training samples are created. Only 1 sentence for each entity mention in QA setup (which ensures optimality in terms of entity mentions now! - kind of like a lower bound)
+
+Next we look at span detection and classification in detail with corresponding personalizations for each
 

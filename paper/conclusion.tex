@@ -6,3 +6,9 @@ Our span-based setup opens up prospects for more intuitive and creative ways of 
 %Our study on training effectiveness reveals that feeding additional external semantics while fine-tuning the BERT model is non-trivial. This again motivates future research on designing feature fusion techniques which are effective with a BERT (transformer-like) architecture.
 
 From the qualitative analysis of the various approaches, we observe that boundary detection serves as a primary issue in NER. To alleviate this problem, we explicitly model word types and special symbols. However, there is still a wide margin to cover. We encourage the research community to design architectures or new training objectives tailor-made to handle mention boundaries effectively. 
+
+- currently a two level pipeline, but can be extended for hierarchical NER
+
+- main problem of span detection is that every entity is being clubed into a single class. Very crude NER. Similar problems as a very generic class (like OTHER entities): is a good motivation for hierarchical strategy, trying to build some sort of a decision tree model with max information gain (least entropy in buckets)
+
+- disadvantage of pipeline is that error propagates and so span detection setves as a boottleneck
