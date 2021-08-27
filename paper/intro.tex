@@ -23,9 +23,10 @@ Here the model is asked a question as plain text and fed the input sentence. The
 
 However, all of these previous approaches treat the NER problem as a whole. One single model must take a sentence as input and return mention tuples with correct boundaries and correct entity type. 
 Further, the existing span classification approaches consider all possible spans up to a predetermined length $l$.
-For an input sentence $\{w_1, w_2, \ldots, w_n\}$, these systems enumerate all possible spans from length 1 to length $l$.
+For an input sentence $\{w_1, w_2, \ldots, w_n\}$, these systems enumerate all spans from length 1 to length $l$,
+significantly increasing the computation.
 
-We propose a division of labor. We break down the NER problem into a two-step pipelined process. In the first step, \textit{Span Detection}, we detect all mention spans in a given sentence irrespective of their semantic class. In the next step, \textit{Span Classification}, we classify these spans into their corresponding entity type. Using this formulation, we can now train two separate language models independently which specialize in their own sub-tasks and together solve the NER problem. In our experiments, we borrow the basic intuitions of QA setup for NER to solve both our sub-tasks.
+We propose a division of labor. We break down the NER problem into a two-step pipelined process. In the first step, \textit{Span Detection}, we detect all mention spans in a given sentence irrespective of their semantic class. In the next step, \textit{Span Classification}, we classify these spans into their corresponding entity type. Using this formulation, we can now train two separate language models independently which specialize in their own sub-tasks and together solve the NER problem. In our experiments, we borrow the basic intuitions of the QA-based NER to solve both our sub-tasks.
 
 Both our sub-task models can be trained independently. The pipeline structure comes during the inference time. Here, every unlabeled sentence is first passed through the \textit{Span Detection} stage and each output span is converted into an input sample for the \textit{Span Classification} stage which assigns each mention span into an entity type thus completing the NER task. We study this proposed logical separation thoroughly by conducting experiments over multiple NER datasets belonging to different domains. Our contributions through this work are:
 
@@ -38,3 +39,4 @@ Both our sub-task models can be trained independently. The pipeline structure co
     
     \item We substantiate theoretically and demonstrate experimentally that this logical separation is more efficient and hence takes lesser time to train for equal, if not better performance.
 \end{itemize}
+\yjcomment{add  (1) unlike other span classification NER, we don't enumerate all potential fixed length spans.  (2) pipeline is more efficient as we can train the two models simultaneously.  (3) more effective as we can better fine-tune the system  optimizing each model (3) more flexible, as we can apply the models indepently. in some cases such as csv or json files,  the mention spans are already known in the input data, so we can only apply the span classification model. }
