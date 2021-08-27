@@ -40,12 +40,12 @@ Also show from result analysis that span class is simpler and gives above 90\% r
 \begin{small}
 \begin{tabular}{ccccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
-BERT-QA & \textcolor{red}{todo} & \textcolor{red}{todo} & \textcolor{red}{todo}  & \textcolor{red}{todo} \\
+BERT-QA & \textcolor{red}{todo} & \textcolor{red}{todo} & \textcolor{red}{todo}  & \textcolor{blue}{ongoing} \\
 BERT-Span-Pipeline     & 86.70 & \textcolor{red}{todo} & 90.31 & 56.30  \\
 Reported SOTA & 85.56(thesis see) & N/A & 92.07(MRC-Dice) & 60.45(CL-KL)  \\
 \bottomrule
 \end{tabular}
-\caption{Results. \texttt{\#F1} mention-level Micro F1\%. \yjcomment{we need to add discussions for MRC-Dice and CL-KL as they use additional knowledge. point out that our system does not rely on external knowledge which is usually unavailable for domain-speicific data and results in longer training}}
+\caption{Results. \texttt{\#F1} mention-level Micro F1\%. \yjcomment{let's compare with SOTA without any external data or additinonal pretraining. I consider MRC-Dice also using additional info. as they added several synonyms/hyponyms in query.   we can put SOTA without external data and with external data in separate rows if you like. We point out that our system does not rely on external knowledge which is usually unavailable for domain-speicific data and needs less computing resources than MRC}}
 \label{tab:main}
 \end{small}
 \end{table*}
@@ -97,7 +97,7 @@ Span-Class-CE     & 94.04 & 87.58 & \textcolor{red}{todo} & 73.31  \\
 \begin{small}
 \begin{tabular}{ccccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes(10\%)} & \texttt{WNUT17} \\ \toprule 
-QA                & 1,372.8 & 877.1 & \textit{ongoing}  & 568.2\\
+QA                & 1,372.8 & 877.1 & \textcolor{blue}{ongoing}  & 568.2\\
 Span-Pipeline     & 241.2 (106.3/134.9) & 145.53 (113.7/31.9) & 300.8 (185.5/115.3)  & 122.9 (98.9/24.0)\\
 \bottomrule
 \end{tabular}
