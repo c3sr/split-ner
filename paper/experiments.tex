@@ -40,8 +40,8 @@ Also show from result analysis that span class is simpler and gives above 90\% r
 \begin{small}
 \begin{tabular}{ccccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
-BERT-QA & todo & todo & todo  \\
-BERT-Span-Pipeline     & 86.70 & todo & 90.31 & 56.30  \\
+BERT-QA & \textcolor{red}{todo} & \textcolor{red}{todo} & \textcolor{red}{todo}  & \textcolor{red}{todo} \\
+BERT-Span-Pipeline     & 86.70 & \textcolor{red}{todo} & 90.31 & 56.30  \\
 Reported SOTA & 85.56(thesis see) & N/A & 92.07(MRC-Dice) & 60.45(CL-KL)  \\
 \bottomrule
 \end{tabular}
@@ -70,7 +70,7 @@ Reported SOTA & N/A & 86.9(few-shot-paper-unpublished) & 50.5(CL-KL)  \\
 \begin{tabular}{ccccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
 Span-Detector-CharPattern & 91.06 & 78.63 & 92.50 & 55.21  \\
-Span-Detector-Vanilla     & 90.67 & \textit{ongoing} & todo & 54.85  \\
+Span-Detector-Vanilla     & 90.67 & \textcolor{red}{todo} & \textcolor{red}{todo} & 54.85  \\
 \bottomrule
 \end{tabular}
 \caption{Span Detector Results. \texttt{\#F1} mention-level Micro F1\%.}
@@ -83,8 +83,8 @@ Span-Detector-Vanilla     & 90.67 & \textit{ongoing} & todo & 54.85  \\
 \begin{small}
 \begin{tabular}{ccccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
-Span-Class-Dice & 94.27 & \textit{ongoing} &  96.74 & 73.40  \\
-Span-Class-CE     & 94.04 & 87.58 & todo & 73.31  \\
+Span-Class-Dice & 94.27 & \textcolor{red}{todo} &  96.74 & 73.40  \\
+Span-Class-CE     & 94.04 & 87.58 & \textcolor{red}{todo} & 73.31  \\
 \bottomrule
 \end{tabular}
 \caption{Span Classifier Results. \texttt{\#F1} mention-level Micro F1\%.}
@@ -97,8 +97,8 @@ Span-Class-CE     & 94.04 & 87.58 & todo & 73.31  \\
 \begin{small}
 \begin{tabular}{ccccc}\toprule
  \textbf{Model} & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes(10\%)} & \texttt{WNUT17} \\ \toprule 
-QA                & 1,372.8 & todo & \textit{ongoing}  & 568.2\\
-Span-Pipeline     & 241.2 (106.3/134.9) & todo & 300.8 (185.5/115.3)  & 122.9 (98.9/24.0)\\
+QA                & 1,372.8 & 877.1 & \textit{ongoing}  & 568.2\\
+Span-Pipeline     & 241.2 (106.3/134.9) & 145.53 (113.7/31.9) & 300.8 (185.5/115.3)  & 122.9 (98.9/24.0)\\
 \bottomrule
 \end{tabular}
 \caption{Comparison of the training time between our method and a non-pipelined QA-based NER method. 
