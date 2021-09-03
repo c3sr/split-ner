@@ -1,3 +1,8 @@
+programatically classified the errors made by the system into some predefined categories (details in Appendix 1). From the experiments, we reveal that a shocking 80\% of errors occur primarily due to incorrect boundary detection. These are cases where the model approximately identifies the region for an entity mention in text but fails to identify the boundaries exactly. Since most NER studies report span-level (in other words, mention-level) micro-averaged F1 scores, all of these approximate mentions identified, are voided out. What causes the model to not identify these mentions exactly? The linguistic structures of several entity mentions in sentences is shared, irrespective of their entity type. However, the BER
+
+Appendix 1:
+
+
 Given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$, the goal of this module is to output a list of spans (mention tuples) $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. Note that here the mention tuples are not associated with an entity type. 
 
 We formulate this as a question answering task asking the model to identify all entity spans in a given sentence. For example, the sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], is converted to the input, \textit{What is the \texttt{entity} mentioned in the text? Emily lives in United States}. This is fed to BERT model which outputs labels for each token following the \texttt{BIOE} scheme. In this example, we expect two spans, \textit{Emily} and \textit{United States}. Figure \ref{fig:span_detection} shows our span detection setup.
