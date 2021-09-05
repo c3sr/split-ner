@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import time
+from datetime import datetime, timedelta
 import traceback
 
 import numpy as np
@@ -110,12 +111,23 @@ class NerSpanExecutor:
     def run(self):
         if self.train_args.do_train:
             start = time.time()
-            logger.info("training mode: start_time {0}".format(str(start)))
+            logger.info("training mode: start time: {0}".format(str(datetime.now())))
 
             try:
                 self.trainer.train(self.additional_args.resume)
             except:
                 traceback.print_exc()
+
+            end = time.time()
+            logger.info("end time: {0}".format(str(datetime.now())))
+            elapsed = end - start
+            logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+
+            filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-train-"+str(self.train_args.num_train_epochs)+".elapsed"
+            file = open(filename, "w")
+            file.write(str(elapsed)+" seconds\n")
+            file.write(str(timedelta(seconds=elapsed)));
+            file.close()
 
             elapsed = time.time() - start
             logger.info("elapsed time: {0}".format(str(elapsed)))
