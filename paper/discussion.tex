@@ -1,32 +1,60 @@
-\subsection{Observations}
-\begin{itemize}
-    \item \textbf{Span Detection}: Detecting all mention spans together without classification is a simpler problem for the model than full NER and we get better performance on this sub-task compared to complete NER task in QA setup.
-    
-    \item \textbf{Span Classification}: Given that spans are pre-identified, classifying them to an entity type is a relatively simple task for the BERT model. On all datasets, we see around $95\%$ Micro-F1 on test set.
-    
-    \item \textbf{Pipeline}: The pipelined procedure gives comparable and even better performance than standard QA NER model on all datasets demonstrating the effectiveness of this division of labor. 
-    
-    \item Since out \texttt{Pipeline} results are comparable to \texttt{BERT-QA} model, we conclude that internally \texttt{BERT-QA} model also tries to logically segregate boundary detection and classification as separate tasks.
-    
-    \item The results of span pipeline are limited by the performance of the span detector part. Since this procedure is pipelined, errors in this first step propagate to the next step. Boundary detection serves as the primary challenge in Span Detector and has a large scope for improvement on biomedical datasets.
-    
-    \item Qualitative analysis reveals that both \texttt{BERT-QA} and \texttt{Span Detector} share very similar boundary detection issues.
-\end{itemize}
-
-\subsection{Salient Features}
+From the results of experiments reported in the previous section, we make the following observations:
 
 \begin{itemize}
-    \item Compared to sequence labeling and question answering approach, this span-based approach has more representative power. This is because here we have two BERT models each working on their own sub-tasks and contributing towards better NER while the other approaches just have a single model.
+    \item From Table \ref{tab:main}, we see that \texttt{2Q-NER} outperforms sequence-tagging and QA-based baselines by a large margin on three cross-domain datasets and performs on-par with the baseline on \texttt{BioNLP13CG} corpus demonstrating the effectiveness of our proposed division of labor. 
     
-    \item Even though we are training two BERT models, they can be trained independently, in parallel. Only at inference time, we need to maintain the sequential nature.
+    \item The results show that span detection and classification tasks have minimal correlation with each other and can be done independent of each other. 
     
-    \item If we have $T$ entities of interest, then standard question answering approach creates $T$ samples for each input sentence both at train and inference time. Considering that each sentence on an average has much lesser than $T$ entity mentions, there is a lot of redundancy in this approach. 
+    \item Compared to sequence labeling and question answering approach, \texttt{2Q-NER} has more representative power. This is because we have two BERT models each working on their own sub-tasks and contributing towards better NER while the baselines just have a single model.
     
-    \item Our span-based approach removes QA model redundancy even though inherently we have a QA-based setup. Span Detector only sees an input sentence once and identifies all mention spans. The span classifier will work on only these identified mention spans and classify them into an entity type.
+    \item Comparison with baselines gives some additional insights into the internal functioning of BERT model which also implicitly tries to learn entity-agnostic extraction rules for mentions. Our approach explicitly models that behavior and hence is found to be more effective.
     
-    \item Nevertheless, our approach has a pipeline-based structure and hence errors made by span detector propagate to the classifier. Sequence labeling and question answering approaches do not face this concern. 
+    \item \data{WNUT17} dataset has rare and diverse range of emerging entities crudely categorized into $6$ entity types. Training a single NER model may confuse the system to form entity-specific extraction rules. Our task segregation allows the span detection step to form generalized rules for extracting all mentions which is found to be much more effective as can be seen from Table \ref{tab:main}.
     
-    \item Our span-based approach shows the effectiveness of \textit{reverse question answering}. For a sentence, \textit{Emily lives in United States}, rather than asking a question of the form, \textit{"What is the \texttt{Person} mentioned in the text?"}, we ask, \textit{"What is \texttt{Emily}?"}. This opens up prospects for more intuitive forms of approaching NER, taking us closer to human understanding and interpretations.
+    \item As a sidenote, our baselines and \texttt{2Q-NER} (in Table \ref{tab:main}) outperform the previously published approaches on \data{BioNLP13CG} thus setting new state-of-the-art results. However, the credit here goes to SciBERT model, better training parameters and partially to the added character and pattern features.
     
-    \item Comparable and even improved performance of this span-based approach compared to the general QA NER setup (results in Table \ref{tab:res_span}) shows that boundary detection of mentions has less correlation with the entity type it belongs to.
+    \item Our pipelined \texttt{2Q-NER} approach leverages the QA framework and removes its redundancies. Span Detector only sees an input sentence once and identifies all mention spans. The span classifier will work on only these identified mention spans and classify them into an entity type. Table \ref{tab:train_time_ablation} confirms and shows that the margin of improvement is more pronounced with increase in dataset size and number of entity types in the dataset.
+    
+    \item Table \ref{tab:train_time_ablation} considers the components of \texttt{2Q-NER} being trained sequentially. However, the approach is flexible enough to train both the BERT models independently, in parallel, reducing the train time even further. Only at inference time, we need to maintain the sequential nature.
+    
+    \item Comparing the F1 scores in Table \ref{tab:det_ablation} and Table \ref{tab:class_ablation}, detecting correct mention spans (span detection) is harder than disambiguating them and classifying them into entity types (span classification). Both the sub-tasks are however individually simpler than the overall NER task.
+    
+    \item From results in Table \ref{tab:det_ablation}, adding character and pattern features indeed helps detect better boundaries improving precision with comparable recall thus leading to a higher F1 score in \textit{Span Detection Module}.
+    
+    \item From results in Table \ref{tab:feature_ablation}, adding character and patterns individually has a positive impact on overall span detection performance. Both together give an even better performance. Part-of-speech semantics is well captured by the existing BERT features and the added character and pattern features and hence does not need to be explicitly learnt.
+    
+    \item From results in Table \ref{tab:class_ablation}, we see that \texttt{Dice Loss} helps handle the class imbalance issues seen in \textit{Span Classification Module} and gives a slight performance improvement over \texttt{Cross Entropy Loss}.
 \end{itemize}
+
+\subsection{Qualitative Analysis}
+In Table \ref{tab:quality} we show some sample predictions made by our \texttt{2Q-NER} system and compare them with those made by the corresponding \texttt{BERT-QA} system. 
+\begin{itemize}
+    \item \texttt{2Q-NER} is better in detecting emerging entities and out-of-vocabulary terms (like new movies, softwares) which may be rare in the dataset and have high diversity. This can be attributed to \textit{Span Detection Module} being stronger in generalizing and sharing entity extraction rules across multiple entity types.
+    
+    \item \texttt{BERT-QA} gets confused in cases where entities have special symbols within them (like hyphens in scientific terms, comma in some multi-word entities). Character and pattern features in \textit{Span Detection Module} help handle such cases well.
+    
+    \item \texttt{BERT-QA} model develops a bias towards more common entity types like \texttt{Location} and may misclassify rare entity mentions (like \texttt{Products}) when they occur in a similar context. \texttt{2Q-NER} handles such cases well with a dedicated \textit{Span Classification Module} designed to use dice loss.
+\end{itemize}
+
+\begin{table*}[h!]
+\centering
+\begin{small}
+\begin{tabular}{ccc}\toprule
+Category & Model & Example \\\toprule
+\multirow{2}{*}{General Detection} & \texttt{BERT-QA} & \textit{CVS selling their own version of ...} \\
+    & \texttt{2Q-NER} & \textit{\textcolor{blue}{CVS}[\texttt{Corporation}] selling their own version of ...} \\ \midrule
+\multirow{2}{*}{Emerging Entities} & \texttt{BERT-QA} & \textit{Does Rogue One create a plot hole in Return of the Jedi ... } \\
+    & \texttt{2Q-NER} & \textit{Does \textcolor{blue}{Rogue One}[\texttt{Creative Work}] create a plot hole in \textcolor{blue}{Return of the Jedi}[\texttt{Creative Work}] ... } \\ \midrule
+\multirow{2}{*}{Scientific Terms} & \texttt{BERT-QA} & \textit{The MVD and Ki - 67 LI were higher ... } \\
+    & \texttt{2Q-NER} & \textit{The MVD and \textcolor{blue}{Ki - 67}[\texttt{Gene}] LI were higher ...} \\ \midrule
+\multirow{2}{*}{Boundaries} & \texttt{BERT-QA} & \textit{.. Hotel Housekeepers Needed in Spring , \textcolor{blue}{TX}[\texttt{Location}] ... } \\
+    & \texttt{2Q-NER} & \textit{.. Hotel Housekeepers Needed in \textcolor{blue}{Spring , TX}[\texttt{Location}] ... } \\ \midrule
+\multirow{2}{*}{Out of Vocab Terms} & \texttt{BERT-QA} & \textit{Store SQL database credentials in a webserver} \\
+    & \texttt{2Q-NER} & \textit{Store \textcolor{blue}{SQL}[\texttt{Product}] database credentials in a webserver} \\ \midrule
+\multirow{2}{*}{Entity Classification} & \texttt{BERT-QA} & \textit{Why do so many kids in \textcolor{blue}{Digimon}[\texttt{Location}] wear gloves?} \\
+    & \texttt{2Q-NER} & \textit{Why do so many kids in \textcolor{blue}{Digimon}[\texttt{Product}] wear gloves?} \\ \bottomrule
+\end{tabular}
+\caption{Examples from multiple datasets comparing performance of \texttt{2Q-NER} and \texttt{BERT-QA} systems}
+    \label{tab:quality}
+\end{small}
+\end{table*}

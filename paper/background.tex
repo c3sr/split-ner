@@ -1,0 +1,20 @@
+Our work is inspired by the advancements in NER by the span classification and the QA-based frameworks for NER.
+
+Before deep diving into our proposed model architecture and its individual components, we implement and analyse a standard single QA-based framework over BERT architecture for NER%, which is similar to the MRC system~\cite{li2020MRC}. 
+In this setup, a model is fed a question specifying which entity to extract (for example, \textit{Where is the Person mentioned in the text?}) and an input sentence. The model is trained to understand the entity semantics from the question and identify the right mention spans from the input. 
+For each token in the input sentence, the model does a multi-class classification into four possible output categories: \texttt{B} (begin), \texttt{I} (intermediate), \texttt{E} (end) and \texttt{O} (none). Following the standard \texttt{BIOE} tagging scheme, we return the longest possible mention spans as output. We call this as the \texttt{BERT-QA} model and train it independently on four different corpora. %, \texttt{BioNLP13CG}, \texttt{OntoNotes}, \texttt{CyberThreats} and \texttt{WNUT17}. 
+From a qualitative analysis of its predictions, we draw the following two findings:
+\begin{enumerate}
+    \item An entity type, say \texttt{Person}, can occur in diverse linguistic contexts in a sentence.
+    
+    \item Mentions belonging to completely different entity types can occur in very similar linguistic construct in a sentence.
+\end{enumerate}
+
+Both findings are substantiated through examples like those shown in Table \ref{}\comment{make table with examples}. 
+%Essentially, there are multiple ways of representing the same semantics in a sentence just by rearranging the entities within it. 
+These findings reveal that we don't need entity-specific extraction rules and the task of extracting a mention span can be decoupled from the task of classifying it into an entity type. 
+Hence, this is what we propose through our two-stage pipelined system, \modelname.
+
+Additionally, when looking at the predictions made by \texttt{BERT-QA} model, we categorized the errors made by the system (details in Appendix 1) \comment{may add some detail about prefix missing, suffix missing, exact match entity different cases from BioNLP13CG dataset in Appendix} and noticed that around 70\% \comment{check ratio! Haven't calculated this percent yet.} of errors are due to incorrect boundary detection. These are cases where the model approximately identifies the region for an entity mention in text but fails to identify the boundaries exactly. Since most NER studies report span-level (in other words, mention-level) micro-averaged F1 scores, all of these approximate mentions are voided out. 
+
+\comment{Add a line to connect this with span detection.. Now, by implementing our pipelined system, we see that this falls in the category of our span detection subtask and we can individually customize and work on it by modeling character patterns }

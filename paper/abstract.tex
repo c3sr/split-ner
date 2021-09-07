@@ -3,5 +3,8 @@ We apply the question-answering (QA) framework over the BERT architecture for bo
 
 We demonstrate that this logical separation and the QA framework are  effective and  time efficient through comprehensive experiments on multiple cross-domain data sets. The effectiveness stems from leveraging the power of the same language model twice, once for each sub-task and the ability to optimize each model independently at the sub-task level.   
 Further, this separation produces two leaner models instead of one large complex model and allows faster training since the two models can be trained in parallel.
+\comment{Add performance/time figures} 
 % (1) how generalizable is this strategy
 % (2) BERT model (black box deep model) seems to implicitly decouple the NER task this way
+
+% \comment{Note: Readers' may say that any improvements you are getting could be due to training noise.. because we haven't conducted multiple experiments and not reported mean and std. deviation.. our main theme should be that, we are not trying to compete with vanilla NER in terms of performance! We are saying we are on-par with the vanilla NER performance and at the same time, getting immense improvements in time training efficiency!\\~\\ + flexibility that we give now that we have to focus on simpler sub-tasks..\\~\\The fact that our system is achieving similar results to normal NER also gives readers some insights into the BERT model and how it is handling NER as separate tasks internally!}
