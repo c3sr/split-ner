@@ -1,7 +1,6 @@
 {
-  "model_name": "ner-scibert-qa4-querytype4-char-pattern3-subtext-dim50",
+  "model_name": "ner-scibert-qa4-querytype4-char-pattern3-subtext-dim50-dice",
   "num_labels": 4,
-  "no_cuda": true,
   "do_train": true,
   "resume": null,
   "pos_tag_vocab_path": "pos_tag_vocab.txt",
@@ -24,6 +23,7 @@
   "use_char_cnn": "both",
   "pattern_type": "3",
   "token_type": "sub_text",
+  "loss_type": "dice",
   "char_emb_dim": 50,
   "query_type": "question4",
   "base_model": "allenai/scibert_scivocab_uncased",
@@ -33,8 +33,8 @@
   "save_total_limit": 2,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
-  "per_device_train_batch_size": 128,
-  "per_device_eval_batch_size": 128,
+  "per_device_train_batch_size": 16,
+  "per_device_eval_batch_size": 16,
   "learning_rate": 1e-5,
   "wandb_mode": "dryrun"
 }

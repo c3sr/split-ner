@@ -1,39 +1,41 @@
-% \comment{An overall system description and architecture diagram. Details of span detection and classification go ot the subsections.}
-
 % - question answering framework is suited to give generalized questions as input and even then expect the model to learn correct answer spans
 
 % - QA effectiveness on identifying accurate entity boundaries (which is key for NER) is already proven by its recent success in NER
 
 % - QA model is found to give high precision/recall for even very generalized entity types (like Genes). This motivates us to gneralize and try bringing all extractable entities under one bucket (motivation for span detection)
 
-% (can show entity level results in appendix)
+% The BERT model is trained on a vast English corpus and the deeply interconnected transformer architecture ensures that the so-called foundational model learns some generalized semantics and language attributes which can be fine-tuned and reoriented to suit for a variety of NLP tasks, one such being NER.
 
-% - Entity scrambling experiment shows that QA model learns a keyword to span mapping. Then why not try to learn an exactly reverse mapping. Given entity span, associate it with a keyword.
+% In the NLP domain, there are several standardized problem settings or paradigms, like sequence labeling, sentence classification. An NLP application can be approached (or solved) through several of these problem settings. For example, one way of looking at NER task is through sequence labeling where each token of a sequence is to be labeled into an output class, like \texttt{Person}, \texttt{Organization}. The NER task has been traditionally looked at from this perspective. However, recently the question-answering setting has gained popularity for NER, where a question is fed as plain text, like, "Where is the Person mentioned in the text?" along with the sentence input and a model is trained to output the right span where the entity in question is present. \cite{} show the effectiveness of the question-answering paradigm for NER over the BERT architecture. Here on, we refer to this as the \texttt{BERT-QA} setup. We implemented the \texttt{BERT-QA} setup, trained it on multiple datasets (OntoNotes, BioNLP13CG, WNUT) and qualitatively studied the model outputs to draw two broad findings:
 
-% (show results in appendix, show that scrambing experiment shows internal term semantics of "Person", "Org" does not contribute much to NER in QA)
-
-% Base QA Framework
-% - training samples are created for each entity type for each sentence. 
-% - Mention spans are treated as answers else left blank
-% - Total complexity 
-% - Bias towards entities with more samples. Rare entities may have very few positive samples.
-
-% Span Detection and classification setup ensures that no extra training samples are created. Only 1 sentence for each entity mention in QA setup (which ensures optimality in terms of entity mentions now! - kind of like a lower bound)
-
-% Next we look at span detection and classification in detail with corresponding personalizations for each
-
-The BERT model is trained on a vast English corpus and the deeply interconnected transformer architecture ensures that the so-called foundational model learns some generalized semantics and language attributes which can be fine-tuned and reoriented to suit for a variety of NLP tasks, one such being NER.
-
-In the NLP domain, there are several standardized problem settings or paradigms, like sequence labeling, sentence classification. An NLP application can be approached (or solved) through several of these problem settings. For example, one way of looking at NER task is through sequence labeling where each token of a sequence is to be labeled into an output class, like \texttt{Person}, \texttt{Organization}. The NER task has been traditionally looked at from this perspective. However, recently the question-answering setting has gained popularity for NER, where a question is fed as plain text, like, "Where is the Person mentioned in the text?" along with the sentence input and a model is trained to output the right span where the entity in question is present. \cite{} show the effectiveness of the question-answering paradigm for NER over the BERT architecture. Here on, we refer to this as the \texttt{BERT-QA} setup. We implemented the \texttt{BERT-QA} setup, trained it on multiple datasets (OntoNotes, BioNLP13CG, WNUT) and qualitatively studied the model outputs to draw two broad findings:
-
-\begin{enumerate}
-    \item \textbf{Finding 1}: Entity mentions belonging to the same entity type can occur in different parts of the sentence depending on sentence style.
+% \begin{enumerate}
+%     \item \textbf{Finding 1}: Entity mentions belonging to the same entity type can occur in different parts of the sentence depending on sentence style.
     
-    \item \textbf{Finding 2}: Entity mentions belonging to different entity types can occur in similar parts of the sentence.
-\end{enumerate}
+%     \item \textbf{Finding 2}: Entity mentions belonging to different entity types can occur in similar parts of the sentence.
+% \end{enumerate}
 
-The findings are substantiated through examples in Table \ref{tab:ner_problem_ex}. Based on the findings, we can conclude that identifying entity mentions and inferring their entity types can be decoupled and treated as separate tasks. This gives the advantage that entity mention extraction rules can be shared across entity types and in case of datasets with high class imbalance, the rare entities can benefit from rules derived from mentions of the frequent ones. 
+% The findings are substantiated through examples in Table \ref{tab:ner_problem_ex}. Based on the findings, we can conclude that identifying entity mentions and inferring their entity types can be decoupled and treated as separate tasks. This gives the advantage that entity mention extraction rules can be shared across entity types and in case of datasets with high class imbalance, the rare entities can benefit from rules derived from mentions of the frequent ones. 
 
-This motivates us to break down the NER task into two sub-tasks, \textit{Span Detection} and \textit{Span Classification}, each of which are trained independent of each other. \textit{Span Detection} is entity-type agnostic and forms generalized rules to identify mention spans. The \textit{Span Classification} stage takes these mention span outputs from the previous stage and associates them with their entity types.
+% This motivates us to break down the NER task into two sub-tasks, \textit{Span Detection} and \textit{Span Classification}, each of which are trained independent of each other. \textit{Span Detection} is entity-type agnostic and forms generalized rules to identify mention spans. The \textit{Span Classification} stage takes these mention span outputs from the previous stage and associates them with their entity types.
 
-In fact, through the similarity of our results as shown later in the paper, an NER system performing well on a dataset which does not violate the findings stated above, inherently is performing the span detection and classification tasks separately. 
+% In fact, through the similarity of our results as shown later in the paper, an NER system performing well on a dataset which does not violate the findings stated above, inherently is performing the span detection and classification tasks separately. 
+
+In our system, the NER task is performed by a combination of two separately trained modules -- \textit{Span Detection Module}
+and \textit{Span Classification Module}.
+The first one, \textit{Span Detection Module}, identifies all mention spans by learning entity-agnostic rules for extraction. This helps the low-resource entity types (with very few mentions) borrow knowledge from the high-resource entity types (which have a rich diversity of mention samples in training data). 
+% Note that our span detection setup is formulated as a simpler NER task, where there are only 4 target labels (BIEO).
+% Our method is completely different from other span classification-based methods~\cite{li2020MRC,Jiang20,Ouchi20}, which consider all possible spans up a predetermined length in a input sequence. 
+All these extracted mention spans are fed as input to the second module, \textit{Span Classification Module}, which reanalyses them in the sentence structure and looks at how they interact with the other entities of the sentence to classify it into a target entity type. In this way, both the modules, even though being separate from each other, have complete access to full sentence structure and do not suffer from lack of any essential information for their sub-tasks.
+%\yjcomment{be more specific instead of `essential information'}.
+
+This separation gives us the freedom to train both modules independently (can be done in parallel) and optimized and fine-tuned for their intended sub-tasks. Even if done sequentially, these sub-tasks are much simpler than the generalized NER task and as we show later, give a significant efficiency boost with no compromise in performance.
+
+We adopt the BERT-QA framework as the underlying architecture of both the models, but
+use different features and loss functions. \comment{check if required and add a bit more about the architecture and add the overall system diagram here}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{framework5.png}
+    \caption{Span Detection Setup with \texttt{BIOE} scheme and \textit{What is the entity mentioned in the text?} as the question (colored tokens depict the generic entity type in question and gold entity mentions with expected output labels}
+    \label{fig:framework}
+\end{figure*}

@@ -1,16 +1,11 @@
-Here, we are given a sentence $\mathcal{S}$ as a $N$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_N \rangle$ and a span $\langle s, e\rangle$ where $s \in [1, N]$ is the \textit{start} index, $e \in [1, N]$ is the \textit{end} index. The goal is to output a label $t$ for the span such that $t \in \mathcal{T}$, where $\mathcal{T}$ is the set of all entity types.
+Given a sentence $\mathcal{S}$, a $n$-length sequence of tokens, $\mathcal{S} = \langle w_1, w_2 \ldots w_n \rangle$ and a span $\langle s, e\rangle$, where $s$ and $e$ are the start and end indices, the goal of this module is to output a label $t$ for the span such that $t \in \mathcal{T}$, where $\mathcal{T}$ is the set of all entity types.
 
-This is modeled as the reverse of QA model for NER described in Section \ref{sec:span}. For every gold entity mention (E.g. \textit{United States}) in a training set sentence, \textit{Emily}[\texttt{PERSON}] \textit{lives in United States}[\texttt{LOCATION}], we form a sample input, \textit{Emily lives in United States. What is United States?} The sentence is fed to a BERT model where we do sequence classification. The pooled sequence embedding returned by BERT is fed to a fully connected layer and converted to a probability distribution over possible entity types. In this example, the model is expected to assign maximum probability to \texttt{LOCATION}. Figure \ref{fig:span_classification} shows our span classification setup.
+We model this problem as the reverse of a standard QA-based single-model NER setup. A standard QA-based NER setup feeds the entity type as a question along with the input sentence to the model which returns the corresponding mentions. In our setup, we do the reverse and feed a mention span as input to the model along with the input sentence and expect its entity type as the output. 
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\linewidth]{resources/span_classification}
-    \caption{Span Classification Setup (colored tokens depict the entity mention in question with expected output entity label)}
-    \label{fig:span_classification}
-\end{figure}
+During training, we create an input training sample for each gold entity mention in a given sentence. During inference, this module gets the mention outputs from \textit{Span Detection Module} as its input. For a given sentence and mention, we suffix the question \textit{``What is [mention]?"}, where \textit{[mention]} is the string value of mention span in the sentence. Each input sample is fed to a BERT model where we do sequence classification. The pooled sequence embedding returned by BERT is fed to a fully connected layer and converted into a probability distribution over the possible entity types. Figure \ref{fig:framework} explains this with an example.
 
-- is reverse question answering setup
-- is a simpler step in general compared to span detection. 
-- may suffer from biases because of lots of classes and class imbalance. 
-- Dice loss has been shown to be effective. So, we adopt it here as well.
-- Later ablations show its effectiveness
+% Note that, each input sentence is multiplied by the number of entity mentions in the sentence in our method, while, in the MRC system, all the input sentences are multiplied by the number of entity types resulting in a huge increase of training data when the number of target entity types is large.
+
+Most real world datasets do not have a similar distribution among entity types. Some entities are very common while others are rare. This leads to a class imbalance and may bias the model to classify entity mentions into the common entity types. A recent study \cite{li2019dice} has shown that using dice coefficient as the loss function is more beneficial than cross entropy loss in such situations. Inspired by this work, we trained the \textit{Span Classification Module} in out \texttt{2Q-NER} framework using dice loss. Experiments and ablations later in the paper show its effectiveness compared to cross entropy loss. 
+
+% \comment{may also say that dice loss is less effective in general NER setup (as shown by our NER experiments) and more effective when specially done for span classification}

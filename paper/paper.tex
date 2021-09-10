@@ -42,6 +42,7 @@
 \usepackage{amsmath}
 \usepackage{xcolor}
 
+\newcommand{\modelname}{\texttt{2Q-NER}}
 \newcommand{\data}[1]{\texttt{{#1}}}
 \newcommand{\header}[1]{\textit{{#1}}}
 \newcommand{\deptool}[1]{\texttt{{#1}}}
@@ -64,8 +65,8 @@
 % or commands are allowed.
 % Keep the /TemplateVersion tag as is
 \pdfinfo{
-/Title (Can you ask the question again? Named entity detection via two question-answering-based classifications)
-/Author (Jatin Arora, Youngja Park)
+/Title (2Q-NER)
+/Author (Jatin Arora, Youngja Park, Jiawei Han)
 /TemplateVersion (2022.1)
 }
 
@@ -132,8 +133,9 @@
 \author {
     % Authors
     Anonymous
-    %Jatin Arora\textsuperscript{\rm 1}
+    %Jatin Arora \textsuperscript{\rm 1}
     %Youngja Park \textsuperscript{\rm 2}
+    %Jiawei Han \textsuperscript{\rm 3}
 }
 \affiliations {
     % Affiliations
@@ -160,13 +162,13 @@
 \label{sec:intro}
 \input{intro}
 
+\section{Background}
+\label{sec:background}
+\input{background}
+
 \section{Pipelined NER}
 \label{sec:method}
 \input{method.tex}
-
-\subsection{Features}
-\label{sec:features}
-\input{features}
 
 \subsection{Span Detection}
 \label{sec:span}
@@ -176,9 +178,13 @@
 \label{sec:class}
 \input{classification}
 
-\subsection{Learning Objective Function}
-\label{sec:loss}
-\input{loss}
+\subsection{Training Efficiency}
+\label{sec:training_efficiency}
+\input{training_efficiency}
+
+% \subsection{Learning Objective Function}
+% \label{sec:loss}
+% \input{loss}
 
 \section{Experimental Results}
 \label{sec:exp}
