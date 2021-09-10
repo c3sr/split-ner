@@ -1,21 +1,44 @@
-We demonstrate the effectiveness of our proposed framework both in terms of performance and latency through a variety of experiments and ablation studies.
+We demonstrate the effectiveness of \modelname{} both in terms of performance and latency through a variety of experiments and ablation studies.
 
 \subsection{Datasets}
-We select four corpora for our study covering a diverse set of domains, writing styles and entity types:
+We select four corpora covering a diverse set of domains, writing styles and entity types:
+
+% \yjcomment{let's put a short summary of the datasets and move this  list to Appendix to save the space. Especially they, except security, are public and widely used, I don't think they need detailed description.}
 \begin{itemize}
 
     \item \data{BioNLP13CG} \cite{pyysalo2015overview} is an English scientific text corpus on the theme of biological processes relating to the development and progression of cancer. It consists of $16$ biomedical entity types.
     
     \item \data{CyberThreats} is a privately curated corpus from news articles, blogs and technical reports related to malware, hacking groups and vulnerabilities in the cybersecurity domain and has $8$ entity types.
     
-    \item \data{OntoNotes5.0} \cite{weischedel2013ontonotes} is a large English corpus with text from various genres (news, weblogs, talk shows) having $18$ entity types including common ones like \texttt{Person}, \texttt{Org}, \texttt{Date} and some corpus specific ones like \texttt{Law}, \texttt{Language}.
+    \item \data{OntoNotes5.0} \cite{weischedel2013ontonotes} is a large English corpus with text from various genres (news, weblogs, talk shows) having $18$ entity types including common ones like \type{Person}, \type{Org}, \type{Date} and corpus specific ones like \type{Law}, \type{Language}.
     
     \item \data{WNUT17} \cite{derczynski2017results} is an English text corpus curated from newswire and social media and consists of emerging and rare entities broadly categorized into $6$ entity types.
     
 \end{itemize}
 
-Together these datasets cover a variety of writing styles from news articles to scientific literature including both common as well as rare entity types. They not only include the traditional whole-word entities like \texttt{Person}, \texttt{Location} but also many entity types with non-word mentions (like antivirus signatures, chemical compounds and abbreviations), very long mentions (like URLs, software with version numbers). Table \ref{tab:datasets_summary} summarizes our datasets. \comment{(yj) add CyberThreats details in Appendix}
+These datasets cover a variety of writing styles from news articles to scientific literature including both common as well as rare entity types. They not only include the traditional whole-word entities like \type{Person}, \type{Location} but also many entity types with non-word mentions (like antivirus signatures, chemical formulas) and long mentions (like URLs, software with version numbers). Table \ref{tab:datasets_summary} summarizes our datasets. More details on \data{CyberThreats} corpus is provided in Appendix.
 
+\begin{table}[h!]
+\centering
+\begin{small}
+\begin{tabular}{cccrrr}\toprule
+\multirow{2}{*}{\textbf{Dataset}} & \header{\# of} & \header{Mention} & \multirow{2}{*}{\header{Train}} & \multirow{2}{*}{\header{Dev}} & \multirow{2}{*}{\header{Test}} \\ 
+   & \header{Types} & \header{Density} &  &  &  \\ \toprule 
+\data{BioNLP13CG} & $16$ & $3.59$ & $3,033$  & $1,003$ & $1,906$ \\
+\data{CyberThreats} & $8$ & 0.63 & $38,721$ & $6,322$ & $9,837$\\
+\data{OntoNotes5.0} & $18$ & $1.36$ & $59,924$ & $8,528$ & $8,262$\\  
+\data{WNUT17} & $6$ & $0.68$ & $3,394$ & $1,009$ & $1,287$\\
+\bottomrule
+\end{tabular}
+\caption{Dataset overview. \header{\# of Types} indicates the number of unique entity types.
+\header{Train}, \header{Dev} and \header{Test} show the number of sentences in corresponding dataset splits. \header{Mention Density} refers to the average number of mentions per sentence and is calculated by dividing the total count of mentions  by the total count of sentences in the full dataset (\header{Train}+\header{Dev}+\header{Test}).
+}
+\label{tab:datasets_summary}
+\end{small}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% old version
+\if false
 \begin{table*}[h!]
 \centering
 \begin{small}
@@ -27,92 +50,104 @@ Together these datasets cover a variety of writing styles from news articles to 
 \data{WNUT17} & $6$ & $0.68$ & $3,394$ & $1,009$ & $1,287$\\
 \bottomrule
 \end{tabular}
-\caption{Dataset overview. \header{\#Entities} indicates the number of unique entity types. \header{Mention Density} refers to average number of mentions per sentence and is calculated by dividing the total count of mentions across the full dataset (\header{Train} + \header{Dev} + \header{Test}) by total count of sentences in full dataset.
-\header{Train}, \header{Dev} and \header{Test} show the corresponding number of sentences in the datasets.}
+\caption{Dataset overview. \header{\#Entities} indicates the number of unique entity types.
+\header{Train}, \header{Dev} and \header{Test} show the number of sentences in the corresponding dataset splits.
+\header{Mention Density} refers to the average number of mentions per sentence and is calculated by dividing the total count of mentions  by the total count of sentences in the full dataset (\header{Train} + \header{Dev} + \header{Test}).
+}
 \label{tab:datasets_summary}
 \end{small}
 \end{table*}
-
-% \yjcomment{Shall we show the class distribution for the datasets?}
-
+\fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Experimental Setup}
-Our system is implemented in python using \deptool{pytorch} with \deptool{transformers}\footnote{https://github.com/huggingface/transformers}. We use pretrained RoBERTa [\textit{roberta-base}] \cite{liu2019roberta} model for \data{OntoNotes 5.0}, BERT [\textit{bert-base-uncased}] \cite{devlin2019bert} for \data{WNUT17} and \data{CyberThreats} and SciBERT [\textit{allenai/scibert\_scivocab\_uncased}] \cite{beltagy-etal-2019-scibert} model for \data{BioNLP13CG}.
+Our system is implemented in python using \deptool{pytorch} with \deptool{transformers}\footnote{https://github.com/huggingface/transformers} library. We use pretrained RoBERTa [\textit{roberta-base}] \cite{liu2019roberta} model for \data{OntoNotes5.0}, BERT [\textit{bert-base-uncased}] \cite{devlin2019bert} for \data{WNUT17} and \data{CyberThreats} and SciBERT [\textit{allenai/scibert\_scivocab\_uncased}] \cite{beltagy-etal-2019-scibert} model for \data{BioNLP13CG}.
 
-In all our experiments (including baselines and ablations), we use the BERT-base architecture which has around $110$ million trainable parameters. The training data is randomly shuffled and a batch size of $16$ is used with post-padding. We fixed random seed to $42$ for replication. We set the maximum sequence length to $256$ for \data{BioNLP13CG}, \data{CyberThreats} and \data{WNUT17} and to $512$ for \data{OntoNotes5.0}. Cross entropy loss is used during training by default unless otherwise specified. The development set evaluation takes place at steps of 0.5 training epochs. We train all models for maximum of $300$ epochs at learning rate $10^{-5}$. All other training parameters are the default ones provided by the \deptool{transformers} library. Our experiments are conducted on \textit{Nvidia GeForce GTX 1080} and \textit{Nvidia Tesla V100} GPUs. 
+In all our experiments (including baselines and ablations), we use the BERT-base architecture which has around $110$ million trainable parameters. The training data is randomly shuffled and a batch size of $16$ is used with post-padding. We fix the random seed to $42$ for replication. We set the maximum sequence length to $256$ for \data{BioNLP13CG}, \data{CyberThreats} and \data{WNUT17} and to $512$ for \data{OntoNotes5.0}. Cross entropy loss is used during training by default unless otherwise specified. The development set evaluation takes place at steps of 0.5 training epochs. We train all models for maximum of $300$ epochs at learning rate $10^{-5}$. Learning rate decay, warmup period and all other training parameters are set to default ones provided by the \deptool{transformers} library. Our experiments are conducted using \textit{Nvidia GeForce GTX 1080} and \textit{Nvidia Tesla V100} GPUs. 
+All results reported in the paper are on test set and correspond to the checkpoint giving the best result on the development set. Performance is reported in terms of mention-level micro-F1 score. This means only the exact mention matches are counted towards the score.
 
-All results reported in the paper are on test set and correspond to the checkpoint giving best result on development set. Performance is reported in terms of mention-level micro-F1 score. This means only the exact mention matches are counted towards the score.
-
-BERT-based token-level classification models output entity labels for each sub-token of an existing token in the dataset as per WordPiece tokenization. We take the label of the first sub-token as the label for the corresponding token for our evaluations (as is the standard practice seen in most open-source implementations). We follow \texttt{BIOE} tagging scheme in all our experiments. For \textit{Span Detection Module}, we use \textit{``Extract important entity spans from the following text"} as our question phrase prefixed to the input sentence. For \textit{Span Classification Module}, we use, \textit{``What is [mention]?"} as our question phrase suffixed with the input sentence, where \textit{[mention]} refers to the string value for the corresponding mention span in the input sentence. 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+BERT-based token-level classification models output entity labels for each sub-token of a token in the dataset as per WordPiece tokenization. We take the label of the first sub-token as the label for the corresponding token for our evaluations (as is the standard practice seen in most open-source implementations). We follow the \texttt{BIOE} tagging scheme in all our experiments. For \spandetect{}, we use \textit{``Extract important entity spans from the following text"} as our question phrase prefixed to the input sentence. For \spanclass{}, we use, \textit{``What is [mention]?"} as our question phrase suffixed with the input sentence, where \textit{[mention]} refers to the string value for the corresponding mention span in the input sentence. 
 
 \subsection{Performance Evaluation}
 
-Our \texttt{2Q-NER} model is primarily composed of two QA-based models over the BERT-base architecture. Hence, all our baselines also use the same BERT-base architecture. 
-
-To study the effectiveness of dividing the NER task into our proposed sub-tasks, we compare \texttt{2Q-NER} with two baseline models. Both baselines use same additional character and pattern features as used by \texttt{2Q-NER} to ensure fairness:
+Our \modelname{} model is primarily composed of two QA-based models over the BERT-base architecture. Hence our baseline models also use the same BERT-base architecture. To study the effectiveness of dividing the NER task into our proposed sub-tasks, we compare \modelname{} with two baselines. To ensure fairness, both of these use the same additional character and pattern features as used by \modelname{}:
 
 \begin{itemize}
-    \item \texttt{BERT-SeqTagging (+ C/P Features)}: This is standard single-model sequence-tagging setup over BERT which assigns an output label to each token of sentence as per \texttt{BIOE} tagging scheme.
+    \item \bertseq{}: This is standard single-model sequence tagging setup over BERT which assigns an output label to each token of sentence as per \texttt{BIOE} tagging scheme. 
     
-    \item \texttt{BERT-QA (+ C/P Features)}: This is standard single-model QA-based setup over BERT which prefixes any input sentence with a question describing the entity to be extracted.
+    \item \bertqa{}: This is standard single-model QA-based setup over BERT which prefixes input sentences with a question describing the entity to be extracted. 
 \end{itemize}
 
-To study the effectiveness of the added character and pattern features, we compare \texttt{2Q-NER} with a feature-stripped baseline version of the system, \texttt{2Q-NER (w/o C/P Features)}. This model does not make use of the additional character and pattern features in \texttt{Span Detection Module}. All other settings are same as \texttt{2Q-NER}.
-
-Table \ref{tab:main} reports our results. Note that our system does not leverage any external knowledge sources and the goal of our proposed approach is to get on-par or better performance using minimal resources (both time and compute) and hence the choice of our baselines. For completeness, we do mention other published state-of-the-art systems which either make use of external knowledge or use BERT-large variants in related works but omit them from Table \ref{tab:main} for clarity.
+Further, to study the effectiveness of the added character and pattern features, we compare \modelname{} with a feature-stripped baseline version of our system, \texttt{2Q-NER (-CharPattern)}. This model does not make use of the additional character and pattern features in \spandetect{}. All other settings are same as \modelname{}.
+Table \ref{tab:main} reports our results. Note that our system does not leverage any external knowledge sources, and the goal of our proposed approach is to get on-par or better performance using minimal resources (both time and compute) and hence the choice of our baselines. For completeness, we do mention other published state-of-the-art systems which either make use of external knowledge or use BERT-large variants in related works but omit them from Table \ref{tab:main} for clarity.
 
 \begin{table*}[h!]
 \centering
 \begin{small}
-\begin{tabular}{rcccc}\toprule
- Model & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes5.0} & \texttt{WNUT17} \\ \toprule 
-\texttt{BERT-SeqTagging (+ C/P Features)} & \textbf{87.09} & 72.37 & 88.18 & 45.04\\
-\texttt{BERT-QA (+ C/P Features)} & 86.69 & 71.01 & \textcolor{blue}{ongoing(j)}  & 44.60 \\
-\texttt{2Q-NER (w/o C/P Features)}     & 86.69 & 74.04 & 90.12 & 55.36  \\
+\begin{tabular}{ccccc}\toprule
+ Model & \data{BioNLP13CG} & \data{CyberThreats} & \data{OntoNotes5.0} & \data{WNUT17} \\ \toprule 
+\bertseq & \textbf{87.09} & 72.37 & 88.18 & 45.04\\
+\bertqa & 86.69 & 71.01 & 88.91  & 44.60 \\
+\texttt{2Q-NER(-CharPattern)}     & 86.69 & 74.04 & 90.12 & 55.36  \\
 \modelname     & 86.74 & \textbf{74.97} & \textbf{90.31} & \textbf{56.30}  \\
 % Reported SOTA & 85.56(thesis see) & N/A & 92.07(MRC-Dice) & 60.45(CL-KL)  \\
 \bottomrule
 \end{tabular}
-\caption{NER Performance (mention-level Micro F1 score over test set). \texttt{C/P Features} refers to the proposed character and pattern features. Best results are highlighted in bold.
-% \yjcomment{can you find the results of SOTA without any external data or additional pretraining? I consider MRC-Dice also using additional info. as they added several synonyms/hyponyms in query.   we can put SOTA without external data and with external data in separate rows if you like. We point out that our system does not rely on external knowledge which is usually unavailable for domain-specific data and needs less computing resources than MRC}
+\caption{NER Performance (mention-level Micro F1 score). \method{CharPattern} refers to the character and pattern features described in the \textit{Span Detection} section. Best results are highlighted in bold.
 }
 \label{tab:main}
 \end{small}
 \end{table*}
 
 \subsection{Latency Evaluation}
-As discussed in our methodology, our proposed \texttt{2Q-NER} system is more efficient than training a single QA-based NER model. To validate this assertion, we measure the training time of \texttt{2Q-NER} and its QA-based baseline counterpart. Both use exactly the same features and underlying architecture with the only difference being that the baseline, \texttt{BERT-QA (+ C/P Features)} performs NER in one unified model. All experiments are done using two \textit{Nvidia V100} GPUs with 16G memory on each GPU. Note that the individual span detection and span classification components of our system can be trained in parallel but that would require more resource (GPU) utilization. To ensure a fair comparison, we report the training time for \texttt{2Q-NER} as the sum of training times for its components. This means both the components are being trained sequentially one after the other using the exact same amount of resource (GPU) as used by the baseline. The results are summarized in Table \ref{tab:train_time_ablation}.
-
-% The results confirm that \texttt{2Q-NER} is much more efficient and the efficiency improvement grows as the size of training data and the number of entity types grow.
+As discussed earlier, our proposed \modelname{} system is more efficient than training a single standalone QA-based NER model. To validate this assertion, we measure the training time of \modelname{} and its QA-based baseline counterpart. Both use exactly the same features and underlying architecture with the only difference being that the baseline, \bertqa{} performs NER in a single unified model. All experiments are done using two \textit{Nvidia V100} GPUs with 16G memory on each GPU. Note that the individual span detection and span classification components of our system can be trained in parallel but that would require more resource (GPU) utilization. To ensure a fair comparison, we report the training time for \modelname{} as the sum of training times for \spandetect{} and \spanclass{}, trained sequentially using the exact same amount of resource (GPU) as used by the baseline. The results are summarized in Table \ref{tab:train_time_ablation}. As we can see, the pipelined \modelname{} is 5 to 25 times faster than \bertqa. 
 
 \begin{table*}[h!]
 \centering
 \begin{small}
 \begin{tabular}{lcccc}\toprule
- Model & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
-\texttt{2Q-NER (Span Detection Module)} & 106.32 & 1,136.50 &  1,854.58  & 98.85 \\
-\texttt{2Q-NER (Span Classification Module)} & 134.90 & 318.77 & 1,153.19 & 24.03 \\ \toprule
-\texttt{2Q-NER (Overall)}     & 241.22 & \textbf{1,455.28} & \textbf{3,007.77} & 122.87 \\
-\texttt{BERT-QA (+ C/P Features)} & 1,372.83 & 8,770.97 &  73,818.38   & 568.15\\
-\texttt{BERT-SeqTagging (+ C/P Features)} & \textbf{102.19} & 6,425.86 &  9,181.10   & \textbf{101.25}\\
-% \modelname     & 241.2 (106.3 + 134.9) & 1,455.3 (1,137.0 + 319.0) & 3,008.0 (1,855.0 + 1,153.0)  & 122.9 (98.9 + 24.0)\\
+ Model & \data{BioNLP13CG} & \data{CyberThreats} & \data{OntoNotes5.0} & \data{WNUT17} \\ \toprule 
+\modelname     & \textbf{241.22} & \textbf{1,455.27} & \textbf{3,007.77} & \textbf{122.88} \\
+~~~~~~~~~~(\spandetect) & 106.32 & 1,136.50 &  1,854.58  & 98.85 \\
+~~~~~~~~~~(\spanclass) & 134.90 & 318.77 & 1,153.19 & 24.03 \\ \midrule
+\bertqa & 1,372.83 & 8,770.97 &  73,818.38   & 568.15\\
 \bottomrule
 \end{tabular}
-\caption{Latency Comparison (training time in seconds per epoch). Overall pipelined \texttt{2Q-NER} training time is calculated as the sum of training times for individual \textit{Span Detection Module} and \textit{Span Classification Module}. Best (minimum latency) result is highlighted in bold.
-% The numbers in the parentheses denote the training times for span detection and span classification respectively. 
+\caption{Latency Comparison (training time per epoch, in seconds). \modelname{} training time is calculated as the sum of training times for \spandetect{} and \spanclass{}. The best (minimum latency) result is highlighted in bold.
 }
 \label{tab:train_time_ablation}
 \end{small}
 \end{table*}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% old version
+\if false
+\begin{table*}[h!]
+\centering
+\begin{small}
+\begin{tabular}{lcccc}\toprule
+ Model & \data{BioNLP13CG} & \data{CyberThreats} & \data{OntoNotes5.0} & \data{WNUT17} \\ \toprule 
+\texttt{2Q-NER (Span Detection Module)} & 106.32 & 1,136.50 &  1,854.58  & 98.85 \\
+\texttt{2Q-NER (Span Classification Module)} & 134.90 & 318.77 & 1,153.19 & 24.03 \\ \toprule
+\texttt{2Q-NER (Overall)}     & \textbf{241.22} & \textbf{1,455.28} & \textbf{3,007.77} & \textbf{122.87} \\
+\texttt{BERT-QA (+ C/P Features)} & 1,372.83 & 8,770.97 &  73,818.38   & 568.15\\
+% \texttt{BERT-SeqTagging (+ C/P Features)} & \textbf{102.19} & 6,425.86 &  9,181.10   & \textbf{101.25}\\
+% \modelname     & 241.2 (106.3 + 134.9) & 1,455.3 (1,137.0 + 319.0) & 3,008.0 (1,855.0 + 1,153.0)  & 122.9 (98.9 + 24.0)\\
+\bottomrule
+\end{tabular}
+\caption{Latency Comparison (training time in seconds per epoch). Overall pipelined \modelname{} training time is calculated as the sum of training times for individual \spandetect{} and \spanclass{}. Best (minimum latency) result is highlighted in bold.
+% The numbers in the parentheses denote the training times for span detection and span classification respectively. 
+}
+\label{tab:train_time_ablation}
+\end{small}
+\end{table*}
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% old version
+
 \subsection{Performance Ablations}
-Next we study the individual components of our \texttt{2Q-NER} system in detail.
+Next, we study the individual components of our \modelname{} system in detail.
 
 \subsubsection{Span Detection Module}
-To investigate the effectiveness of character and pattern features which are concatenated with the BERT embeddings, we perform span detection with and without these additional features. Table~\ref{tab:det_ablation} reports the mention-level micro-avg precision (P), recall (R) and F1 scores by the two models. 
+To investigate the effectiveness of character and pattern features which are concatenated with the BERT embeddings, we perform span detection with and without these additional features. Table~\ref{tab:det_ablation} reports mention-level precision (P), recall (R) and F1 scores by the two models. Note that \spandetect{} identifies mention spans without entity type information. A mention span detected by the module is counted as correct if its boundaries exactly match the gold span irrespective of entity types.
 
 \begin{table*}[h!]
 \centering
@@ -120,16 +155,19 @@ To investigate the effectiveness of character and pattern features which are con
 \begin{tabular}{rcccccccccccc}\toprule
  \multirow{2}{*}{Span Detection Module} & \multicolumn{3}{c}{\data{BioNLP13CG}} & \multicolumn{3}{c}{\data{CyberThreats}} & \multicolumn{3}{c}{\data{OntoNotes5.0}} & \multicolumn{3}{c}{\data{WNUT17}} \\ \cmidrule{2-13}
  & P & R & F1 & P & R & F1 & P & R & F1 & P & R & F1 \\ \midrule
-\texttt{with C/P Features} & \textbf{91.43} & \textbf{90.70} & \textbf{91.06} & \textbf{80.59} & 77.21 & \textbf{78.86} & \textbf{92.17} & \textbf{92.83} & \textbf{92.50} & \textbf{73.38} & \textbf{44.25} & \textbf{55.21}  \\
-\texttt{without C/P Features} & 91.41 & 90.45 & 90.93 &79.65 & \textbf{77.77} & 78.70 & 91.96 & 92.79 & 92.37 & 72.63 & 44.06 &54.85  \\
+\method{with CharPattern} & \textbf{91.43} & \textbf{90.70} & \textbf{91.06} & \textbf{80.59} & 77.21 & \textbf{78.86} & \textbf{92.17} & \textbf{92.83} & \textbf{92.50} & \textbf{73.38} & \textbf{44.25} & \textbf{55.21}  \\
+\method{without CharPattern} & 91.41 & 90.45 & 90.93 &79.65 & \textbf{77.77} & 78.70 & 91.96 & 92.79 & 92.37 & 72.63 & 44.06 &54.85  \\
+% \textit{BERT-SeqTagging} & 90.68 &	90.45 &	90.56 & 78.33 &	76.71 &	77.51 & & & & 73.42 &	44.02 &	55.04 \\
 \bottomrule
 \end{tabular}
-\caption{\textit{Span Detection Module} performance with and without character and pattern features (mention-level micro-avg scores). Best results are highlighted in bold.}
+\caption{\spandetect{} performance with and without character and pattern features (mention-level scores). Best results are highlighted in bold. 
+% \yjcomment{remove the last row if you don't want to keep the BERT_SeqTagging results here}
+}
 \label{tab:det_ablation}
 \end{small}
 \end{table*}
 
-Additionally, we also study the effect of adding character and pattern features separately, in concatenation with the  BERT outputs, in \textit{Span Detection Module}. We also try increasing these additional features to explicitly model part-of-speech semantics as one-hot vectors (following PennTreebank tagset) concatenated with the character and pattern features. Table~\ref{tab:feature_ablation} shows this ablation study on \data{BioNLP13CG} dataset. 
+Additionally, we also study the effect of adding character and pattern features separately, in concatenation with the  BERT outputs, in \spandetect{}. We also try increasing these additional features to explicitly model part-of-speech semantics as one-hot vectors (following PennTreebank tagset) concatenated with the character and pattern features. Table~\ref{tab:feature_ablation} shows this ablation study on the \data{BioNLP13CG} dataset. 
 
 % adding character and pattern features and nothing more, produces the best result for \data{BioNLP13CG}. This shows that POS tag semantics is well covered by existing BERT model.
 
@@ -144,7 +182,7 @@ Features & P & R & F1 \\ \midrule
 \texttt{+Char} & 89.85 &	91.45 &	90.64 \\
 \bottomrule
 \end{tabular}
-\caption{\textit{Span Detection Module} performance (mention-level micro F1 score) for \data{BioNLP13CG} corpus using different feature sets. 
+\caption{\spandetect{} performance (mention-level F1 score) for \data{BioNLP13CG} corpus using different feature sets. 
 \texttt{POS} denotes part-of-speech. Best results are highlighted in bold.}
 \label{tab:feature_ablation}
 \end{small}
@@ -155,18 +193,39 @@ Features & P & R & F1 \\ \midrule
 % the cross entropy loss for NLP tasks with imbalanced data~\cite{li2019dice}. 
 % Inspired by this work, we trained our span classification model, which has the data imbalance problem,
 % using both cross entropy loss and dice loss.
-Borrowing the findings from \cite{li2019dice} for general NER task, we conduct experiments using dice loss and cross-entropy loss to evaluate their effectiveness in handling the class imbalance issue in \textit{Span Classification Module}. Table~\ref{tab:class_ablation} summarizes our findings and conforms with \cite{li2019dice}.
+Borrowing the findings from \cite{li2019dice} for general NER task, we conduct experiments using dice loss and cross-entropy loss to evaluate their effectiveness in handling the class imbalance issue in \spanclass{}. Table~\ref{tab:class_ablation} summarizes our findings and conforms with \cite{li2019dice}.
 
+\begin{table}[h!]
+\centering
+\begin{small}
+\begin{tabular}{ccc}\toprule
+Dataset & Dice Loss &   Cross Entropy Loss \\ \toprule 
+\data{BioNLP13CG} & \textbf{94.27}  & 94.04\\
+\data{CyberThreats} & \textbf{87.84} & 87.58\\
+\data{OntoNotes5.0} &  \textbf{96.74}  & 96.50 \\
+\data{WNUT17} & \textbf{73.40}    & 73.31  \\
+\bottomrule
+\end{tabular}
+\caption{\spanclass{} performance (mention-level micro F1 score) with different loss functions to handle class imbalance. Best results are highlighted in bold.}
+\label{tab:class_ablation}
+\end{small}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% old version
+\if false
 \begin{table*}[h!]
 \centering
 \begin{small}
 \begin{tabular}{ccccc}\toprule
- Span Classification Module & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes} & \texttt{WNUT17} \\ \toprule 
+ Span Classification Module & \texttt{BioNLP13CG} & \texttt{CyberThreats} & \texttt{OntoNotes5.0} & \texttt{WNUT17} \\ \toprule 
 \texttt{Dice Loss} & \textbf{94.27} & \textbf{87.84} &  \textbf{96.74} & \textbf{73.40}  \\
 \texttt{Cross Entropy Loss}     & 94.04 & 87.58 & 96.50 & 73.31  \\
 \bottomrule
 \end{tabular}
-\caption{\textit{Span Classification Module} performance (mention-level micro F1 score) with different loss functions to handle class imbalance. Best results are highlighted in bold.}
+\caption{\spanclass{} performance (mention-level micro F1 score) with different loss functions to handle class imbalance. Best results are highlighted in bold.}
 \label{tab:class_ablation}
 \end{small}
 \end{table*}
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% old version

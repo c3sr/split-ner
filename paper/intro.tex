@@ -1,38 +1,29 @@
-% \comment{
-% 1. first paragraph: (1) a couple of sentneces  for NER 
-%     and current state of the art; (2)short description on the problem 
-%     we try to address in this paper (NER for low resource types)
-% 2. a paragraph about our approach: pipeline of span detection and
-%     classification. convince the readers
-% 3. a short summary on the novelities of the approach and the result
-% }
+Named entity recognition (NER) is a fundamental natural language processing (NLP) task and lays the foundations for a variety of applications like question answering, information retrieval and machine translation~\cite{li2020survey}. Over the years, NER techniques have evolved quite in sync with the advances in machine learning. In the past couple of years, the advent of BERT \cite{devlin2019bert} and its effectiveness in capturing text semantics has given new traction to NER research. For long, NER has been seen as a sequence labeling task where a model is trained to classify each token of a sequence into a predefined semantic class ~\cite{Chiu16,Lample16,ma2016end,devlin2019bert},
+popular architectures being CNN-LSTM-CRF and BERT. In recent years however, there has been a new trend of formulating NER as span prediction problem ~\cite{li2020MRC,Jiang20,Ouchi20},
+where a model is trained to perform span boundary detection and multi-class classification over the spans. Another trend is to formulate NER as a question answering (QA) task~\cite{li2020MRC}. Here, the model is given a sentence and a query corresponding to each entity type. The language model is trained to understand the semantics of the query and extract entity mentions as answers from the input sentence. %parts of the input sentence that can serve as its answer. 
+The QA framework has shown success in other NLP tasks as well like relation extraction, machine translation and sentiment analysis~\cite{li2020MRC,levy2017zero,mccann2018natural}. However, all these approaches treat the NER problem as a whole and train one single model which takes a sentence as input and returns mentions with correct boundaries and entity types. 
+%%Further, the existing span classification approaches consider all possible spans up to a predetermined length $l$.
+%%For an input sentence $\{w_1, w_2, \ldots, w_n\}$, these systems enumerate all spans from length 1 to length $l$, significantly increasing the computation.
 
-Named entity recognition lays the foundations for a variety of natural language processing (NLP) applications like question answering, information retrieval and machine translation~\cite{li2020survey}\comment{more citations} and has been a popular area of research for long. Over the years, NER techniques have evolved in sync with the advances in machine learning. The advent of the BERT \cite{devlin2019bert} and its effectiveness in capturing text semantics, in the past couple of years, has given new traction to NER research. 
-
-For long, NER has been seen as a sequence labeling task where a model is trained to classify each token of a sequence into an output category~\cite{Chiu16,Lample16,ma2016end,devlin2019bert}.
-\cite{ma2016end} and \cite{devlin2018bert} show the effectiveness of popular CNN-LSTM-CRF and BERT framework for this, respectively. 
-In recent years, however, there has been a new trend of formulating NER problems 
-as span classification tasks~\cite{li2020MRC,Jiang20,Ouchi20}, 
-where a model is trained to perform span boundary detection and multi-class classification over the spans.
-
-Another new trend is formulating NER as a question answering(QA) task~\cite{li2020MRC}. Here, the model is asked a question as plain text and fed the input sentence. The language model is trained to understand the semantics of the question and identify parts of the input that serve as its answer. \cite{li2020MRC,levy2017zero} model relation extraction as QA tasks and \cite{mccann2018natural} propose a QA-based multi-task learning setup.
-
-However, all of these previous approaches treat the NER problem as a whole. One single model that take a sentence as input and returns mention tuples with correct boundaries and correct entity type. 
-Further, the existing span classification approaches consider all possible spans up to a predetermined length $l$.
-For an input sentence $\{w_1, w_2, \ldots, w_n\}$, these systems enumerate all spans from length 1 to length $l$,
-significantly increasing the computation.
-
-We propose a division of labor. We break down the NER problem into a two-step pipelined process. In the first step, \textit{Span Detection}, we detect all mention spans in a given sentence irrespective of their semantic class. In the next step, \textit{Span Classification}, we classify these spans into their corresponding entity type. Using this formulation, we can now train two separate language models independently which specialize in their own sub-tasks and together solve the NER problem. In our experiments, we borrow the basic intuitions of the QA-based NER setup to solve both our sub-tasks. The pipeline structure comes only during inference time. Here, every unlabeled sentence is first passed through the \textit{Span Detection} stage. This outputs all required mention spans and each such output span is converted into an input sample for the \textit{Span Classification} stage which assigns them an entity type thus completing the NER task. We study this proposed logical separation thoroughly by conducting experiments over multiple NER datasets belonging to different domains. Our contributions through this work are:
-
+In this work, we propose a division of labor. We break down the NER problem into a two-step pipelined process. The first step focuses on detecting all required mention spans irrespective of entity type. The second step classifies these extracted spans into their corresponding entity type. Using this formulation, we can train two separate language models independently, which specialize in their own sub-tasks and together solve the NER problem. The pipeline structure comes only during inference time. Both our sub-tasks are modeled as QA tasks over the BERT-base architecture. After conducting thorough experiments over four datasets belonging to multiple domains we make the following contributions through this work:
+%In our experiments, 
+% We borrow the basic intuitions of the QA-based NER setup~\cite{li2020MRC} to solve both our sub-tasks. 
+% An unlabeled sentence is first passed through the \textit{Span Detection} stage, which generates all mention spans in the sentence.
+%%This outputs all required mention spans and each such output span is converted into an input sample for the \textit{Span Classification} stage which assigns them an entity type thus completing the NER task. 
+% Then,  each of the extracted spans is fed to \textit{Span Classification} which assigns an entity type to the mention thus completing the NER task.
+% We study this proposed logical separation thoroughly by conducting experiments over multiple NER datasets belonging to different domains. 
+% Our contributions through this work are:
 \begin{itemize}
-    \item We demonstrate that our proposed sub-tasks are not tightly coupled to each other and independently handling them does not lead to any degradation in performance compared to modeling the NER task as a whole. 
+    \item We demonstrate that detecting mention spans and associating them with an entity type are not tightly coupled tasks and can be done independent of the other with no degradation in performance compared to modeling the NER task as a whole. 
     
-    \item In fact, it helps train a more effective NER system since instead of using the BERT model once for the whole NER task, we are effectively using it twice (fine-tuned for both our sub-task). The similarity of performance in both strategies gives a strong evidence that for NER, the BERT model implicitly does a similar division of labor internally.
+     \item In fact, it helps train a more effective NER system, since instead of using the BERT model once for the whole NER task, we are effectively using it twice, fine-tuned for each of our sub-tasks.
+     
+   %% \item In fact, it helps train a more effective NER system since, instead of using the BERT model once for the whole NER task, we are effectively using it twice (fine-tuned for both our sub-task). The similarity of performance in both strategies gives a strong evidence that for NER, the BERT model implicitly does a similar division of labor internally.
     
     \item Training separate models for the sub-tasks gives more flexibility to cater to their respective shortcomings. We propose modeling character patterns for effective span detection and using dice loss for span classification.
     
-    \item We demonstrate that in a QA-based setup, this logical separation is more efficient than modeling NER as a whole and takes lesser time to train for equal, if not better performance.
-    \comment{no external knowledge used by us unlike others recently}
+    \item We demonstrate that, in a QA-based setup, this proposed logical separation is more efficient than modeling NER as a single atomic task and takes much lesser time to train with a comparable or even better performance.
+    % \comment{no external knowledge used by us unlike others recently}
 \end{itemize}
 
 % \yjcomment{add  (1)our method does not depend on any external knowledge sources but use richer token representation using character and pattern embeddings.  Recent improvements were gained mostly from utilizing external knowledge and data but these are not available for many real world problems; (2) our method is efficient    (a) unlike other span classification NER, we don't enumerate all potential fixed length spans.  (b) our span classification is done x number of mentions per sentence while QA does x num of entity types;  (c) pipeline is more efficient as we can train the two models simultaneously.  (3) more effective as we can better fine-tune the system  optimizing each model (5) more flexible, as we can apply the models indepently. in some cases such as csv or json files,  the mention spans are already known in the input data, so we can only apply the span classification model. }

@@ -20,22 +20,13 @@
 
 % In fact, through the similarity of our results as shown later in the paper, an NER system performing well on a dataset which does not violate the findings stated above, inherently is performing the span detection and classification tasks separately. 
 
-In our system, the NER task is performed by a combination of two separately trained modules -- \textit{Span Detection Module}
-and \textit{Span Classification Module}.
-The first one, \textit{Span Detection Module}, identifies all mention spans by learning entity-agnostic rules for extraction. This helps the low-resource entity types (with very few mentions) borrow knowledge from the high-resource entity types (which have a rich diversity of mention samples in training data). 
-% Note that our span detection setup is formulated as a simpler NER task, where there are only 4 target labels (BIEO).
+As the name suggests, \modelname{} performs NER through a combination of two independently trained modules  -- \spandetect{} and \spanclass{}, both of which are modeled as question-answering tasks. Both modules use BERT-base as the underlying architecture. \spandetect{} identifies all required mention spans in a given sentence irrespective of entity type by learning entity-agnostic extraction rules. This helps rare entity types borrow knowledge from the more common ones. These extracted mention spans are fed one-by-one to \spanclass{} which reanalyses them in the sentence structure and classifies them into an entity type. In this way, both modules, even though being separate from each other, have complete access to full sentence structure and do not suffer from lack of any essential information that may be required for their sub-tasks. Both modules can be trained independently, in parallel. Even if done sequentially, these sub-tasks are much simpler to learn than the overall NER task and this gives \modelname{} a significant efficiency boost and better performance than corresponding baselines which train a single NER model. Figure~\ref{fig:framework} illustrates how \modelname{} works. 
+
 % Our method is completely different from other span classification-based methods~\cite{li2020MRC,Jiang20,Ouchi20}, which consider all possible spans up a predetermined length in a input sequence. 
-All these extracted mention spans are fed as input to the second module, \textit{Span Classification Module}, which reanalyses them in the sentence structure and looks at how they interact with the other entities of the sentence to classify it into a target entity type. In this way, both the modules, even though being separate from each other, have complete access to full sentence structure and do not suffer from lack of any essential information for their sub-tasks.
-%\yjcomment{be more specific instead of `essential information'}.
 
-This separation gives us the freedom to train both modules independently (can be done in parallel) and optimized and fine-tuned for their intended sub-tasks. Even if done sequentially, these sub-tasks are much simpler than the generalized NER task and as we show later, give a significant efficiency boost with no compromise in performance.
-
-We adopt the BERT-QA framework as the underlying architecture of both the models, but
-use different features and loss functions. \comment{check if required and add a bit more about the architecture and add the overall system diagram here}
-
-\begin{figure*}
+\begin{figure*}[h!]
     \centering
-    \includegraphics[width=\linewidth]{framework5.png}
-    \caption{Span Detection Setup with \texttt{BIOE} scheme and \textit{What is the entity mentioned in the text?} as the question (colored tokens depict the generic entity type in question and gold entity mentions with expected output labels}
+    \includegraphics[width=0.9\linewidth]{framework6.png}
+    \caption{Overview of \modelname. Sentence \textit{``Emily lives in United States"} is fed as input to \spandetect{} which identifies two mention spans. Each span is then queried with \spanclass{} which assigns them the most probable entity type. \texttt{CharPattern} refers to character and pattern features described in the \textit{Span Detection} section.}
     \label{fig:framework}
 \end{figure*}

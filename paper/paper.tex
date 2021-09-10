@@ -40,15 +40,19 @@
 \usepackage{booktabs}
 \usepackage{wrapfig}
 \usepackage{amsmath}
-\usepackage{xcolor}
+% \usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 
 \newcommand{\modelname}{\texttt{2Q-NER}}
-\newcommand{\data}[1]{\texttt{{#1}}}
+\newcommand{\spandetect}{\textit{Span Detection Module}}
+\newcommand{\spanclass}{\textit{Span Classification Module}}
+%\newcommand{\data}[1]{\texttt{{#1}}}
+\newcommand{\data}[1]{\textit{{#1}}}
 \newcommand{\header}[1]{\textit{{#1}}}
-\newcommand{\deptool}[1]{\texttt{{#1}}}
+\newcommand{\type}[1]{\uppercase{#1}}
 \newcommand{\method}[1]{\texttt{{#1}}}
-
-
+\newcommand{\bertqa}{\method{BERT-QA+CharPattern}}
+\newcommand{\bertseq}{\method{BERT-SeqTagging+CharPattern}}
 
 %\newcommand{\comment}[1]{{\textbf{\textit{ #1}}}}
 \newcommand{\comment}[1]{\textit{\small\textcolor{red}{ #1}}}
@@ -66,7 +70,8 @@
 % Keep the /TemplateVersion tag as is
 \pdfinfo{
 /Title (2Q-NER)
-/Author (Jatin Arora, Youngja Park, Jiawei Han)
+% /Author (Jatin Arora, Youngja Park, Jiawei Han)
+/Author (Anonymous)
 /TemplateVersion (2022.1)
 }
 
@@ -190,6 +195,8 @@
 \label{sec:exp}
 \input{experiments}
 
+
+
 \section{Discussions}
 \label{sec:discussion}
 \input{discussion}
@@ -207,11 +214,5 @@
 \bibliographystyle{aaai22}
 \bibliography{thesisrefs.bib}
 %\bibliography{anthology,custom}
-
-%\appendix
-
-%\section{Example Appendix}
-%\label{sec:appendix}
-
 
 \end{document}
