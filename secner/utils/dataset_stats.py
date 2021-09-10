@@ -6,6 +6,19 @@ from collections import defaultdict
 from secner.utils.general import read_data
 
 
+def get_mention_density(data):
+    cnt_mention = 0
+    for sent in data:
+        for tok in sent:
+            if tok[-1].startswith("B-"):
+                cnt_mention += 1
+
+    print("cnt_mention: ", cnt_mention)
+    print("len_data: ", len(data))
+    
+    return cnt_mention / len(data)
+
+
 def main(args):
     data_dir = os.path.join("..", "..", "data", args.path)
     train_data = read_data(os.path.join(data_dir, "train.tsv"))
@@ -13,8 +26,8 @@ def main(args):
     test_data = read_data(os.path.join(data_dir, "test.tsv"))
 
     print("# Sentences: {0} (Train) | {1} (Dev) | {2} (Test)".format(len(train_data), len(dev_data), len(test_data)))
-
     corpus_data = train_data + dev_data + test_data
+    print("mention density: {0:.2f}".format(get_mention_density(corpus_data)))
     print("Avg. sentence length: {0:.3f}".format(sum(len(sent) for sent in corpus_data) * 1.0 / len(corpus_data)))
 
     all_tokens = [(tok[0], tok[-1]) for sent in corpus_data for tok in sent]

@@ -25,7 +25,7 @@ def intrinsic_patterns(args):
             text = NerDataset.make_pattern_type0(tok.text)
             if text not in term_dict:
                 term_dict[text] = defaultdict(int)
-            tag = tok.tag if tok.tag == "O" else tok.tag[2:]
+            tag = tok.tags[-1] if tok.tags[-1] == "O" else tok.tags[-1][2:]
             term_dict[text][tag] += 1
     term_dict_percent = dict()
     for term in term_dict:
@@ -47,16 +47,16 @@ def extrinsic_patterns(args):
     for sent in data:
         new_tokens = []
         for i in range(len(sent.tokens)):
-            if sent.tokens[i].tag.startswith("B-"):
-                new_tokens.append(Token(sent.tokens[i].tag[2:], sent.tokens[i].tag[2:]))
-            elif sent.tokens[i].tag == "O":
+            if sent.tokens[i].tags[-1].startswith("B-"):
+                new_tokens.append(Token(sent.tokens[i].tags[-1][2:], sent.tokens[i].tags[-1][2:]))
+            elif sent.tokens[i].tags[-1] == "O":
                 new_tokens.append(Token(sent.tokens[i].text, "O"))
         new_data.append(Sentence(new_tokens))
 
     pat_dict = defaultdict(int)
     for sent in new_data:
         for i in range(len(sent.tokens)):
-            tag = sent.tokens[i].tag
+            tag = sent.tokens[i].tags[-1]
             if tag == "O":
                 continue
             pat_dict[" ".join([sent.tokens[j].text for j in range(max(0, i - 1), min(len(sent.tokens), i + 1))])] += 1
@@ -102,5 +102,5 @@ if __name__ == "__main__":
     ap.add_argument("--corpus", type=str, default="bio")
     ap.add_argument("--file", type=str, default="test")
     ap = ap.parse_args()
-    intrinsic_patterns(ap)
-    # extrinsic_patterns(ap)
+    # intrinsic_patterns(ap)
+    extrinsic_patterns(ap)

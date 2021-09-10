@@ -1,6 +1,7 @@
 {
   "model_name": "ner-roberta-spanclass-dice",
   "dataset_dir": "onto_final",
+  "wandb_mode": "dryrun",
   "do_train": true,
   "resume": null,
   "num_train_epochs": 300,
