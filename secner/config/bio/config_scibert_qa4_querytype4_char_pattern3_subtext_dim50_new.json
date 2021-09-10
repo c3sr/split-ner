@@ -1,9 +1,8 @@
 {
-  "model_name": "ner-scibert-qa4-querytype4-char-pattern3-subtext-dim50",
+  "model_name": "ner-scibert-qa4-querytype4-char-pattern3-subtext-dim50-new",
   "num_labels": 4,
-  "no_cuda": true,
-  "do_train": true,
-  "resume": null,
+  "do_train": false,
+  "resume": "29601",
   "pos_tag_vocab_path": "pos_tag_vocab.txt",
   "dataset_dir": "bio",
   "num_train_epochs": 300,
@@ -33,8 +32,8 @@
   "save_total_limit": 2,
   "load_best_model_at_end": true,
   "metric_for_best_model": "micro_f1",
-  "per_device_train_batch_size": 128,
-  "per_device_eval_batch_size": 128,
+  "per_device_train_batch_size": 16,
+  "per_device_eval_batch_size": 16,
   "learning_rate": 1e-5,
   "wandb_mode": "dryrun"
 }
