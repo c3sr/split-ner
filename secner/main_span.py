@@ -63,8 +63,23 @@ class NerSpanExecutor:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
+        logger.info("start time: {0}".format(str(datetime.now())))
+        start = time.time()
         model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
         data = self.map_predictions_to_sentences(dataset, model_predictions)
+
+        #  elapsed time 
+        end = time.time()
+        logger.info("end time: {0}".format(str(datetime.now())))
+        elapsed = end - start
+        logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+
+        filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
+        file = open(os.path.join("elapsed_time", filename), "w")
+        file.write(str(elapsed)+" seconds\n")
+        file.write(str(timedelta(seconds=elapsed)));
+        file.close()
+        # ----
 
         os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
         predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
@@ -144,8 +159,8 @@ class NerSpanExecutor:
                 self.dump_predictions(NerInferSpanDataset(self.additional_args))
             else:
                 logger.info("prediction mode")
-                self.dump_predictions(self.train_dataset)
-                self.dump_predictions(self.dev_dataset)
+                #self.dump_predictions(self.train_dataset)
+                #self.dump_predictions(self.dev_dataset)
                 self.dump_predictions(self.test_dataset)
                 # throws some threading related tqdm/wandb exception in the end (but code fully works)
 

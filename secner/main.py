@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import time
+from datetime import datetime, timedelta
 import traceback
 
 import numpy as np
@@ -60,13 +61,36 @@ class NerExecutor:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
-        if self.additional_args.prediction_mapping == "type1":
-            data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
-        elif self.additional_args.prediction_mapping == "type2":
-            data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
-        else:
-            raise NotImplementedError
+
+        filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
+        file = open(os.path.join("elapsed_time", filename), "w")
+        total_elapsed=0
+        n=5 
+        for i in range(1,n):
+            logger.info("{0}-th prediction".format(str(i)))
+            logger.info("start time: {0}".format(str(datetime.now())))
+            start = time.time()
+
+            model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
+            if self.additional_args.prediction_mapping == "type1":
+                data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
+            elif self.additional_args.prediction_mapping == "type2":
+                data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+            else:
+                raise NotImplementedError
+
+            #  elapsed time
+            end = time.time()
+            elapsed = end - start
+            total_elapsed += elapsed
+
+            logger.info("end time: {0}".format(str(datetime.now())))
+            logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+            file.write(str(i)+",  "+str(elapsed)+"\n")
+
+        file.write("avg,  "+str(total_elapsed/n)+"\n")
+        file.close()
+        # ----
 
         os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
         predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
@@ -149,8 +173,8 @@ class NerExecutor:
         else:
             logger.info("prediction mode")
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
-            self.dump_predictions(self.train_dataset)
-            self.dump_predictions(self.dev_dataset)
+            #self.dump_predictions(self.train_dataset)
+            #self.dump_predictions(self.dev_dataset)
             self.dump_predictions(self.test_dataset)
             # throws some threading related tqdm/wandb exception in the end (but code fully works)
 
