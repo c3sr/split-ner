@@ -65,8 +65,8 @@ class NerExecutor:
         filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
         file = open(os.path.join("elapsed_time", filename), "w")
         total_elapsed=0
-        n=5 
-        for i in range(1,n):
+        n= 10
+        for i in range(0,n):
             logger.info("{0}-th prediction".format(str(i)))
             logger.info("start time: {0}".format(str(datetime.now())))
             start = time.time()
@@ -80,15 +80,14 @@ class NerExecutor:
                 raise NotImplementedError
 
             #  elapsed time
-            end = time.time()
-            elapsed = end - start
+            elapsed = time.time() - start
             total_elapsed += elapsed
 
-            logger.info("end time: {0}".format(str(datetime.now())))
             logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
             file.write(str(i)+",  "+str(elapsed)+"\n")
 
-        file.write("avg,  "+str(total_elapsed/n)+"\n")
+        avg_elapsed = total_elapsed / n
+        file.write("avg,  "+str(avg_elapsed)+"\n")
         file.close()
         # ----
 

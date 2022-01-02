@@ -78,23 +78,28 @@ class NerQAExecutor:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        logger.info("start time: {0}".format(str(datetime.now())))
-        start = time.time()
-
-        model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
-        data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
-        # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
-
-        #  elapsed time 
-        end = time.time()
-        logger.info("end time: {0}".format(str(datetime.now())))
-        elapsed = end - start
-        logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
-
         filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
         file = open(os.path.join("elapsed_time", filename), "w")
-        file.write(str(elapsed)+" seconds\n")
-        file.write(str(timedelta(seconds=elapsed)));
+        total_elapsed=0
+        n= 10
+        for i in range(0,n):
+            logger.info("{0}-th prediction".format(str(i)))
+            logger.info("start time: {0}".format(str(datetime.now())))
+            start = time.time()
+
+            model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
+            data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
+            # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+
+            #  elapsed time
+            elapsed = time.time() - start
+            total_elapsed += elapsed
+
+            logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+            file.write(str(i)+",  "+str(elapsed)+"\n")
+
+        avg_elapsed = total_elapsed / n
+        file.write("avg,  "+str(avg_elapsed)+"\n")
         file.close()
         # ----
 
