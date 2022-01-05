@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import time
+from datetime import datetime, timedelta
 import traceback
 
 import numpy as np
@@ -73,9 +74,30 @@ class NerQAExecutor:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
-        data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
-        # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+        filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
+        file = open(os.path.join("elapsed_time", filename), "w")
+        total_elapsed=0
+        n= 10
+        for i in range(0,n):
+            logger.info("{0}-th prediction".format(str(i)))
+            logger.info("start time: {0}".format(str(datetime.now())))
+            start = time.time()
+
+            model_predictions: np.ndarray = self.trainer.predict(dataset).predictions
+            data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
+            # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
+
+            #  elapsed time
+            elapsed = time.time() - start
+            total_elapsed += elapsed
+
+            logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+            file.write(str(i)+",  "+str(elapsed)+"\n")
+
+        avg_elapsed = total_elapsed / n
+        file.write("avg,  "+str(avg_elapsed)+"\n")
+        file.close()
+        # ----
 
         os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
         predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
@@ -195,19 +217,29 @@ class NerQAExecutor:
 
     def run(self):
         if self.train_args.do_train:
+            logger.info("training mode: start time: {0}".format(str(datetime.now())))
+
             start = time.time()
-            logger.info("training mode: start_time {0}".format(str(start)))
             try:
                 self.trainer.train(self.additional_args.resume)
             except:
                 traceback.print_exc()
-            elapsed = time.time() - start
-            logger.info("elapsed time: {0}".format(str(elapsed)))
+
+            end = time.time()
+            logger.info("end time: {0}".format(str(datetime.now())))
+            elapsed = end - start
+            logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+
+            filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-train-"+str(self.train_args.num_train_epochs)+".elapsed"
+            file = open(filename, "w")
+            file.write(str(elapsed)+" seconds\n")
+            file.write(str(timedelta(seconds=elapsed)));
+            file.close()
         else:
             logger.info("prediction mode")
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
-            self.dump_predictions(self.train_dataset)
-            self.dump_predictions(self.dev_dataset)
+            #self.dump_predictions(self.train_dataset)
+            #self.dump_predictions(self.dev_dataset)
             self.dump_predictions(self.test_dataset)
             # throws some threading related tqdm/wandb exception in the end (but code fully works)
 
@@ -238,6 +270,5 @@ def main(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="QA Model Runner")
     ap.add_argument("--config", default="config/config_debug.json", help="config json file")
-    ap.add_argument("--output", default="out/ner", help="output path")
     ap = ap.parse_args()
     main(ap)
