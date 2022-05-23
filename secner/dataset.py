@@ -195,17 +195,21 @@ class NerDataset(Dataset):
 
     @staticmethod
     def make_pattern(text, pattern_type):
+        pattern = None
         if pattern_type == "0":
-            return NerDataset.make_pattern_type0(text)
-        if pattern_type == "1":
-            return NerDataset.make_pattern_type1(text)
-        if pattern_type == "2":
-            return NerDataset.make_pattern_type2(text)
-        if pattern_type == "3":
-            return NerDataset.make_pattern_type3(text)
-        if pattern_type == "4":
-            return NerDataset.make_pattern_type4(text)
-        raise NotImplementedError
+            pattern = NerDataset.make_pattern_type0(text)
+        elif pattern_type == "1":
+            pattern =  NerDataset.make_pattern_type1(text)
+        elif pattern_type == "2":
+            pattern =  NerDataset.make_pattern_type2(text)
+        elif pattern_type == "3":
+            pattern =  NerDataset.make_pattern_type3(text)
+        elif pattern_type == "4":
+            pattern =  NerDataset.make_pattern_type4(text)
+        else:
+            raise NotImplementedError
+        #print("Pattern:", pattern_type, ": ", text, "=>", pattern) 
+        return pattern
 
     @staticmethod
     def make_pattern_type0(text):
