@@ -81,7 +81,7 @@ class NerQAExecutor:
         filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
         file = open(os.path.join("elapsed_time", filename), "w")
         total_elapsed=0
-        n= 10
+        n= 1
         for i in range(0,n):
             logger.info("{0}-th prediction".format(str(i)))
             logger.info("start time: {0}".format(str(datetime.now())))
@@ -254,18 +254,11 @@ class NerQAExecutor:
         if self.additional_args.model_mode == "roberta_std":
             from secner.model_roberta import NerRobertaModel
             return NerRobertaModel
-        if self.additional_args.model_mode == "crf":
-            from secner.model_crf import NerModelWithCrf
-            return NerModelWithCrf
-        if self.additional_args.model_mode == "bidaf":
-            from secner.model_bidaf import NerModelBiDAF
-            return NerModelBiDAF
-
+        raise NotImplementedError
 
 def main(args):
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
-    print (args.config)
     train_args, additional_args = parse_config(parser, args.config)
     executor = NerQAExecutor(train_args, additional_args)
     executor.run()
