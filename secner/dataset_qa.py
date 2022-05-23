@@ -167,21 +167,23 @@ class NerQADataset(Dataset):
         else:
             tag_text = self.tag_to_text_mapping[tag]
 
+        question = tag_text
         if self.args.query_type == "question":
-            return "What is the {0} mentioned in the text ?".format(tag_text)
-        if self.args.query_type == "question2":
-            return "Where is the {0} mentioned in the text ?".format(tag_text)
-        if self.args.query_type == "question3":
-            return "Find {0} in the following text .".format(tag_text)
-        if self.args.query_type == "question4":
-            return "Extract {0} from the following text .".format(tag_text)
-        if self.args.query_type == "question5":
-            return "Extract {0} from the following text .".format(tag_text)
+            question= "What is the {0} mentioned in the text ?".format(tag_text)
+        elif self.args.query_type == "question2":
+            question= "Where is the {0} mentioned in the text ?".format(tag_text)
+        elif self.args.query_type == "question3":
+            question= "Find {0} in the following text .".format(tag_text)
+        elif self.args.query_type == "question4":
+            question= "Extract {0} from the following text .".format(tag_text)
+        elif self.args.query_type == "question5":
+            quenstion= "Extract {0} from the following text .".format(tag_text)
 
-        return tag_text
+        return question
 
     def prep_context(self, sentence, tag):
         tag_text = self.get_tag_query_text(tag)
+
         # query
         bert_query_tokens = []
         query_tokens = tag_text.split()
