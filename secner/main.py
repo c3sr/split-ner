@@ -65,7 +65,7 @@ class NerExecutor:
         filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
         file = open(os.path.join("elapsed_time", filename), "w")
         total_elapsed=0
-        n= 10
+        n= 1
         for i in range(0,n):
             logger.info("{0}-th prediction".format(str(i)))
             logger.info("start time: {0}".format(str(datetime.now())))
