@@ -157,6 +157,10 @@ class NerQADataset(Dataset):
                 tag_text = "named entities"
             elif self.args.query_type == "question4":
                 tag_text = "important entity spans"
+            elif self.args.query_type == "question5":
+                return ""
+            elif self.args.query_type == "question6":
+                return "_"
             else:
                 tag_text = "entity"
         else:
