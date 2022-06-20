@@ -161,6 +161,10 @@ class NerQADataset(Dataset):
                 return ""
             elif self.args.query_type == "question6":
                 return "_"
+            elif self.args.query_type == "question7":
+                return "Extract entities ."
+            elif self.args.query_type == "question8":
+                return "Where are entities ?"
             else:
                 tag_text = "entity"
         else:
