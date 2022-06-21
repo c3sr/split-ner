@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
-import gensim
 
 from secner.additional_args import AdditionalArguments
 from secner.cnn import CharCNN
