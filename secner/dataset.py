@@ -33,8 +33,6 @@ class NerDataset(Dataset):
                                                             self.args.use_pos_tag)
         self.dep_tag_vocab = NerDataset.parse_aux_tag_vocab(self.args.dep_tag_vocab_path, self.args.none_tag,
                                                             self.args.use_dep_tag)
-        self.pattern_vocab = NerDataset.parse_aux_tag_vocab(self.args.pattern_vocab_path, self.args.none_tag,
-                                                            self.args.pattern_embedding_type!="cnn")
 
         self.tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
         self.bert_start_token, self.bert_first_sep_token, self.bert_second_sep_token = \
@@ -86,9 +84,7 @@ class NerDataset(Dataset):
     def parse_aux_tag_vocab(vocab_path, none_tag, do_task=True):
         if not do_task:
             return []
-
-        # add PAD
-        vocab = [none_tag]  
+        vocab = [none_tag]
         with open(vocab_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
@@ -140,6 +136,7 @@ class NerDataset(Dataset):
         spans = defaultdict(list)
         for index, tok in enumerate(sentence.tokens):
             for tag in tok.tags:
+                #print(cnt,' ', tag)
                 if tag.startswith("B-"):
                     spans[tag[2:]].append(PairSpan(index, index))
                 elif tag.startswith("I-"):
@@ -195,21 +192,17 @@ class NerDataset(Dataset):
 
     @staticmethod
     def make_pattern(text, pattern_type):
-        pattern = None
         if pattern_type == "0":
-            pattern = NerDataset.make_pattern_type0(text)
-        elif pattern_type == "1":
-            pattern =  NerDataset.make_pattern_type1(text)
-        elif pattern_type == "2":
-            pattern =  NerDataset.make_pattern_type2(text)
-        elif pattern_type == "3":
-            pattern =  NerDataset.make_pattern_type3(text)
-        elif pattern_type == "4":
-            pattern =  NerDataset.make_pattern_type4(text)
-        else:
-            raise NotImplementedError
-        #print("Pattern:", pattern_type, ": ", text, "=>", pattern) 
-        return pattern
+            return NerDataset.make_pattern_type0(text)
+        if pattern_type == "1":
+            return NerDataset.make_pattern_type1(text)
+        if pattern_type == "2":
+            return NerDataset.make_pattern_type2(text)
+        if pattern_type == "3":
+            return NerDataset.make_pattern_type3(text)
+        if pattern_type == "4":
+            return NerDataset.make_pattern_type4(text)
+        raise NotImplementedError
 
     @staticmethod
     def make_pattern_type0(text):
@@ -496,15 +489,14 @@ class NerDataset(Dataset):
     @staticmethod
     def get_pattern_ids(batch_text, max_len, pattern_vocab):
         batch_ids = []
-        unk_idx = len(pattern_vocab)
-
+        vocab_size = len(pattern_vocab)
         for sent_text in batch_text:
             sent_ids = []
             for word_text in sent_text:
                 if word_text in pattern_vocab:
                     sent_ids.append(pattern_vocab.index(word_text))
                 else:
-                    sent_ids.append(unk_idx)
+                    sent_ids.append(vocab_size)
 
             pad_len = max_len - len(sent_ids)
             sent_ids += [0] * pad_len
@@ -671,12 +663,8 @@ class NerDataCollator:
         if self.args.use_char_cnn in ["pattern", "both", "both-flair"]:
             batch_pattern = [[NerDataset.make_pattern(word, self.args.pattern_type)
                               for word in entry[self.args.token_type]] for entry in features]
-
-            if self.args.pattern_embedding_type == "cnn":
-                pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
-                batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
-            else:
-                batch["pattern_ids"] = NerDataset.get_pattern_ids(batch_pattern, max_len, self.pattern_vocab)
+            pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
+            batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
             #print("----------- make pattern_ids")
             #print(batch_pattern[0])
             #print(batch["pattern_ids"][0])
