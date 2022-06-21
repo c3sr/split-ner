@@ -1,8 +1,8 @@
-scikit-learn
+scikit-learn==0.24.2
 torch==1.6.0
 transformers==4.5.1
-git+https://github.com/kmkurn/pytorch-crf#egg=pytorch_crf
-spacy
+#git+https://github.com/kmkurn/pytorch-crf#egg=pytorch_crf
+spacy==3.0.7
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
-datasets
+datasets==1.11.0
 wandb
