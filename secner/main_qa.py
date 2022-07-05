@@ -254,11 +254,18 @@ class NerQAExecutor:
         if self.additional_args.model_mode == "roberta_std":
             from secner.model_roberta import NerRobertaModel
             return NerRobertaModel
-        raise NotImplementedError
+        if self.additional_args.model_mode == "crf":
+            from secner.model_crf import NerModelWithCrf
+            return NerModelWithCrf
+        if self.additional_args.model_mode == "bidaf":
+            from secner.model_bidaf import NerModelBiDAF
+            return NerModelBiDAF
+
 
 def main(args):
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
+    print (args.config)
     train_args, additional_args = parse_config(parser, args.config)
     executor = NerQAExecutor(train_args, additional_args)
     executor.run()
