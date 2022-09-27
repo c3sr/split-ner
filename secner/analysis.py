@@ -54,7 +54,8 @@ def calc_micro_f1(data):
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("Overall | Cnt: {0} | P: {1:.4f} | R: {2:.4f} | Micro F1: {3:.4f}"
+    print("Overall | Cnt:\tP:\tR:\tMicro F1:")
+    print("          {0}\t{1:.2f}\t{2:.2f}\t{3:.2f}\n"
           .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
 
     tags = list(set(tp.keys()).union(set(fn.keys())))
