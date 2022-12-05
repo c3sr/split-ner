@@ -171,7 +171,7 @@ class NerExecutor:
 
             ## Added this to do multi-run
             from secner.utils.checkpoint import find_best_checkpoint
-            find_best_checkpoint(train_args.output_dir)
+            find_best_checkpoint(self.train_args.output_dir)
             ## Added this to do multi-run
 
         else:
