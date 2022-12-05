@@ -78,9 +78,9 @@ class NerQAExecutor:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
-        file = open(os.path.join("elapsed_time", filename), "w")
-        total_elapsed=0
+        #filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
+        #file = open(os.path.join("elapsed_time", filename), "w")
+        #total_elapsed=0
         n= 1
         for i in range(0,n):
             logger.info("{0}-th prediction".format(str(i)))
@@ -93,14 +93,14 @@ class NerQAExecutor:
 
             #  elapsed time
             elapsed = time.time() - start
-            total_elapsed += elapsed
-
             logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
-            file.write(str(i)+",  "+str(elapsed)+"\n")
+            #total_elapsed += elapsed
 
-        avg_elapsed = total_elapsed / n
-        file.write("avg,  "+str(avg_elapsed)+"\n")
-        file.close()
+            #file.write(str(i)+",  "+str(elapsed)+"\n")
+
+        #avg_elapsed = total_elapsed / n
+        #file.write("avg,  "+str(avg_elapsed)+"\n")
+        #file.close()
         # ----
 
         os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
@@ -232,13 +232,18 @@ class NerQAExecutor:
             end = time.time()
             logger.info("end time: {0}".format(str(datetime.now())))
             elapsed = end - start
-            logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+            logger.info("elapsed time: {0} In seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
 
-            filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-train-"+str(self.train_args.num_train_epochs)+".elapsed"
-            file = open(filename, "w")
-            file.write(str(elapsed)+" seconds\n")
-            file.write(str(timedelta(seconds=elapsed)));
-            file.close()
+            ## Added this to do multi-run
+            from secner.utils.checkpoint import find_best_checkpoint
+            find_best_checkpoint(train_args.output_dir)
+            ## Added this to do multi-run
+
+            #filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-train-"+str(self.train_args.num_train_epochs)+".elapsed"
+            #file = open(filename, "w")
+            #file.write(str(elapsed)+" seconds\n")
+            #file.write(str(timedelta(seconds=elapsed)));
+            #file.close()
         else:
             logger.info("prediction mode")
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
@@ -262,18 +267,37 @@ class NerQAExecutor:
             return NerModelBiDAF
 
 
-def main(args):
+def main():
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
-    print (args.config)
-    train_args, additional_args = parse_config(parser, args.config)
+    
+    ## Added this to do multi-run
+    import sys
+    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
+        # when a config json file is provided, parse it to get our arguments.
+        print("==========  parse config json")
+        train_args, additional_args = parser.parse_json_file(json_file=os.path.abspath(args.config))
+    else:
+        print("==========  parse sys.argv")
+        train_args, additional_args = parser.parse_args_into_dataclasses()
+    #train_args, additional_args = parse_config(parser, args.config)
+
+    print("  seed=",train_args.seed)
+    if train_args.seed == -1:
+        import random
+        train_args.seed = random.randint(0, 2**32)
+    ## Added this to do multi-run
+
     executor = NerQAExecutor(train_args, additional_args)
     executor.run()
 
 
 
 if __name__ == "__main__":
+    '''
     ap = argparse.ArgumentParser(description="QA Model Runner")
-    ap.add_argument("--config", default="config/config_debug.json", help="config json file")
+    ap.add_argument("--config", default=None, help="config json file")
     ap = ap.parse_args()
     main(ap)
+    '''
+    main()
