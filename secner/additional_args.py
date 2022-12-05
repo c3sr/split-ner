@@ -17,7 +17,7 @@ class AdditionalArguments:
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
-    infer_path: str = field(default=None, metadata=
+    infer_path: str = field(default="span.tsv", metadata=
     {"help": "set to predictions file of span detector in predict mode, relative to predictions dir"})
     train_path: str = field(default="train.tsv", metadata={"help": "train file path relative to data root"})
     dev_path: str = field(default="dev.tsv", metadata={"help": "dev file path relative to data root"})
@@ -39,7 +39,7 @@ class AdditionalArguments:
     model_mode: str = field(default="std", metadata={"help": "model mode (std|crf|bidaf|char|roberta_std)"})
     loss_type: str = field(default="ce", metadata={"help": "loss type in 'std' mode (ce|ce_wt|ce_punct|dice)"})
     use_char_cnn: str = field(default="none", metadata={"help": "use char CNN (none|char|pattern|flair|both|both-flair)"})
-    token_type: str = field(default="text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
+    token_type: str = field(default="sub_text", metadata={"help": "token type used with CNN/pattern etc. (text|sub_text)"})
     prediction_mapping: str = field(default="type1", metadata=
     {"help": "converting from bert to dataset level outputs (type1|type2)"})
     pattern_type: str = field(default="0", metadata={"help": "pattern type (0|1|2)(1 works best)"})
@@ -49,7 +49,7 @@ class AdditionalArguments:
     query_type: str = field(default="question", metadata=
     {"help": "query type for entities fed in QA model (question|question2)"})
     detect_spans: bool = field(default=False, metadata={"help": "in QA mode with this set, we detect only spans"})
-    char_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
+    char_emb_dim: int = field(default=50, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     pos_emb_dim: int = field(default=16, metadata={"help": "char embedding dimension (input channels to char CNN)"})
     lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_num_layers: int = field(default=1, metadata={"help": "pattern LSTM: no. of layers"})
@@ -81,7 +81,7 @@ class AdditionalArguments:
 
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
-        if self.resume and len(self.resume) > 0:
+        if self.resume:
             self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
         self.wandb_dir = self.run_root
         self.predictions_dir = os.path.join(self.run_root, "predictions")
