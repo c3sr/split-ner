@@ -226,11 +226,11 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # when a config json file is provided, parse it to get our arguments.
         print("==========  parse config json")
-        train_args, additional_args = parser.parse_json_file(json_file=os.path.abspath(args.config))
+        train_args, additional_args = parse_config(parser, sys.argv[1])
+        #train_args, additional_args = parser.parse_json_file(json_file=os.path.abspath(args.config))
     else:
         print("==========  parse sys.argv")
         train_args, additional_args = parser.parse_args_into_dataclasses()
-    #train_args, additional_args = parse_config(parser, args.config)
 
     print("  seed=",train_args.seed)
     if train_args.seed == -1:

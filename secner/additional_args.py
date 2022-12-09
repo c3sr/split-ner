@@ -13,7 +13,7 @@ class AdditionalArguments:
     resume: Optional[str] = field(default=None, metadata={"help": "checkpoint to resume. Starts from scratch, if None"})
     dataset_dir: str = field(default="bio", metadata={"help": "dataset dir relative to data root dir"})
     num_labels: int = field(default=4, metadata={"help": "# output labels in QA setup: 2(BO)|3(BIO)|4(BIOE)|5(BIOES)"})
-    tagging: str = field(default="bio", metadata={"help": "tagging scheme (bo|bio). Not used in QA currently"})
+    tagging: str = field(default="bioe", metadata={"help": "tagging scheme (bio|bioe). Not used in QA currently"})
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
