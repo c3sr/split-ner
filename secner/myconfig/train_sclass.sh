@@ -20,7 +20,7 @@ do
   do
 	model_type="class"
         output_dir="$out_root/$data/$model_type/run-$seed/checkpoints"
-	echo "** Training SpanDetect(QA_with_charpattern) base_model=$base_model  output_dir=$output_dir
+	echo "** Training SpanDetect(QA_with_charpattern) base_model=$base_model  output_dir=$output_dir"
         python main_span.py --seed $seed --model_name $model_type  --dataset_dir $data \
 		  --num_train_epochs $train_epochs --max_seq_len $seq_length  \
 		  --data_root $data_root --out_root $out_root --base_model $base_model --output_dir $output_dir  \
@@ -34,10 +34,9 @@ do
 	if [ -d "$output_dir/best_checkpoint" ]; then
             for chk in "$output_dir"/checkpoint-*
             do
-		echo "Removing checkpoint: $chk"
-                rm -r "$chk"
+		echo "Removing checkpoint:"$chk
+                rm -r $chk
             done
 	fi
-
-    done
+   done
 done
