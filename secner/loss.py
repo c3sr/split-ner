@@ -13,7 +13,7 @@ class DiceLoss(nn.Module):
         num_classes = logits.shape[1]
         labels_mod = labels.clone()
         labels_mod[labels_mod == self.ignore_index] = 0
-        labels_1_hot = torch.eye(num_classes)[labels_mod].to(logits.device)
+        labels_1_hot = torch.eye(num_classes, device=logits.device)[labels_mod].to(logits.device)
         labels_1_hot *= mask.unsqueeze(-1).repeat(1, num_classes)
 
         dice_total = 0.
