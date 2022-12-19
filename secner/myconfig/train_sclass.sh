@@ -16,13 +16,13 @@ do
   base_model=${base_models[d]}
   eval_step=${eval_steps[d]}
 
-  for i in {1..5}
+  for seed in 142 242 342 442
   do
 	model_type="class"
-        output_dir="$out_root/$data/$model_type/run-$i/checkpoints"
-	logfile="./log/train/$data-$model_type-train-$i.out"
+        output_dir="$out_root/$data/$model_type/run-$seed/checkpoints"
+	logfile="./log/train/$data-$model_type-train-$seed.out"
 	echo "** Training SpanDetect(QA_with_charpattern) base_model=$base_model  output_dir=$output_dir  log_file=$logfile"
-        python main_span.py --seed "-1" --model_name $model_type  --dataset_dir $data \
+        python main_span.py --seed $seed --model_name $model_type  --dataset_dir $data \
 		  --num_train_epochs $train_epochs --max_seq_len $seq_length  \
 		  --data_root $data_root --out_root $out_root --base_model $base_model --output_dir $output_dir  \
 		  --loss_type "dice" --query_type "question" \

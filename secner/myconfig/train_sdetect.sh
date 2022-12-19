@@ -17,13 +17,13 @@ do
   num_label=4
   eval_step=${eval_steps[d]}
 
-  for i in {1..5}
+  for seed in 142 242 342 442 
   do
 	model_type="span-seq"
-        output_dir="$out_root/$data/$model_type/run-$i/checkpoints"
-	logfile="./log/train/$data-$model_type-train-$i.out"
+        output_dir="$out_root/$data/$model_type/run-$seed/checkpoints"
+	logfile="./log/train/$data-$model_type-train-$seed.out"
 	echo "** Training SpanDetect(SeqTag) base_model=$base_model data_set = $data  output_dir=$output_dir  log_file=$logfile" 
-        python main.py --seed "-1" --model_name $model_type --tagging "bioe"  --dataset_dir $data --num_labels $num_label \
+        python main.py --seed $seed --model_name $model_type --tagging "bioe"  --dataset_dir $data --num_labels $num_label \
 		  --token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
 		  --num_train_epochs $train_epochs --max_seq_len $seq_length \
 		  --data_root $data_root --out_root $out_root --base_model $base_model  --output_dir $output_dir \
@@ -43,10 +43,10 @@ do
 	fi
 
 	model_type="span-qa"
-        output_dir="$out_root/$data/$model_type/run-$i/checkpoints"
-	logfile="./log/train/$data-$model_type-train-$i.out"
+        output_dir="$out_root/$data/$model_type/run-$seed/checkpoints"
+	logfile="./log/train/$data-$model_type-train-$seed.out"
 	echo "** Training SpanDetect(QA_with_charpattern) base_model=$base_model  output_dir=$output_dir  log_file=$logfile"
-        python main_qa.py --seed "-1" --model_name $model_type  --dataset_dir $data --num_labels $num_label \
+        python main_qa.py --seed $seed --model_name $model_type  --dataset_dir $data --num_labels $num_label \
 		  --num_train_epochs $train_epochs --max_seq_len $seq_length  \
 		  --data_root $data_root --out_root $out_root --base_model $base_model --output_dir $output_dir  \
 		  --token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
@@ -66,10 +66,10 @@ do
 	fi
 
 	model_type="span-qa-nocharpattern"
-        output_dir="$out_root/$data/$model_type/run-$i/checkpoints"
-	logfile="./log/train/$data-$model_type-train-$i.out"
+        output_dir="$out_root/$data/$model_type/run-$seed/checkpoints"
+	logfile="./log/train/$data-$model_type-train-$seed.out"
 	echo "** Training SpanDetect(QA_no_charpattern) base_model=$base_model  output_dir=$output_dir  log_file=$logfile"
-        python main_qa.py --seed "-1" --model_name $model_type  --dataset_dir $data --num_labels $num_label \
+        python main_qa.py --seed $seed --model_name $model_type  --dataset_dir $data --num_labels $num_label \
 		  --num_train_epochs $train_epochs --max_seq_len $seq_length  \
 		  --data_root $data_root --out_root $out_root --base_model $base_model --output_dir $output_dir \
 		  --use_char_cnn "none" --query_type "question4" \
