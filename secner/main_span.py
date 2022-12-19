@@ -175,16 +175,9 @@ def main():
     import sys
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # when a config json file is provided, parse it to get our arguments.
-        print("==========  parse config json")
         train_args, additional_args = parse_config(parser, sys.argv[1])
     else:
-        print("==========  parse sys.argv")
         train_args, additional_args = parser.parse_args_into_dataclasses()
-
-    print("  seed=",train_args.seed)
-    if train_args.seed == -1:
-        import random
-        train_args.seed = random.randint(0, 2**32)
     ## Added this to do multi-run
 
     executor = NerSpanExecutor(train_args, additional_args)
