@@ -20,8 +20,7 @@ do
   do
 	model_type="class"
         output_dir="$out_root/$data/$model_type/run-$seed/checkpoints"
-	logfile="./log/train/$data-$model_type-train-$seed.out"
-	echo "** Training SpanDetect(QA_with_charpattern) base_model=$base_model  output_dir=$output_dir  log_file=$logfile"
+	echo "** Training SpanDetect(QA_with_charpattern) base_model=$base_model  output_dir=$output_dir
         python main_span.py --seed $seed --model_name $model_type  --dataset_dir $data \
 		  --num_train_epochs $train_epochs --max_seq_len $seq_length  \
 		  --data_root $data_root --out_root $out_root --base_model $base_model --output_dir $output_dir  \
