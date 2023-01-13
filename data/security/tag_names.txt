@@ -1,0 +1,8 @@
+CAMPAIGN	Cybersecurity Campaign
+COURSE_OF_ACTION	course of action mitigation
+EXPLOIT_TARGET	exploit target vulnerability
+IDENTITY	identity person location organization name
+INDICATOR	indicator of compromise ip url file domain
+MALWARE	malware
+RESOURCE	resources used in attacks
+THREAT_ACTOR	threat actor hacker
