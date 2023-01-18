@@ -40,17 +40,17 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 
 #### F1 Results
 
-| Model | Seed: 142 | Seed: 242 | Seed: 342 | Seed: 442 | Mean F1 |
-|-------|-----------|-----------|-----------|-----------|---------|
-| Pipeline(QA-QA) | 88.53 | 89.50 | 89.12 | 89.32 | 89.12 |
-| Pipeline(QA_NoCharPattern-QA) | 88.74 | 89.20 | 89.10 | 89.27 | 89.08 |
-| Pipeline(SeqTag-QA) | 88.45 | 89.40 | 89.11 | 89.10 | 89.02 |
-| Single(QA) | - | - | - | - | - |
-| Single(SeqTag) | 89.17 | 87.81 | 88.99 | 89.04 | 88.75 |
-| SpanDetect(SeqTag) | 91.79 | 92.04 | 91.90 | 91.68 | 91.86 |
-| SpanDetect(QA) | 91.62 | 92.11 | 91.88 | 92.04 | 91.92 |
-| SpanDetect(QA_NoCharPattern) | 91.91 | 91.91 | 91.96 | 91.89 | 91.92 |
-| SpanClass(Dice, QA) | 95.58 | 96.19 | 96.18 | 96.23 | 96.04 |
+| Model | Seed: 42 | Seed: 142 | Seed: 242 | Seed: 342 | Seed: 442 | Mean F1 (TBD) |
+|-------|----------|-----------|-----------|-----------|-----------|---------|
+| Pipeline(QA-QA) | 90.31 | 88.53 | 89.50 | 89.12 | 89.32 | 89.12 |
+| Pipeline(QA_NoCharPattern-QA) | 90.12 | 88.74 | 89.20 | 89.10 | 89.27 | 89.08 |
+| Pipeline(SeqTag-QA) | 90.30 | 88.45 | 89.40 | 89.11 | 89.10 | 89.02 |
+| Single(QA) | 88.91 | - | - | - | - | - |
+| Single(SeqTag) | 88.18 | 89.17 | 87.81 | 88.99 | 89.04 | 88.75 |
+| SpanDetect(SeqTag) | - | 91.79 | 92.04 | 91.90 | 91.68 | 91.86 |
+| SpanDetect(QA) | 92.50 | 91.62 | 92.11 | 91.88 | 92.04 | 91.92 |
+| SpanDetect(QA_NoCharPattern) | 92.37 | 91.91 | 91.91 | 91.96 | 91.89 | 91.92 |
+| SpanClass(Dice, QA) | 96.74 | 95.58 | 96.19 | 96.18 | 96.23 | 96.04 |
 
 #### Detailed Results
 
