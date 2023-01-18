@@ -76,7 +76,7 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 * Current reported Mean F1 is only for seeds: 142-442
 
 | Model | Seed: 42 | Seed: 142 | Seed: 242 | Seed: 342 | Seed: 442 | Mean F1 (TBD) | Std. Dev. F1 (TBD) |
-|-------|-----------|-----------|-----------|-----------|---------------|--------------------|
+|-------|----------|-----------|-----------|-----------|-----------|---------------|--------------------|
 | Single(QA) | 71.01 | 69.42 | 70.38 | 70.64 | 70.03 | 70.12 | - |
 
 #### Detailed Results
