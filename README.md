@@ -34,6 +34,21 @@ For evaluating on saved checkpoint (say, ```4840```), in config.json, do:
 }
 ```
 
+## ACL 2023 Results (Jatin)
+
+### OntoNotes
+
+
+### Security
+
+| Model | Mean F1 |
+| Single(QA) | 70.12 |
+
+| Model | Seed: 142 | Seed: 242 | Seed: 342 | Seed: 442 |
+| Single(QA) | p: 75.09, r: 64.55, f1: 69.42 | p: 76.82, r: 64.93, f1: 70.38 | p: 74.97, r: 66.79, f1: 70.64 | p: 77.06, r: 64.18, f1: 70.03 |
+
+
+
 ## Results
 
 | Test Entity F1(%)                        | BioNLP13CG                  | JNLPBA         |   CoNLL                    | Genia     | Onto                 |
