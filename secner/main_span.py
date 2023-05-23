@@ -87,7 +87,8 @@ class NerSpanExecutor:
         # ----
 
         os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
-        predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
+        # predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
+        predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(self.additional_args.my_infer_file))
         logger.info("Outputs published in file: {0}".format(predictions_file))
         with open(predictions_file, "w", encoding="utf-8") as f:
             # f.write("Token\tGold\tPredicted\n")

@@ -54,25 +54,25 @@ def calc_micro_f1(data):
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("Overall | Cnt:\tP:\tR:\tMicro F1:")
-    print("          {0} {1:.2f} {2:.2f} {3:.2f}\n"
-          .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
+    # print("Overall | Cnt:\tP:\tR:\tMicro F1:")
+    # print("          {0} {1:.2f} {2:.2f} {3:.2f}\n"
+    #       .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
 
-    tags = list(set(tp.keys()).union(set(fn.keys())))
-    tags = sorted(tags, key=lambda x: len(tp[x]) + len(fn[x]), reverse=True)
-    tag_f1_sum = 0.0
-    for tag in tags:
-        tag_tp, tag_fp, tag_fn = len(tp[tag]), len(fp[tag]), len(fn[tag])
-        tag_cnt = tag_tp + tag_fn
-        tag_p = tag_tp * 1.0 / (tag_tp + tag_fp + 1e-7)
-        tag_r = tag_tp * 1.0 / (tag_tp + tag_fn + 1e-7)
-        tag_f1 = 2.0 * tag_p * tag_r / (tag_p + tag_r + 1e-7)
-        tag_f1_sum += tag_f1
-        print("Tag: {0} | Cnt: {1} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
-              .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
-    print("Macro F1: {0:.4f}".format(tag_f1_sum * 100.0 / (len(tags) + 1e-7)))
+    # tags = list(set(tp.keys()).union(set(fn.keys())))
+    # tags = sorted(tags, key=lambda x: len(tp[x]) + len(fn[x]), reverse=True)
+    # tag_f1_sum = 0.0
+    # for tag in tags:
+    #     tag_tp, tag_fp, tag_fn = len(tp[tag]), len(fp[tag]), len(fn[tag])
+    #     tag_cnt = tag_tp + tag_fn
+    #     tag_p = tag_tp * 1.0 / (tag_tp + tag_fp + 1e-7)
+    #     tag_r = tag_tp * 1.0 / (tag_tp + tag_fn + 1e-7)
+    #     tag_f1 = 2.0 * tag_p * tag_r / (tag_p + tag_r + 1e-7)
+    #     tag_f1_sum += tag_f1
+    #     print("Tag: {0} | Cnt: {1} | P: {2:.4f} | R: {3:.4f} | F1: {4:.4f}"
+    #           .format(tag, tag_cnt, 100.0 * tag_p, 100.0 * tag_r, 100.0 * tag_f1))
+    # print("Macro F1: {0:.4f}".format(tag_f1_sum * 100.0 / (len(tags) + 1e-7)))
 
-    return tp, fp, fn, f1
+    return 100.0 * p, 100.0 * r, 100.0 * f1
 
 
 def get_spans(tokens, sent_index):
@@ -399,9 +399,9 @@ def convert_to_span_based(data):
     return new_data
 
 
-def pre_process_data(args):
-    root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{args.seed}", "predictions")
-    print("data_location=",root_path)
+def pre_process_data(args, seed):
+    root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{seed}", "predictions")
+    # print("data_location=",root_path)
     # train_path = os.path.join(root_path, "train.tsv")
     # dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
     # test_path = os.path.join(root_path, "test.tsv")
@@ -416,19 +416,35 @@ def pre_process_data(args):
     data[args.file] = parse_file(file_path)
 
     if args.span_based:
-        data["train"] = convert_to_span_based(data["train"])
-        data["dev"] = convert_to_span_based(data["dev"])
-        data["test"] = convert_to_span_based(data["test"])
+        # data["train"] = convert_to_span_based(data["train"])
+        # data["dev"] = convert_to_span_based(data["dev"])
+        # data["test"] = convert_to_span_based(data["test"])
+        data[args.file] = convert_to_span_based(data[args.file])
 
     return data
 
 
 def main(args):
-    data = pre_process_data(args)
-    get_boundary_error_ratio(data[args.file])
+    # get_boundary_error_ratio(data[args.file])
     
     if args.only_f1:
-        calc_micro_f1(data[args.file])
+        seeds = [142, 242, 342, 442]
+        p, r, f1 = [], [], []
+        res = []
+        f1_res = []
+        for seed in seeds:
+            data = pre_process_data(args, seed)
+            tmp_p, tmp_r, tmp_f1 = calc_micro_f1(data[args.file])
+            p.append(tmp_p)
+            r.append(tmp_r)
+            f1.append(tmp_f1)
+            f1_res.append("{0:.2f}".format(tmp_f1))
+            res.append("p: {0:.2f}, r: {1:.2f}, f1: {2:.2f}".format(tmp_p, tmp_r, tmp_f1))
+        
+        mean_f1 = sum(f1) / len(f1)
+        print("| {0} | {1} | {2:.2f} |".format(args.id, " | ".join(f1_res), mean_f1))
+        print("| {0} | {1} |".format(args.id, " | ".join(res)))
+    
     else:
         analyse_errors(data[args.file])
         analyse_error_overlaps(os.path.join(root_path, "analysis"), data[args.file], dump_errors=True)
@@ -437,10 +453,10 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
+    ap.add_argument("--id", type=str, default=None)
     ap.add_argument("--dataset", type=str, default="bio")
     ap.add_argument("--modelpath", type=str, default="../emnlp")
     ap.add_argument("--model", type=str, default="ner-biobert-qa4")
-    ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
     ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
     ap.add_argument("--span_based", dest="span_based", action="store_true", help="set this flag if using span detector")

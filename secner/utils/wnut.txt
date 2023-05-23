@@ -1,0 +1,760 @@
+1: & gt ; * Arrangements are in place to carry the mortal remains of the martyrs to their native places immediately after weather becomes clear , Defence[B-group] Spokesman Colonel[B-person] Rajesh[B-person] Kalia[I-person] said . 
+2: & gt ; * Arrangements are in place to carry the mortal remains of the martyrs to their native places immediately after weather becomes clear , Defence Spokesman Colonel[B-person] Rajesh[B-person] Kalia[I-person] said . 
+G: & gt ; * Arrangements are in place to carry the mortal remains of the martyrs to their native places immediately after weather becomes clear , Defence Spokesman Colonel[B-person] Rajesh[I-person] Kalia[I-person] said . 
+
+1: ( Source : ANI ) Visuals of the avalanche site in Gurez[B-location] sector . 
+2: ( Source : ANI ) Visuals of the avalanche site in Gurez[B-location] sector[I-location] . 
+G: ( Source : ANI[B-group] ) Visuals of the avalanche site in Gurez[B-location] sector[I-location] . 
+
+1: `` Arrangements are in place to carry the mortal remains of the martyrs to their native places immediately after weather becomes clear , ” Defence[B-group] Spokesman Colonel[B-person] Rajesh[I-person] Kalia[I-person] said . 
+2: `` Arrangements are in place to carry the mortal remains of the martyrs to their native places immediately after weather becomes clear , ” Defence Spokesman Colonel[B-person] Rajesh[B-person] Kalia[I-person] said . 
+G: `` Arrangements are in place to carry the mortal remains of the martyrs to their native places immediately after weather becomes clear , ” Defence Spokesman Colonel Rajesh[B-person] Kalia[I-person] said . 
+
+1: The[B-group] DRDO[I-group] is working on projects to develop new technologies to predict avalanches in a much precise manner . 
+2: The DRDO[B-corporation] is working on projects to develop new technologies to predict avalanches in a much precise manner . 
+G: The DRDO[B-group] is working on projects to develop new technologies to predict avalanches in a much precise manner . 
+
+1: ( File Photo ) The DRDO[B-group] is working on projects to develop new technologies to predict avalanches in a much precise manner . 
+2: ( File Photo ) The DRDO[B-corporation] is working on projects to develop new technologies to predict avalanches in a much precise manner . 
+G: ( File Photo ) The DRDO[B-group] is working on projects to develop new technologies to predict avalanches in a much precise manner . 
+
+1: The Defence[B-group] Research[I-group] Development[I-group] Organisation[I-group] ( DRDO[B-group] ) is working on four projects to develop new technologies for more accurate prediction of avalanches , the government said on Friday . 
+2: The Defence[B-corporation] Research Development Organisation ( DRDO[B-corporation] ) is working on four projects to develop new technologies for more accurate prediction of avalanches , the government said on Friday . 
+G: The Defence[B-group] Research[I-group] Development[I-group] Organisation[I-group] ( DRDO[B-group] ) is working on four projects to develop new technologies for more accurate prediction of avalanches , the government said on Friday . 
+
+1: `` Presently , the DRDO[B-group] is working on four projects to develop new technologies for more accurate prediction of avalanches , ” he said in a written response . 
+2: `` Presently , the DRDO[B-corporation] is working on four projects to develop new technologies for more accurate prediction of avalanches , ” he said in a written response . 
+G: `` Presently , the DRDO[B-group] is working on four projects to develop new technologies for more accurate prediction of avalanches , ” he said in a written response . 
+
+1: `` In Navy , advisories on mental health are issued from time to time and stress relieving activities like yoga , art of living are conducted periodically . 
+2: `` In Navy[B-location] , advisories on mental health are issued from time to time and stress relieving activities like yoga , art of living are conducted periodically . 
+G: `` In Navy , advisories on mental health are issued from time to time and stress relieving activities like yoga , art of living are conducted periodically . 
+
+1: I hope y ' all take back what you said at Glenn[B-location] Greenwald[I-location] in the last thread . 
+2: I hope y ' all take back what you said at Glenn[B-person] Greenwald[I-person] in the last thread . 
+G: I hope y ' all take back what you said at Glenn[B-person] Greenwald[I-person] in the last thread . 
+
+1: LMAOOOOOOOO , are the Democrats really doubling down on the thing that got Trump[B-person] elected in first place ? 
+2: LMAOOOOOOOO , are the Democrats[B-group] really doubling down on the thing that got Trump[B-person] elected in first place ? 
+G: LMAOOOOOOOO , are the Democrats[B-group] really doubling down on the thing that got Trump[B-person] elected in first place ? 
+
+1: Living Computer Museum + Labs , Skyview[B-location] Observatory[I-location] , Smith[B-location] Tower[I-location] and Observation Deck , 
+2: Living[B-corporation] Computer[I-corporation] Museum + Labs , Skyview[B-location] Observatory[I-location] , Smith[B-location] Tower[I-location] and Observation Deck , 
+G: Living[B-location] Computer[I-location] Museum[I-location] +[I-location] Labs[I-location] , Skyview[B-location] Observatory[I-location] , Smith[B-location] Tower[I-location] and Observation[B-location] Deck[I-location] , 
+
+1: CVS selling their own version of[I-product] epipen[B-product] at 1 / 6 th price . 
+2: CVS[B-corporation] selling their own version of epipen[B-product] at 1 / 6 th price . 
+G: CVS[B-corporation] selling their own version of epipen[B-product] at 1 / 6 th price . 
+
+1: I remember having parliament on the radio in my car and hearing Leyonhjelm[B-person] [ give this speach ] ( https://np.reddit.com/r/australia/comments/307z4f/leyonhjelm_on_metadata/ ) which was impressive . 
+2: I remember having parliament[B-person] on the radio in my car and hearing Leyonhjelm[B-person] [ give this speach ] ( https://np.reddit.com/r/australia/comments/307z4f/leyonhjelm_on_metadata/ ) which was impressive . 
+G: I remember having parliament on the radio in my car and hearing Leyonhjelm[B-person] [ give this speach ] ( https://np.reddit.com/r/australia/comments/307z4f/leyonhjelm_on_metadata/ ) which was impressive . 
+
+1: Looks like Grimaldo[B-person] is linked with MU[B-person] too 
+2: Looks like Grimaldo[B-person] is linked with MU[B-group] too 
+G: Looks like Grimaldo[B-person] is linked with MU[B-group] too 
+
+1: Here ' s a link to a Redditor[B-group] ' s experience in Calgary[B-location] : 
+2: Here ' s a link to a Redditor[B-corporation] ' s experience in Calgary[B-location] : 
+G: Here ' s a link to a Redditor ' s experience in Calgary[B-location] : 
+
+1: * * submission title * * : Battle underway for return of Napoleon[B-person] ' s horse Marengo to Ireland[B-location] 
+2: * * submission title * * : Battle underway for return of Napoleon[B-person] ' s horse Marengo[B-product] to Ireland[B-location] 
+G: * * submission title * * : Battle underway for return of Napoleon[B-person] ' s horse Marengo to Ireland[B-location] 
+
+1: She ' s been making me question my sexuality since The X-Files started . 
+2: She ' s been making me question my sexuality since The X-Files[B-creative-work] started . 
+G: She ' s been making me question my sexuality since The[B-creative-work] X-Files[I-creative-work] started . 
+
+1: EDIT : No actually screw that , i ' d like to ask why you ' d want attacks on Trump[B-group] supporters to continue ? 
+2: EDIT : No actually screw that , i ' d like to ask why you ' d want attacks on Trump[B-person] supporters to continue ? 
+G: EDIT : No actually screw that , i ' d like to ask why you ' d want attacks on Trump[B-person] supporters to continue ? 
+
+1: * * submission title * * : Proposed class action against B . C . 
+2: * * submission title * * : Proposed class action against B[B-location] .[I-location] C[I-location] .[I-location] 
+G: * * submission title * * : Proposed class action against B[B-group] .[I-group] C[I-group] .[I-group] 
+
+1: You do realize this was published by CBC[B-corporation] Manitoba . 
+2: You do realize this was published by CBC[B-corporation] Manitoba[I-corporation] . 
+G: You do realize this was published by CBC[B-corporation] Manitoba[I-corporation] . 
+
+1: Here is the background on Rastus[B-person] and Pete[B-person] . 
+2: Here is the background on Rastus[B-creative-work] and[I-creative-work] Pete[B-person] . 
+G: Here is the background on Rastus[B-person] and Pete[B-person] . 
+
+1: Yet in [ another post ] ( https://www.reddit.com/r/australia/comments/5m9hs3/labors_linda_burney_requests_auditorgeneral/dc2atzg/ ) you lambast Labor for * * only * * three of their front bench publicly denouncing this debacle . 
+2: Yet in [ another post ] ( https://www.reddit.com/r/australia/comments/5m9hs3/labors_linda_burney_requests_auditorgeneral/dc2atzg/ ) you lambast Labor[B-group] for * * only * * three of their front bench publicly denouncing this debacle . 
+G: Yet in [ another post ] ( https://www.reddit.com/r/australia/comments/5m9hs3/labors_linda_burney_requests_auditorgeneral/dc2atzg/ ) you lambast Labor[B-group] for * * only * * three of their front bench publicly denouncing this debacle . 
+
+1: / r / canada used to say the CBC went clickbait because those evil cons tried to defund them , but the rut is clearly much deeper and more permanent . 
+2: / r / canada used to say the CBC[B-corporation] went clickbait because those evil cons tried to defund them , but the rut is clearly much deeper and more permanent . 
+G: / r / canada[B-location] used to say the CBC[B-corporation] went clickbait because those evil cons[B-group] tried to defund them , but the rut is clearly much deeper and more permanent . 
+
+1: Narsingh to see here , [ r / soccer thread ] ( https://www.reddit.com/r/soccer/comments/5ne3ed/psv_right_winger_luciano_narsingh_set_to_move_to/ ) totally brutal 
+2: Narsingh[B-person] to see here , [ r / soccer thread ] ( https://www.reddit.com/r/soccer/comments/5ne3ed/psv_right_winger_luciano_narsingh_set_to_move_to/ ) totally brutal 
+G: Narsingh[B-person] to see here , [ r / soccer thread ] ( https://www.reddit.com/r/soccer/comments/5ne3ed/psv_right_winger_luciano_narsingh_set_to_move_to/ ) totally brutal 
+
+1: I remember around a year ago there was a post about how Ronaldo[B-person] had scored over 40 % of Madrid[B-group] ' s goals since 2009 . 
+2: I remember around a year ago there was a post about how Ronaldo[B-person] had scored over 40 % of Madrid[B-location] ' s goals since 2009 . 
+G: I remember around a year ago there was a post about how Ronaldo[B-person] had scored over 40 % of Madrid[B-group] ' s goals since 2009 . 
+
+1: [ Ritchie[B-person] McClaw ] ( https://imgur.com/a/xP0Ta ) 
+2: [ Ritchie[B-person] McClaw[I-person] ] ( https://imgur.com/a/xP0Ta ) 
+G: [ Ritchie[B-person] McClaw[I-person] ] ( https://imgur.com/a/xP0Ta ) 
+
+1: -[B-person] Jürgen[I-person] Klopp[I-person] 
+2: -[B-person] Jürgen[B-person] Klopp[I-person] 
+G: - Jürgen[B-person] Klopp[I-person] 
+
+1: * * submission title * * : Official : PSG[B-corporation] sign Gonçalo[B-person] Guedes[I-person] for 25 million € 
+2: * * submission title * * : Official : PSG[B-group] sign Gonçalo[B-person] Guedes[I-person] for 25 million € 
+G: * * submission title * * : Official : PSG[B-group] sign Gonçalo[B-person] Guedes[I-person] for 25 million € 
+
+1: * * submission title * * : ZM ( possibly other radio stations ) adding rap features to normal songs ? 
+2: * * submission title * * : ZM[B-group] ( possibly other radio stations ) adding rap features to normal songs ? 
+G: * * submission title * * : ZM[B-corporation] ( possibly other radio stations ) adding rap features to normal songs ? 
+
+1: Well looks like Demolition Man has come true . 
+2: Well looks like Demolition[B-creative-work] Man[I-creative-work] has come true . 
+G: Well looks like Demolition[B-creative-work] Man[I-creative-work] has come true . 
+
+1: [ Ah , the ol ' reddit[B-group] skin-a-roo ! 
+2: [ Ah , the ol ' reddit[B-corporation] skin-a-roo ! 
+G: [ Ah , the ol ' reddit[B-corporation] skin-a-roo ! 
+
+1: Also , check the FIFA XI thread where a lot of people were shitting on him when he actually had a fantastic 2016 
+2: Also , check the FIFA[B-group] XI[I-group] thread where a lot of people were shitting on him when he actually had a fantastic 2016 
+G: Also , check the FIFA[B-creative-work] XI[I-creative-work] thread where a lot of people were shitting on him when he actually had a fantastic 2016 
+
+1: [ Live Goal + Replays - AA Mirror HD ] ( https://streamable.com/qlwoq ) 
+2: [ Live Goal + Replays - AA[B-product] Mirror[I-product] HD ] ( https://streamable.com/qlwoq ) 
+G: [ Live Goal + Replays - AA[B-group] Mirror HD ] ( https://streamable.com/qlwoq ) 
+
+1: * * submission title * * : British man dies working on Qatar[B-location] 2022 World Cup[I-location] stadium 
+2: * * submission title * * : British[B-location] man dies working on Qatar[B-location] 2022 World Cup stadium 
+G: * * submission title * * : British man dies working on Qatar[B-location] 2022[I-location] World[I-location] Cup[I-location] stadium[I-location] 
+
+1: [ Aah , the old Reddit[B-product] deatharoo ] ( https://www.reddit.com/r/newzealand/comments/5m9mam/kia_ora_rbrasil_cultural_exchange_with_rbrasil/dc3dgin/?context=3 ) 
+2: [ Aah , the old Reddit[B-corporation] deatharoo ] ( https://www.reddit.com/r/newzealand/comments/5m9mam/kia_ora_rbrasil_cultural_exchange_with_rbrasil/dc3dgin/?context=3 ) 
+G: [ Aah , the old Reddit[B-corporation] deatharoo ] ( https://www.reddit.com/r/newzealand/comments/5m9mam/kia_ora_rbrasil_cultural_exchange_with_rbrasil/dc3dgin/?context=3 ) 
+
+1: I want anyteam to win it except PSG . 
+2: I want anyteam to win it except PSG[B-corporation] . 
+G: I want anyteam to win it except PSG[B-group] . 
+
+1: 3 weeks from now a Centrelink recipient kills himself . 
+2: 3 weeks from now a Centrelink[B-corporation] recipient kills himself . 
+G: 3 weeks from now a Centrelink[B-product] recipient kills himself . 
+
+1: I like u / Womble _ Don ' s post about why Lahm is a good captain . 
+2: I like u / Womble _ Don ' s post about why Lahm[B-person] is a good captain . 
+G: I like u / Womble[B-person] _[I-person] Don[I-person] ' s post about why Lahm[B-person] is a good captain . 
+
+1: So discussion related to , say , " New[B-location] Zealand[I-location] " could all go in one place , such as reddit . com / r / newzealand . 
+2: So discussion related to , say , " New[B-location] Zealand[I-location] " could all go in one place , such as reddit[B-corporation] . com / r / newzealand . 
+G: So discussion related to , say , " New[B-location] Zealand[I-location] " could all go in one place , such as reddit[B-location] .[I-location] com[I-location] /[I-location] r[I-location] /[I-location] newzealand[I-location] . 
+
+1: Ken[B-person] King[I-person] said it himself when he started talking about CalgaryNEXT that he wants * less * seats in the new arena . 
+2: Ken[B-person] King[I-person] said it himself when he started talking about CalgaryNEXT[B-group] that he wants * less * seats in the new arena . 
+G: Ken[B-person] King[I-person] said it himself when he started talking about CalgaryNEXT[B-location] that he wants * less * seats in the new arena . 
+
+1: * * submission title * * : Adebayor[B-person] signs for Turkish side Basaksehir 
+2: * * submission title * * : Adebayor[B-person] signs for Turkish[B-location] side Basaksehir[B-group] 
+G: * * submission title * * : Adebayor[B-person] signs for Turkish side Basaksehir[B-group] 
+
+1: [ Please do n ' t forget that liberals and Democrats are Nazi Useful Idiots who believe government / CIA[B-group] propaganda and Fake News sites . 
+2: [ Please do n ' t forget that liberals[B-group] and Democrats[B-group] are Nazi Useful Idiots who believe government / CIA[B-corporation] propaganda and Fake News sites . 
+G: [ Please do n ' t forget that liberals and Democrats[B-group] are Nazi[B-group] Useful Idiots who believe government / CIA[B-group] propaganda and Fake News sites . 
+
+1: Even though I ' ve only been once through a reciprocal membership , I ' ll nominate Virgin Active at Moore[B-location] Park[I-location] / Zetland[B-location] for you . 
+2: Even though I ' ve only been once through a reciprocal membership , I ' ll nominate Virgin[B-corporation] Active[I-corporation] at Moore[B-location] Park[I-location] / Zetland[B-location] for you . 
+G: Even though I ' ve only been once through a reciprocal membership , I ' ll nominate Virgin[B-corporation] Active[I-corporation] at Moore[B-location] Park[I-location] / Zetland[B-location] for you . 
+
+1: * * redditor * * : Jay[B-person] 911[I-person] 
+2: * * redditor * * : Jay[B-person] 911 
+G: * * redditor * * : Jay[B-person] 911[I-person] 
+
+1: & gt ; Are you hoping that someone in R[B-location] /[I-location] Calgary[B-location] just happens to be a stock shelfer there or has an extremely intimate knowledge of all of their 1 million items ? 
+2: & gt ; Are you hoping that someone in R[B-location] /[I-location] Calgary[I-location] just happens to be a stock shelfer there or has an extremely intimate knowledge of all of their 1 million items ? 
+G: & gt ; Are you hoping that someone in R[B-group] /[I-group] Calgary[B-group] just happens to be a stock shelfer there or has an extremely intimate knowledge of all of their 1 million items ? 
+
+1: I ' m referring to the ones newly introduced in Rogue[B-creative-work] One[I-creative-work] - I ca n ' t remember if they were given a specific name - I only remember them being referred to as ' Imperial Droids ' 
+2: I ' m referring to the ones newly introduced in Rogue[B-product] One[I-product] - I ca n ' t remember if they were given a specific name - I only remember them being referred to as ' Imperial[B-group] Droids ' 
+G: I ' m referring to the ones newly introduced in Rogue[B-creative-work] One[I-creative-work] - I ca n ' t remember if they were given a specific name - I only remember them being referred to as ' Imperial[B-product] Droids[I-product] ' 
+
+1: senate democrats eliminated the nuclear option when they had the majority a few years ago , over republican objections . the republicans warned that without the nuclear option , the democrats[B-group] could lose a powerful means to stop the republican administration nominees if / when the table is turned . well , the democrats today would have loved to undo what they enthusiastically did a few year back . 
+2: senate[B-group] democrats[B-group] eliminated the nuclear option when they had the majority a few years ago , over republican objections . the republicans warned that without the nuclear option , the democrats[B-group] could lose a powerful means to stop the republican administration nominees if / when the table is turned . well , the democrats[B-group] today would have loved to undo what they enthusiastically did a few year back . 
+G: senate[B-group] democrats[I-group] eliminated the nuclear option when they had the majority a few years ago , over republican[B-group] objections . the republicans[B-group] warned that without the nuclear option , the democrats[B-group] could lose a powerful means to stop the[B-group] republican[I-group] administration[I-group] nominees[I-group] if / when the table is turned . well , the democrats[B-group] today would have loved to undo what they enthusiastically did a few year back . 
+
+1: It ' s best to consider * Voyager * as a whole as non-canon . 
+2: It ' s best to consider *[B-product] Voyager * as a whole as non-canon . 
+G: It ' s best to consider * Voyager[B-creative-work] * as a whole as non-canon . 
+
+1: Why was porygon[B-person] in this episode of Pokémon[B-creative-work] 
+2: Why was porygon[B-person] in this episode of Pokémon[B-product] 
+G: Why was porygon[B-person] in this episode of Pokémon[B-creative-work] 
+
+1: Hi Garvan[I-person] and welcome to the Physics SE ! Please note that this is not a homework help site . Please see [ this Meta post on asking homework questions ] ( http://meta.physics.stackexchange.com/questions/714/how-do-i-ask-homework-questions-on-physics-stack-exchange ) and [ this Meta post for " check my work " problems ] ( http://meta.physics.stackexchange.com/questions/6093/should-any-check-my-work-questions-be-made-on-topic ) . 
+2: Hi Garvan[B-person] and welcome to the Physics SE ! Please note that this is not a homework help site . Please see [ this Meta post on asking homework questions ] ( http://meta.physics.stackexchange.com/questions/714/how-do-i-ask-homework-questions-on-physics-stack-exchange ) and [ this Meta post for " check my work " problems ] ( http://meta.physics.stackexchange.com/questions/6093/should-any-check-my-work-questions-be-made-on-topic ) . 
+G: Hi Garvan[B-person] and welcome to the Physics[B-location] SE[I-location] ! Please note that this is not a homework help site . Please see [ this Meta post on asking homework questions ] ( http://meta.physics.stackexchange.com/questions/714/how-do-i-ask-homework-questions-on-physics-stack-exchange ) and [ this Meta post for " check my work " problems ] ( http://meta.physics.stackexchange.com/questions/6093/should-any-check-my-work-questions-be-made-on-topic ) . 
+
+1: Java Object encryption 
+2: Java[B-product] Object encryption 
+G: Java[B-product] Object[I-product] encryption[I-product] 
+
+1: Can the president[I-person] appoint him- or herself to the Supreme Court ? 
+2: Can the president[B-person] appoint him- or herself to the Supreme Court ? 
+G: Can the president appoint him- or herself to the Supreme[B-group] Court[I-group] ? 
+
+1: But is ryll mined on Kessel[B-location] ? They mention that planet in ANH , and then never again . 
+2: But is ryll[B-location] mined on Kessel[B-location] ? They mention that planet in ANH , and then never again . 
+G: But is ryll[B-product] mined on Kessel[B-location] ? They mention that planet in ANH[B-creative-work] , and then never again . 
+
+1: @ Xantec . You ' re right , it is . The Hogwarts staff member delivering the letter would be expected to mention Diagon Alley ( as Dumbledore[B-person] did ) . Hagrid[B-person] neglected to do this by just posting the letter through the letterbox . So really it ' s an oversight on the part of Hagrid[B-person] ( although obviously in reality he did take Harry[B-person] to DA in person ) . 
+2: @ Xantec . You ' re right , it is . The Hogwarts[B-corporation] staff member delivering the letter would be expected to mention Diagon[B-location] Alley[I-location] ( as Dumbledore[B-person] did ) . Hagrid[B-person] neglected to do this by just posting the letter through the letterbox . So really it ' s an oversight on the part of Hagrid[B-person] ( although obviously in reality he did take Harry[B-person] to DA in person ) . 
+G: @ Xantec[B-product] . You ' re right , it is . The Hogwarts[B-location] staff member delivering the letter would be expected to mention Diagon[B-location] Alley[I-location] ( as Dumbledore[B-person] did ) . Hagrid[B-person] neglected to do this by just posting the letter through the letterbox . So really it ' s an oversight on the part of Hagrid[B-person] ( although obviously in reality he did take Harry[B-person] to DA[B-location] in person ) . 
+
+1: How to ensure wildcard certificate private key security ? 
+2: How to ensure wildcard[B-corporation] certificate private key security ? 
+G: How to ensure wildcard[B-product] certificate[I-product] private[I-product] key[I-product] security[I-product] ? 
+
+1: Why was Thorin[B-person] so interested in gold in the film , when he was really just after the[B-product] Arkenstone[B-product] ? 
+2: Why was Thorin[B-person] so interested in gold in the film , when he was really just after the[B-product] Arkenstone[I-product] ? 
+G: Why was Thorin[B-person] so interested in gold in the film , when he was really just after the Arkenstone[B-product] ? 
+
+1: Amazon Echo / Dot on your network 
+2: Amazon[B-corporation] Echo / Dot on your network 
+G: Amazon[B-product] Echo[I-product] / Dot[B-product] on your network 
+
+1: In " The[B-creative-work] Six[I-creative-work] Thatchers " , why does Watson[B-person] blame Sherlock[B-person] rather than himself ? 
+2: In " The[B-creative-work] Six[I-creative-work] Thatchers[I-creative-work] " , why does Watson[B-person] blame Sherlock[B-person] rather than himself ? 
+G: In " The[B-creative-work] Six[I-creative-work] Thatchers[I-creative-work] " , why does Watson[B-person] blame Sherlock[B-person] rather than himself ? 
+
+1: Are the TIE Fighter pilots clones ? 
+2: Are the TIE[B-product] Fighter[I-product] pilots[I-product] clones ? 
+G: Are the TIE[B-group] Fighter[I-group] pilots[I-group] clones ? 
+
+1: Why is visa-free travel such a big deal in politics ? 
+2: Why is visa-free[B-product] travel such a big deal in politics ? 
+G: Why is visa-free travel such a big deal in politics ? 
+
+1: I think this answer is wrong — I certainly took it to be meant literally . The last line in your answer is key , but it ’ s entirely possible that the worth of market value of small amounts of mithril is so ridiculously high that , scaled to a whole armour made of mithril , its value would indeed dwarf an unimportant economy such as the Shire ’ s , without requiring an exact calculation . This isn ’ t * that * unrealistic for an item ’ s value ( as a gift , it kind of is though ) . 
+2: I think this answer is wrong — I certainly took it to be meant literally . The last line in your answer is key , but it ’ s entirely possible that the worth of market value of small amounts of mithril[B-product] is so ridiculously high that , scaled to a whole armour made of mithril , its value would indeed dwarf an unimportant economy such as the Shire ’ s , without requiring an exact calculation . This isn ’ t * that * unrealistic for an item ’ s value ( as a gift , it kind of is though ) . 
+G: I think this answer is wrong — I certainly took it to be meant literally . The last line in your answer is key , but it ’ s entirely possible that the worth of market value of small amounts of mithril[B-product] is so ridiculously high that , scaled to a whole armour made of mithril[B-product] , its value would indeed dwarf an unimportant economy such as the[B-location] Shire[I-location] ’ s , without requiring an exact calculation . This isn ’ t * that * unrealistic for an item ’ s value ( as a gift , it kind of is though ) . 
+
+1: What non- Star[B-creative-work] Trek[I-creative-work] movie used the TOS font for the end credits ? 
+2: What non- Star Trek movie used the TOS[B-product] font for the end credits ? 
+G: What non- Star[B-creative-work] Trek[I-creative-work] movie[I-creative-work] used the TOS[B-product] font[I-product] for the end credits ? 
+
+1: Store SQL database credentials in a webserver 
+2: Store SQL[B-product] database credentials in a webserver 
+G: Store SQL[B-product] database credentials in a webserver 
+
+1: [ Related answer ] ( http://movies.stackexchange.com/a/33905/1190 ) for you bonus sidenote with word of god . 
+2: [ Related answer ] ( http://movies.stackexchange.com/a/33905/1190 ) for you bonus sidenote with word[B-creative-work] of[I-creative-work] god[I-creative-work] . 
+G: [ Related answer ] ( http://movies.stackexchange.com/a/33905/1190 ) for you bonus sidenote with word of god . 
+
+1: How does the President[B-person] of the United States[I-location] get a budget authorised ? 
+2: How does the President of the United[B-location] States[I-location] get a budget authorised ? 
+G: How does the President of the United[B-location] States[I-location] get a budget authorised ? 
+
+1: It seems to me this answer confirms what the restrictions on a 501[B-group] ([I-group] c[I-group] )[I-group] 3[I-group] are w . r . t a candidate ; I think the more relevant issue here is whether the filing makes Trump[B-person] a " candidate " for purposes of said restrictions , especially in light of the first phrase in the filing , " While this does not constitute a formal announcement of my candidacy for the 2020 election . " 
+2: It seems to me this answer confirms what the restrictions on a 501 ( c ) 3 are w . r . t a candidate ; I think the more relevant issue here is whether the filing makes Trump[B-person] a " candidate " for purposes of said restrictions , especially in light of the first phrase in the filing , " While this does not constitute a formal announcement of my candidacy for the 2020 election . " 
+G: It seems to me this answer confirms what the restrictions on a 501[B-creative-work] ([I-creative-work] c[I-creative-work] )[I-creative-work] 3[I-creative-work] are w . r . t a candidate ; I think the more relevant issue here is whether the filing makes Trump[B-person] a " candidate " for purposes of said restrictions , especially in light of the first phrase in the filing , " While this does not constitute a formal announcement of my candidacy for the 2020 election . " 
+
+1: Commutation Relation between the Dirac Hamiltonian and Helicity operator 
+2: Commutation Relation between the Dirac[B-person] Hamiltonian and Helicity operator 
+G: Commutation Relation between the Dirac Hamiltonian and Helicity operator 
+
+1: Why do so many kids in Digimon[B-location] wear gloves ? 
+2: Why do so many kids in Digimon[B-product] wear gloves ? 
+G: Why do so many kids in Digimon[B-product] wear gloves ? 
+
+1: They also used ' magic ' to accomplish their works . Minas[B-location] Tirith[I-location] ( The First Age one ) had a spell bounding stone to stone , and it collapsed after Lúthien[B-person] had broken it . 
+2: They also used ' magic ' to accomplish their works . Minas[B-person] Tirith[I-person] ( The First[B-creative-work] Age one ) had a spell bounding stone to stone , and it collapsed after Lúthien[B-person] had broken it . 
+G: They also used ' magic ' to accomplish their works . Minas[B-location] Tirith[I-location] ( The First Age one ) had a spell bounding stone to stone , and it collapsed after Lúthien[B-person] had broken it . 
+
+1: " * It ' s all down to Neville[B-person] . He really gets this room . You ' ve got to ask it for exactly what you need - like , ' I do n ' t want any Carrow[B-group] supporters to be able to get in ' - and ' ll do it for you ! You ' ve just got to make sure you close the loopholes ! Neville[B-person] ' s the man ! * " - Seamus[B-person] 
+2: " * It ' s all down to Neville[B-person] . He really gets this room . You ' ve got to ask it for exactly what you need - like , ' I do n ' t want any Carrow[B-person] supporters to be able to get in ' - and ' ll do it for you ! You ' ve just got to make sure you close the loopholes ! Neville[B-person] ' s the man ! * " - Seamus[B-person] 
+G: " * It ' s all down to Neville[B-person] . He really gets this room . You ' ve got to ask it for exactly what you need - like , ' I do n ' t want any Carrow[B-person] supporters to be able to get in ' - and ' ll do it for you ! You ' ve just got to make sure you close the loopholes ! Neville[B-person] ' s the man ! * " - Seamus[B-person] 
+
+1: Thank you for the quick reply . Just wanted to confirm one more thing . How do you mitigate this issue ? Is it done by mandating auth for all the mail sending actions ? 
+2: Thank you for the quick reply . Just wanted to confirm one more thing . How do you mitigate this issue ? Is it done by mandating auth[B-person] for all the mail sending actions ? 
+G: Thank you for the quick reply . Just wanted to confirm one more thing . How do you mitigate this issue ? Is it done by mandating auth for all the mail sending actions ? 
+
+1: Suggestions on how I would detect that , or rather ; or whether there would be a Windows[B-product] Event log confirming this ? ? 
+2: Suggestions on how I would detect that , or rather ; or whether there would be a Windows[B-corporation] Event log confirming this ? ? 
+G: Suggestions on how I would detect that , or rather ; or whether there would be a Windows[B-product] Event[I-product] log[I-product] confirming this ? ? 
+
+1: Where was the planet inhabited by " the Giants " located relative to Earth ? 
+2: Where was the planet inhabited by " the[B-group] Giants[I-group] " located relative to Earth[B-location] ? 
+G: Where was the planet inhabited by " the[B-group] Giants[I-group] " located relative to Earth[B-location] ? 
+
+1: Hm , pest should not be a problem for witchers , as their mutation makes them immune to diseases . However , there is another reason to avoid cities or even villages : Most people do n ' t like witchers and highly distrust them ( yeah , they might be useful to get rid of mosters , but they are somehow monsters themselves and may rob your children if you ' re not careful ) . So it is safer for witchers to stay among themselves , far away from other people . 
+2: Hm , pest should not be a problem for witchers[B-product] , as their mutation makes them immune to diseases . However , there is another reason to avoid cities or even villages : Most people do n ' t like witchers[B-product] and highly distrust them ( yeah , they might be useful to get rid of mosters , but they are somehow monsters themselves and may rob your children if you ' re not careful ) . So it is safer for witchers[B-product] to stay among themselves , far away from other people . 
+G: Hm , pest should not be a problem for witchers , as their mutation makes them immune to diseases . However , there is another reason to avoid cities or even villages : Most people do n ' t like witchers and highly distrust them ( yeah , they might be useful to get rid of mosters , but they are somehow monsters themselves and may rob your children if you ' re not careful ) . So it is safer for witchers to stay among themselves , far away from other people . 
+
+1: What is the meaning if all IoT hacked by Mirai[B-corporation] all over the world identify themselves on my server since 15 days in the rhythm of 180 unique IoT / h ? 
+2: What is the meaning if all IoT[B-corporation] hacked by Mirai[B-person] all over the world identify themselves on my server since 15 days in the rhythm of 180 unique IoT / h ? 
+G: What is the meaning if all IoT[B-product] hacked by Mirai[B-product] all over the world identify themselves on my server since 15 days in the rhythm of 180 unique IoT[B-product] / h ? 
+
+1: How did the media know the method Batman[B-person] used to catch the Joker[I-person] ? 
+2: How did the media know the method Batman[B-person] used to catch the Joker[B-person] ? 
+G: How did the media know the method Batman[B-person] used to catch the Joker[B-person] ? 
+
+1: Standardized Data Formats for specifying bandstructure and Fermi[B-product] surfaces 
+2: Standardized Data Formats for specifying bandstructure[B-product] and Fermi[B-corporation] surfaces 
+G: Standardized Data Formats for specifying bandstructure and Fermi surfaces 
+
+1: ' ll certainly check it out . But superior ? As a native kiwi that will be my judgement to make : - P 
+2: ' ll certainly check it out . But superior ? As a native kiwi[B-location] that will be my judgement to make : - P 
+G: ' ll certainly check it out . But superior ? As a native kiwi[B-group] that will be my judgement to make : - P 
+
+1: If it is called Mandalorian , I would think that the Mandalorians[B-group] designed it . 
+2: If it is called Mandalorian[B-product] , I would think that the Mandalorians[B-group] designed it . 
+G: If it is called Mandalorian[B-product] , I would think that the Mandalorians[B-group] designed it . 
+
+1: Thanks a lot , but can you give me a link for the first site , GhostSec[B-corporation] ' s pentest[B-corporation] labs[I-corporation] ? 
+2: Thanks a lot , but can you give me a link for the first site , GhostSec[B-corporation] '[I-corporation] s[I-corporation] pentest[B-corporation] labs[I-corporation] ? 
+G: Thanks a lot , but can you give me a link for the first site , GhostSec[B-product] '[I-product] s[I-product] pentest[I-product] labs[I-product] ? 
+
+1: The Matrix : How did the Nebuchadnezzar[I-person] know where to find Neo[B-person] in the real world ? 
+2: The Matrix : How did the[B-person] Nebuchadnezzar[I-person] know where to find Neo[B-person] in the real world ? 
+G: The[B-creative-work] Matrix[I-creative-work] : How did the[B-person] Nebuchadnezzar[I-person] know where to find Neo[B-person] in the real world ? 
+
+1: and I ' d disagree w / @ Edlothiad ' s response - it is absolutely based more on myth than sci-fi concepts - but , ultimately , that does n ' t matter since Valorum is correct : ) 
+2: and I ' d disagree w / @ Edlothiad ' s response - it is absolutely based more on myth than sci-fi concepts - but , ultimately , that does n ' t matter since Valorum[B-creative-work] is correct : ) 
+G: and I ' d disagree w / @ Edlothiad[B-person] ' s response - it is absolutely based more on myth than sci-fi concepts - but , ultimately , that does n ' t matter since Valorum[B-person] is correct : ) 
+
+1: What does the ending scene of The[B-creative-work] Sopranos mean ? 
+2: What does the ending scene of The[B-creative-work] Sopranos[I-creative-work] mean ? 
+G: What does the ending scene of The[B-creative-work] Sopranos[I-creative-work] mean ? 
+
+1: @ defalt I do n ' t think OP was asking about the VPN server ' s port ( which I addressed , too ) . 
+2: @ defalt I do n ' t think OP was asking about the VPN[B-corporation] server ' s port ( which I addressed , too ) . 
+G: @ defalt I do n ' t think OP[B-person] was asking about the VPN[B-product] server[I-product] ' s port ( which I addressed , too ) . 
+
+1: Hi , welcome to the site . You say the Hulk saw ' something messed up ' - do you have any quotes or information from the film that would help explain what is was he actually saw ? 
+2: Hi , welcome to the site . You say the Hulk[B-person] saw ' something messed up ' - do you have any quotes or information from the film that would help explain what is was he actually saw ? 
+G: Hi , welcome to the site . You say the Hulk saw ' something messed up ' - do you have any quotes or information from the film that would help explain what is was he actually saw ? 
+
+1: Is there any evolutionary advantage to the position of the Vulcan heart ? 
+2: Is there any evolutionary advantage to the position of the Vulcan[B-product] heart ? 
+G: Is there any evolutionary advantage to the position of the Vulcan[B-group] heart ? 
+
+1: Why do all Potterwatch contributors ' codenames start with " R " ? 
+2: Why do all Potterwatch[B-corporation] contributors ' codenames start with " R " ? 
+G: Why do all Potterwatch[B-creative-work] contributors ' codenames start with " R " ? 
+
+1: Why was Hogwarts[B-group] so adamant about having Harry[B-person] go there ? 
+2: Why was Hogwarts[B-corporation] so adamant about having Harry[B-person] go there ? 
+G: Why was Hogwarts[B-location] so adamant about having Harry[B-person] go there ? 
+
+1: The blue shifting could even get to the point that the microwave background is visible , I really do n ' t know . I think as far as the more extremely warped paths of light coming up from near the black hole , you might look at the black hole from interstellar[B-corporation] . They modeled all of the light really well . However , I think you have some creative leeway here given just how complex the paths of rays near a black hole can be . Best of luck 
+2: The blue shifting could even get to the point that the microwave background is visible , I really do n ' t know . I think as far as the more extremely warped paths of light coming up from near the black hole , you might look at the black[B-location] hole[I-location] from interstellar[B-location] . They modeled all of the light really well . However , I think you have some creative leeway here given just how complex the paths of rays near a black hole can be . Best of luck 
+G: The blue shifting could even get to the point that the microwave background is visible , I really do n ' t know . I think as far as the more extremely warped paths of light coming up from near the black hole , you might look at the black hole from interstellar . They modeled all of the light really well . However , I think you have some creative leeway here given just how complex the paths of rays near a black hole can be . Best of luck 
+
+1: A futuristic book I am sure was titled " Grandfather Bank[I-creative-work] " 
+2: A futuristic book I am sure was titled " Grandfather[B-creative-work] Bank[I-creative-work] " 
+G: A futuristic book I am sure was titled " Grandfather[B-creative-work] Bank[I-creative-work] " 
+
+1: Please use mathjax to format mathematical expressions . To learn more about mathjax , please read [ MathJax basic tutorial and quick reference ] ( http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference ) . 
+2: Please use mathjax[B-product] to format mathematical expressions . To learn more about mathjax[B-product] , please read [ MathJax[B-product] basic tutorial and quick reference ] ( http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference ) . 
+G: Please use mathjax[B-product] to format mathematical expressions . To learn more about mathjax[B-product] , please read [ MathJax[B-creative-work] basic[I-creative-work] tutorial[I-creative-work] and[I-creative-work] quick[I-creative-work] reference[I-creative-work] ] ( http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference ) . 
+
+1: Could a President[I-person] withdraw nominated Supreme Court judge before confirmation by the senate ? 
+2: Could a President[B-person] withdraw nominated Supreme Court judge before confirmation by the senate[B-group] ? 
+G: Could a President withdraw nominated Supreme[B-person] Court[I-person] judge[I-person] before confirmation by the senate ? 
+
+1: In the RotS scene where Obi-[B-person] Wan[I-person] and Anakin[B-person] are stupid enough to walk backwards into the elevator , the droids could have just shot them . 
+2: In the RotS scene where Obi-[B-person] Wan[I-person] and Anakin[B-person] are stupid enough to walk backwards into the elevator , the droids[B-product] could have just shot them . 
+G: In the RotS[B-creative-work] scene where Obi-[B-person] Wan[I-person] and Anakin[B-person] are stupid enough to walk backwards into the elevator , the droids[B-product] could have just shot them . 
+
+1: Turkish[B-group] military presence in other countries soil 
+2: Turkish[B-location] military presence in other countries soil 
+G: Turkish[B-group] military[I-group] presence in other countries soil 
+
+1: Few Questions About Tor Hidden Services 
+2: Few Questions About Tor[B-corporation] Hidden Services 
+G: Few Questions About Tor[B-product] Hidden[I-product] Services[I-product] 
+
+1: Who is driving Thomas[B-person] Jane[I-person] ' s hair and wardrobe on the Expanse ? 
+2: Who is driving Thomas[B-person] Jane[I-person] ' s hair and wardrobe on the[B-location] Expanse[I-location] ? 
+G: Who is driving Thomas[B-person] Jane[I-person] ' s hair and wardrobe on the[B-creative-work] Expanse[I-creative-work] ? 
+
+1: @ phoog Parliament can do anything it likes . It is sometimes said , by way of emphasis that " it can make women men , and men women , if it wants " . The only thing it ca n ' t do is to pass legislation which binds successor parliament in any way . 
+2: @ phoog Parliament[B-group] can do anything it likes . It is sometimes said , by way of emphasis that " it can make women men , and men women , if it wants " . The only thing it ca n ' t do is to pass legislation which binds successor parliament in any way . 
+G: @ phoog[B-person] Parliament[B-group] can do anything it likes . It is sometimes said , by way of emphasis that " it can make women men , and men women , if it wants " . The only thing it ca n ' t do is to pass legislation which binds successor parliament in any way . 
+
+1: How to derive the equation of motion of Born- Infeld ? 
+2: How to derive the equation of motion of Born-[B-location] Infeld[I-location] ? 
+G: How to derive the equation of motion of Born- Infeld ? 
+
+1: What are the advantages of the French two-round voting system against a one round alternative ? 
+2: What are the advantages of the French[B-location] two-round voting system against a one round alternative ? 
+G: What are the advantages of the French[B-group] two-round voting system against a one round alternative ? 
+
+1: How many people are the three billion watching Zaphod Beeblebrox ? 
+2: How many people are the three billion watching Zaphod[B-person] Beeblebrox[I-person] ? 
+G: How many people are the three billion watching Zaphod[B-person] Beeblebrox[I-person] ? 
+
+1: How did Mon- El know English ? 
+2: How did Mon-[B-person] El[I-person] know English ? 
+G: How did Mon-[B-person] El[I-person] know English ? 
+
+1: @ Gordon Not all , for example gluons and photons do n ' t interact with the Higgs . 
+2: @ Gordon Not all , for example gluons and photons do n ' t interact with the Higgs[B-product] . 
+G: @ Gordon[B-person] Not all , for example gluons and photons do n ' t interact with the Higgs . 
+
+1: Tango - In the section about the fictional enterprise and the fictional workings of the Star[B-creative-work] Trek[I-creative-work] universe[I-creative-work] there is a section of biographies of the Star Trek[I-creative-work] characters , including Kirk[B-person] . My copy of the Making of Star[B-creative-work] Trek[I-creative-work] 1968[I-creative-work] edition is packed away and unreachable as is any copy of the writers guide I may own . 
+2: Tango - In the section about the fictional enterprise[B-product] and the fictional workings of the Star[B-creative-work] Trek[I-creative-work] universe[I-creative-work] there is a section of biographies of the Star[B-creative-work] Trek[I-creative-work] characters , including Kirk[B-person] . My copy of the Making of Star[B-creative-work] Trek[I-creative-work] 1968 edition is packed away and unreachable as is any copy of the writers guide I may own . 
+G: Tango - In the section about the fictional enterprise and the fictional workings of the Star[B-creative-work] Trek[I-creative-work] universe there is a section of biographies of the Star[B-creative-work] Trek[I-creative-work] characters , including Kirk[B-person] . My copy of the Making[B-creative-work] of[I-creative-work] Star[I-creative-work] Trek[I-creative-work] 1968[I-creative-work] edition[I-creative-work] is packed away and unreachable as is any copy of the[B-creative-work] writers[I-creative-work] guide[I-creative-work] I may own . 
+
+1: Are the Martians saying " Ut " or " Ack " ? 
+2: Are the Martians[B-group] saying " Ut " or " Ack " ? 
+G: Are the Martians[B-group] saying " Ut " or " Ack " ? 
+
+1: I actually think that " Did the Democrats suffer consequences for invoking it ? " is a better question than the one asked . I think if you ask that . Then after it gets answered youcould ask each one of your other questions assuming you still dont understand how it works . 
+2: I actually think that " Did the Democrats[B-group] suffer consequences for invoking it ? " is a better question than the one asked . I think if you ask that . Then after it gets answered youcould ask each one of your other questions assuming you still dont understand how it works . 
+G: I actually think that " Did the Democrats[B-group] suffer consequences for invoking it ? " is a better question than the one asked . I think if you ask that . Then after it gets answered youcould ask each one of your other questions assuming you still dont understand how it works . 
+
+1: How much official communication was there between the Senate[I-group] and the Jedi[B-group] Council[I-group] ? 
+2: How much official communication was there between the Senate[B-group] and the Jedi[B-group] Council[I-group] ? 
+G: How much official communication was there between the Senate[B-group] and the Jedi[B-group] Council[I-group] ? 
+
+1: How can a country ( UN[B-group] or non- UN[B-group] member ) become a member of World Bank[I-group] ? 
+2: How can a country ( UN[B-group] or non- UN[B-group] member ) become a member of World[B-corporation] Bank[I-corporation] ? 
+G: How can a country[B-location] ( UN[B-group] or non- UN member ) become a member of World[B-group] Bank[I-group] ? 
+
+1: @ CandiedOrange I see a difference here . While exploding bombs or freezing molecules always follow certain chemical and physical laws , human history has witnessed events where perceived equilibrium are broken time after time . Just look at our population and think about what the equilibrium would have been if we were still living in wood and stone age . Or better yet , see how Malthusianism checks out . 
+2: @ CandiedOrange I see a difference here . While exploding bombs or freezing molecules always follow certain chemical and physical laws , human history has witnessed events where perceived equilibrium are broken time after time . Just look at our population and think about what the equilibrium would have been if we were still living in wood and stone age . Or better yet , see how Malthusianism[B-product] checks out . 
+G: @ CandiedOrange I see a difference here . While exploding bombs or freezing molecules always follow certain chemical and physical laws , human history has witnessed events where perceived equilibrium are broken time after time . Just look at our population and think about what the equilibrium would have been if we were still living in wood and stone age . Or better yet , see how Malthusianism checks out . 
+
+1: Higgs boson and electroweak gauge boson transformations under CP 
+2: Higgs[B-product] boson[I-product] and electroweak gauge boson transformations under CP 
+G: Higgs boson and electroweak gauge boson transformations under CP 
+
+1: What is the difference between Yautja[B-person] and Super Yautja in Predators[B-group] ? 
+2: What is the difference between Yautja and Super Yautja in Predators[B-product] ? 
+G: What is the difference between Yautja[B-person] and Super[B-person] Yautja[I-person] in Predators[B-creative-work] ? 
+
+1: What Star Trek TOS characters have been confirmed to be appearing in Discovery ? 
+2: What Star[B-creative-work] Trek[I-creative-work] TOS characters have been confirmed to be appearing in Discovery[B-creative-work] ? 
+G: What Star[B-creative-work] Trek[I-creative-work] TOS[I-creative-work] characters have been confirmed to be appearing in Discovery[B-creative-work] ? 
+
+1: Does Rogue One create a plot hole in Return of the Jedi re Hyperspace Radio ? 
+2: Does Rogue[B-creative-work] One[I-creative-work] create a plot hole in Return[B-creative-work] of[I-creative-work] the[I-creative-work] Jedi[I-creative-work] re Hyperspace Radio ? 
+G: Does Rogue[B-creative-work] One[I-creative-work] create a plot hole in Return[B-creative-work] of[I-creative-work] the[I-creative-work] Jedi[I-creative-work] re Hyperspace Radio ? 
+
+1: Schroeder[B-person] ' s Minkowski Space Integral - Concerns about Wick Rotations 
+2: Schroeder[B-person] ' s Minkowski[B-person] Space Integral - Concerns about Wick Rotations 
+G: Schroeder[B-person] ' s Minkowski Space Integral - Concerns about Wick Rotations 
+
+1: Short story published in Asimov ' s in the 90 ' s 
+2: Short story published in Asimov[B-product] '[I-product] s[I-product] in the 90 ' s 
+G: Short story published in Asimov[B-creative-work] '[I-creative-work] s[I-creative-work] in the 90 ' s 
+
+1: Need some help understanding Peltier Plates 
+2: Need some help understanding Peltier[B-location] Plates 
+G: Need some help understanding Peltier Plates 
+
+1: Interpretation of Dynkin diagrams 
+2: Interpretation of Dynkin[B-person] diagrams 
+G: Interpretation of Dynkin diagrams 
+
+1: Might want to note that this Wookipedia excerpt seems to be sourced from a Legends book that had continuity problems to begin with . Not sure what proper Canon sources are for " detect location of hidden creatures " . 
+2: Might want to note that this Wookipedia[B-product] excerpt seems to be sourced from a Legends book that had continuity problems to begin with . Not sure what proper Canon sources are for " detect location of hidden creatures " . 
+G: Might want to note that this Wookipedia[B-creative-work] excerpt seems to be sourced from a Legends[B-creative-work] book that had continuity problems to begin with . Not sure what proper Canon sources are for " detect location of hidden creatures " . 
+
+1: Apparently Wikipedia claims that insulators and semiconductors lack Fermi surfaces . Quoting Wikipedia : " A material whose Fermi level falls in a gap between bands is an insulator or semiconductor depending on the size of the bandgap . When a material ' s Fermi level falls in a bandgap , there is no Fermi surface . " 
+2: Apparently Wikipedia[B-corporation] claims that insulators[B-product] and semiconductors lack Fermi[B-person] surfaces . Quoting Wikipedia[B-corporation] : " A material whose Fermi level falls in a gap between bands is an insulator or semiconductor depending on the size of the bandgap . When a material ' s Fermi level falls in a bandgap , there is no Fermi[B-person] surface . " 
+G: Apparently Wikipedia[B-creative-work] claims that insulators and semiconductors lack Fermi surfaces . Quoting Wikipedia[B-creative-work] : " A material whose Fermi level falls in a gap between bands is an insulator or semiconductor depending on the size of the bandgap . When a material ' s Fermi level falls in a bandgap , there is no Fermi surface . " 
+
+1: Why did n ' t someone make Lily[B-person] and James[B-person] Potter[I-person] portraits like the dead Hogwarts[B-group] Headmasters ? 
+2: Why did n ' t someone make Lily[B-person] and James[B-person] Potter[I-person] portraits like the dead Hogwarts[B-corporation] Headmasters ? 
+G: Why did n ' t someone make Lily[B-person] and James[B-person] Potter[I-person] portraits like the dead Hogwarts[B-location] Headmasters ? 
+
+1: OMB[B-group] nominee Mick[B-person] Mulvaney[I-person] wants changes to Social Security , Medicare https://t.co/4NdBdMXSC3 via @ WSJ 
+2: OMB[B-group] nominee Mick[B-person] Mulvaney[I-person] wants changes to Social Security , Medicare[B-corporation] https://t.co/4NdBdMXSC3 via @ WSJ 
+G: OMB[B-location] nominee Mick[B-person] Mulvaney[I-person] wants changes to Social Security , Medicare https://t.co/4NdBdMXSC3 via @ WSJ 
+
+1: If KITT has all the features of the show . . Then without a doubt its Kitt . . . But if its just appearance the . . . https://t.co/64EX6ktzAa 
+2: If KITT[B-product] has all the features of the show . . Then without a doubt its Kitt . . . But if its just appearance the . . . https://t.co/64EX6ktzAa 
+G: If KITT[B-person] has all the features of the show . . Then without a doubt its Kitt[B-person] . . . But if its just appearance the . . . https://t.co/64EX6ktzAa 
+
+1: Kelli[B-person] ' s Cardio Kickboxing Workout - Max[B-person] Calorie[I-person] Burn Workout with no Equipment # fitnessblender https://t.co/df66JQrqeM 
+2: Kelli[B-person] ' s Cardio Kickboxing Workout - Max Calorie Burn Workout with no Equipment # fitnessblender https://t.co/df66JQrqeM 
+G: Kelli[B-creative-work] '[I-creative-work] s[I-creative-work] Cardio[I-creative-work] Kickboxing[I-creative-work] Workout[I-creative-work] -[I-creative-work] Max[I-creative-work] Calorie[I-creative-work] Burn[I-creative-work] Workout[I-creative-work] with[I-creative-work] no[I-creative-work] Equipment[I-creative-work] # fitnessblender[B-corporation] https://t.co/df66JQrqeM 
+
+1: #[B-product] corvette[I-product] # auction 2017 Chevrolet[B-product] Corvette[I-product] MSRP $ 102520 Grand Sport[I-product] 3 LT GPS[I-product] Leather Torch Red New Navigation … https://t.co/K9TZaaLa7k 
+2: #[B-product] corvette # auction 2017 Chevrolet[B-product] Corvette[I-product] MSRP $ 102520 Grand Sport 3 LT GPS Leather[B-product] Torch Red New Navigation … https://t.co/K9TZaaLa7k 
+G: # corvette[B-product] # auction 2017[B-product] Chevrolet[I-product] Corvette[I-product] MSRP $ 102520 Grand[B-product] Sport[I-product] 3[I-product] LT[I-product] GPS Leather Torch Red New Navigation … https://t.co/K9TZaaLa7k 
+
+1: Can we talk about how bap are # 1 on a list full of rock music ; ; ; only bap could do this & gt ; . & lt ; ❤ https://t.co/Y4ZL0cYp2V 
+2: Can we talk about how bap[B-product] are # 1 on a list full of rock music ; ; ; only bap[B-product] could do this & gt ; . & lt ; ❤ https://t.co/Y4ZL0cYp2V 
+G: Can we talk about how bap[B-group] are # 1 on a list full of rock music ; ; ; only bap[B-group] could do this & gt ; . & lt ; ❤ https://t.co/Y4ZL0cYp2V 
+
+1: @ RevAaronMarquis Based off ELR , I assume you smoke ? If so , are you one of the few RT[B-group] employees who do ? 
+2: @ RevAaronMarquis Based off ELR , I assume you smoke ? If so , are you one of the few RT[B-corporation] employees who do ? 
+G: @ RevAaronMarquis Based off ELR , I assume you smoke ? If so , are you one of the few RT[B-corporation] employees who do ? 
+
+1: RT @ TheCWSupergirl : Roulette[B-person] returns . . . #[B-creative-work] Supergirl[I-creative-work] https://t.co/9tQ6nuttJK 
+2: RT @ TheCWSupergirl : Roulette[B-person] returns . . . # Supergirl https://t.co/9tQ6nuttJK 
+G: RT @ TheCWSupergirl : Roulette returns . . . # Supergirl https://t.co/9tQ6nuttJK 
+
+1: Bangkok[B-location] , Thailand[B-location] : Land[B-group] of[I-group] Smiles[I-group] - Day 1 # blog # conozcopablo # Travel https://t.co/qxLmN6lGV4 
+2: Bangkok[B-location] , Thailand[B-location] : Land[B-creative-work] of[I-creative-work] Smiles[I-creative-work] - Day 1 # blog # conozcopablo # Travel https://t.co/qxLmN6lGV4 
+G: Bangkok[B-location] , Thailand[B-location] : Land of Smiles - Day 1 # blog # conozcopablo # Travel https://t.co/qxLmN6lGV4 
+
+1: Someone be down to go to JoJo[B-location] ' s concert with me 
+2: Someone be down to go to JoJo[B-person] ' s concert with me 
+G: Someone be down to go to JoJo[B-person] ' s concert with me 
+
+1: Doing play by play with my buddy @ jfradioshow for the Senate[B-group] v house[B-group] basketball game . Let ' s go Senate ! https://t.co/gf0q0vLBV1 
+2: Doing play by play with my buddy @ jfradioshow for the Senate[B-location] v house[B-location] basketball game . Let ' s go Senate[B-location] ! https://t.co/gf0q0vLBV1 
+G: Doing play by play with my buddy @ jfradioshow[B-person] for the Senate[B-group] v house[B-group] basketball game . Let ' s go Senate[B-group] ! https://t.co/gf0q0vLBV1 
+
+1: @ rmathis 15 Nicole[B-person] ' s raspberry sorbet[I-product] gum ? 
+2: @ rmathis 15 Nicole[B-person] ' s raspberry sorbet gum ? 
+G: @ rmathis 15 Nicole[B-person] ' s raspberry[B-product] sorbet[I-product] gum[I-product] ? 
+
+1: frugaliscious : It ' s Arri ' s Playtime Tv : how to start The Fisher- P . . . https://t.co/rSiOwfOSWY 
+2: frugaliscious : It ' s Arri[B-person] ' s Playtime Tv : how to start The Fisher- P . . . https://t.co/rSiOwfOSWY 
+G: frugaliscious : It ' s Arri[B-creative-work] '[I-creative-work] s[I-creative-work] Playtime[I-creative-work] Tv[I-creative-work] :[I-creative-work] how[I-creative-work] to[I-creative-work] start[I-creative-work] The[I-creative-work] Fisher-[I-creative-work] P[I-creative-work] . . . https://t.co/rSiOwfOSWY 
+
+1: RT @ mcgregor _ ewan : Was going on Good Morning Britain[B-location] , didn ' t realise @ piersmorgan was host . Won ' t go on with him after his comments about … 
+2: RT @ mcgregor _ ewan : Was going on Good[B-creative-work] Morning Britain[B-location] , didn ' t realise @ piersmorgan was host . Won ' t go on with him after his comments about … 
+G: RT @ mcgregor[B-person] _ ewan[B-person] : Was going on Good[B-creative-work] Morning[I-creative-work] Britain[I-creative-work] , didn ' t realise @ piersmorgan[B-person] was host . Won ' t go on with him after his comments about … 
+
+1: On[B-person] god[I-person] Darius[I-person] plugs unreliable asf https://t.co/aTJdj52tNv 
+2: On[B-product] god Darius plugs unreliable asf https://t.co/aTJdj52tNv 
+G: On god Darius[B-person] plugs unreliable asf https://t.co/aTJdj52tNv 
+
+1: The Sheep # poetry # poem # writing # amwriting # words # political # DumpTrump https://t.co/Z6dyLcXlWF 
+2: The[B-location] Sheep # poetry # poem # writing # amwriting # words # political # DumpTrump https://t.co/Z6dyLcXlWF 
+G: The[B-creative-work] Sheep[I-creative-work] # poetry # poem # writing # amwriting # words # political # DumpTrump https://t.co/Z6dyLcXlWF 
+
+1: Clean Sweep as cathedral links up with city charity https://t.co/5VEIBK228B https://t.co/DcwFj8k5XE 
+2: Clean Sweep as cathedral[B-location] links up with city[B-group] charity[I-group] https://t.co/5VEIBK228B https://t.co/DcwFj8k5XE 
+G: Clean Sweep as cathedral links up with city charity https://t.co/5VEIBK228B https://t.co/DcwFj8k5XE 
+
+1: Blog Technology to review the electronic devices and accessories and other . https://t.co/i5waTFD1Zp | January 25 , 2017 at 03 : 00 AM 
+2: Blog[B-corporation] Technology to review the electronic devices and accessories and other . https://t.co/i5waTFD1Zp | January 25 , 2017 at 03 : 00 AM 
+G: Blog[B-creative-work] Technology[I-creative-work] to review the electronic devices and accessories and other . https://t.co/i5waTFD1Zp | January 25 , 2017 at 03 : 00 AM 
+
+1: Illuminatiam : The First Testament Of The Illuminati https://t.co/DzwRWGm6fB 
+2: Illuminatiam[B-person] : The First Testament Of The[B-group] Illuminati[I-group] https://t.co/DzwRWGm6fB 
+G: Illuminatiam[B-creative-work] :[I-creative-work] The[I-creative-work] First[I-creative-work] Testament[I-creative-work] Of[I-creative-work] The[I-creative-work] Illuminati[I-creative-work] https://t.co/DzwRWGm6fB 
+
+1: RT @ coppolanat : Sana tu ❤ Reconecta con el Amor . The Angels are Listening : Snatam[B-person] Kaur[I-person] sings Suṉi-ai with Ajeet[B-person] Kaur at . . . https://t.co/… 
+2: RT @ coppolanat : Sana tu ❤ Reconecta con el Amor . The Angels are Listening : Snatam[B-person] Kaur[I-person] sings Suṉi-ai[B-creative-work] with Ajeet[B-person] Kaur[I-person] at . . . https://t.co/… 
+G: RT @ coppolanat : Sana tu ❤ Reconecta con el Amor . The[B-creative-work] Angels[I-creative-work] are[I-creative-work] Listening[I-creative-work] : Snatam[B-person] Kaur[I-person] sings Suṉi-ai[B-creative-work] with Ajeet[B-person] Kaur[I-person] at . . . https://t.co/… 
+
+1: Seoul-[B-location] Incheon[B-location] , South[B-location] Korea[I-location] : Old Meets New Part 2 # blog # Featured # conozcopablo # Travel https://t.co/3OzEAUYKjx 
+2: Seoul-[B-location] Incheon[I-location] , South[B-location] Korea[I-location] : Old Meets New Part 2 # blog # Featured # conozcopablo # Travel https://t.co/3OzEAUYKjx 
+G: Seoul-[B-location] Incheon[I-location] ,[I-location] South[I-location] Korea[I-location] : Old Meets New Part 2 # blog # Featured # conozcopablo # Travel https://t.co/3OzEAUYKjx 
+
+1: RT @ IngrahamAngle : On my show today @ seanhannity & amp ; I warn @ realDonaldTrump abt staff already leaking to media . https://t.co/RjBWzduYIP 
+2: RT @ IngrahamAngle : On my show today @ seanhannity & amp ; I warn @ realDonaldTrump abt[B-group] staff already leaking to media . https://t.co/RjBWzduYIP 
+G: RT @ IngrahamAngle : On my show today @ seanhannity[B-person] & amp ; I warn @ realDonaldTrump[B-person] abt staff already leaking to media . https://t.co/RjBWzduYIP 
+
+1: LUB expires Wind Advisory till 6 : 00 PM CST https://t.co/x5da9yigjY 
+2: LUB[B-person] expires Wind Advisory till 6 : 00 PM CST https://t.co/x5da9yigjY 
+G: LUB[B-group] expires Wind Advisory till 6 : 00 PM CST https://t.co/x5da9yigjY 
+
+1: RT @ elizabeth _ macg : Me 2 weeks ago : I ' m gonna get organized , get healthy , and get my life together ! Me now : living off an old bag of M & amp ; Ms , … 
+2: RT @ elizabeth _ macg : Me 2 weeks ago : I ' m gonna get organized , get healthy , and get my life together ! Me now : living off an old bag of M[B-product] &[I-product] amp[I-product] ;[I-product] Ms[I-product] , … 
+G: RT @ elizabeth[B-person] _[I-person] macg[I-person] : Me 2 weeks ago : I ' m gonna get organized , get healthy , and get my life together ! Me now : living off an old bag of M & amp ; Ms , … 
+
+1: RT @ audubonsociety : . @ BadlandsNPS is a great place to find climate-endangered birds like the Golden Eagle . https://t.co/shCTBCgPOJ https://… 
+2: RT @ audubonsociety : . @ BadlandsNPS is a great place to find climate-endangered birds like the Golden[B-location] Eagle . https://t.co/shCTBCgPOJ https://… 
+G: RT @ audubonsociety : . @ BadlandsNPS[B-location] is a great place to find climate-endangered birds like the Golden Eagle . https://t.co/shCTBCgPOJ https://… 
+
+1: Lowongan PT Citilink[B-corporation] Indonesia[B-location] - Recruitment ForFresh Graduate Management Trainee Citilink[B-corporation] January 2017 . . . https://t.co/GIGQnl4qTY 
+2: Lowongan PT Citilink Indonesia[B-location] - Recruitment ForFresh Graduate Management Trainee Citilink[B-corporation] January 2017 . . . https://t.co/GIGQnl4qTY 
+G: Lowongan PT[B-corporation] Citilink[I-corporation] Indonesia[I-corporation] - Recruitment ForFresh Graduate Management Trainee Citilink[B-corporation] January 2017 . . . https://t.co/GIGQnl4qTY 
+
+1: @ WarGit @ northumbriana If Ney had appeared in Marshals[B-group] uniform he would have been degraded . All his stars and medals torn off into the mud 
+2: @ WarGit @ northumbriana If Ney[B-person] had appeared in Marshals[B-location] uniform he would have been degraded . All his stars and medals torn off into the mud 
+G: @ WarGit @ northumbriana If Ney[B-person] had appeared in Marshals[B-group] uniform he would have been degraded . All his stars and medals torn off into the mud 
+
+1: DELL[B-product] Inspiron[I-product] 17[I-product] R[I-product] 5721[I-product] Core[I-product] i[I-product] 5[I-product] -[I-product] 3317[I-product] U[I-product] 1[I-product] .[I-product] 7[I-product] GHz[I-product] 6 Gb[I-product] 750 Gb DVDRW 17[I-product] .[I-product] 3[I-product] "[I-product] Laptop https://t.co/SvPm1Qm5dg https://t.co/eG2GWQ5Jv7 
+2: DELL[B-product] Inspiron[I-product] 17[I-product] R[I-product] 5721[I-product] Core[I-product] i[I-product] 5 - 3317 U 1 . 7 GHz 6 Gb 750 Gb DVDRW 17 . 3 " Laptop https://t.co/SvPm1Qm5dg https://t.co/eG2GWQ5Jv7 
+G: DELL[B-product] Inspiron[I-product] 17[I-product] R[I-product] 5721[I-product] Core[I-product] i[I-product] 5[I-product] -[I-product] 3317[I-product] U[I-product] 1[I-product] .[I-product] 7[I-product] GHz[I-product] 6[I-product] Gb[I-product] 750[I-product] Gb[I-product] DVDRW[I-product] 17[I-product] .[I-product] 3[I-product] "[I-product] Laptop[I-product] https://t.co/SvPm1Qm5dg https://t.co/eG2GWQ5Jv7 
+
+1: RT @ soompi : ICYMI-[B-person] Lee[I-person] Joon[I-person] Gi[I-person] ’ s Agency Responds To Rumors Of The Actor Dating IU[B-person] https://t.co/cy7Cir3rhq https://t.co/6jGVOyQAte 
+2: RT @ soompi : ICYMI-[B-person] Lee[I-person] Joon[I-person] Gi[I-person] ’ s Agency Responds To Rumors Of The Actor Dating IU[B-group] https://t.co/cy7Cir3rhq https://t.co/6jGVOyQAte 
+G: RT @ soompi[B-person] : ICYMI- Lee[B-person] Joon[I-person] Gi[I-person] ’ s Agency Responds To Rumors Of The Actor Dating IU[B-person] https://t.co/cy7Cir3rhq https://t.co/6jGVOyQAte 
+
+1: RT @ 30 secondrock : The[B-group] Black[B-group] Keys[I-group] - " Lonely[B-creative-work] Boy[I-creative-work] " https://t.co/k1hxm2U1Mq 
+2: RT @ 30 secondrock : The[B-group] Black[I-group] Keys[I-group] - " Lonely[B-creative-work] Boy[I-creative-work] " https://t.co/k1hxm2U1Mq 
+G: RT @ 30 secondrock : The[B-group] Black[I-group] Keys[I-group] - " Lonely[B-creative-work] Boy[I-creative-work] " https://t.co/k1hxm2U1Mq 
+
+1: RT @ jzaffos : Hey federal scientists : @ highcountrynews is collecting reports of interference or intimidation . Confidential form : https://t.c… 
+2: RT @ jzaffos : Hey federal[B-corporation] scientists : @ highcountrynews is collecting reports of interference or intimidation . Confidential form : https://t.c… 
+G: RT @ jzaffos[B-person] : Hey federal scientists : @ highcountrynews[B-corporation] is collecting reports of interference or intimidation . Confidential form : https://t.c… 
+
+1: RT @ er 1 cmau : # Catalonia ' s foreign minister @ raulromeva : " legally voting to chose one ' s future is rooted in European practice " 
+2: RT @ er 1 cmau : #[B-location] Catalonia[I-location] ' s foreign minister @ raulromeva : " legally voting to chose one ' s future is rooted in European practice " 
+G: RT @ er 1 cmau : # Catalonia[B-location] ' s foreign minister @ raulromeva[B-person] : " legally voting to chose one ' s future is rooted in European practice " 
+
+1: RT @ GayPrideBelize : # MissUniverse # Belize[I-location] Let ' s Go Belize[B-location] . https://t.co/9suUngvG7T 
+2: RT @ GayPrideBelize : # MissUniverse # Belize Let ' s Go Belize[B-location] . https://t.co/9suUngvG7T 
+G: RT @ GayPrideBelize[B-creative-work] : # MissUniverse[B-corporation] # Belize[B-location] Let ' s Go Belize[B-location] . https://t.co/9suUngvG7T 
+
+1: # NowPlaying She In Here Right Now by BiggDawg C Loc on https://t.co/N2EeQhksi0 
+2: # NowPlaying She In Here Right Now by BiggDawg[B-person] C[I-person] Loc on https://t.co/N2EeQhksi0 
+G: # NowPlaying She In Here Right Now by BiggDawg[B-person] C[I-person] Loc[I-person] on https://t.co/N2EeQhksi0 
+
+1: RT @ SouthernHomo : It ' s like y ' all elected that damn Cloyd[B-person] Rivers[I-person] account to be president . I swear to GOD I ' d rather have Dory . https://t.co… 
+2: RT @ SouthernHomo : It ' s like y ' all elected that damn Cloyd[B-group] Rivers[I-group] account[I-group] to be president . I swear to GOD I ' d rather have Dory . https://t.co… 
+G: RT @ SouthernHomo : It ' s like y ' all elected that damn Cloyd[B-person] Rivers[I-person] account to be president . I swear to GOD I ' d rather have Dory[B-person] . https://t.co… 
+
+1: New Post : 2000 AD At The[B-location] Cartoon[I-location] Museum[I-location] https://t.co/k1wMU7Kvst https://t.co/h1jGfAx4e9 
+2: New Post : 2000 AD At The Cartoon[B-location] Museum[I-location] https://t.co/k1wMU7Kvst https://t.co/h1jGfAx4e9 
+G: New Post : 2000[B-creative-work] AD[I-creative-work] At[I-creative-work] The[I-creative-work] Cartoon[I-creative-work] Museum[I-creative-work] https://t.co/k1wMU7Kvst https://t.co/h1jGfAx4e9 
+
+1: RT @ davidfrum : The president[B-person] of the United[I-location] States[I-location] has the power to end human life on earth . It ’ s important that he not be disconnected from … 
+2: RT @ davidfrum : The president of the United[B-location] States[I-location] has the power to end human life on earth . It ’ s important that he not be disconnected from … 
+G: RT @ davidfrum[B-person] : The president of the United[B-location] States[I-location] has the power to end human life on earth . It ’ s important that he not be disconnected from … 
+
+1: If you prefer to eat food that ’ s # organicallygrown , Chiquita has a # banana for you ! https://t.co/S1poVEnumr https://t.co/qTYbmAe0zw 
+2: If you prefer to eat food that ’ s # organicallygrown , Chiquita[B-location] has a # banana for you ! https://t.co/S1poVEnumr https://t.co/qTYbmAe0zw 
+G: If you prefer to eat food that ’ s # organicallygrown , Chiquita[B-corporation] has a # banana for you ! https://t.co/S1poVEnumr https://t.co/qTYbmAe0zw 
+
+1: Questions Not Answers | Box of Crayons https://t.co/CXafSHeWPV https://t.co/9kvP5sokij 
+2: Questions Not Answers | Box[B-product] of[I-product] Crayons[I-product] https://t.co/CXafSHeWPV https://t.co/9kvP5sokij 
+G: Questions[B-creative-work] Not[I-creative-work] Answers[I-creative-work] | Box[B-corporation] of[I-corporation] Crayons[I-corporation] https://t.co/CXafSHeWPV https://t.co/9kvP5sokij 
+
+1: RT @ davidlongoria 7 An obstacle is often an unrecognized opportunity . - Petteri[B-person] Tarkkonen[I-person] # quote https://t.co/kEdv4NLpOm 
+2: RT @ davidlongoria 7 An obstacle is often an unrecognized opportunity . -[B-location] Petteri[B-person] Tarkkonen[I-person] # quote https://t.co/kEdv4NLpOm 
+G: RT @ davidlongoria[B-person] 7 An obstacle is often an unrecognized opportunity . - Petteri[B-person] Tarkkonen[I-person] # quote https://t.co/kEdv4NLpOm 
+
+1: Now playing Money Ain ' t A Problem Feat . French[B-person] Montana[I-person] by Diddy[B-person] ! Click link below https://t.co/MIUcppR9OU https://t.co/HuYksBaHkb 
+2: Now playing Money[B-creative-work] Ain[I-creative-work] ' t A Problem Feat . French[B-group] Montana[I-group] by Diddy[B-person] ! Click link below https://t.co/MIUcppR9OU https://t.co/HuYksBaHkb 
+G: Now playing Money[B-creative-work] Ain[I-creative-work] '[I-creative-work] t[I-creative-work] A[I-creative-work] Problem[I-creative-work] Feat . French[B-person] Montana[I-person] by Diddy[B-person] ! Click link below https://t.co/MIUcppR9OU https://t.co/HuYksBaHkb 
+
+1: RT @ 2000 sHits : 50[B-person] Cent[I-person] - 21 Questions ft . Nate[B-person] Dogg[I-person] https://t.co/vlZiyvWUxG 
+2: RT @ 2000 sHits : 50 Cent - 21 Questions ft . Nate[B-person] Dogg[I-person] https://t.co/vlZiyvWUxG 
+G: RT @ 2000 sHits : 50[B-person] Cent[I-person] - 21[B-creative-work] Questions[I-creative-work] ft . Nate[B-person] Dogg[I-person] https://t.co/vlZiyvWUxG 
+
+1: @ coffee _ bean 2016 I don ' t have Bellarmine money lmao 
+2: @ coffee _ bean 2016 I don ' t have Bellarmine[B-person] money lmao 
+G: @ coffee _ bean 2016 I don ' t have Bellarmine[B-corporation] money lmao 
+
+1: I don ' t know how it will look like if Leicester[B-group] wins the champions league and man u wins Europa league ! ! ! ! ! 
+2: I don ' t know how it will look like if Leicester[B-group] wins the champions league and man[B-group] u[I-group] wins Europa[B-group] league ! ! ! ! ! 
+G: I don ' t know how it will look like if Leicester[B-group] wins the champions league and man u wins Europa[B-group] league ! ! ! ! ! 
+
+1: andrew[B-person] mccabe[I-person] fuck flynn[B-person] then we fuck trump[B-person] - Google Search @ StefanMolyneux @ realDonaldTrump @ DonaldJTrumpJr https://t.co/XGOEPsF0KB : 
+2: andrew[B-person] mccabe[I-person] fuck flynn[B-person] then we fuck trump[B-person] - Google[B-corporation] Search @ StefanMolyneux @ realDonaldTrump @ DonaldJTrumpJr https://t.co/XGOEPsF0KB : 
+G: andrew[B-person] mccabe[I-person] fuck flynn[B-person] then we fuck trump[B-person] - Google[B-product] Search[I-product] @ StefanMolyneux[B-person] @ realDonaldTrump[B-person] @ DonaldJTrumpJr[B-person] https://t.co/XGOEPsF0KB : 
+
+1: @ Schofe @ C 4 Gogglebox would love if @ ITV could arrange for you and @ hollywills to film the Wha wha tribe . I ' d watch that sooo funny 😂 
+2: @ Schofe @ C 4 Gogglebox[B-person] would love if @ ITV could arrange for you and @ hollywills to film the Wha wha tribe . I ' d watch that sooo funny 😂 
+G: @ Schofe[B-person] @ C 4 Gogglebox[B-creative-work] would love if @ ITV[B-corporation] could arrange for you and @ hollywills[B-person] to film the Wha wha tribe . I ' d watch that sooo funny 😂 
+
+1: Tonight at 10 on KODE Action 12 News . # kode 12 https://t.co/Ad6ruIyr5M 
+2: Tonight at 10 on KODE[B-corporation] Action 12 News . # kode 12 https://t.co/Ad6ruIyr5M 
+G: Tonight at 10 on KODE[B-creative-work] Action[I-creative-work] 12[I-creative-work] News[I-creative-work] . # kode[B-creative-work] 12[I-creative-work] https://t.co/Ad6ruIyr5M 
+
+1: Help to Stop Cruel Treatment of Monkeys at Biomedical Laboratories ! Plz sign : https://t.co/c55GE1ecfz https://t.co/d7TyB0bIbm 
+2: Help to Stop Cruel Treatment of Monkeys at Biomedical[B-location] Laboratories[I-location] ! Plz sign : https://t.co/c55GE1ecfz https://t.co/d7TyB0bIbm 
+G: Help to Stop Cruel Treatment of Monkeys at Biomedical Laboratories ! Plz sign : https://t.co/c55GE1ecfz https://t.co/d7TyB0bIbm 
+
+1: # UC perfect 7 - 7 from the field . Would be 8 if that Caupain 3 counted . @ WCPO 
+2: #[B-group] UC[I-group] perfect 7 - 7 from the field . Would be 8 if that Caupain 3 counted . @ WCPO 
+G: # UC perfect 7 - 7 from the field . Would be 8 if that Caupain 3 counted . @ WCPO 
+
+1: 2017 , 03 , 18 06 : 30 : 05 jay dmb test 8 - 11 - 2016 
+2: 2017 , 03 , 18 06 : 30 : 05 jay[B-person] dmb[I-person] test 8 - 11 - 2016 
+G: 2017 , 03 , 18 06 : 30 : 05 jay dmb test 8 - 11 - 2016 
+
+1: RT @ CrapTaxidermy : " I told you it was fucking hunting season Doreen but Nooooo , we had to visit your sisters new place by the lake ! " https:… 
+2: RT @ CrapTaxidermy : " I told you it was fucking hunting season Doreen[B-person] but Nooooo , we had to visit your sisters new place by the lake ! " https:… 
+G: RT @ CrapTaxidermy[B-person] : " I told you it was fucking hunting season Doreen[B-person] but Nooooo , we had to visit your sisters new place by the lake ! " https:… 
+
+1: I dream of a day #[B-location] Birmingham[I-location] is # Birminghamistan an islamic state with no kufr[B-group] Police https://t.co/q2XTjd6x0m 
+2: I dream of a day #[B-location] Birmingham[I-location] is #[B-location] Birminghamistan[I-location] an islamic state with no kufr[B-group] Police https://t.co/q2XTjd6x0m 
+G: I dream of a day # Birmingham[B-location] is # Birminghamistan an islamic[B-group] state[B-group] with no kufr Police https://t.co/q2XTjd6x0m 
+
+1: Trio @ phronesismusic collaborates with the Frankfurt Radio[I-group] Big[I-group] Band[I-group] & amp ; @ JulArgJazz for The Behemoth @ EditionRecords … https://t.co/UV5UG6ec2w 
+2: Trio @ phronesismusic collaborates with the Frankfurt[B-group] Radio[I-group] Big[I-group] Band[I-group] & amp ; @ JulArgJazz for The Behemoth @ EditionRecords … https://t.co/UV5UG6ec2w 
+G: Trio @ phronesismusic[B-group] collaborates with the Frankfurt[B-group] Radio[I-group] Big[I-group] Band[I-group] & amp ; @ JulArgJazz[B-group] for The[B-creative-work] Behemoth[I-creative-work] @ EditionRecords[B-corporation] … https://t.co/UV5UG6ec2w 
+
+1: ParkWest[B-corporation] Staffing Services is hiring : Hotel Housekeepers Needed in Spring , TX[B-location] https://t.co/5dUhYD7OAt 
+2: ParkWest[B-corporation] Staffing Services is hiring : Hotel Housekeepers Needed in Spring[B-location] , TX[B-location] https://t.co/5dUhYD7OAt 
+G: ParkWest[B-corporation] Staffing Services is hiring : Hotel Housekeepers Needed in Spring[B-location] , TX[B-location] https://t.co/5dUhYD7OAt 
+
+1: RT @ curscurs : your standards began to be ignored when u let mfs get comfortable in knowing that another chance will always exist 
+2: RT @ curscurs : your standards began to be ignored when u let mfs[B-corporation] get comfortable in knowing that another chance will always exist 
+G: RT @ curscurs : your standards began to be ignored when u let mfs get comfortable in knowing that another chance will always exist 
+
+1: Listen to PreTape[B-product] by RichiDenz # np on # SoundCloud[I-corporation] https://t.co/5x6wc5sRqA 
+2: Listen to PreTape[B-product] by RichiDenz[B-person] # np on #[B-corporation] SoundCloud[I-corporation] https://t.co/5x6wc5sRqA 
+G: Listen to PreTape[B-creative-work] by RichiDenz[B-person] # np on # SoundCloud[B-corporation] https://t.co/5x6wc5sRqA 
+
+1: RT @ TheBestOfGifs 1 : TWENTY-SIX YEARS AGO ! / / Beauty[B-creative-work] and[I-creative-work] the[I-creative-work] Beast[I-creative-work] https://t.co/qsy37dQgRa 
+2: RT @ TheBestOfGifs 1 : TWENTY-SIX YEARS AGO ! / / Beauty[B-creative-work] and[I-creative-work] the[I-creative-work] Beast https://t.co/qsy37dQgRa 
+G: RT @ TheBestOfGifs 1 : TWENTY-SIX YEARS AGO ! / / Beauty[B-creative-work] and[I-creative-work] the[I-creative-work] Beast[I-creative-work] https://t.co/qsy37dQgRa 
+
+1: RT @ MadamMelanin : Skai[B-person] Jackson[I-person] for Untitled Magazine https://t.co/sO24ZLf3MA 
+2: RT @ MadamMelanin : Skai[B-person] Jackson[I-person] for Untitled[B-creative-work] Magazine https://t.co/sO24ZLf3MA 
+G: RT @ MadamMelanin : Skai[B-person] Jackson[I-person] for Untitled[B-corporation] Magazine[I-corporation] https://t.co/sO24ZLf3MA 
+
+1: # 152 Chikorita[B-product] ( Tackle / Grass Knot 8 / 12 / 0 - 44 . 44 % ) None Paramount[B-product] Dr[B-product] L[I-product] 8 J 2 M 7 , 08 : 30 : 00 pm ( 29 m 45 s left ) https://t.co/tQHwbjzXib 
+2: # 152 Chikorita[B-person] ( Tackle / Grass Knot 8 / 12 / 0 - 44 . 44 % ) None Paramount[B-group] Dr L 8 J 2 M 7 , 08 : 30 : 00 pm ( 29 m 45 s left ) https://t.co/tQHwbjzXib 
+G: # 152 Chikorita[B-creative-work] ( Tackle / Grass Knot 8 / 12 / 0 - 44 . 44 % ) None Paramount[B-corporation] Dr L 8 J 2 M 7 , 08 : 30 : 00 pm ( 29 m 45 s left ) https://t.co/tQHwbjzXib 
+
+1: RT @ amyrightside : Age of Defenders - Multiplayer Tower Defense and Offense post . . . https://t.co/kkWpZlqHHk # ipad # games # strategy 
+2: RT @ amyrightside : Age[B-creative-work] of[I-creative-work] Defenders[I-creative-work] - Multiplayer Tower Defense and Offense post . . . https://t.co/kkWpZlqHHk # ipad # games # strategy 
+G: RT @ amyrightside : Age[B-creative-work] of[I-creative-work] Defenders[I-creative-work] -[I-creative-work] Multiplayer[I-creative-work] Tower[I-creative-work] Defense[I-creative-work] and[I-creative-work] Offense[I-creative-work] post . . . https://t.co/kkWpZlqHHk # ipad[B-product] # games # strategy 
+
+1: teen wolf sai logo do hiatus eu te imploroo 
+2: teen[B-person] wolf[I-person] sai logo do hiatus eu te imploroo 
+G: teen[B-creative-work] wolf[I-creative-work] sai logo do hiatus eu te imploroo 
+
+1: RT @ Independent : Cutting food for elderly ' most compassionate thing we can do ' , Trump[B-group] team[I-group] says https://t.co/waaWhnQ07i 
+2: RT @ Independent : Cutting food for elderly ' most compassionate thing we can do ' , Trump[B-person] team says https://t.co/waaWhnQ07i 
+G: RT @ Independent : Cutting food for elderly ' most compassionate thing we can do ' , Trump[B-group] team[I-group] says https://t.co/waaWhnQ07i 
+
+1: naked[B-creative-work] city[I-creative-work] tv series # nude google[B-corporation] videos https://t.co/cFIQG0z1tV 
+2: naked[B-creative-work] city[I-creative-work] tv series #[B-creative-work] nude[I-creative-work] google[B-corporation] videos https://t.co/cFIQG0z1tV 
+G: naked[B-creative-work] city[I-creative-work] tv[I-creative-work] series[I-creative-work] # nude google videos https://t.co/cFIQG0z1tV 
+
+1: Madama[B-creative-work] butterfly[I-creative-work] in the English[B-location] pub[I-location] : for those who loves opera with their pint . — feeling intrigued at King[B-location] '[I-location] s[I-location] .[I-location] . . https://t.co/ZYqghgQBYp 
+2: Madama[B-creative-work] butterfly[I-creative-work] in the English[B-location] pub[I-location] : for those who loves opera with their pint . — feeling intrigued at King[B-location] '[I-location] s[I-location] . . . https://t.co/ZYqghgQBYp 
+G: Madama[B-creative-work] butterfly[I-creative-work] in the English pub : for those who loves opera with their pint . — feeling intrigued at King ' s . . . https://t.co/ZYqghgQBYp 
+
+1: RT @ boujeetuan : mark[B-person] : - " i was in boy scouts i know what im doing ! " - he dont know what he doing - already started growing weed - s … 
+2: RT @ boujeetuan : mark[B-person] : - " i was in boy[B-group] scouts[I-group] i know what im doing ! " - he dont know what he doing - already started growing weed - s … 
+G: RT @ boujeetuan : mark[B-person] : - " i was in boy[B-group] scouts[I-group] i know what im doing ! " - he dont know what he doing - already started growing weed - s … 
+
+1: RT @ MarshmallowDoof : I did drawn the Tiger Mama ★ ★ ★ @ BuxbiArts https://t.co/jjvS2aLyHb 
+2: RT @ MarshmallowDoof : I did drawn the Tiger[B-person] Mama ★ ★ ★ @ BuxbiArts https://t.co/jjvS2aLyHb 
+G: RT @ MarshmallowDoof : I did drawn the Tiger[B-creative-work] Mama[I-creative-work] ★ ★ ★ @ BuxbiArts https://t.co/jjvS2aLyHb 
+
+1: Nexus[B-product] 6[I-product] P[I-product] |[I-product] Nexus[I-product] 6[I-product] Sleeve[I-product] Shop : https://t.co/Rg2eopRpWB | #[B-product] Nexus[I-product] 6[I-product] P #[B-product] Nexus[I-product] 6[I-product] #[B-product] Nexus[I-product] 6[I-product] PSleeve[I-product] # Nexus[I-product] 6 PCover # Nexus[I-product] 6[I-product] PLeather # Nexus[I-product] 6 PCase 
+2: Nexus[B-product] 6[I-product] P | Nexus[B-product] 6[I-product] Sleeve Shop : https://t.co/Rg2eopRpWB | # Nexus 6 P # Nexus 6 # Nexus 6 PSleeve # Nexus 6 PCover # Nexus 6 PLeather # Nexus 6 PCase 
+G: Nexus[B-product] 6[I-product] P[I-product] | Nexus[B-product] 6[I-product] Sleeve[I-product] Shop : https://t.co/Rg2eopRpWB | # Nexus[B-product] 6[I-product] P # Nexus[B-product] 6[I-product] # Nexus[B-product] 6[I-product] PSleeve[I-product] # Nexus[B-product] 6[I-product] PCover[I-product] # Nexus[B-product] 6[I-product] PLeather[I-product] # Nexus[B-product] 6[I-product] PCase[I-product] 
+
+1: / . Trump[B-person] administration[I-person] rolls back protections for people in default on student loans https://t.co/YPe2DRsjLe 
+2: / . Trump[B-person] administration rolls back protections for people in default on student loans https://t.co/YPe2DRsjLe 
+G: / . Trump[B-group] administration[I-group] rolls back protections for people in default on student loans https://t.co/YPe2DRsjLe 
+
+1: Alain[B-person] 3378[I-person] played Plague[B-creative-work] Inc[I-creative-work] :[I-creative-work] Evolved[I-creative-work] ( PS[B-product] 4[I-product] ) in the last 24 hours https://t.co/6Tm2ZBNKip # exophase 
+2: Alain[B-person] 3378[I-person] played Plague[B-creative-work] Inc[I-creative-work] :[I-creative-work] Evolved[I-creative-work] ( PS 4 ) in the last 24 hours https://t.co/6Tm2ZBNKip # exophase 
+G: Alain[B-person] 3378 played Plague[B-creative-work] Inc[I-creative-work] :[I-creative-work] Evolved[I-creative-work] ( PS[B-product] 4[I-product] ) in the last 24 hours https://t.co/6Tm2ZBNKip # exophase 
+
+1: RT @ LessGovMoreFun : . Sounds like that outfit that left the White House on January 20 . . . . # Wiretap # WireGate https://t.co/gFWJJ5Llx0 
+2: RT @ LessGovMoreFun : . Sounds like that outfit that left the White[B-location] House[I-location] on January 20 . . . . # Wiretap # WireGate https://t.co/gFWJJ5Llx0 
+G: RT @ LessGovMoreFun : . Sounds like that outfit that left the White[B-location] House[I-location] on January 20 . . . . # Wiretap # WireGate https://t.co/gFWJJ5Llx0 
+
+1: RT @ V _ of _ Europe : Europe[B-location] ' s most horrible person is in the White House . The damage she ' s done to her country and our continent is unpr … 
+2: RT @ V _ of _ Europe : Europe[B-location] ' s most horrible person is in the White[B-location] House[I-location] . The damage she ' s done to her country and our continent is unpr … 
+G: RT @ V _ of _ Europe[B-location] : Europe[B-location] ' s most horrible person is in the White[B-location] House[B-location] . The damage she ' s done to her country and our continent is unpr … 
+
+1: RT @ boyband _ joao : Happy Six Months To All Of The Other João ' s Supporters Out There ! I Love You All ! More Blessings For Everyone ! ❤ TeamJOA … 
+2: RT @ boyband _ joao : Happy Six Months To All Of The Other João[B-person] ' s Supporters Out There ! I Love You All ! More Blessings For Everyone ! ❤ TeamJOA … 
+G: RT @ boyband[B-group] _[I-group] joao[I-group] : Happy Six Months To All Of The Other João[B-group] ' s Supporters Out There ! I Love You All ! More Blessings For Everyone ! ❤ TeamJOA[B-group] … 
+

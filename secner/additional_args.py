@@ -17,7 +17,7 @@ class AdditionalArguments:
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
-    infer_path: str = field(default="span.tsv", metadata=
+    infer_path: str = field(default=None, metadata=
     {"help": "set to predictions file of span detector in predict mode, relative to predictions dir"})
     train_path: str = field(default="train.tsv", metadata={"help": "train file path relative to data root"})
     dev_path: str = field(default="dev.tsv", metadata={"help": "dev file path relative to data root"})
@@ -78,11 +78,14 @@ class AdditionalArguments:
 #    pattern_vocab_path: str = field(default=None, metadata={"help": "pattern vocab file path"})
     pattern_vocab_path: str = field(default="pattern_vocab.txt", metadata={"help": "pattern vocab file path"})
     pattern_vocab_size: int = field(default=0, metadata={"help": "pattern vocab file path"})
+    my_seed: int = field(default=42, metadata={"help": "my seed"})
+    my_infer_file: str = field(default=None, metadata={"help": "my infer output file"})
 
     def __post_init__(self):
-        self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name)
+        self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name, f"run-{self.my_seed}")
         if self.resume:
-            self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
+            # self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
+            self.resume = os.path.join(self.run_root, "checkpoints", "best_checkpoint")
         self.wandb_dir = self.run_root
         self.predictions_dir = os.path.join(self.run_root, "predictions")
 
