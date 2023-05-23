@@ -1,6 +1,7 @@
 out/
 data/cyber
 data/bio_context/raw
+data/security
 **/wandb/
 *.egg-info/
 **/__pycache__/
