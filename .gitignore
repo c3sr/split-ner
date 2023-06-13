@@ -1,5 +1,10 @@
 out/
 data/cyber
+data/security
+multirun/*
+quality/*
+**/elapsed_time/*
+**/runs/*
 data/bio_context/raw
 data/security
 **/wandb/
