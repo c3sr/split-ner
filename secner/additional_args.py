@@ -84,8 +84,8 @@ class AdditionalArguments:
     def __post_init__(self):
         self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name, f"run-{self.my_seed}")
         if self.resume:
-            # self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
-            self.resume = os.path.join(self.run_root, "checkpoints", "best_checkpoint")
+            self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
+            # self.resume = os.path.join(self.run_root, "checkpoints", "best_checkpoint")
         self.wandb_dir = self.run_root
         self.predictions_dir = os.path.join(self.run_root, "predictions")
 

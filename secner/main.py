@@ -170,8 +170,8 @@ class NerExecutor:
             logger.info("elapsed time: {0}  In seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
 
             ## Added this to do multi-run
-            from secner.utils.checkpoint import find_best_checkpoint
-            find_best_checkpoint(self.train_args.output_dir)
+            # from secner.utils.checkpoint import find_best_checkpoint
+            # find_best_checkpoint(self.train_args.output_dir)
             ## Added this to do multi-run
 
         else:
