@@ -1,5 +1,0 @@
-DNA	DNA
-RNA	RNA
-cell_line	cell line
-cell_type	cell type
-protein	protein
