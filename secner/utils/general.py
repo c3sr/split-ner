@@ -589,6 +589,7 @@ def process_onto_final_corpus(corpus_path):
     write_token_data(test, os.path.join(corpus_path, "test.tsv"))
     generate_dataset_files(train, dev, test, corpus_path)
 
+
 # def process_i2b2_corpus(corpus_path):
 #     raw_path = os.path.join(corpus_path, "raw")
 #     orig_train = read_i2b2_data(os.path.join(raw_path, "train"))
@@ -602,3 +603,76 @@ def process_onto_final_corpus(corpus_path):
 #     write_token_data(dev, os.path.join(raw_path, "dev.tsv"))
 #     write_token_data(test, os.path.join(raw_path, "test.tsv"))
 #     generate_dataset_files(train, dev, test, corpus_path)
+
+
+def has_diff(sent1, sent2):
+    for tok1, tok2 in zip(sent1, sent2):
+        if tok1[-1] != tok2[-1]:
+            return True
+    return False
+
+
+def sent_repr(sent, gold=False):
+    buf = ""
+    for tok in sent:
+        buf += tok[0]
+        k = 1 if gold else -1
+        if tok[k] != "O":
+            buf += "[{0}]".format(tok[k])
+        buf += " "
+    return buf
+
+
+def get_data_dict(data):
+    data_dict = {}
+    for sent in data:
+        key = " ".join([tok[0] for tok in sent])
+        data_dict[key] = sent
+    return data_dict
+
+
+def compare_predictions(predictions_path1, predictions_path2):
+    data1 = read_data(predictions_path1)
+    data2 = read_data(predictions_path2)
+
+    data_dict1 = get_data_dict(data1)
+    data_dict2 = get_data_dict(data2)
+
+    diff = []
+    for sent in data_dict1.keys():
+        if sent in data_dict2 and has_diff(data_dict1[sent], data_dict2[sent]):
+            print("1: {0}".format(sent_repr(data_dict1[sent])))
+            print("2: {0}".format(sent_repr(data_dict2[sent])))
+            print("G: {0}".format(sent_repr(data_dict1[sent], gold=True)))
+            print()
+
+
+def print_sents_having_entity(corpus_name, entity):
+    base_path = os.path.join("..", "..", "data", corpus_name)
+    train_data = read_data(os.path.join(base_path, "train.tsv"))
+    dev_data = read_data(os.path.join(base_path, "dev.tsv"))
+    test_data = read_data(os.path.join(base_path, "test.tsv"))
+    corpus_data = train_data + dev_data + test_data
+
+    entity = entity.lower()
+
+    filtered_data = []
+    for sent in corpus_data:
+        for tok in sent:
+            if entity in tok[-1].lower():
+                filtered_data.append(sent)
+                break
+
+    for sent in filtered_data:
+        print(sent_repr(sent))
+
+
+if __name__ == "__main__":
+    # quality_path = os.path.join("..", "..", "quality")
+    # dataset_name = "bio"
+
+    # path1 = os.path.join(quality_path, dataset_name, "qa", "test.tsv")
+    # path2 = os.path.join(quality_path, dataset_name, "span", "test.tsv")
+    # compare_predictions(path1, path2)
+
+    print_sents_having_entity("onto_final", "loc")
