@@ -22,7 +22,7 @@ batch_size=32
 # 		--token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
 # 				--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 # 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-# 		--my_seed $seed  --do_train  --load_best_model_at_end --wandb_mode "dryrun" 
+# 		--run_dir $seed  --do_train  --load_best_model_at_end --wandb_mode "dryrun" 
 # 	done
 
 # for seed in 42
@@ -37,7 +37,7 @@ batch_size=32
 # 		--data_root $data_root --out_root $out_root --base_model $base_model  --output_dir $output_dir \
 # 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 # 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-# 		--my_seed $seed --do_train  --load_best_model_at_end --wandb_mode "dryrun" \
+# 		--run_dir $seed --do_train  --load_best_model_at_end --wandb_mode "dryrun" \
 # 		--detect_spans
 # 	done
 
@@ -53,7 +53,7 @@ batch_size=32
 # 		--token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
 # 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 # 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-# 		--my_seed $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  \
+# 		--run_dir $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  \
 # 		--detect_spans --resume "1552"
 # 	done
 
@@ -69,7 +69,7 @@ batch_size=32
 # 		--use_char_cnn "none" --query_type "question3" \
 # 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 # 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-# 		--my_seed $seed --do_train --load_best_model_at_end  --wandb_mode "dryrun" --resume "8040" \
+# 		--run_dir $seed --do_train --load_best_model_at_end  --wandb_mode "dryrun" --resume "8040" \
 # 		--detect_spans
 # 	done
 
@@ -85,7 +85,7 @@ batch_size=32
 # 		--token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "char" --query_type "question4" \
 # 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 # 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-# 		--my_seed $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  \
+# 		--run_dir $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  \
 # 		--detect_spans
 # 	done
 
@@ -102,6 +102,6 @@ for seed in 42
 		--token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-		--my_seed $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  \
+		--run_dir $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  \
 		--detect_spans --use_pos_tag
 	done

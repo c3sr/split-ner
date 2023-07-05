@@ -22,6 +22,6 @@ for seed in 242
 		--token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-		--my_seed $seed --do_eval  --load_best_model_at_end  --wandb_mode "dryrun" --resume "77000" \
+		--run_dir $seed --do_eval  --load_best_model_at_end  --wandb_mode "dryrun" --resume "77000" \
 		--detect_spans
 	done

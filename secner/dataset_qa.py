@@ -24,7 +24,7 @@ class NerQADataset(Dataset):
                                                             self.args.pattern_embedding_type != "cnn")
 
         self.tag_to_text_mapping = self.parse_tag_names()
-        self.tag_text = ",".join(list(self.tag_to_text_mapping.values()))
+        self.all_tag_names = ", ".join(list(self.tag_to_text_mapping.values()))
 
         if self.args.use_pos_tag or self.args.use_dep_tag:
             import spacy
@@ -160,30 +160,28 @@ class NerQADataset(Dataset):
                 tag_text = "named entities"
             elif self.args.query_type == "question4":
                 tag_text = "important entity spans"
-            elif self.args.query_type == "question5":
-                tag_text = self.tag_text+" entity spans"
+            elif self.args.query_type == "question9":
+                tag_text = self.all_tag_names + " entity spans"
             else:
                 tag_text = "entity"
         else:
             tag_text = self.tag_to_text_mapping[tag]
 
-        question = tag_text
         if self.args.query_type == "question":
-            question= "What is the {0} mentioned in the text ?".format(tag_text)
+            return "What is the {0} mentioned in the text ?".format(tag_text)
         elif self.args.query_type == "question2":
-            question= "Where is the {0} mentioned in the text ?".format(tag_text)
+            return "Where is the {0} mentioned in the text ?".format(tag_text)
         elif self.args.query_type == "question3":
-            question= "Find {0} in the following text .".format(tag_text)
+            return "Find {0} in the following text .".format(tag_text)
         elif self.args.query_type == "question4":
-            question= "Extract {0} from the following text .".format(tag_text)
-        elif self.args.query_type == "question5":
-            quenstion= "Extract {0} from the following text .".format(tag_text)
+            return "Extract {0} from the following text .".format(tag_text)
+        elif self.args.query_type == "question9":
+            return "Extract {0} from the following text .".format(tag_text)
 
-        return question
+        return tag_text
 
     def prep_context(self, sentence, tag):
         tag_text = self.get_tag_query_text(tag)
-
         # query
         bert_query_tokens = []
         query_tokens = tag_text.split()
@@ -302,7 +300,6 @@ class NerQADataset(Dataset):
 
     def prep_context_span(self, sentence):
         tag_text = self.get_tag_query_text(None)
-
         # query
         bert_query_tokens = []
         query_tokens = tag_text.split()
@@ -399,32 +396,6 @@ class NerQADataset(Dataset):
         else:
             for tag in self.tag_to_text_mapping.keys():
                 self.contexts.append(self.prep_context(sentence, tag))
-
-    '''
-    def process_sentence_query(self, sentence):
-        if self.args.detect_spans:
-            query = ""
-            if ("train" in self.corpus_path):
-                tags = set()
-                for token in sentence.tokens:
-                    for tag in token.tags:
-                       if tag != "O":
-                          tags.add(tag[2:])
-                for tag in tags:
-                    tag_text = self.tag_to_text_mapping[tag]
-                    if len(query) == 0:
-                       query = tag_text
-                    else:
-                       query = query+ " and " +tag_text
-
-            #print(tags)
-            #print(self.corpus_path+"::"+query)
-
-            self.contexts.append(self.prep_context_span_query(sentence, query))
-        else:
-            for tag in self.tag_to_text_mapping.keys():
-                self.contexts.append(self.prep_context(sentence, tag))
-    '''
 
 
 def main(args):

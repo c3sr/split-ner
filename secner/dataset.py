@@ -136,7 +136,6 @@ class NerDataset(Dataset):
         spans = defaultdict(list)
         for index, tok in enumerate(sentence.tokens):
             for tag in tok.tags:
-                #print(cnt,' ', tag)
                 if tag.startswith("B-"):
                     spans[tag[2:]].append(PairSpan(index, index))
                 elif tag.startswith("I-"):
@@ -503,7 +502,6 @@ class NerDataset(Dataset):
 
             batch_ids.append(torch.tensor(sent_ids))
 
-        #return torch.as_tensor(batch_ids)
         return torch.stack(batch_ids)
 
     @staticmethod
@@ -655,9 +653,6 @@ class NerDataCollator:
             batch_text = [entry[self.args.token_type] for entry in features]
             char_vocab = NerDataset.get_char_vocab()
             batch["char_ids"] = NerDataset.get_char_ids(batch_text, max_len, char_vocab)
-            #print("----------- make char_ids")
-            #print(batch_text[0])
-            #print(batch["char_ids"][0])
 
         # pattern_ids
         if self.args.use_char_cnn in ["pattern", "both", "both-flair"]:
@@ -665,9 +660,6 @@ class NerDataCollator:
                               for word in entry[self.args.token_type]] for entry in features]
             pattern_vocab = NerDataset.get_pattern_vocab(self.args.pattern_type)
             batch["pattern_ids"] = NerDataset.get_char_ids(batch_pattern, max_len, pattern_vocab)
-            #print("----------- make pattern_ids")
-            #print(batch_pattern[0])
-            #print(batch["pattern_ids"][0])
 
         # flair_ids
         if self.args.use_char_cnn in ["flair", "both-flair"]:

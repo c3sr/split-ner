@@ -23,7 +23,7 @@ batch_size=16
 # 		--data_root $data_root --out_root $out_root --base_model $base_model  --output_dir $output_dir \
 # 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 # 				--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-# 		--my_seed $seed --do_eval  --load_best_model_at_end --wandb_mode "dryrun" --resume "64000" \
+# 		--run_dir $seed --do_eval  --load_best_model_at_end --wandb_mode "dryrun" --resume "64000" \
 # 		--detect_spans
 # 	done
 
@@ -38,5 +38,5 @@ for seed in 42
 		--loss_type "ce" --query_type "question" \
 		--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 		--metric_for_best_model "micro_f1" --per_device_train_batch_size $batch_size --per_device_eval_batch_size $batch_size --learning_rate "1e-5" \
-		--my_seed $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  
+		--run_dir $seed --do_train  --load_best_model_at_end  --wandb_mode "dryrun"  
 	done

@@ -17,7 +17,7 @@ In corresponding config.json, do:
 Then,
 ```commandline
 cd secner
-CUDA_VISIBLE_DEVICES=0,1 python main.py --config config.json
+CUDA_VISIBLE_DEVICES=0,1 python main.py config.json
 ```
 #### Base Models
 The base model can be specified in ```base_model``` field of config.json. Supported models:
@@ -142,13 +142,13 @@ Instead of Sequence Labeling and Question-Asnwering perspective, we look at a pi
 In the config (json) file, set ```"detect_spans": true```. For running using QA-based model using ```BIOE``` scheme, set ```"num_labels": 4```. We support multiple question types which can be set, for example, ```"query_type": "question4"```. Example run command:
 
 ```shell script
-CUDA_VISIBLE_DEVICES=0,1 python main_qa.py --config config/conll/config_bert_qa4_span_querytype4.json
+CUDA_VISIBLE_DEVICES=0,1 python main_qa.py config/conll/config_bert_qa4_span_querytype4.json
 ```
 
 For sequence labeling procedure using ```BIOE``` scheme, set ```"tagging": "bioe"``` along with ```"detect_spans": true```. Example run command:
 
 ```shell script
-CUDA_VISIBLE_DEVICES=0,1 python main.py --config config/conll/config_bert_bioe_span.json
+CUDA_VISIBLE_DEVICES=0,1 python main.py config/conll/config_bert_bioe_span.json
 ```
 
 Next, we generate predictions using the standard evaluation procedure.
@@ -158,20 +158,20 @@ Next, we generate predictions using the standard evaluation procedure.
 It does not depend on tagging schemes. Example run command:
 
 ```shell script
-CUDA_VISIBLE_DEVICES=0,1,2 python main_span.py --config config/bio/config_bert_spanclass_dice.json
+CUDA_VISIBLE_DEVICES=0,1,2 python main_span.py config/bio/config_bert_spanclass_dice.json
 ```
 
 #### Pipeline
 Once the above models are individually trained, we copy ```test.tsv``` from ```predictions``` folder of span detector into the corresponding folder in span classifier model. Rename this test file as say, ```infer_inp.tsv```. Specify this file name in the config for span classifier (as shown below) and also set ```"do_train": false``` and provide the checkpoint using the ```resume``` option (the standard model evaluation procedure).
 
 ```json
-"infer_path": "infer_inp.tsv"
+"infer_inp_path": "infer_inp.tsv"
 ```
 
 The final outputs are generated always in file ```infer.tsv``` under the ```predictions``` folder of span classifier. To get the overall F1-score metrics run:
 
 ```shell script
-python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer --only_f1
+python analysis.py --dataset conll --model ner-bert-spanclass-dice --file infer
 ```
 
 ### Few-Shot NER (10% data)

@@ -54,8 +54,7 @@ def calc_micro_f1(data):
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("Overall | Cnt:\tP:\tR:\tMicro F1:")
-    print("          {0} {1:.2f} {2:.2f} {3:.2f}\n"
+    print("Overall | Cnt: {0} | P: {1:.2f} | R: {2:.2f} | Micro F1: {3:.2f}"
           .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
 
     tags = list(set(tp.keys()).union(set(fn.keys())))
@@ -351,7 +350,6 @@ def analyse_oov_errors(train_data, test_data):
 
 
 def get_boundary_error_ratio(data):
-    print('get_boundary_error_ratio')
     gold_spans = [get_spans([[tok[0], tok[1]] for tok in sent], index) for index, sent in enumerate(data)]
     pred_spans = [get_spans([[tok[0], tok[2]] for tok in sent], index) for index, sent in enumerate(data)]
     boundary_error_cnt = 0
@@ -399,37 +397,25 @@ def convert_to_span_based(data):
     return new_data
 
 
-def pre_process_data(args):
-    root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{args.seed}", "predictions")
-    print("data_location=",root_path)
-    # train_path = os.path.join(root_path, "train.tsv")
-    # dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
-    # test_path = os.path.join(root_path, "test.tsv")
-    # infer_path = os.path.join(root_path, "infer.tsv")
+def pre_process_data(root_path, args):
     file_path = os.path.join(root_path, f"{args.file}.tsv")
 
     data = dict()
-    # data["train"] = parse_file(train_path)
-    # data["dev"] = parse_file(dev_path)
-    # data["test"] = parse_file(test_path)
-    # data["infer"] = parse_file(infer_path)
     data[args.file] = parse_file(file_path)
 
     if args.span_based:
-        data["train"] = convert_to_span_based(data["train"])
-        data["dev"] = convert_to_span_based(data["dev"])
-        data["test"] = convert_to_span_based(data["test"])
+        data[args.file] = parse_file(file_path)
 
     return data
 
 
 def main(args):
-    data = pre_process_data(args)
+    root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{args.run_dir}", "predictions")
+    data = pre_process_data(root_path, args)
     get_boundary_error_ratio(data[args.file])
     
-    if args.only_f1:
-        calc_micro_f1(data[args.file])
-    else:
+    calc_micro_f1(data[args.file])
+    if args.verbose:
         analyse_errors(data[args.file])
         analyse_error_overlaps(os.path.join(root_path, "analysis"), data[args.file], dump_errors=True)
         analyse_oov_errors(data["train"], data[args.file])
@@ -437,12 +423,12 @@ def main(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser("Predictions Analyzer")
+    ap.add_argument("--experiment_dir", type=str, default="pretrained")
     ap.add_argument("--dataset", type=str, default="bio")
-    ap.add_argument("--modelpath", type=str, default="../emnlp")
     ap.add_argument("--model", type=str, default="ner-biobert-qa4")
-    ap.add_argument("--seed", type=int, default=None)
+    ap.add_argument("--run_dir", type=int, default="42")
     ap.add_argument("--file", type=str, default="test", help="which file to evaluate (train|dev|test|infer)")
-    ap.add_argument("--only_f1", dest="only_f1", action="store_true", help="set this flag to only report micro-f1")
+    ap.add_argument("--verbose", dest="verbose", action="store_true", help="set this flag to report verbose analysis")
     ap.add_argument("--span_based", dest="span_based", action="store_true", help="set this flag if using span detector")
     ap = ap.parse_args()
     main(ap)

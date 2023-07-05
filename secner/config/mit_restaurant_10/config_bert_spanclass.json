@@ -7,7 +7,7 @@
   "num_train_epochs": 300,
   "data_root": "../data",
   "out_root": "../out",
-  "infer_path": "infer_inp.tsv",
+  "infer_inp_path": "infer_inp.tsv",
   "train_path": "train.tsv",
   "dev_path": "dev.tsv",
   "test_path": "test.tsv",

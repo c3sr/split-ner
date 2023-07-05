@@ -14,10 +14,6 @@ from secner.additional_args import AdditionalArguments
 from secner.dataset import NerDataCollator
 from secner.dataset_qa import NerQADataset
 from secner.evaluator_qa import EvaluatorQA
-from secner.model import NerModel
-#from secner.model_bidaf import NerModelBiDAF
-#from secner.model_crf import NerModelWithCrf
-from secner.model_roberta import NerRobertaModel
 from secner.trainer import NerTrainer
 from secner.utils.general import set_all_seeds, set_wandb, parse_config, setup_logging
 
@@ -78,11 +74,13 @@ class NerQAExecutor:
         return {"micro_f1": evaluator.entity_metric.micro_avg_f1()}
 
     def dump_predictions(self, dataset):
-        #filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-inference-"+str(self.train_args.num_train_epochs)+".elapsed"
-        #file = open(os.path.join("elapsed_time", filename), "w")
-        #total_elapsed=0
-        n= 1
-        for i in range(0,n):
+        os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
+        timer_file_path = os.path.join(self.additional_args.predictions_dir, "{0}-timer.log".format(dataset.corpus_type))
+        timer_file = open(timer_file_path, "a")
+        
+        total_elapsed = 0
+        n = 1   # manually set to 10 for prod experiments
+        for i in range(0, n):
             logger.info("{0}-th prediction".format(str(i)))
             logger.info("start time: {0}".format(str(datetime.now())))
             start = time.time()
@@ -91,19 +89,15 @@ class NerQAExecutor:
             data = self.bert_to_orig_token_mapping1(dataset, model_predictions)
             # data = self.bert_to_orig_token_mapping2(dataset, model_predictions)
 
-            #  elapsed time
             elapsed = time.time() - start
             logger.info("elapsed time: {0} seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
-            #total_elapsed += elapsed
+            total_elapsed += elapsed
+            timer_file.write(f"Iteration {str(i)}: {str(elapsed)}\n")
 
-            #file.write(str(i)+",  "+str(elapsed)+"\n")
+        avg_elapsed = total_elapsed / n
+        timer_file.write(f"Avg: {str(avg_elapsed)}\n")
+        timer_file.close()
 
-        #avg_elapsed = total_elapsed / n
-        #file.write("avg,  "+str(avg_elapsed)+"\n")
-        #file.close()
-        # ----
-
-        os.makedirs(self.additional_args.predictions_dir, exist_ok=True)
         predictions_file = os.path.join(self.additional_args.predictions_dir, "{0}.tsv".format(dataset.corpus_type))
         logger.info("Outputs published in file: {0}".format(predictions_file))
         with open(predictions_file, "w", encoding="utf-8") as f:
@@ -232,23 +226,13 @@ class NerQAExecutor:
             end = time.time()
             logger.info("end time: {0}".format(str(datetime.now())))
             elapsed = end - start
-            logger.info("elapsed time: {0} In seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
+            logger.info("Elapsed time: {0} | In seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
 
-            ## Added this to do multi-run
-            # from secner.utils.checkpoint import find_best_checkpoint
-            # find_best_checkpoint(self.train_args.output_dir)
-            ## Added this to do multi-run
-
-            #filename=self.additional_args.dataset_dir+"-"+self.additional_args.model_name+"-train-"+str(self.train_args.num_train_epochs)+".elapsed"
-            #file = open(filename, "w")
-            #file.write(str(elapsed)+" seconds\n")
-            #file.write(str(timedelta(seconds=elapsed)));
-            #file.close()
         else:
             logger.info("prediction mode")
             assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
-            #self.dump_predictions(self.train_dataset)
-            #self.dump_predictions(self.dev_dataset)
+            # self.dump_predictions(self.train_dataset)
+            # self.dump_predictions(self.dev_dataset)
             self.dump_predictions(self.test_dataset)
             # throws some threading related tqdm/wandb exception in the end (but code fully works)
 
@@ -271,14 +255,12 @@ def main():
     setup_logging()
     parser = HfArgumentParser([TrainingArguments, AdditionalArguments])
     
-    ## Added this to do multi-run
     import sys
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # when a config json file is provided, parse it to get our arguments.
         train_args, additional_args = parse_config(parser, sys.argv[1])
     else:
         train_args, additional_args = parser.parse_args_into_dataclasses()
-    ## Added this to do multi-run
 
     executor = NerQAExecutor(train_args, additional_args)
     executor.run()
@@ -286,10 +268,4 @@ def main():
 
 
 if __name__ == "__main__":
-    '''
-    ap = argparse.ArgumentParser(description="QA Model Runner")
-    ap.add_argument("--config", default=None, help="config json file")
-    ap = ap.parse_args()
-    main(ap)
-    '''
     main()

@@ -17,7 +17,7 @@ do
 	echo "** Training Single(QA)         base_model=$base_model  output_dir=$output_dir  log_file=$logfile"
 		python main_qa.py --seed $seed --model_name $model_type  --dataset_dir $data --num_labels 4 \
 			--num_train_epochs $train_epochs  --data_root $data_root --out_root $out_root --base_model $base_model \
-			--output_dir $output_dir --max_seq_len $seq_length --my_seed $seed --resume "yes" \
+			--output_dir $output_dir --max_seq_len $seq_length --run_dir $seed --resume "yes" \
 			--token_type "sub_text" --char_emb_dim 50 --pattern_type "3" --use_char_cnn "both" --query_type "question4" \
 					--evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
 					--metric_for_best_model "micro_f1" --per_device_train_batch_size 16 --per_device_eval_batch_size 16 --learning_rate "5e-5" \

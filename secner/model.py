@@ -17,13 +17,12 @@ class NerModel(BertPreTrainedModel):
         # added (+1) to give special importance to <PAD> token (breaks backward compatibility with prev. trained models)
         self.num_word_types = len(NerDataset.get_word_type_vocab()) + 1
         none_tag = self.additional_args.none_tag
-
         self.num_pos_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pos_tag_vocab_path, none_tag,
                                                                self.additional_args.use_pos_tag))
         self.num_dep_tags = len(NerDataset.parse_aux_tag_vocab(self.additional_args.dep_tag_vocab_path, none_tag,
                                                                self.additional_args.use_dep_tag))
         self.num_patterns = len(NerDataset.parse_aux_tag_vocab(self.additional_args.pattern_vocab_path, none_tag,
-                                                               self.additional_args.pattern_embedding_type!="cnn"))
+                                                               self.additional_args.pattern_embedding_type != "cnn"))
 
         self.ignore_label = nn.CrossEntropyLoss().ignore_index
         dropout_prob = config.hidden_dropout_prob if self.additional_args.lstm_num_layers > 1 else 0.
@@ -31,7 +30,7 @@ class NerModel(BertPreTrainedModel):
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         classifier_inp_dim = self.bert.config.hidden_size
-        print("Word Dim="+str(self.bert.config.hidden_size))
+        print("Word Dimensions = " + str(self.bert.config.hidden_size))
 
         if self.additional_args.word_type_handling == "1hot":
             classifier_inp_dim += self.num_word_types
@@ -47,10 +46,10 @@ class NerModel(BertPreTrainedModel):
                                         num_layers=self.additional_args.lstm_num_layers,
                                         dropout=dropout_prob)
                 classifier_inp_dim += 2 * self.additional_args.pos_lstm_hidden_dim
-                print("POS Dim="+str(2 * self.additional_args.pos_lstm_hidden_dim))
+                print("POS Dimensions = " + str(2 * self.additional_args.pos_lstm_hidden_dim))
             else:
                 classifier_inp_dim += self.num_pos_tags
-                print("POS Dim="+str(self.num_pos_tags))
+                print("POS Dimensions = " + str(self.num_pos_tags))
 
 
         if self.additional_args.use_dep_tag:
@@ -69,7 +68,7 @@ class NerModel(BertPreTrainedModel):
         if self.additional_args.use_char_cnn in ["char", "both"]:
             self.char_cnn = CharCNN(additional_args, "char")
             classifier_inp_dim += self.char_cnn.char_out_dim
-            print("Char Dim="+str(self.char_cnn.char_out_dim))
+            print("Char Dimensions = " + str(self.char_cnn.char_out_dim))
 
         if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
             from secner.flair_cnn import FlairCNN
@@ -81,6 +80,7 @@ class NerModel(BertPreTrainedModel):
             if self.additional_args.pattern_embedding_type == "cnn":
                 self.pattern_emb = CharCNN(additional_args, "pattern")
             elif self.additional_args.pattern_embedding_type == "word2vec":
+                import gensim
                 w2vmodel =  gensim.models.word2vec.Word2Vec.load('./pattern_emb/biojnlp.w2v')
 
                 w2vec_vectors = []
@@ -98,9 +98,9 @@ class NerModel(BertPreTrainedModel):
                 self.pattern_emb = nn.Embedding.from_pretrained(weights)
                 self.pattern_emb.char_out_dim = w2vec_vectors[0].size()[0] 
             else:
-                self.pattern_emb = nn.Embedding(self.num_patterns+1, self.additional_args.char_emb_dim)
+                self.pattern_emb = nn.Embedding(self.num_patterns + 1, self.additional_args.char_emb_dim)
                 self.pattern_emb.char_out_dim = self.additional_args.char_emb_dim
-                print("Pattern num_patterns = ", self.num_patterns, "  embedding dim=",str(self.pattern_emb.char_out_dim))
+                print("Pattern num_patterns = ", self.num_patterns, " embedding dim = ", str(self.pattern_emb.char_out_dim))
 
 
             self.pattern_lstm = nn.LSTM(input_size=self.pattern_emb.char_out_dim,
@@ -109,7 +109,7 @@ class NerModel(BertPreTrainedModel):
                                         batch_first=True,
                                         num_layers=self.additional_args.lstm_num_layers,
                                         dropout=dropout_prob)
-            print("Pattern dim="+str(2 * self.additional_args.lstm_hidden_dim))
+            print("Pattern Dimensions = " + str(2 * self.additional_args.lstm_hidden_dim))
             classifier_inp_dim += 2 * self.additional_args.lstm_hidden_dim
 
         if self.additional_args.use_end_cnn:
@@ -145,7 +145,7 @@ class NerModel(BertPreTrainedModel):
             for param in self.bert.parameters():
                 param.requires_grad = False
 
-        print("Total Dim="+str(classifier_inp_dim))
+        print("Total Dimensions = " + str(classifier_inp_dim))
 
     def forward(
             self,
@@ -262,7 +262,6 @@ class NerModel(BertPreTrainedModel):
                                                               total_length=seq_len)
             if self.additional_args.lstm_dropout:
                 pattern_vec = self.dropout(pattern_vec)
-
             sequence_output = torch.cat([sequence_output, pattern_vec], dim=2)
 
         if self.additional_args.use_end_cnn:

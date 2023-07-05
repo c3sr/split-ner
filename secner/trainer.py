@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 from transformers.trainer import Trainer, PREFIX_CHECKPOINT_DIR
-#from transformers import Trainer, PREFIX_CHECKPOINT_DIR
+# from transformers import Trainer, PREFIX_CHECKPOINT_DIR
 from typing import List
 
 
@@ -17,7 +17,7 @@ class NerTrainer(Trainer):
         ordering_and_checkpoint_path = []
 
         glob_checkpoints = [str(x) for x in Path(self.args.output_dir).glob(f"{checkpoint_prefix}-*")]
-        #glob_checkpoints = [str(x) for x in Path(output_dir).glob(f"{checkpoint_prefix}-*")]
+        # glob_checkpoints = [str(x) for x in Path(output_dir).glob(f"{checkpoint_prefix}-*")]
 
         for path in glob_checkpoints:
             if use_mtime:

@@ -13,15 +13,17 @@ class AdditionalArguments:
     resume: Optional[str] = field(default=None, metadata={"help": "checkpoint to resume. Starts from scratch, if None"})
     dataset_dir: str = field(default="bio", metadata={"help": "dataset dir relative to data root dir"})
     num_labels: int = field(default=4, metadata={"help": "# output labels in QA setup: 2(BO)|3(BIO)|4(BIOE)|5(BIOES)"})
-    tagging: str = field(default="bioe", metadata={"help": "tagging scheme (bio|bioe). Not used in QA currently"})
+    tagging: str = field(default="bioe", metadata={"help": "tagging scheme (bo|bio|bioe). Not used in QA currently"})
 
     data_root: str = field(default="../data", metadata={"help": "data root directory"})
     out_root: str = field(default="../out", metadata={"help": "outputs root directory"})
-    infer_path: str = field(default=None, metadata=
-    {"help": "set to predictions file of span detector in predict mode, relative to predictions dir"})
+    infer_inp_path: str = field(default=None, metadata=
+    {"help": "output of span detector (input to span classifier), relative to predictions dir. If None, will not run inference mode."})
     train_path: str = field(default="train.tsv", metadata={"help": "train file path relative to data root"})
     dev_path: str = field(default="dev.tsv", metadata={"help": "dev file path relative to data root"})
     test_path: str = field(default="test.tsv", metadata={"help": "test file path relative to data root"})
+    infer_out_path: str = field(default="infer.tsv", metadata=
+    {"help": "output file path (for corresponding infer_inp_path file) relative to predictions dir"})
     tag_vocab_path: str = field(default="tag_vocab.txt", metadata={"help": "tag vocab file path relative to data root"})
     pos_tag_vocab_path: str = field(default="pos_tag_vocab.txt", metadata={"help": "pos tag vocab file path"})
     dep_tag_vocab_path: str = field(default="dep_tag_vocab.txt", metadata={"help": "dep tag vocab file path"})
@@ -75,22 +77,19 @@ class AdditionalArguments:
     pattern_embedding_type: str = field(default="cnn", metadata={"help": "use CNN or embedding"})
     pos_lstm_hidden_dim: int = field(default=256, metadata={"help": "pattern LSTM hidden dim"})
     lstm_dropout: bool = field(default=True, metadata={"help": "add dropout after LSTM"})
-#    pattern_vocab_path: str = field(default=None, metadata={"help": "pattern vocab file path"})
     pattern_vocab_path: str = field(default="pattern_vocab.txt", metadata={"help": "pattern vocab file path"})
     pattern_vocab_size: int = field(default=0, metadata={"help": "pattern vocab file path"})
-    my_seed: int = field(default=42, metadata={"help": "my seed"})
-    my_infer_file: str = field(default=None, metadata={"help": "my infer output file"})
+    run_dir: str = field(default="42", metadata={"help": "for tracking multiple random seed runs (default: 42)"})
 
     def __post_init__(self):
-        self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name, f"run-{self.my_seed}")
+        self.run_root = os.path.join(self.out_root, self.dataset_dir, self.model_name, f"run-{self.run_dir}")
         if self.resume:
             self.resume = os.path.join(self.run_root, "checkpoints", "checkpoint-{0}".format(self.resume))
-            # self.resume = os.path.join(self.run_root, "checkpoints", "best_checkpoint")
         self.wandb_dir = self.run_root
         self.predictions_dir = os.path.join(self.run_root, "predictions")
 
-        if self.infer_path:
-            self.infer_path = os.path.join(self.predictions_dir, self.infer_path)
+        if self.infer_inp_path:
+            self.infer_inp_path = os.path.join(self.predictions_dir, self.infer_inp_path)
 
         self.abs_dataset_dir = os.path.join(self.data_root, self.dataset_dir)
         self.train_path = os.path.join(self.abs_dataset_dir, self.train_path)

@@ -15,7 +15,7 @@
   "wandb_mode": "dryrun",
   "data_root": "../data",
   "out_root": "../out",
-  "infer_path": "span.tsv",
+  "infer_inp_path": "span.tsv",
   "train_path": "train.tsv",
   "dev_path": "dev.tsv",
   "test_path": "test.tsv",

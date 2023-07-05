@@ -1,1 +1,1 @@
-python main_span.py --config $1
+python main_span.py $1

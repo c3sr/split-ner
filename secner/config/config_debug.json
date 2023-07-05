@@ -11,7 +11,7 @@
   "data_pos_dep": true,
   "data_root": "../data",
   "out_root": "../out",
-  "infer_path": null,
+  "infer_inp_path": null,
   "train_path": "train.tsv",
   "dev_path": "dev.tsv",
   "test_path": "test.tsv",

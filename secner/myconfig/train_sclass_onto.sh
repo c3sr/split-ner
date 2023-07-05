@@ -21,7 +21,7 @@ do
                         --loss_type "dice" --query_type "question" \
                         --evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
                         --metric_for_best_model "micro_f1" --per_device_train_batch_size 12 --per_device_eval_batch_size 12 --learning_rate "5e-5" \
-                        --my_seed $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun"  
+                        --run_dir $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun"  
 
         # if the best checkpoint is found, remove other checkpoints to save the disk space
         # rm -r "$output_dir/runs"

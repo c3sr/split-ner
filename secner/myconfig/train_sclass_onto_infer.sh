@@ -24,7 +24,7 @@ do
                         --loss_type "dice" --query_type "question" \
                         --evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
                         --metric_for_best_model "micro_f1" --per_device_train_batch_size 12 --per_device_eval_batch_size 12 --learning_rate "5e-5" \
-                        --my_seed $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun" --infer_path $infer_inp --my_infer_file $infer_out
+                        --run_dir $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun" --infer_inp_path $infer_inp --infer_out_path $infer_out
 
         infer="span-qa"
         infer_inp="span-qa-inp.tsv"
@@ -37,7 +37,7 @@ do
                         --loss_type "dice" --query_type "question" \
                         --evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
                         --metric_for_best_model "micro_f1" --per_device_train_batch_size 12 --per_device_eval_batch_size 12 --learning_rate "5e-5" \
-                        --my_seed $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun" --infer_path $infer_inp --my_infer_file $infer_out
+                        --run_dir $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun" --infer_inp_path $infer_inp --infer_out_path $infer_out
 
         infer="span-qa-nocharpattern"
         infer_inp="span-qa-nocharpattern-inp.tsv"
@@ -50,7 +50,7 @@ do
                         --loss_type "dice" --query_type "question" \
                         --evaluation_strategy "steps" --eval_steps $eval_step --save_steps $eval_step  --save_total_limit 2 \
                         --metric_for_best_model "micro_f1" --per_device_train_batch_size 12 --per_device_eval_batch_size 12 --learning_rate "5e-5" \
-                        --my_seed $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun" --infer_path $infer_inp --my_infer_file $infer_out
+                        --run_dir $seed --resume "yes"  --load_best_model_at_end  --wandb_mode "dryrun" --infer_inp_path $infer_inp --infer_out_path $infer_out
 
         
 done
