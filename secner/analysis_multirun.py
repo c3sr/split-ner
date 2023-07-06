@@ -400,7 +400,7 @@ def convert_to_span_based(data):
 
 
 def pre_process_data(args, seed):
-    root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{seed}", "predictions")
+    root_path = os.path.join("..", args.experiment_dir, args.dataset, args.model, f"run-{seed}", "predictions")
     # print("data_location=",root_path)
     # train_path = os.path.join(root_path, "train.tsv")
     # dev_path = os.path.join(root_path, "dev.tsv")  # "dev"/"dev1"/"dev2" based on the mapping scheme defined in main.py
@@ -446,7 +446,7 @@ def main(args):
         print("| {0} | {1} |".format(args.id, " | ".join(res)))
     
     else:
-        root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{seed}", "predictions")
+        root_path = os.path.join("..", args.experiment_dir, args.dataset, args.model, f"run-{seed}", "predictions")
         analyse_errors(data[args.file])
         analyse_error_overlaps(os.path.join(root_path, "analysis"), data[args.file], dump_errors=True)
         analyse_oov_errors(data["train"], data[args.file])

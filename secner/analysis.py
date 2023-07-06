@@ -54,7 +54,7 @@ def calc_micro_f1(data):
     p = total_tp * 1.0 / (total_tp + total_fp + 1e-7)
     r = total_tp * 1.0 / (total_tp + total_fn + 1e-7)
     f1 = 2.0 * p * r / (p + r + 1e-7)
-    print("Overall | Cnt: {0} | P: {1:.2f} | R: {2:.2f} | Micro F1: {3:.2f}"
+    print("Overall | Cnt: {0} | P: {1:.4f} | R: {2:.4f} | Micro F1: {3:.4f}"
           .format(total_cnt, 100.0 * p, 100.0 * r, 100.0 * f1))
 
     tags = list(set(tp.keys()).union(set(fn.keys())))
@@ -404,13 +404,13 @@ def pre_process_data(root_path, args):
     data[args.file] = parse_file(file_path)
 
     if args.span_based:
-        data[args.file] = parse_file(file_path)
+        data[args.file] = convert_to_span_based(data[args.file])
 
     return data
 
 
 def main(args):
-    root_path = os.path.join("..", args.modelpath, args.dataset, args.model, f"run-{args.run_dir}", "predictions")
+    root_path = os.path.join("..", args.experiment_dir, args.dataset, args.model, f"run-{args.run_dir}", "predictions")
     data = pre_process_data(root_path, args)
     get_boundary_error_ratio(data[args.file])
     
