@@ -118,7 +118,7 @@ def set_wandb(wandb_dir):
 def parse_config(parser: HfArgumentParser, json_file: str) -> Tuple[DataClass, ...]:
     data = json.loads(Path(json_file).read_text())
 
-    curr_run_output_dir = os.path.join(data["out_root"], data["dataset_dir"], data["model_name"])
+    curr_run_output_dir = os.path.join(data["out_root"], data["dataset_dir"], data["model_name"], f"run-{data['run_dir']}")
     data["output_dir"] = os.path.join(curr_run_output_dir, "checkpoints")
     data["logging_dir"] = os.path.join(curr_run_output_dir, default_logdir())
 

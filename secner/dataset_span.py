@@ -139,7 +139,8 @@ class NerSpanDataset(Dataset):
 class NerInferSpanDataset(NerSpanDataset):
 
     def __init__(self, args: AdditionalArguments):
-        super(NerInferSpanDataset, self).__init__(args, corpus_type=args.infer_out_path)
+        infer_prefix = args.infer_out_path.split(".tsv")[0]
+        super(NerInferSpanDataset, self).__init__(args, corpus_type=infer_prefix)
 
     def parse_dataset(self):
         spans = self.parse_infer_file()
