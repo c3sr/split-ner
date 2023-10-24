@@ -68,13 +68,20 @@ CUDA_VISIBLE_DEVICES=0,1 python main_span.py ../config/dummy/spanclass-dice.json
 ```
 
 #### SplitNER Pipeline
-Once the above models are individually trained and evaluated, copy ```test.tsv``` from ```predictions``` folder of Span Detector into ```predictions``` folder for Span Classification model. Rename this file as say, ```infer_inp.tsv```. Specify this file name in the config for span classifier (as shown below) and run its evaluation once again.
+Once the above models are individually trained and evaluated, copy ```test.tsv``` from ```predictions``` folder of Span Detector into ```predictions``` folder for Span Classification model. Rename this file as say, ```infer_inp.tsv```. Specify this file name in the config for span classifier (as shown below). Specify an output file path say, ```infer.tsv```.
 
 ```json
-"infer_path": "infer_inp.tsv"
+"infer_inp_path": "infer_inp.tsv",
+"infer_out_path": "infer.tsv",
 ```
 
-The final outputs are generated always in file ```infer.tsv``` under the ```predictions``` folder of Span Classification model. To get the overall F1-score metrics run:
+Run evaluation once again.
+
+```commandline
+CUDA_VISIBLE_DEVICES=0,1 python main_span.py ../config/dummy/spanclass-dice.json
+```
+
+The final outputs whill be in file ```infer.tsv``` under the ```predictions``` folder of Span Classification model. To get the overall F1-score metrics over your outputs, run:
 
 ```shell script
 python analysis.py --dataset dummy --model spanclass-dice --file infer --only_f1
