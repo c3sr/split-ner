@@ -3,7 +3,7 @@ import torch.nn as nn
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
-from secner.additional_args import AdditionalArguments
+from splitner.additional_args import AdditionalArguments
 
 
 class NerSpanModel(BertPreTrainedModel):
@@ -60,7 +60,7 @@ class NerSpanModel(BertPreTrainedModel):
 
         if labels is not None:
             if self.additional_args.loss_type == "dice":
-                from secner.loss import DiceLoss
+                from splitner.loss import DiceLoss
                 loss = DiceLoss()(logits, labels, torch.ones_like(labels))
             elif self.additional_args.loss_type == "ce_wt":
                 loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(logits.device))(logits, labels)

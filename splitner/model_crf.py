@@ -5,10 +5,10 @@ from torchcrf import CRF
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
-from secner.additional_args import AdditionalArguments
-from secner.cnn import CharCNN
-from secner.dataset import NerDataset
-from secner.model import NerModel
+from splitner.additional_args import AdditionalArguments
+from splitner.cnn import CharCNN
+from splitner.dataset import NerDataset
+from splitner.model import NerModel
 
 
 class NerModelWithCrf(BertPreTrainedModel):

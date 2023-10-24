@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
 
-from secner.additional_args import AdditionalArguments
-from secner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
+from splitner.additional_args import AdditionalArguments
+from splitner.utils.general import Token, set_all_seeds, BertToken, Sentence, parse_config, setup_logging, PairSpan
 
 # logging.basicConfig(filename='dataset.log', level=logging.INFO)
 logger = logging.getLogger(__name__)

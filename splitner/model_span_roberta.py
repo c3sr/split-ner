@@ -3,7 +3,7 @@ import torch.nn as nn
 from transformers import RobertaConfig
 from transformers.models.roberta.modeling_roberta import RobertaPreTrainedModel, RobertaModel
 
-from secner.additional_args import AdditionalArguments
+from splitner.additional_args import AdditionalArguments
 
 
 class NerSpanRobertaModel(RobertaPreTrainedModel):

@@ -5,8 +5,8 @@ import os
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForNextSentencePrediction
 
-from secner.dataset import NerDataset
-from secner.utils.general import Sentence, Token, setup_logging
+from splitner.dataset import NerDataset
+from splitner.utils.general import Sentence, Token, setup_logging
 
 logger = logging.getLogger(__name__)
 

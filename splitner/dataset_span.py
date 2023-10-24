@@ -6,9 +6,9 @@ from attr import dataclass
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser, AutoTokenizer
 
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context, Sentence, \
+from splitner.additional_args import AdditionalArguments
+from splitner.dataset import NerDataset
+from splitner.utils.general import Token, set_all_seeds, BertToken, parse_config, setup_logging, Context, Sentence, \
     PairSpan
 
 logger = logging.getLogger(__name__)

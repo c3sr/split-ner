@@ -4,8 +4,8 @@ import torch.nn.functional as F
 from transformers import BertConfig
 from transformers.models.bert import BertPreTrainedModel
 
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
+from splitner.additional_args import AdditionalArguments
+from splitner.dataset import NerDataset
 
 
 class NerModelChar(BertPreTrainedModel):

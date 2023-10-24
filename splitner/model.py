@@ -3,9 +3,9 @@ import torch.nn as nn
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
-from secner.additional_args import AdditionalArguments
-from secner.cnn import CharCNN
-from secner.dataset import NerDataset
+from splitner.additional_args import AdditionalArguments
+from splitner.cnn import CharCNN
+from splitner.dataset import NerDataset
 
 
 class NerModel(BertPreTrainedModel):
@@ -71,7 +71,7 @@ class NerModel(BertPreTrainedModel):
             print("Char Dimensions = " + str(self.char_cnn.char_out_dim))
 
         if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
-            from secner.flair_cnn import FlairCNN
+            from splitner.flair_cnn import FlairCNN
 
             self.flair_cnn = FlairCNN(additional_args)
             classifier_inp_dim += self.flair_cnn.out_dim
@@ -305,12 +305,12 @@ class NerModel(BertPreTrainedModel):
                 active_labels = labels.view(-1)
 
             if self.additional_args.loss_type == "dice":
-                from secner.loss import DiceLoss
+                from splitner.loss import DiceLoss
                 loss = DiceLoss()(active_logits, active_labels, attention_mask.view(-1))
             elif self.additional_args.loss_type == "ce_wt":
                 loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(active_logits.device))(active_logits, active_labels)
             elif self.additional_args.loss_type == "ce_punct":
-                from secner.loss import CrossEntropyPunctuationLoss
+                from splitner.loss import CrossEntropyPunctuationLoss
                 # TODO: ce_punct currently does not work with multi-dimensional punctuation_vec (expects 'type1' format)
                 loss = CrossEntropyPunctuationLoss()(active_logits, active_labels, attention_mask.view(-1),
                                                      punctuation_vec.view(-1))

@@ -4,11 +4,11 @@ import torch.nn.functional as F
 from transformers import BertConfig
 from transformers.models.bert import BertModel, BertPreTrainedModel
 
-from secner.additional_args import AdditionalArguments
-from secner.cnn import CharCNN
-from secner.dataset import NerDataset
-from secner.loss import DiceLoss, CrossEntropyPunctuationLoss
-from secner.model import NerModel
+from splitner.additional_args import AdditionalArguments
+from splitner.cnn import CharCNN
+from splitner.dataset import NerDataset
+from splitner.loss import DiceLoss, CrossEntropyPunctuationLoss
+from splitner.model import NerModel
 
 
 class NerModelBiDAF(BertPreTrainedModel):

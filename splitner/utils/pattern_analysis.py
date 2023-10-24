@@ -1,9 +1,9 @@
 import argparse
 from collections import defaultdict
 
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import Sentence, Token
+from splitner.additional_args import AdditionalArguments
+from splitner.dataset import NerDataset
+from splitner.utils.general import Sentence, Token
 
 
 def mine_patterns(data_spans, tag):

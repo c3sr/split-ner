@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
+from splitner.additional_args import AdditionalArguments
+from splitner.dataset import NerDataset
 
 
 class FlairCNN(nn.Module):

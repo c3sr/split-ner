@@ -13,9 +13,9 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from transformers import HfArgumentParser, AutoModel
 
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import setup_logging, parse_config, set_all_seeds, PairSpan
+from splitner.additional_args import AdditionalArguments
+from splitner.dataset import NerDataset
+from splitner.utils.general import setup_logging, parse_config, set_all_seeds, PairSpan
 
 rng = default_rng(seed=42)
 

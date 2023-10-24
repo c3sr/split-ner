@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from torch.utils.data import Dataset
 from transformers import HfArgumentParser
 
-from secner.additional_args import AdditionalArguments
-from secner.dataset import NerDataset
-from secner.utils.general import set_all_seeds, parse_config, setup_logging
+from splitner.additional_args import AdditionalArguments
+from splitner.dataset import NerDataset
+from splitner.utils.general import set_all_seeds, parse_config, setup_logging
 
 
 class NerCharDataset(Dataset):

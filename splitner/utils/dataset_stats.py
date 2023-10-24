@@ -3,7 +3,7 @@ import os
 import re
 from collections import defaultdict
 
-from secner.utils.general import read_data
+from splitner.utils.general import read_data
 
 
 def get_mention_density(data):

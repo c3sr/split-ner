@@ -1,6 +1,6 @@
 import os
 import argparse
-from secner.dataset import NerDataset
+from splitner.dataset import NerDataset
 
 def convert_data(args):
     pattern_doc_file = open(args.output, "w")

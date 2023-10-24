@@ -1,7 +1,7 @@
 import numpy as np
 
-from secner.dataset_qa import NerQADataset
-from secner.evaluator import Span, Metric
+from splitner.dataset_qa import NerQADataset
+from splitner.evaluator import Span, Metric
 
 
 class EvaluatorQA:

@@ -4,7 +4,7 @@ from datasets import load_dataset
 from spacy.tokens import Doc
 from tqdm import tqdm
 
-from secner.utils.general import setup_logging, generate_aux_tag_vocab_from_data
+from splitner.utils.general import setup_logging, generate_aux_tag_vocab_from_data
 
 logger = logging.getLogger(__name__)
 

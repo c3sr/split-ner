@@ -3,10 +3,10 @@ import torch.nn as nn
 from transformers import RobertaConfig
 from transformers.models.roberta.modeling_roberta import RobertaPreTrainedModel, RobertaModel
 
-from secner.additional_args import AdditionalArguments
-from secner.cnn import CharCNN
-from secner.dataset import NerDataset
-from secner.model import NerModel
+from splitner.additional_args import AdditionalArguments
+from splitner.cnn import CharCNN
+from splitner.dataset import NerDataset
+from splitner.model import NerModel
 
 
 class NerRobertaModel(RobertaPreTrainedModel):
@@ -52,7 +52,7 @@ class NerRobertaModel(RobertaPreTrainedModel):
             classifier_inp_dim += self.char_cnn.char_out_dim
 
         if self.additional_args.use_char_cnn in ["flair", "both-flair"]:
-            from secner.flair_cnn import FlairCNN
+            from splitner.flair_cnn import FlairCNN
             self.flair_cnn = FlairCNN(additional_args)
             classifier_inp_dim += self.flair_cnn.out_dim
 
@@ -234,12 +234,12 @@ class NerRobertaModel(RobertaPreTrainedModel):
                 active_labels = labels.view(-1)
 
             if self.additional_args.loss_type == "dice":
-                from secner.loss import DiceLoss
+                from splitner.loss import DiceLoss
                 loss = DiceLoss()(active_logits, active_labels, attention_mask.view(-1))
             elif self.additional_args.loss_type == "ce_wt":
                 loss = nn.CrossEntropyLoss(weight=self.loss_wt.to(active_logits.device))(active_logits, active_labels)
             elif self.additional_args.loss_type == "ce_punct":
-                from secner.loss import CrossEntropyPunctuationLoss
+                from splitner.loss import CrossEntropyPunctuationLoss
                 loss = CrossEntropyPunctuationLoss()(active_logits, active_labels, attention_mask.view(-1),
                                                      punctuation_vec.view(-1))
             else:
