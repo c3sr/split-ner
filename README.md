@@ -1,4 +1,4 @@
-# 2Q-NER
+# SplitNER
 
 Named Entity Recognition via Two Question-Answering-based Classifications
 
@@ -58,38 +58,38 @@ cd splitner
 Make sure config file has ```"detect_spans": true```.  Example run command:
 
 ```commandline
-CUDA_VISIBLE_DEVICES=0,1 python main_qa.py --config config/dummy/config_2qner_spandetect_charpattern.json
+CUDA_VISIBLE_DEVICES=0,1 python main_qa.py ../config/dummy/spandetect.json
 ```
 
 #### Span Classification Module Training / Evaluation
 
 ```commandline
-CUDA_VISIBLE_DEVICES=0,1 python main_span.py --config config/dummy/config_2qner_spanclass_dice.json
+CUDA_VISIBLE_DEVICES=0,1 python main_span.py ../config/dummy/spanclass-dice.json
 ```
 
-#### 2Q-NER Pipeline
-Once the above models are individually trained and evaluated, copy ```test.tsv``` from ```predictions``` folder of span detector into ```predictions``` folder for span classifier model. Rename this file as say, ```infer_inp.tsv```. Specify this file name in the config for span classifier (as shown below) and run its evaluation once again.
+#### SplitNER Pipeline
+Once the above models are individually trained and evaluated, copy ```test.tsv``` from ```predictions``` folder of Span Detector into ```predictions``` folder for Span Classification model. Rename this file as say, ```infer_inp.tsv```. Specify this file name in the config for span classifier (as shown below) and run its evaluation once again.
 
 ```json
 "infer_path": "infer_inp.tsv"
 ```
 
-The final outputs are generated always in file ```infer.tsv``` under the ```predictions``` folder of span classifier. To get the overall F1-score metrics run:
+The final outputs are generated always in file ```infer.tsv``` under the ```predictions``` folder of Span Classification model. To get the overall F1-score metrics run:
 
 ```shell script
-python analysis.py --dataset dummy --model 2qner-spanclass-dice --file infer --only_f1
+python analysis.py --dataset dummy --model spanclass-dice --file infer --only_f1
 ```
 
-#### Baseline: BERT-QA+CharPattern Training / Evaluation
+#### Baseline: Single-QA Training / Evaluation
 
 ```commandline
-CUDA_VISIBLE_DEVICES=0,1 python main_qa.py --config config/dummy/config_bert_qa_charpattern.json
+CUDA_VISIBLE_DEVICES=0,1 python main_qa.py ../config/dummy/single-qa.json
 ```
 
-#### Baseline: BERT-SeqTagging+CharPattern Training / Evaluation
+#### Baseline: Single-SeqTagging Training / Evaluation
 
 ```commandline
-CUDA_VISIBLE_DEVICES=0,1 python main.py --config config/dummy/config_bert_seqtagging_charpattern.json
+CUDA_VISIBLE_DEVICES=0,1 python main.py ../config/dummy/single-seqtag.json
 ```
 
 ### Reproducing Results
