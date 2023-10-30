@@ -1,9 +1,8 @@
-# SplitNER
+<p align="center">
+<img src="https://user-images.githubusercontent.com/11084611/279028520-5001bc38-4543-4352-a3a7-c452a2686d21.png" height="190" />
+</p>
 
-This repository has the source code and pretrained models for our work, *Named Entity Recognition via Two Question-Answering-based Classifications* published in ACL 2023. 
-
-
-We also have a video presentation of our work from ACL 2023 conference and some slides / poster. Do check them out in the [`resources`](resources) directory!
+This repository has the source code and pretrained models for our work, *Named Entity Recognition via Two Question-Answering-based Classifications* published in [ACL 2023](https://aclanthology.org/2023.acl-short.36). 
 
 ## Introduction
 
@@ -346,6 +345,10 @@ For the query types, the pre-trained model checkpoint names as as under:
 | Span Detection (Q3) | ```splitner/spandetect-qa-find-bionlp13cg```    |
 | Span Detection (Q4) | ```splitner/spandetect-qa-empty-bionlp13cg```   |
 
+## Additional Resources
+
+We also have a video presentation of our work from ACL 2023 conference and some slides / poster. Do check them out in the [resources](resources) directory!
+
 ## Citation
 
 We hope you like our work. 😊 Please do cite us when you reference Split-NER:
@@ -371,8 +374,11 @@ Youngja Park <young_park@us.ibm.com>
 
 This work was conducted under the IBM-Illinois Center for Cognitive Computing Systems Research ([C3SR](https://www.c3sr.com)), while the first author was an intern at IBM and a graduate student at University of Illinois Urbana-Champaign advised by [Prof. Jiawei Han](https://scholar.google.com/citations?user=Kv9AbjMAAAAJ&hl=en&oi=ao). We are very grateful to him for his continued guidance, support and valuable feedback throughout this work.
 
-<p float="left">
-  <img src="https://user-images.githubusercontent.com/11084611/279018367-83039dfb-3492-44b3-941a-06239dc4269c.png" width="100" />
-  <img src="https://user-images.githubusercontent.com/11084611/279018371-119599f9-3846-4b42-8936-b76db621614e.png" width="100" /> 
-  <img src="https://user-images.githubusercontent.com/11084611/279019339-405ea6c3-aad2-4cce-8457-a7b96f5381e8.png" width="100" />
+<br>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/11084611/279018367-83039dfb-3492-44b3-941a-06239dc4269c.png" height="80" />
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="https://user-images.githubusercontent.com/11084611/279018371-119599f9-3846-4b42-8936-b76db621614e.png" height="80" /> 
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="https://user-images.githubusercontent.com/11084611/279021028-5c80578d-d64a-4962-be23-e42664773954.png" height="80" />
 </p>
