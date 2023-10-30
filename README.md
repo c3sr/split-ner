@@ -370,3 +370,9 @@ Youngja Park <young_park@us.ibm.com>
 ## Acknowledgements
 
 This work was conducted under the IBM-Illinois Center for Cognitive Computing Systems Research ([C3SR](https://www.c3sr.com)), while the first author was an intern at IBM and a graduate student at University of Illinois Urbana-Champaign advised by [Prof. Jiawei Han](https://scholar.google.com/citations?user=Kv9AbjMAAAAJ&hl=en&oi=ao). We are very grateful to him for his continued guidance, support and valuable feedback throughout this work.
+
+<p float="left">
+  <img src="https://user-images.githubusercontent.com/11084611/279018367-83039dfb-3492-44b3-941a-06239dc4269c.png" width="100" />
+  <img src="https://user-images.githubusercontent.com/11084611/279018371-119599f9-3846-4b42-8936-b76db621614e.png" width="100" /> 
+  <img src="https://user-images.githubusercontent.com/11084611/279019339-405ea6c3-aad2-4cce-8457-a7b96f5381e8.png" width="100" />
+</p>
