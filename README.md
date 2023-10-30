@@ -342,3 +342,27 @@ For the query types, the pre-trained model checkpoint names as as under:
 | Span Detection (Q2) | ```splitner/spandetect-qa-where-bionlp13cg```   |
 | Span Detection (Q3) | ```splitner/spandetect-qa-find-bionlp13cg```    |
 | Span Detection (Q4) | ```splitner/spandetect-qa-empty-bionlp13cg```   |
+
+## Citation
+
+We hope you like our work. 😊 Please do cite us when you reference Split-NER:
+```
+@inproceedings{arora2023split,
+  title={Split-NER: Named Entity Recognition via Two Question-Answering-based Classifications},
+  author={Arora, Jatin and Park, Youngja},
+  booktitle={Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)},
+  pages={416--426},
+  year={2023}
+}
+```
+
+## Correspondence
+ 
+For any follow-ups, please don't hesitate in reaching out to us over e-mail!
+```
+Jatin Arora <jatinarora2702@gmail.com>
+Youngja Park <young_park@us.ibm.com>
+```
+
+## Acknowledgements
+
