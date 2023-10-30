@@ -145,7 +145,7 @@ The final outputs whill be in file ```infer.tsv``` under the ```predictions``` f
 python analysis.py --experiment_dir out --dataset dummy --model spanclass-dice --run_dir <run name> --file infer
 ```
 
-### Baseline
+### Baselines
 
 #### Single-QA
 
@@ -220,93 +220,93 @@ The following table lists our pre-trained model checkpoint names:
         <tr>
             <td rowspan=3>Span Detection (QA)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/spandetect-qa-bionlp13cg</pre></td>
+            <td><code>splitner/spandetect-qa-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/spandetect-qa-ontonotes</pre></td>
+            <td><code>splitner/spandetect-qa-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/spandetect-qa-wnut17</pre></td>
+            <td><code>splitner/spandetect-qa-wnut17</code></td>
         </tr>
         <tr>
             <td rowspan=3>Span Classification (Dice Loss)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/spanclass-qa-dice-bionlp13cg</pre></td>
+            <td><code>splitner/spanclass-qa-dice-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/spanclass-qa-dice-ontonotes</pre></td>
+            <td><code>splitner/spanclass-qa-dice-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/spanclass-qa-dice-wnut17</pre></td>
+            <td><code>splitner/spanclass-qa-dice-wnut17</code></td>
         </tr>
         <tr>
             <td rowspan=3>Span Detection Model (Sequence Tagging)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/spandetect-seqtag-bionlp13cg</pre></td>
+            <td><code>splitner/spandetect-seqtag-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/spandetect-seqtag-ontonotes</pre></td>
+            <td><code>splitner/spandetect-seqtag-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/spandetect-seqtag-wnut17</pre></td>
+            <td><code>splitner/spandetect-seqtag-wnut17</code></td>
         </tr>
         <tr>
             <td rowspan=3>Span Detection (QA - No Char Pattern)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/spandetect-qa-nocharpattern-bionlp13cg</pre></td>
+            <td><code>splitner/spandetect-qa-nocharpattern-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/spandetect-qa-nocharpattern-ontonotes</pre></td>
+            <td><code>splitner/spandetect-qa-nocharpattern-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/spandetect-qa-nocharpattern-wnut17</pre></td>
+            <td><code>splitner/spandetect-qa-nocharpattern-wnut17</code></td>
         </tr>
         <tr>
             <td rowspan=3>Span Classification (Cross-Entropy Loss)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/spanclass-qa-crossentropy-bionlp13cg</pre></td>
+            <td><code>splitner/spanclass-qa-crossentropy-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/spanclass-qa-crossentropy-ontonotes</pre></td>
+            <td><code>splitner/spanclass-qa-crossentropy-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/spanclass-qa-crossentropy-wnut17</pre></td>
+            <td><code>splitner/spanclass-qa-crossentropy-wnut17</code></td>
         </tr>
         <tr>
             <td rowspan=3>Single NER Model (Sequence Tagging)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/single-seqtag-bionlp13cg</pre></td>
+            <td><code>splitner/single-seqtag-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/single-seqtag-ontonotes</pre></td>
+            <td><code>splitner/single-seqtag-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/single-seqtag-wnut17</pre></td>
+            <td><code>splitner/single-seqtag-wnut17</code></td>
         </tr>
         <tr>
             <td rowspan=3>Single NER Model (Question-Answering)</td>
             <td>BioNLP13CG</td>
-            <td><pre>splitner/single-qa-bionlp13cg</pre></td>
+            <td><code>splitner/single-qa-bionlp13cg</code></td>
         </tr>
         <tr>
             <td>OntoNotes5.0</td>
-            <td><pre>splitner/single-qa-ontonotes</pre></td>
+            <td><code>splitner/single-qa-ontonotes</code></td>
         </tr>
         <tr>
             <td>WNUT17</td>
-            <td><pre>splitner/single-qa-wnut17</pre></td>
+            <td><code>splitner/single-qa-wnut17</code></td>
         </tr>
     </tbody>
 </table>
