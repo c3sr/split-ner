@@ -211,7 +211,7 @@ The following table lists our pre-trained model checkpoint names:
 <table>
     <thead>
         <tr>
-            <th style="width:70%">Model</th>
+            <th>Model</th>
             <th>Dataset</th>
             <th>Pre-trained Checkpoint Name</th>
         </tr>
@@ -244,7 +244,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/spanclass-qa-dice-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Span Detection Model (Sequence Tagging)</td>
+            <td rowspan=3>Span Detection Model\n(Sequence Tagging)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/spandetect-seqtag-bionlp13cg</code></td>
         </tr>
