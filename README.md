@@ -231,7 +231,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/spandetect-qa-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Span Classification (Dice Loss)</td>
+            <td rowspan=3>Span Classification<br>(Dice Loss)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/spanclass-qa-dice-bionlp13cg</code></td>
         </tr>
@@ -257,7 +257,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/spandetect-seqtag-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Span Detection (QA - No Char Pattern)</td>
+            <td rowspan=3>Span Detection<br>(QA - No Char Pattern)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/spandetect-qa-nocharpattern-bionlp13cg</code></td>
         </tr>
@@ -270,7 +270,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/spandetect-qa-nocharpattern-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Span Classification (Cross-Entropy Loss)</td>
+            <td rowspan=3>Span Classification<br>(Cross-Entropy Loss)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/spanclass-qa-crossentropy-bionlp13cg</code></td>
         </tr>
@@ -283,7 +283,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/spanclass-qa-crossentropy-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Single NER Model (Sequence Tagging)</td>
+            <td rowspan=3>Single NER Model<br>(Sequence Tagging)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/single-seqtag-bionlp13cg</code></td>
         </tr>
@@ -296,7 +296,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/single-seqtag-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Single NER Model (Question-Answering)</td>
+            <td rowspan=3>Single NER Model<br>(Question-Answering)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/single-qa-bionlp13cg</code></td>
         </tr>
