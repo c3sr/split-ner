@@ -211,7 +211,7 @@ The following table lists our pre-trained model checkpoint names:
 <table>
     <thead>
         <tr>
-            <th>Model</th>
+            <th style="width:100px">Model</th>
             <th>Dataset</th>
             <th>Pre-trained Checkpoint Name</th>
         </tr>
