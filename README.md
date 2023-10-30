@@ -198,8 +198,137 @@ We also provide pretrained model checkpoints for all our model variants and base
 
 The following table lists our pre-trained model checkpoint names:
 
-| Model Name | Dataset Name | Pretrained Checkpoint Name |
-|------------|--------------|----------------------------|
-| Span Detect Model (`spandetect`) | splitner/spandetect-qa-wnut17 |
-| Span Classification Model (`spanclass-dice`) | splitner/spanclass-qa-dice-wnut17 |
-| Span Classification Model (`spanclass-dice`) | splitner/spanclass-qa-dice-wnut17 |
+<table>
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>Dataset</th>
+            <th>Pre-trained Checkpoint Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan=3>Span Detection (QA)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/spandetect-qa-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/spandetect-qa-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/spandetect-qa-wnut17`</td>
+        </tr>
+        <tr>
+            <td rowspan=3>Span Classification (Dice Loss)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/spanclass-qa-dice-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/spanclass-qa-dice-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/spanclass-qa-dice-wnut17`</td>
+        </tr>
+        <tr>
+            <td rowspan=3>Span Detection Model (Sequence Tagging)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/spandetect-seqtag-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/spandetect-seqtag-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/spandetect-seqtag-wnut17`</td>
+        </tr>
+        <tr>
+            <td rowspan=3>Span Detection (QA - No Char Pattern)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/spandetect-qa-nocharpattern-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/spandetect-qa-nocharpattern-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/spandetect-qa-nocharpattern-wnut17`</td>
+        </tr>
+        <tr>
+            <td rowspan=3>Span Classification (Cross-Entropy Loss)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/spanclass-qa-crossentropy-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/spanclass-qa-crossentropy-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/spanclass-qa-crossentropy-wnut17`</td>
+        </tr>
+        <tr>
+            <td rowspan=3>Single NER Model (Sequence Tagging)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/single-seqtag-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/single-seqtag-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/single-seqtag-wnut17`</td>
+        </tr>
+        <tr>
+            <td rowspan=3>Single NER Model (Question-Answering)</td>
+            <td>BioNLP13CG</td>
+            <td>`splitner/single-qa-bionlp13cg`</td>
+        </tr>
+        <tr>
+            <td>OntoNotes5.0</td>
+            <td>`splitner/single-qa-ontonotes`</td>
+        </tr>
+        <tr>
+            <td>WNUT17</td>
+            <td>`splitner/single-qa-wnut17`</td>
+        </tr>
+    </tbody>
+</table>
+
+Other ablations are only performed on the **BioNLP13CG** dataset and are listed below.
+
+#### Char / Pattern Feature Ablation
+
+| Model Name                                     | Pretrained Checkpoint Name                      |
+|------------------------------------------------|-------------------------------------------------|
+| Span Detection (no Char / Pattern features)    | splitner/spandetect-qa-nocharpattern-bionlp13cg |
+| Span Detection (Char features only)            | splitner/spandetect-qa-charonly-bionlp13cg      |
+| Span Detection (Pattern features only)         | splitner/spandetect-qa-patonly-bionlp13cg       |
+| Span Detection (Char + Pattern features)       | splitner/spandetect-qa-bionlp13cg               |
+| Span Detection (Char + Pattern + POS features) | splitner/spandetect-qa-pos-bionlp13cg           |
+
+#### Query Type Ablation
+
+For ease of nomenclature we define query types as mentioned below.
+
+| Query Type  | Description                                               |
+|-------------|-----------------------------------------------------------|
+| Q1          | *Extract important entity spans from the following text.* |
+| Q2          | *Where is the entity mentioned in the text?*              |
+| Q3          | *Find named entities in the following text.*              |
+| Q4          | *<empty>*                                                 |
+
+For the query types, the pre-trained model checkpoint names as as under:
+
+| Model Name          | Pretrained Checkpoint Name                |
+|---------------------|-------------------------------------------|
+| Span Detection (Q1) | splitner/spandetect-qa-extract-bionlp13cg |
+| Span Detection (Q2) | splitner/spandetect-qa-where-bionlp13cg   |
+| Span Detection (Q3) | splitner/spandetect-qa-find-bionlp13cg    |
+| Span Detection (Q4) | splitner/spandetect-qa-empty-bionlp13cg   |
