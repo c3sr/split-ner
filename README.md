@@ -356,6 +356,10 @@ We hope you like our work. 😊 Please do cite us when you reference Split-NER:
 }
 ```
 
+## Additional Resources
+
+We also have a video presentation of our work from ACL 2023 conference and some slides and a poster. Do check them out in the `resources` directory!
+
 ## Correspondence
  
 For any follow-ups, please don't hesitate in reaching out to us over e-mail!
@@ -366,3 +370,4 @@ Youngja Park <young_park@us.ibm.com>
 
 ## Acknowledgements
 
+This work was conducted under the IBM-Illinois Center for Cognitive Computing Systems Research ([C3SR](https://www.c3sr.com)), while the first author was an intern at IBM and a graduate student at University of Illinois Urbana-Champaign advised by [Prof. Jiawei Han](https://scholar.google.com/citations?user=Kv9AbjMAAAAJ&hl=en&oi=ao). We are very grateful to him for his continued guidance, support and valuable feedback throughout this work.
