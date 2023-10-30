@@ -230,7 +230,6 @@ class NerQAExecutor:
 
         else:
             logger.info("prediction mode")
-            assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
             # self.dump_predictions(self.train_dataset)
             # self.dump_predictions(self.dev_dataset)
             self.dump_predictions(self.test_dataset)

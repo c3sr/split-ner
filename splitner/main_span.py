@@ -142,7 +142,6 @@ class NerSpanExecutor:
             elapsed = end - start
             logger.info("Elapsed time: {0} | In seconds: {1}".format(str(elapsed), str(timedelta(seconds=elapsed))))
         else:
-            assert self.additional_args.resume is not None, "specify model checkpoint to load for predictions"
             if self.additional_args.infer_inp_path:
                 logger.info("inference mode")
                 from splitner.dataset_span import NerInferSpanDataset

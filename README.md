@@ -132,3 +132,22 @@ Experiments are performed on 4 datsets: ```BioNLP13CG```, ```CyberThreats```, ``
 * Set ```"base_model": "bert-base-uncased"``` for ```WNUT17``` and ```CyberThreats```
 * Set ```"base_model": "allenai/scibert_scivocab_uncased"``` for ```BIONLP13CG```
 * Set ```"base_model": "roberta-base"``` and ```"model_mode": "roberta_std"``` for ```OntoNotes5.0```
+
+## Pretrained Models
+
+We also provide pretrained model checkpoints for all our model variants and baselines. To use a pretrained checkpoint, make sure to update the following fields in the config:
+
+```json
+{
+ "do_train": false,
+ "resume": null,
+ "base_model": "<pretrained checkpoint name>",
+}
+```
+
+The following table lists our pre-trained model checkpoint names:
+
+| Model Name | Pretrained Checkpoint Name |
+|------------|----------------------------|
+| SpanDetect-WNUT | splitner/spandetect-qa-wnut17 |
+| SpanClass-Dice-WNUT | splitner/spanclass-qa-dice-wnut17 |
