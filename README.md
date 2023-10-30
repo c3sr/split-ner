@@ -322,13 +322,13 @@ For ease of nomenclature we define query types as mentioned below.
 | Q1          | *Extract important entity spans from the following text.* |
 | Q2          | *Where is the entity mentioned in the text?*              |
 | Q3          | *Find named entities in the following text.*              |
-| Q4          | *<empty>*                                                 |
+| Q4          | *```<empty>```*                                                 |
 
 For the query types, the pre-trained model checkpoint names as as under:
 
-| Model Name          | Pretrained Checkpoint Name                |
-|---------------------|-------------------------------------------|
-| Span Detection (Q1) | splitner/spandetect-qa-extract-bionlp13cg |
-| Span Detection (Q2) | splitner/spandetect-qa-where-bionlp13cg   |
-| Span Detection (Q3) | splitner/spandetect-qa-find-bionlp13cg    |
-| Span Detection (Q4) | splitner/spandetect-qa-empty-bionlp13cg   |
+| Model Name          | Pretrained Checkpoint Name                      |
+|---------------------|-------------------------------------------------|
+| Span Detection (Q1) | ```splitner/spandetect-qa-extract-bionlp13cg``` |
+| Span Detection (Q2) | ```splitner/spandetect-qa-where-bionlp13cg```   |
+| Span Detection (Q3) | ```splitner/spandetect-qa-find-bionlp13cg```    |
+| Span Detection (Q4) | ```splitner/spandetect-qa-empty-bionlp13cg```   |
