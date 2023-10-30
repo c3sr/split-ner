@@ -1,6 +1,9 @@
 # SplitNER
 
-This repository has the source code and pretrained models for our work, *Named Entity Recognition via Two Question-Answering-based Classifications* published in ACL 2023.
+This repository has the source code and pretrained models for our work, *Named Entity Recognition via Two Question-Answering-based Classifications* published in ACL 2023. 
+
+
+We also have a video presentation of our work from ACL 2023 conference and some slides / poster. Do check them out in the [`resources`](resources) directory!
 
 ## Introduction
 
@@ -355,10 +358,6 @@ We hope you like our work. 😊 Please do cite us when you reference Split-NER:
   year={2023}
 }
 ```
-
-## Additional Resources
-
-We also have a video presentation of our work from ACL 2023 conference and some slides and a poster. Do check them out in the `resources` directory!
 
 ## Correspondence
  
