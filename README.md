@@ -231,7 +231,7 @@ The following table lists our pre-trained model checkpoint names:
             <td><code>splitner/spandetect-qa-wnut17</code></td>
         </tr>
         <tr>
-            <td rowspan=3>Span Classification<br>(Dice Loss)</td>
+            <td rowspan=3>Span Classification (Dice Loss)</td>
             <td>BioNLP13CG</td>
             <td><code>splitner/spanclass-qa-dice-bionlp13cg</code></td>
         </tr>
