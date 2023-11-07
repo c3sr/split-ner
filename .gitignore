@@ -1,0 +1,11 @@
+**/wandb/
+*.egg-info/
+**/__pycache__/
+
+out/*
+!out/README.md
+
+.idea/
+.DS_Store
+.project
+.pydevproject
