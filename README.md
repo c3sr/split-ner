@@ -2,7 +2,7 @@
 <img src="https://user-images.githubusercontent.com/11084611/279028520-5001bc38-4543-4352-a3a7-c452a2686d21.png" height="110" />
 </p>
 
-This repository has the source code and pretrained models for our work, *Named Entity Recognition via Two Question-Answering-based Classifications* published in [ACL 2023](https://aclanthology.org/2023.acl-short.36). 
+This repository has the source code and pretrained models for our work, *Named Entity Recognition via Two Question-Answering-based Classifications* published in [ACL 2023](https://arxiv.org/abs/2310.19942). 
 
 ## Introduction
 
